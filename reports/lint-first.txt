@@ -1,0 +1,292 @@
+5171 warnings generated.
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:9:5: error: function 'runProbe' is declared in an anonymous namespace; prefer using 'static' for restricting visibility [llvm-prefer-static-over-anonymous-namespace,-warnings-as-errors]
+    9 | int runProbe() {
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:26:5: error: an exception may be thrown in function 'main' which should not throw exceptions [bugprone-exception-escape,-warnings-as-errors]
+   26 | int main() {
+      |     ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\xiosbase:172:13: note: frame #0: unhandled exception of type 'failure' may be thrown in function 'clear' here
+  172 |             _THROW(failure(_Msg));
+      |             ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\yvals.h:481:21: note: expanded from macro '_THROW'
+  481 | #define _THROW(...) throw(__VA_ARGS__)
+      |                     ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\ios:40:9: note: frame #1: function 'clear' calls function 'clear' here
+   40 |         ios_base::clear(_State | (_Mystrbuf ? ios_base::goodbit : ios_base::badbit), _Reraise);
+      |         ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\ios:51:9: note: frame #2: function 'setstate' calls function 'clear' here
+   51 |         clear(rdstate() | _State, _Reraise);
+      |         ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\__msvc_ostream.hpp:573:17: note: frame #3: function 'flush' calls function 'setstate' here
+  573 |                 _CATCH_IO_END
+      |                 ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\iosfwd:30:9: note: expanded from macro '_CATCH_IO_END'
+   30 |         _Myios::setstate(ios_base::badbit, true); /* set badbit and rethrow */ \
+      |         ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\__msvc_ostream.hpp:102:13: note: frame #4: function 'sentry' calls function 'flush' here
+  102 |             _Tied->flush();
+      |             ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\__msvc_ostream.hpp:776:34: note: frame #5: function 'operator<<<std::char_traits<char>>' calls function 'sentry' here
+  776 |     const typename _Myos::sentry _Ok(_Ostr);
+      |                                  ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:30:19: note: frame #6: function 'main' calls function 'operator<<<std::char_traits<char>>' here
+   30 |         std::cerr << error.what() << '\n';
+      |                   ^
+Suppressed 5169 warnings (5169 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+2 warnings treated as errors
+4754 warnings generated.
+C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp:8:16: error: no header providing "std::size_t" is directly included [misc-include-cleaner,-warnings-as-errors]
+    5 | 
+    6 | namespace mgl {
+    7 | namespace {
+    8 | constexpr std::size_t DataxHeader = 4;
+      |                ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp:12:16: error: no header providing "std::uint8_t" is directly included [misc-include-cleaner,-warnings-as-errors]
+    5 | 
+    6 | namespace mgl {
+    7 | namespace {
+    8 | constexpr std::size_t DataxHeader = 4;
+    9 | constexpr std::size_t AirshieldHeader = 10;
+   10 | constexpr std::size_t AesBlock = 16;
+   11 | constexpr std::size_t MinimumPrefix = 2;
+   12 | constexpr std::uint8_t DataxBit = 0x80;
+      |                ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp:19:37: error: no header providing "std::span" is directly included [misc-include-cleaner,-warnings-as-errors]
+    5 | 
+    6 | namespace mgl {
+    7 | namespace {
+    8 | constexpr std::size_t DataxHeader = 4;
+    9 | constexpr std::size_t AirshieldHeader = 10;
+   10 | constexpr std::size_t AesBlock = 16;
+   11 | constexpr std::size_t MinimumPrefix = 2;
+   12 | constexpr std::uint8_t DataxBit = 0x80;
+   13 | constexpr std::uint8_t AirshieldDataBits = 0x40;
+   14 | constexpr std::uint8_t TypeMask = 0xC0;
+   15 | constexpr std::uint8_t LengthHighMask = 0x3F;
+   16 | constexpr unsigned LengthHighShift = 8;
+   17 | } // namespace
+   18 | 
+   19 | FramePrefix inspectFramePrefix(std::span<const std::uint8_t> head) noexcept {
+      |                                     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp:21:16: error: use designated initializer list to initialize 'FramePrefix' [modernize-use-designated-initializers,-warnings-as-errors]
+   21 |         return {PrefixStatus::NeedMore, 0};
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                 .status=                .frame_size=
+C:\Users\Randy\Coding\meta_g_link_direct\include\mgl/sdu.hpp:12:1: note: aggregate type is defined here
+   12 | struct FramePrefix {
+      | ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp:23:28: error: possibly unsafe 'operator[]', consider bounds-safe alternatives [cppcoreguidelines-pro-bounds-avoid-unchecked-container-access,-warnings-as-errors]
+   23 |     const auto first = head[0];
+      |                            ^~~
+C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp:27:42: error: possibly unsafe 'operator[]', consider bounds-safe alternatives [cppcoreguidelines-pro-bounds-avoid-unchecked-container-access,-warnings-as-errors]
+   27 |             static_cast<std::size_t>(head[1]);
+      |                                          ^~~
+C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp:28:16: error: use designated initializer list to initialize 'FramePrefix' [modernize-use-designated-initializers,-warnings-as-errors]
+   28 |         return {PrefixStatus::Ready, DataxHeader + payload_size};
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                 .status=             .frame_size=
+C:\Users\Randy\Coding\meta_g_link_direct\include\mgl/sdu.hpp:12:1: note: aggregate type is defined here
+   12 | struct FramePrefix {
+      | ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp:32:20: error: use designated initializer list to initialize 'FramePrefix' [modernize-use-designated-initializers,-warnings-as-errors]
+   32 |             return {PrefixStatus::NeedMore, 0};
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                     .status=                .frame_size=
+C:\Users\Randy\Coding\meta_g_link_direct\include\mgl/sdu.hpp:12:1: note: aggregate type is defined here
+   12 | struct FramePrefix {
+      | ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp:34:63: error: possibly unsafe 'operator[]', consider bounds-safe alternatives [cppcoreguidelines-pro-bounds-avoid-unchecked-container-access,-warnings-as-errors]
+   34 |         const auto block_count = static_cast<std::size_t>(head[AirshieldHeader - 1]) + 1;
+      |                                                               ^~~~~~~~~~~~~~~~~~~~~
+C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp:35:16: error: use designated initializer list to initialize 'FramePrefix' [modernize-use-designated-initializers,-warnings-as-errors]
+   35 |         return {PrefixStatus::Ready, AirshieldHeader + AesBlock * block_count};
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                 .status=             .frame_size=
+C:\Users\Randy\Coding\meta_g_link_direct\include\mgl/sdu.hpp:12:1: note: aggregate type is defined here
+   12 | struct FramePrefix {
+      | ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp:35:56: error: '*' has higher precedence than '+'; add parentheses to explicitly specify the order of operations [readability-math-missing-parentheses,-warnings-as-errors]
+   35 |         return {PrefixStatus::Ready, AirshieldHeader + AesBlock * block_count};
+      |                                                        ^~~~~~~~~~~~~~~~~~~~~~~
+      |                                                        (                     )
+C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp:37:12: error: use designated initializer list to initialize 'FramePrefix' [modernize-use-designated-initializers,-warnings-as-errors]
+Suppressed 4741 warnings (4741 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+12 warnings treated as errors
+   37 |     return {PrefixStatus::Invalid, 0};
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+      |             .status=               .frame_size=
+C:\Users\Randy\Coding\meta_g_link_direct\include\mgl/sdu.hpp:12:1: note: aggregate type is defined here
+   12 | struct FramePrefix {
+      | ^
+39624 warnings generated.
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\capabilities.cpp:4:1: error: included header windows.h is not used directly [misc-include-cleaner,-warnings-as-errors]
+    4 | #include <windows.h>
+      | ^~~~~~~~~~~~~~~~~~~~
+    5 | 
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\capabilities.cpp:20:15: error: no header providing "DWORD" is directly included [misc-include-cleaner,-warnings-as-errors]
+    4 |     constexpr DWORD WlanClientVersion = 2;
+      |               ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\capabilities.cpp:22:5: error: no header providing "HANDLE" is directly included [misc-include-cleaner,-warnings-as-errors]
+    7 | #include <wlanapi.h>
+    8 | 
+    9 | #include <memory>
+   10 | 
+   11 | namespace mgl {
+   12 | namespace {
+   13 | struct WlanCloser {
+   14 |     void operator()(void* handle) const noexcept { WlanCloseHandle(handle, nullptr); }
+   15 | };
+   16 | } // namespace
+   17 | 
+   18 | WirelessCapabilities inspectWirelessCapabilities() noexcept {
+   19 |     WirelessCapabilities result{};
+   20 |     constexpr DWORD WlanClientVersion = 2;
+   21 |     DWORD negotiated_version = 0;
+   22 |     HANDLE raw_wlan = nullptr;
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\capabilities.cpp:24:30: error: no header providing "ERROR_SUCCESS" is directly included [misc-include-cleaner,-warnings-as-errors]
+    7 |     if (result.wifi_error == ERROR_SUCCESS) {
+      |                              ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\capabilities.cpp:38:5: error: 'const auto raw_find' can be declared as 'auto *const raw_find' [llvm-qualified-auto,readability-qualified-auto,-warnings-as-errors]
+   38 |     const auto raw_find = BluetoothFindFirstRadio(&parameters, &raw_radio);
+      |     ^~~~~~~~~~
+      |     auto *const 
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\capabilities.cpp:42:47: error: no header providing "CloseHandle" is directly included [misc-include-cleaner,-warnings-as-errors]
+    4 |         const std::unique_ptr<void, decltype(&CloseHandle)> radio(raw_radio, &CloseHandle);
+      |                                               ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\capabilities.cpp:45:28: error: no header providing "GetLastError" is directly included [misc-include-cleaner,-warnings-as-errors]
+    4 |         const auto error = GetLastError();
+      |                            ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\capabilities.cpp:46:43: error: no header providing "ERROR_NO_MORE_ITEMS" is directly included [misc-include-cleaner,-warnings-as-errors]
+   46 |         result.bluetooth_error = error == ERROR_NO_MORE_ITEMS ? ERROR_SUCCESS : error;
+      |                                           ^
+Suppressed 39615 warnings (39615 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+8 warnings treated as errors
+37749 warnings generated.
+C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp:2:1: error: included header windows.h is not used directly [misc-include-cleaner,-warnings-as-errors]
+    2 | #include <windows.h>
+      | ^~~~~~~~~~~~~~~~~~~~
+    3 | 
+C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp:11:21: error: no header providing "HINSTANCE__" is directly included [misc-include-cleaner,-warnings-as-errors]
+    2 | #include <windows.h>
+    3 | 
+    4 | #include <cstdlib>
+    5 | #include <filesystem>
+    6 | #include <iostream>
+    7 | #include <memory>
+    8 | 
+    9 | namespace {
+   10 | struct LibraryCloser {
+   11 |     void operator()(HINSTANCE__* library) const noexcept { FreeLibrary(library); }
+      |                     ^
+C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp:11:60: error: no header providing "FreeLibrary" is directly included [misc-include-cleaner,-warnings-as-errors]
+    2 | #include <windows.h>
+    3 | 
+    4 | #include <cstdlib>
+    5 | #include <filesystem>
+    6 | #include <iostream>
+    7 | #include <memory>
+    8 | 
+    9 | namespace {
+   10 | struct LibraryCloser {
+   11 |     void operator()(HINSTANCE__* library) const noexcept { FreeLibrary(library); }
+      |                                                            ^
+C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp:15:5: error: an exception may be thrown in function 'main' which should not throw exceptions [bugprone-exception-escape,-warnings-as-errors]
+   15 | int main(int argument_count, char** arguments) {
+      |     ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\filesystem:1863:9: note: frame #0: unhandled exception of type 'filesystem_error' may be thrown in function '_Throw_fs_error' here
+ 1863 |         _THROW(filesystem_error(_Op, _Path1, _Error));
+      |         ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\yvals.h:481:21: note: expanded from macro '_THROW'
+  481 | #define _THROW(...) throw(__VA_ARGS__)
+      |                     ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\filesystem:3038:13: note: frame #1: function 'absolute' calls function '_Throw_fs_error' here
+ 3038 |             _Throw_fs_error("absolute", _Ec, _Input);
+      |             ^
+C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp:30:23: note: frame #2: function 'main' calls function 'absolute' here
+   30 |     const auto path = std::filesystem::absolute(arguments[1]);
+      |                       ^
+C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp:22:15: error: no header providing "DWORD" is directly included [misc-include-cleaner,-warnings-as-errors]
+   22 |     constexpr DWORD SearchFlags =
+      |               ^
+C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp:23:9: error: no header providing "LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR" is directly included [misc-include-cleaner,-warnings-as-errors]
+   23 |         LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR | LOAD_LIBRARY_SEARCH_DEFAULT_DIRS;
+      |         ^
+C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp:23:44: error: no header providing "LOAD_LIBRARY_SEARCH_DEFAULT_DIRS" is directly included [misc-include-cleaner,-warnings-as-errors]
+   23 |         LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR | LOAD_LIBRARY_SEARCH_DEFAULT_DIRS;
+      |                                            ^
+C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp:25:9: error: no header providing "LoadLibraryExW" is directly included [misc-include-cleaner,-warnings-as-errors]
+   25 |         LoadLibraryExW(runtime.c_str(), nullptr, SearchFlags));
+      |         ^
+C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp:27:75: error: no header providing "GetLastError" is directly included [misc-include-cleaner,-warnings-as-errors]
+    2 |         std::cerr << "Real OBS runtime could not load; Windows error " << GetLastError() << '\n';
+      |                                                                           ^
+C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp:37:21: error: do not declare C-style arrays, use 'std::array' instead [cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays,-warnings-as-errors]
+   37 |     constexpr const char* RequiredExports[]{"obs_module_load",        "obs_module_set_pointer",
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp:41:13: error: no header providing "GetProcAddress" is directly included [misc-include-cleaner,-warnings-as-errors]
+   41 |         if (GetProcAddress(plugin.get(), name) == nullptr) {
+      |             ^
+Suppressed 37736 warnings (37736 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+11 warnings treated as errors
+5175 warnings generated.
+C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:12:6: error: function 'expect' is declared in an anonymous namespace; prefer using 'static' for restricting visibility [llvm-prefer-static-over-anonymous-namespace,-warnings-as-errors]
+   12 | void expect(std::span<const std::uint8_t> prefix, mgl::PrefixStatus status, std::size_t length,
+      |      ^
+C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:12:34: error: no header providing "std::uint8_t" is directly included [misc-include-cleaner,-warnings-as-errors]
+    5 | #include <cstdlib>
+    6 | #include <iostream>
+    7 | #include <span>
+    8 | #include <stdexcept>
+    9 | #include <string>
+   10 | 
+   11 | namespace {
+   12 | void expect(std::span<const std::uint8_t> prefix, mgl::PrefixStatus status, std::size_t length,
+      |                                  ^
+C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:20:6: error: function 'testKnownVectors' is declared in an anonymous namespace; prefer using 'static' for restricting visibility [llvm-prefer-static-over-anonymous-namespace,-warnings-as-errors]
+   20 | void testKnownVectors() {
+      |      ^
+C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:41:6: error: function 'testTruncationAndTypes' is declared in an anonymous namespace; prefer using 'static' for restricting visibility [llvm-prefer-static-over-anonymous-namespace,-warnings-as-errors]
+   41 | void testTruncationAndTypes() {
+      |      ^
+C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:55:5: error: an exception may be thrown in function 'main' which should not throw exceptions [bugprone-exception-escape,-warnings-as-errors]
+   55 | int main() {
+      |     ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\xiosbase:172:13: note: frame #0: unhandled exception of type 'failure' may be thrown in function 'clear' here
+  172 |             _THROW(failure(_Msg));
+      |             ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\yvals.h:481:21: note: expanded from macro '_THROW'
+  481 | #define _THROW(...) throw(__VA_ARGS__)
+      |                     ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\ios:40:9: note: frame #1: function 'clear' calls function 'clear' here
+   40 |         ios_base::clear(_State | (_Mystrbuf ? ios_base::goodbit : ios_base::badbit), _Reraise);
+      |         ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\ios:51:9: note: frame #2: function 'setstate' calls function 'clear' here
+   51 |         clear(rdstate() | _State, _Reraise);
+      |         ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\__msvc_ostream.hpp:573:17: note: frame #3: function 'flush' calls function 'setstate' here
+  573 |                 _CATCH_IO_END
+      |                 ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\iosfwd:30:9: note: expanded from macro '_CATCH_IO_END'
+   30 |         _Myios::setstate(ios_base::badbit, true); /* set badbit and rethrow */ \
+      |         ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\__msvc_ostream.hpp:102:13: note: frame #4: function 'sentry' calls function 'flush' here
+  102 |             _Tied->flush();
+      |             ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\__msvc_ostream.hpp:776:34: note: frame #5: function 'operator<<<std::char_traits<char>>' calls function 'sentry' here
+  776 |     const typename _Myos::sentry _Ok(_Ostr);
+      |                                  ^
+C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:62:19: note: frame #6: function 'main' calls function 'operator<<<std::char_traits<char>>' here
+   62 |         std::cerr << error.what() << '\n';
+      |                   ^
+C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:61:25: error: no header providing "std::exception" is directly included [misc-include-cleaner,-warnings-as-errors]
+    6 |     } catch (const std::exception& error) {
+      |                         ^
+Suppressed 5169 warnings (5169 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+6 warnings treated as errors
+Write-Error: clang-tidy rejected: main.cpp, sdu.cpp, capabilities.cpp, module_tests.cpp, sdu_tests.cpp

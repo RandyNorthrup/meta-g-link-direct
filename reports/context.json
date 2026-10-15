@@ -1,0 +1,22 @@
+{
+  "tools": {
+    "python": "3.14.0",
+    "cmake": "3.31.3",
+    "llvm": "22.1.1",
+    "powershell": "7.6.6",
+    "gitleaks": "8.30.1",
+    "node": "24.20.0",
+    "npm": "11.19.0",
+    "semgrep": "1.177.0",
+    "actionlint": "1.7.12",
+    "zizmor": "1.25.2",
+    "osv_scanner": "2.6.0",
+    "pester": "5.7.1",
+    "psscriptanalyzer": "1.25.0",
+    "jscpd": "5.4.1",
+    "precommit": "4.5.1",
+    "msvc": "19.44.35222.0",
+    "cppcheck": "2.22.0"
+  },
+  "platform": "windows"
+}

@@ -1,0 +1,20 @@
+rules:
+  - id: mgl-unsafe-string-copy
+    languages: [c, cpp]
+    severity: ERROR
+    message: Use bounded typed buffers; unbounded string copies are forbidden.
+    pattern-either:
+      - pattern: strcpy(...)
+      - pattern: strcat(...)
+      - pattern: sprintf(...)
+  - id: mgl-shell-execution
+    languages: [c, cpp]
+    severity: ERROR
+    message: The native plugin must not execute shell commands.
+    pattern-either:
+      - pattern: system(...)
+  - id: mgl-cpp-shell-execution
+    languages: [cpp]
+    severity: ERROR
+    message: The native plugin must not execute shell commands.
+    pattern: std::system(...)

@@ -1,0 +1,17 @@
+.deps/
+.tools/
+.drills/
+out/
+dist/
+.venv/
+node_modules/
+__pycache__/
+.env
+.env.*
+!.env.example
+CMakeUserPresets.json
+*.user
+*.pem
+*.key
+identities.*
+wire.log

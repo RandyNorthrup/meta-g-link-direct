@@ -1,0 +1,9 @@
+PASS drill parser-length (green 0, intended red 1, restored 0)
+PASS drill module-metadata (green 0, intended red 1, restored 0)
+PASS drill format (green 0, intended red 1, restored 0)
+PASS drill owned-header (green 0, intended red 1, restored 0)
+PASS drill compiler-types (green 0, intended red 1, restored 0)
+PASS drill unused-code (green 0, intended red 1, restored 0)
+PASS drill script-analysis (green 0, intended red 1, restored 0)
+PASS drill workflow-security (green 0, intended red 1, restored 0)
+Write-Error: Red drill failed or survived: secret-scanner. Inspect C:\Users\Randy\Coding\meta_g_link_direct\reports\red\secret-scanner.txt

@@ -1,0 +1,20 @@
+5169 warnings generated.
+Suppressed 5169 warnings (5169 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+4741 warnings generated.
+Suppressed 4741 warnings (4741 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+39615 warnings generated.
+Suppressed 39615 warnings (39615 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+37737 warnings generated.
+C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp:61:9: error: do not use reinterpret_cast [cppcoreguidelines-pro-type-reinterpret-cast,-warnings-as-errors]
+   61 |         reinterpret_cast<Metadata>(GetProcAddress(plugin.get(), "obs_module_description"));
+      |         ^
+Suppressed 37737 warnings (37736 in non-user code, 1 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+1 warning treated as error
+5169 warnings generated.
+Suppressed 5169 warnings (5169 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+Write-Error: clang-tidy rejected: module_tests.cpp

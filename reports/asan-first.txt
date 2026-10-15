@@ -1,0 +1,63 @@
+Preset CMake variables:
+
+  CMAKE_BUILD_TYPE="RelWithDebInfo"
+  CMAKE_CXX_COMPILER="cl"
+  CMAKE_C_COMPILER="cl"
+  CMAKE_PREFIX_PATH="C:/Users/Randy/Coding/meta_g_link_direct/.deps/obs-sdk"
+  CMAKE_SYSTEM_VERSION="10.0.26100.0"
+  MGL_SANITIZERS:BOOL="TRUE"
+
+-- The C compiler identification is MSVC 19.44.35222.0
+-- The CXX compiler identification is MSVC 19.44.35222.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found SIMDe: C:/Users/Randy/Coding/meta_g_link_direct/.deps/obs-studio-32.2.2-sources/.deps/obs-deps-2026-07-15-x64/include (found version "0.8.2")
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - not found
+-- Found Threads: TRUE
+-- Configuring done (1.5s)
+-- Generating done (0.0s)
+-- Build files have been written to: C:/Users/Randy/Coding/meta_g_link_direct/out/windows-asan
+[1/22] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp for CXX dependencies
+[2/22] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
+[3/22] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\windows\capabilities.cpp for CXX dependencies
+[4/22] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp for CXX dependencies
+[5/22] Generating CXX dyndep file CMakeFiles\mgl_windows.dir\CXX.dd
+[6/22] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp for CXX dependencies
+[7/22] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp for CXX dependencies
+[8/22] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\sdu.cpp.obj
+[9/22] Generating CXX dyndep file CMakeFiles\meta-g-link-probe.dir\CXX.dd
+[10/22] Generating CXX dyndep file CMakeFiles\mgl-sdu-tests.dir\CXX.dd
+[11/22] Generating CXX dyndep file CMakeFiles\mgl-module-tests.dir\CXX.dd
+[12/22] Linking CXX static library mgl_protocol.lib
+[13/22] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\capabilities.cpp.obj
+[14/22] Linking CXX static library mgl_windows.lib
+[15/22] Building CXX object CMakeFiles\meta-g-link-probe.dir\src\probe\main.cpp.obj
+[16/22] Building C object CMakeFiles\meta-g-link-direct.dir\src\plugin\module.c.obj
+[17/22] Building CXX object CMakeFiles\mgl-sdu-tests.dir\tests\sdu_tests.cpp.obj
+[18/22] Linking CXX executable meta-g-link-probe.exe
+[19/22] Linking C shared module meta-g-link-direct.dll
+[20/22] Linking CXX executable mgl-sdu-tests.exe
+[21/22] Building CXX object CMakeFiles\mgl-module-tests.dir\tests\module_tests.cpp.obj
+[22/22] Linking CXX executable mgl-module-tests.exe
+Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows-asan
+    Start 1: protocol-prefix
+1/2 Test #1: protocol-prefix ..................   Passed    0.09 sec
+    Start 2: module-abi
+2/2 Test #2: module-abi .......................   Passed    0.05 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.14 sec

@@ -1,0 +1,13 @@
+repos:
+  - repo: local
+    hooks:
+      - id: staged-secrets
+        name: Scan staged changes for secrets
+        language: system
+        entry: gitleaks git --staged --redact --no-banner
+        pass_filenames: false
+      - id: owned-format
+        name: Check owned C++ formatting
+        language: system
+        entry: pwsh -NoProfile -File scripts/Invoke-Project.ps1 format:check
+        pass_filenames: false

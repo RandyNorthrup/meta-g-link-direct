@@ -1,0 +1,9 @@
+{
+  "path": ["src", "include", "tests"],
+  "format": ["c", "cpp"],
+  "threshold": 0,
+  "minLines": 10,
+  "minTokens": 80,
+  "reporters": ["console"],
+  "gitignore": true
+}

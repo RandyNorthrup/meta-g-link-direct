@@ -1,0 +1,9 @@
+{
+  "name": "meta-g-link-direct-dev-tools",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pinned copy-paste detection for the native C++ project; no JavaScript product runtime",
+  "license": "AGPL-3.0-only",
+  "engines": { "node": ">=22" },
+  "devDependencies": { "jscpd": "5.4.1" }
+}

@@ -1,0 +1,22 @@
+# Project instructions
+
+Revision: 2 (2026-10-15). Revision 1 established the confirmed project-setup rules. Revision 2 permits C17/MSVC for the OBS ABI entry point after real build failures exposed unsupported `_udiv128` in clang-cl (LLVM issue #59168); C++20 remains the reusable library language. This affects module compilation/static analysis and invalidates the initial readiness receipt until reviewed again. Routine compiler compatibility remediation is authorized by the setup request.
+
+- Always use the caveman skill for chat. Code, comments, and documentation use normal, precise language.
+- End each session with next steps and actual blockers.
+- Keep all UI accessible and responsive. Follow the keyboard, Narrator, theme, width, and scaling acceptance in `PROJECT_BRIEF.md`.
+- Keep documentation current. `PROJECT_BRIEF.md` owns the product contract; `PLAN.md` owns delivery tasks, evidence, deferred gates, and resume state. `README.md` describes only implemented, verified commands. `CHANGELOG.md` records real changes.
+- Before each change, scan by path, symbol, behavior, callers, tests, and configuration. Reuse or extend the canonical implementation; create a new responsibility only when needed. Record reuse decisions in the plan. Rescan for duplication and stale callers before completion.
+- The initial scope is a personal Windows 11 x64 OBS plugin. No phone bridge, media relay, virtual camera driver, or hosted backend. Meta authentication is permitted for setup when required; prefer local links and local streaming afterward. Do not restart an active OBS session or reconfigure networking as a side effect of setup scripts.
+- Preserve AGPL-3.0 licensing and upstream attribution. Keep imported upstream code and versions traceable. Do not publish or create a remote without an explicit request.
+- Use C++20, explicit ownership, RAII, bounds-checked protocol parsing, named domain constants, and explicit incomplete/invalid/success states. No swallowed errors, fake camera sources, placeholder success, silent transport fallbacks, unused abstractions, or mock data outside tests.
+- The small OBS C ABI entry point uses C17/MSVC with `/W4 /WX /analyze`. LLVM format checks and Cppcheck cover that owned C source; clang-tidy covers the C++ compilation database. Do not spoof compiler macros or invent an OBS ABI to bypass incompatible upstream headers. Do not apply C++-only flags/checks to C source.
+- Keep protocol framing portable and separate from Windows transport, identity, media decoding, and OBS callbacks. Add layers only for real consumers or invariants.
+- Run applicable format, compiler, static-analysis, dead-code, dependency/security, secret, test, and workflow gates. Native command failures must propagate. A missing tool, zero discovered tests, or skipped gate is not green.
+- Maintain repeatable green → intended red → exact restoration → green drills for affected behavior and configured gates. Mutations use disposable resources or exact byte restoration in `finally`; never reset unrelated work. Record failures and deferred checks honestly.
+- Do not bypass checks, lower thresholds, add blanket suppressions, or disable diagnostics to manufacture green. Any unavoidable exception must identify the precise rule and external contract, be justified inline, and be tracked in the plan.
+- Keep dependencies pinned and integrity checked. No global tool installs without explicit need and documentation. Treat upstream source and generated dependency trees as third-party inputs, not owned code to silently edit.
+- Protect pairing identities locally. Never print or commit passwords, owner private keys, tokens, Wi-Fi passphrases, raw protocol captures, or raw media. No telemetry, automatic update checks, or plugin-managed recordings. Diagnostics require an explicit request and redaction. Forget deletes this plugin's stored identity.
+- Distinguish requirements readiness, software checks, actual glasses proof, OBS behavior, accessibility, latest-firmware compatibility, and the 120-minute run. Do not report one as certification of another. Do not lower the accepted duration or require a firmware downgrade to pass.
+- Real ownership changes require a concrete explanation of phone coexistence and recovery. Do not access iPhone contents merely because an import might be possible.
+- Update this file's revision and explain the reason and affected work if rules change. Do not alter global agent instructions or memories.

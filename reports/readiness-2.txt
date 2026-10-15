@@ -1,0 +1,31 @@
+2026-10-15 requirements and implementation-boundary re-review
+
+Reviewed confirmed PROJECT_BRIEF.md, AGENTS.md revision 2, revised PLAN.md,
+native source/configuration, pinned dependencies and observed tool context.
+The native build and isolated ABI test established the MSVC C17/C++20 build
+path. The module has metadata only and registers no fake source. The actual
+radio probe reports hardware availability without accessing the glasses.
+
+The architecture separates portable framing, platform queries, diagnostic
+output and the OBS ABI. Tests use independent known framing outcomes and
+actual disposable-resource effects. Native source and owned header findings
+were corrected. Analysis exceptions are scoped and recorded: contradictory
+style rule; exact-signature dynamic ABI conversions; model-based Cppcheck
+system includes and external-header scope; actual OBS entry points.
+
+Inspected evidence of selected behavior/gate mutations and exact restoration.
+The first AWS canary had invalid alphabet for the documented scanner rule;
+the corrected base32 canary was rejected. The native-error assertion wording
+was corrected after the original mutation already failed the intended Pester
+assertion. Historical logs remain. The final aggregate command still must run
+the complete maintained set against this final source.
+
+Reviewed active paths, task dependencies and missing/partial work. New
+development package files are tooling, not another product runtime. The only
+canonical rules, product brief and delivery plan remain at project root.
+Candidate writer files are disposable and will not become a competing plan.
+
+Requirements readiness passes for finishing TASK-SETUP. Real authentication,
+media, OBS source UI, current firmware, long-session proof, portable coverage
+and native dependency assessment remain explicitly scoped later obligations.
+This review is not behavior, hardware, hosted-CI or release certification.

@@ -1,0 +1,6 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Generated dependencies, build outputs and disposable drill resources"
+paths = ['''(^|/|\\)(\.deps|\.tools|\.drills|out|dist|node_modules|\.git)(/|\\)''']

@@ -1,0 +1,76 @@
+BASELINE EXIT 0
+ninja: no work to do.
+Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
+    Start 1: protocol-prefix
+1/2 Test #1: protocol-prefix ..................   Passed    0.00 sec
+    Start 2: module-abi
+2/2 Test #2: module-abi .......................   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.02 sec
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 3 tests in 140ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
+Describing Project task runner
+  [+] does not modify files with WhatIf 350ms (329ms|21ms)
+The input line is too long.
+The syntax of the command is incorrect.
+  [+] formats a disposable source when effects are requested 887ms (886ms|2ms)
+  [+] propagates native formatter errors 913ms (912ms|1ms)
+Tests completed in 2.58s
+Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+
+MUTATED EXIT 1
+[1/2] Building C object CMakeFiles\meta-g-link-direct.dir\src\plugin\module.c.obj
+[2/2] Linking C shared module meta-g-link-direct.dll
+Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
+    Start 1: protocol-prefix
+1/2 Test #1: protocol-prefix ..................   Passed    0.00 sec
+    Start 2: module-abi
+2/2 Test #2: module-abi .......................***Failed    0.01 sec
+OBS module metadata does not match development-foundation contract
+
+
+50% tests passed, 1 tests failed out of 2
+
+Total Test time (real) =   0.02 sec
+
+The following tests FAILED:
+	  2 - module-abi (Failed)
+Errors while running CTest
+Write-Error: Native command failed (8): ctest
+
+RESTORED EXIT 0
+[1/2] Building C object CMakeFiles\meta-g-link-direct.dir\src\plugin\module.c.obj
+[2/2] Linking C shared module meta-g-link-direct.dll
+Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
+    Start 1: protocol-prefix
+1/2 Test #1: protocol-prefix ..................   Passed    0.00 sec
+    Start 2: module-abi
+2/2 Test #2: module-abi .......................   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.02 sec
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 3 tests in 147ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
+Describing Project task runner
+  [+] does not modify files with WhatIf 359ms (336ms|23ms)
+The input line is too long.
+The syntax of the command is incorrect.
+  [+] formats a disposable source when effects are requested 843ms (842ms|1ms)
+  [+] propagates native formatter errors 913ms (912ms|1ms)
+Tests completed in 2.56s
+Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+
+RESTORATION SHA256 35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c

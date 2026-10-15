@@ -1,0 +1,72 @@
+5172 warnings generated.
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:9:12: error: function 'runProbe' declared 'static', move to anonymous namespace instead [misc-use-anonymous-namespace,-warnings-as-errors]
+    9 | static int runProbe() {
+      |            ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:29:9: error: the value returned by this function should not be disregarded; neglecting it may lead to errors [cert-err33-c,-warnings-as-errors]
+   29 |         std::fputs(error.what(), stderr);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:29:9: note: cast the expression to void to silence this warning
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:30:9: error: the value returned by this function should not be disregarded; neglecting it may lead to errors [cert-err33-c,-warnings-as-errors]
+   30 |         std::fputc('\n', stderr);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:30:9: note: cast the expression to void to silence this warning
+Suppressed 5169 warnings (5169 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+3 warnings treated as errors
+4741 warnings generated.
+Suppressed 4741 warnings (4741 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+39615 warnings generated.
+Suppressed 39615 warnings (39615 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+37741 warnings and 1 error generated.
+Error while processing C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp.
+C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp:25:12: error: function 'runModuleTests' declared 'static', move to anonymous namespace instead [misc-use-anonymous-namespace,-warnings-as-errors]
+   25 | static int runModuleTests(int argument_count, char** arguments) {
+      |            ^
+C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp:50:17: error: variable 'missing' with type 'auto *const' has incompatible initializer of type 'borrowed_iterator_t<const std::array<const char *, 6> &>' (aka 'std::_Array_const_iterator<const char *, 6>') [clang-diagnostic-error]
+   50 |     auto* const missing = std::ranges::find_if(RequiredExports, [&plugin](const char* name) {
+      |                 ^         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   51 |         return GetProcAddress(plugin.get(), name) == nullptr;
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   52 |     });
+      |     ~~
+C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp:59:23: error: do not use 'std::bit_cast' to cast between pointers [bugprone-bitwise-pointer-cast,-warnings-as-errors]
+   59 |     const auto name = std::bit_cast<Metadata>(GetProcAddress(plugin.get(), "obs_module_name"));
+      |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp:61:9: error: do not use 'std::bit_cast' to cast between pointers [bugprone-bitwise-pointer-cast,-warnings-as-errors]
+   61 |         std::bit_cast<Metadata>(GetProcAddress(plugin.get(), "obs_module_description"));
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp:76:9: error: the value returned by this function should not be disregarded; neglecting it may lead to errors [cert-err33-c,-warnings-as-errors]
+   76 |         std::fputs(error.what(), stderr);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp:76:9: note: cast the expression to void to silence this warning
+C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp:77:9: error: the value returned by this function should not be disregarded; neglecting it may lead to errors [cert-err33-c,-warnings-as-errors]
+   77 |         std::fputc('\n', stderr);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp:77:9: note: cast the expression to void to silence this warning
+Suppressed 37736 warnings (37736 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+5 warnings treated as errors
+5174 warnings generated.
+C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:14:13: error: function 'expect' declared 'static', move to anonymous namespace instead [misc-use-anonymous-namespace,-warnings-as-errors]
+   14 | static void expect(std::span<const std::uint8_t> prefix, mgl::PrefixStatus status,
+      |             ^
+C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:22:13: error: function 'testKnownVectors' declared 'static', move to anonymous namespace instead [misc-use-anonymous-namespace,-warnings-as-errors]
+   22 | static void testKnownVectors() {
+      |             ^
+C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:43:13: error: function 'testTruncationAndTypes' declared 'static', move to anonymous namespace instead [misc-use-anonymous-namespace,-warnings-as-errors]
+   43 | static void testTruncationAndTypes() {
+      |             ^
+C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:63:9: error: the value returned by this function should not be disregarded; neglecting it may lead to errors [cert-err33-c,-warnings-as-errors]
+   63 |         std::fputs(error.what(), stderr);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:63:9: note: cast the expression to void to silence this warning
+C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:64:9: error: the value returned by this function should not be disregarded; neglecting it may lead to errors [cert-err33-c,-warnings-as-errors]
+   64 |         std::fputc('\n', stderr);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:64:9: note: cast the expression to void to silence this warning
+Suppressed 5169 warnings (5169 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+5 warnings treated as errors
+Write-Error: clang-tidy rejected: main.cpp, module_tests.cpp, sdu_tests.cpp

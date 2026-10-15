@@ -1,0 +1,46 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": { "major": 3, "minor": 28, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "windows",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/windows",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "CMAKE_CXX_COMPILER": "cl",
+        "CMAKE_C_COMPILER": "cl",
+        "CMAKE_PREFIX_PATH": "${sourceDir}/.deps/obs-sdk",
+        "CMAKE_SYSTEM_VERSION": "10.0.26100.0"
+      },
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" }
+    },
+    {
+      "name": "windows-asan",
+      "inherits": "windows",
+      "binaryDir": "${sourceDir}/out/windows-asan",
+      "cacheVariables": { "MGL_SANITIZERS": true }
+    },
+    {
+      "name": "portable",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/portable",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "MGL_BUILD_OBS_PLUGIN": false,
+        "MGL_SANITIZERS": true
+      },
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" }
+    }
+  ],
+  "buildPresets": [
+    { "name": "windows", "configurePreset": "windows", "jobs": 2 },
+    { "name": "windows-asan", "configurePreset": "windows-asan", "jobs": 2 },
+    { "name": "portable", "configurePreset": "portable", "jobs": 2 }
+  ],
+  "testPresets": [
+    { "name": "windows", "configurePreset": "windows", "output": { "outputOnFailure": true }, "execution": { "noTestsAction": "error" } },
+    { "name": "windows-asan", "configurePreset": "windows-asan", "output": { "outputOnFailure": true }, "execution": { "noTestsAction": "error" } },
+    { "name": "portable", "configurePreset": "portable", "output": { "outputOnFailure": true }, "execution": { "noTestsAction": "error" } }
+  ]
+}

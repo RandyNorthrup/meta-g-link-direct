@@ -1,0 +1,431 @@
+Checking src\plugin\module.c ...
+Checking src\plugin\module.c: _WIN32=1;_WIN64=1;_MSC_VER=1944;_M_X64=100;HAVE_OBSCONFIG_H=1;MGL_VERSION="0.1.0"...
+.deps\obs-sdk\include\util\darray.h:177:9: style: Variable 'compare' can be declared as pointer to const [constVariablePointer]
+  void *compare = darray_item(element_size, da, i);
+        ^
+.deps\obs-sdk\include\util\darray.h:378:79: style: Parameter 'dst' can be declared as pointer to const [constParameterPointer]
+static inline void darray_move_item(const size_t element_size, struct darray *dst, const size_t from, const size_t to)
+                                                                              ^
+.deps\obs-sdk\include\util\darray.h:405:74: style: Parameter 'dst' can be declared as pointer to const [constParameterPointer]
+static inline void darray_swap(const size_t element_size, struct darray *dst, const size_t a, const size_t b)
+                                                                         ^
+1/6 files checked 4% done
+Checking src\probe\main.cpp ...
+Checking src\probe\main.cpp: _WIN32=1;_WIN64=1;_MSC_VER=1944;_M_X64=100;HAVE_OBSCONFIG_H=1;MGL_VERSION="0.1.0"...
+2/6 files checked 15% done
+Checking src\protocol\sdu.cpp ...
+Checking src\protocol\sdu.cpp: _WIN32=1;_WIN64=1;_MSC_VER=1944;_M_X64=100;HAVE_OBSCONFIG_H=1;MGL_VERSION="0.1.0"...
+3/6 files checked 29% done
+Checking src\windows\capabilities.cpp ...
+Checking src\windows\capabilities.cpp: _WIN32=1;_WIN64=1;_MSC_VER=1944;_M_X64=100;HAVE_OBSCONFIG_H=1;MGL_VERSION="0.1.0"...
+4/6 files checked 46% done
+Checking tests\module_tests.cpp ...
+Checking tests\module_tests.cpp: _WIN32=1;_WIN64=1;_MSC_VER=1944;_M_X64=100;HAVE_OBSCONFIG_H=1;MGL_VERSION="0.1.0"...
+5/6 files checked 74% done
+Checking tests\sdu_tests.cpp ...
+Checking tests\sdu_tests.cpp: _WIN32=1;_WIN64=1;_MSC_VER=1944;_M_X64=100;HAVE_OBSCONFIG_H=1;MGL_VERSION="0.1.0"...
+.deps\obs-sdk\include\callback\calldata.h:55:20: style: The function 'calldata_init' is never used. [unusedFunction]
+static inline void calldata_init(struct calldata *data)
+                   ^
+.deps\obs-sdk\include\callback\calldata.h:62:20: style: The function 'calldata_init_fixed' is never used. [unusedFunction]
+static inline void calldata_init_fixed(struct calldata *data, uint8_t *stack, size_t size)
+                   ^
+.deps\obs-sdk\include\callback\calldata.h:88:27: style: The function 'calldata_create' is never used. [unusedFunction]
+static inline calldata_t *calldata_create(void)
+                          ^
+.deps\obs-sdk\include\callback\calldata.h:93:20: style: The function 'calldata_destroy' is never used. [unusedFunction]
+static inline void calldata_destroy(calldata_t *cd)
+                   ^
+.deps\obs-sdk\include\callback\calldata.h:128:25: style: The function 'calldata_int' is never used. [unusedFunction]
+static inline long long calldata_int(const calldata_t *data, const char *name)
+                        ^
+.deps\obs-sdk\include\callback\calldata.h:135:22: style: The function 'calldata_float' is never used. [unusedFunction]
+static inline double calldata_float(const calldata_t *data, const char *name)
+                     ^
+.deps\obs-sdk\include\callback\calldata.h:142:20: style: The function 'calldata_bool' is never used. [unusedFunction]
+static inline bool calldata_bool(const calldata_t *data, const char *name)
+                   ^
+.deps\obs-sdk\include\callback\calldata.h:149:21: style: The function 'calldata_ptr' is never used. [unusedFunction]
+static inline void *calldata_ptr(const calldata_t *data, const char *name)
+                    ^
+.deps\obs-sdk\include\callback\calldata.h:156:27: style: The function 'calldata_string' is never used. [unusedFunction]
+static inline const char *calldata_string(const calldata_t *data, const char *name)
+                          ^
+.deps\obs-sdk\include\callback\calldata.h:165:20: style: The function 'calldata_set_int' is never used. [unusedFunction]
+static inline void calldata_set_int(calldata_t *data, const char *name, long long val)
+                   ^
+.deps\obs-sdk\include\callback\calldata.h:170:20: style: The function 'calldata_set_float' is never used. [unusedFunction]
+static inline void calldata_set_float(calldata_t *data, const char *name, double val)
+                   ^
+.deps\obs-sdk\include\callback\calldata.h:175:20: style: The function 'calldata_set_bool' is never used. [unusedFunction]
+static inline void calldata_set_bool(calldata_t *data, const char *name, bool val)
+                   ^
+.deps\obs-sdk\include\callback\calldata.h:180:20: style: The function 'calldata_set_ptr' is never used. [unusedFunction]
+static inline void calldata_set_ptr(calldata_t *data, const char *name, void *ptr)
+                   ^
+.deps\obs-sdk\include\callback\calldata.h:185:20: style: The function 'calldata_set_string' is never used. [unusedFunction]
+static inline void calldata_set_string(calldata_t *data, const char *name, const char *str)
+                   ^
+.deps\obs-sdk\include\callback\signal.h:44:20: style: The function 'signal_handler_add_array' is never used. [unusedFunction]
+static inline bool signal_handler_add_array(signal_handler_t *handler, const char **signal_decls)
+                   ^
+.deps\obs-sdk\include\graphics\graphics.h:221:34: style: The function 'gs_vbdata_create' is never used. [unusedFunction]
+static inline struct gs_vb_data *gs_vbdata_create(void)
+                                 ^
+.deps\obs-sdk\include\graphics\graphics.h:226:20: style: The function 'gs_vbdata_destroy' is never used. [unusedFunction]
+static inline void gs_vbdata_destroy(struct gs_vb_data *data)
+                   ^
+.deps\obs-sdk\include\graphics\graphics.h:926:24: style: The function 'gs_get_format_bpp' is never used. [unusedFunction]
+static inline uint32_t gs_get_format_bpp(enum gs_color_format format)
+                       ^
+.deps\obs-sdk\include\graphics\graphics.h:964:20: style: The function 'gs_is_compressed_format' is never used. [unusedFunction]
+static inline bool gs_is_compressed_format(enum gs_color_format format)
+                   ^
+.deps\obs-sdk\include\graphics\graphics.h:969:20: style: The function 'gs_is_srgb_format' is never used. [unusedFunction]
+static inline bool gs_is_srgb_format(enum gs_color_format format)
+                   ^
+6/6 files checked 100% done
+.deps\obs-sdk\include\graphics\graphics.h:981:36: style: The function 'gs_generalize_format' is never used. [unusedFunction]
+static inline enum gs_color_format gs_generalize_format(enum gs_color_format format)
+                                   ^
+.deps\obs-sdk\include\graphics\graphics.h:995:36: style: The function 'gs_get_format_from_space' is never used. [unusedFunction]
+static inline enum gs_color_format gs_get_format_from_space(enum gs_color_space space)
+                                   ^
+.deps\obs-sdk\include\graphics\graphics.h:1009:24: style: The function 'gs_get_total_levels' is never used. [unusedFunction]
+static inline uint32_t gs_get_total_levels(uint32_t width, uint32_t height, uint32_t depth)
+                       ^
+.deps\obs-sdk\include\graphics\math-defs.h:38:20: style: The function 'close_float' is never used. [unusedFunction]
+static inline bool close_float(float f1, float f2, float precision)
+                   ^
+.deps\obs-sdk\include\graphics\srgb.h:139:20: style: The function 'gs_premultiply_xyza_loop' is never used. [unusedFunction]
+static inline void gs_premultiply_xyza_loop(uint8_t *data, size_t texel_count)
+                   ^
+.deps\obs-sdk\include\graphics\srgb.h:147:20: style: The function 'gs_premultiply_xyza_srgb_loop' is never used. [unusedFunction]
+static inline void gs_premultiply_xyza_srgb_loop(uint8_t *data, size_t texel_count)
+                   ^
+.deps\obs-sdk\include\graphics\srgb.h:155:20: style: The function 'gs_premultiply_xyza_loop_restrict' is never used. [unusedFunction]
+static inline void gs_premultiply_xyza_loop_restrict(uint8_t *__restrict dst, const uint8_t *__restrict src,
+                   ^
+.deps\obs-sdk\include\graphics\srgb.h:165:20: style: The function 'gs_premultiply_xyza_srgb_loop_restrict' is never used. [unusedFunction]
+static inline void gs_premultiply_xyza_srgb_loop_restrict(uint8_t *__restrict dst, const uint8_t *__restrict src,
+                   ^
+.deps\obs-sdk\include\graphics\vec2.h:36:20: style: The function 'vec2_zero' is never used. [unusedFunction]
+static inline void vec2_zero(struct vec2 *dst)
+                   ^
+.deps\obs-sdk\include\graphics\vec2.h:48:20: style: The function 'vec2_copy' is never used. [unusedFunction]
+static inline void vec2_copy(struct vec2 *dst, const struct vec2 *v)
+                   ^
+.deps\obs-sdk\include\graphics\vec2.h:54:20: style: The function 'vec2_add' is never used. [unusedFunction]
+static inline void vec2_add(struct vec2 *dst, const struct vec2 *v1, const struct vec2 *v2)
+                   ^
+.deps\obs-sdk\include\graphics\vec2.h:64:20: style: The function 'vec2_mul' is never used. [unusedFunction]
+static inline void vec2_mul(struct vec2 *dst, const struct vec2 *v1, const struct vec2 *v2)
+                   ^
+.deps\obs-sdk\include\graphics\vec2.h:69:20: style: The function 'vec2_div' is never used. [unusedFunction]
+static inline void vec2_div(struct vec2 *dst, const struct vec2 *v1, const struct vec2 *v2)
+                   ^
+.deps\obs-sdk\include\graphics\vec2.h:74:20: style: The function 'vec2_addf' is never used. [unusedFunction]
+static inline void vec2_addf(struct vec2 *dst, const struct vec2 *v, float f)
+                   ^
+.deps\obs-sdk\include\graphics\vec2.h:79:20: style: The function 'vec2_subf' is never used. [unusedFunction]
+static inline void vec2_subf(struct vec2 *dst, const struct vec2 *v, float f)
+                   ^
+.deps\obs-sdk\include\graphics\vec2.h:84:20: style: The function 'vec2_mulf' is never used. [unusedFunction]
+static inline void vec2_mulf(struct vec2 *dst, const struct vec2 *v, float f)
+                   ^
+.deps\obs-sdk\include\graphics\vec2.h:89:20: style: The function 'vec2_divf' is never used. [unusedFunction]
+static inline void vec2_divf(struct vec2 *dst, const struct vec2 *v, float f)
+                   ^
+.deps\obs-sdk\include\graphics\vec2.h:94:20: style: The function 'vec2_neg' is never used. [unusedFunction]
+static inline void vec2_neg(struct vec2 *dst, const struct vec2 *v)
+                   ^
+.deps\obs-sdk\include\graphics\vec2.h:99:21: style: The function 'vec2_dot' is never used. [unusedFunction]
+static inline float vec2_dot(const struct vec2 *v1, const struct vec2 *v2)
+                    ^
+.deps\obs-sdk\include\graphics\vec2.h:109:21: style: The function 'vec2_dist' is never used. [unusedFunction]
+static inline float vec2_dist(const struct vec2 *v1, const struct vec2 *v2)
+                    ^
+.deps\obs-sdk\include\graphics\vec2.h:116:20: style: The function 'vec2_minf' is never used. [unusedFunction]
+static inline void vec2_minf(struct vec2 *dst, const struct vec2 *v, float val)
+                   ^
+.deps\obs-sdk\include\graphics\vec2.h:122:20: style: The function 'vec2_min' is never used. [unusedFunction]
+static inline void vec2_min(struct vec2 *dst, const struct vec2 *v, const struct vec2 *min_v)
+                   ^
+.deps\obs-sdk\include\graphics\vec2.h:128:20: style: The function 'vec2_maxf' is never used. [unusedFunction]
+static inline void vec2_maxf(struct vec2 *dst, const struct vec2 *v, float val)
+                   ^
+.deps\obs-sdk\include\graphics\vec2.h:134:20: style: The function 'vec2_max' is never used. [unusedFunction]
+static inline void vec2_max(struct vec2 *dst, const struct vec2 *v, const struct vec2 *max_v)
+                   ^
+.deps\obs-sdk\include\graphics\vec3.h:44:20: style: The function 'vec3_zero' is never used. [unusedFunction]
+static inline void vec3_zero(struct vec3 *v)
+                   ^
+.deps\obs-sdk\include\graphics\vec3.h:49:20: style: The function 'vec3_set' is never used. [unusedFunction]
+static inline void vec3_set(struct vec3 *dst, float x, float y, float z)
+                   ^
+.deps\obs-sdk\include\graphics\vec3.h:54:20: style: The function 'vec3_copy' is never used. [unusedFunction]
+static inline void vec3_copy(struct vec3 *dst, const struct vec3 *v)
+                   ^
+.deps\obs-sdk\include\graphics\vec3.h:61:20: style: The function 'vec3_add' is never used. [unusedFunction]
+static inline void vec3_add(struct vec3 *dst, const struct vec3 *v1, const struct vec3 *v2)
+                   ^
+.deps\obs-sdk\include\graphics\vec3.h:73:20: style: The function 'vec3_mul' is never used. [unusedFunction]
+static inline void vec3_mul(struct vec3 *dst, const struct vec3 *v1, const struct vec3 *v2)
+                   ^
+.deps\obs-sdk\include\graphics\vec3.h:78:20: style: The function 'vec3_div' is never used. [unusedFunction]
+static inline void vec3_div(struct vec3 *dst, const struct vec3 *v1, const struct vec3 *v2)
+                   ^
+.deps\obs-sdk\include\graphics\vec3.h:84:20: style: The function 'vec3_addf' is never used. [unusedFunction]
+static inline void vec3_addf(struct vec3 *dst, const struct vec3 *v, float f)
+                   ^
+.deps\obs-sdk\include\graphics\vec3.h:90:20: style: The function 'vec3_subf' is never used. [unusedFunction]
+static inline void vec3_subf(struct vec3 *dst, const struct vec3 *v, float f)
+                   ^
+.deps\obs-sdk\include\graphics\vec3.h:96:20: style: The function 'vec3_mulf' is never used. [unusedFunction]
+static inline void vec3_mulf(struct vec3 *dst, const struct vec3 *v, float f)
+                   ^
+.deps\obs-sdk\include\graphics\vec3.h:101:20: style: The function 'vec3_divf' is never used. [unusedFunction]
+static inline void vec3_divf(struct vec3 *dst, const struct vec3 *v, float f)
+                   ^
+.deps\obs-sdk\include\graphics\vec3.h:116:20: style: The function 'vec3_cross' is never used. [unusedFunction]
+static inline void vec3_cross(struct vec3 *dst, const struct vec3 *v1, const struct vec3 *v2)
+                   ^
+.deps\obs-sdk\include\graphics\vec3.h:125:20: style: The function 'vec3_neg' is never used. [unusedFunction]
+static inline void vec3_neg(struct vec3 *dst, const struct vec3 *v)
+                   ^
+.deps\obs-sdk\include\graphics\vec3.h:133:21: style: The function 'vec3_len' is never used. [unusedFunction]
+static inline float vec3_len(const struct vec3 *v)
+                    ^
+.deps\obs-sdk\include\graphics\vec3.h:139:21: style: The function 'vec3_dist' is never used. [unusedFunction]
+static inline float vec3_dist(const struct vec3 *v1, const struct vec3 *v2)
+                    ^
+.deps\obs-sdk\include\graphics\vec3.h:149:20: style: The function 'vec3_norm' is never used. [unusedFunction]
+static inline void vec3_norm(struct vec3 *dst, const struct vec3 *v)
+                   ^
+.deps\obs-sdk\include\graphics\vec3.h:155:20: style: The function 'vec3_close' is never used. [unusedFunction]
+static inline bool vec3_close(const struct vec3 *v1, const struct vec3 *v2, float epsilon)
+                   ^
+.deps\obs-sdk\include\graphics\vec3.h:162:20: style: The function 'vec3_min' is never used. [unusedFunction]
+static inline void vec3_min(struct vec3 *dst, const struct vec3 *v1, const struct vec3 *v2)
+                   ^
+.deps\obs-sdk\include\graphics\vec3.h:168:20: style: The function 'vec3_minf' is never used. [unusedFunction]
+static inline void vec3_minf(struct vec3 *dst, const struct vec3 *v, float f)
+                   ^
+.deps\obs-sdk\include\graphics\vec3.h:174:20: style: The function 'vec3_max' is never used. [unusedFunction]
+static inline void vec3_max(struct vec3 *dst, const struct vec3 *v1, const struct vec3 *v2)
+                   ^
+.deps\obs-sdk\include\graphics\vec3.h:180:20: style: The function 'vec3_maxf' is never used. [unusedFunction]
+static inline void vec3_maxf(struct vec3 *dst, const struct vec3 *v, float f)
+                   ^
+.deps\obs-sdk\include\graphics\vec3.h:186:20: style: The function 'vec3_abs' is never used. [unusedFunction]
+static inline void vec3_abs(struct vec3 *dst, const struct vec3 *v)
+                   ^
+.deps\obs-sdk\include\graphics\vec3.h:194:20: style: The function 'vec3_floor' is never used. [unusedFunction]
+static inline void vec3_floor(struct vec3 *dst, const struct vec3 *v)
+                   ^
+.deps\obs-sdk\include\graphics\vec3.h:202:20: style: The function 'vec3_ceil' is never used. [unusedFunction]
+static inline void vec3_ceil(struct vec3 *dst, const struct vec3 *v)
+                   ^
+.deps\obs-sdk\include\graphics\vec4.h:42:20: style: The function 'vec4_zero' is never used. [unusedFunction]
+static inline void vec4_zero(struct vec4 *v)
+                   ^
+.deps\obs-sdk\include\graphics\vec4.h:47:20: style: The function 'vec4_set' is never used. [unusedFunction]
+static inline void vec4_set(struct vec4 *dst, float x, float y, float z, float w)
+                   ^
+.deps\obs-sdk\include\graphics\vec4.h:52:20: style: The function 'vec4_copy' is never used. [unusedFunction]
+static inline void vec4_copy(struct vec4 *dst, const struct vec4 *v)
+                   ^
+.deps\obs-sdk\include\graphics\vec4.h:59:20: style: The function 'vec4_add' is never used. [unusedFunction]
+static inline void vec4_add(struct vec4 *dst, const struct vec4 *v1, const struct vec4 *v2)
+                   ^
+.deps\obs-sdk\include\graphics\vec4.h:69:20: style: The function 'vec4_mul' is never used. [unusedFunction]
+static inline void vec4_mul(struct vec4 *dst, const struct vec4 *v1, const struct vec4 *v2)
+                   ^
+.deps\obs-sdk\include\graphics\vec4.h:74:20: style: The function 'vec4_div' is never used. [unusedFunction]
+static inline void vec4_div(struct vec4 *dst, const struct vec4 *v1, const struct vec4 *v2)
+                   ^
+.deps\obs-sdk\include\graphics\vec4.h:79:20: style: The function 'vec4_addf' is never used. [unusedFunction]
+static inline void vec4_addf(struct vec4 *dst, const struct vec4 *v, float f)
+                   ^
+.deps\obs-sdk\include\graphics\vec4.h:84:20: style: The function 'vec4_subf' is never used. [unusedFunction]
+static inline void vec4_subf(struct vec4 *dst, const struct vec4 *v, float f)
+                   ^
+.deps\obs-sdk\include\graphics\vec4.h:89:20: style: The function 'vec4_mulf' is never used. [unusedFunction]
+static inline void vec4_mulf(struct vec4 *dst, const struct vec4 *v, float f)
+                   ^
+.deps\obs-sdk\include\graphics\vec4.h:94:20: style: The function 'vec4_divf' is never used. [unusedFunction]
+static inline void vec4_divf(struct vec4 *dst, const struct vec4 *v, float f)
+                   ^
+.deps\obs-sdk\include\graphics\vec4.h:108:20: style: The function 'vec4_neg' is never used. [unusedFunction]
+static inline void vec4_neg(struct vec4 *dst, const struct vec4 *v)
+                   ^
+.deps\obs-sdk\include\graphics\vec4.h:116:21: style: The function 'vec4_len' is never used. [unusedFunction]
+static inline float vec4_len(const struct vec4 *v)
+                    ^
+.deps\obs-sdk\include\graphics\vec4.h:122:21: style: The function 'vec4_dist' is never used. [unusedFunction]
+static inline float vec4_dist(const struct vec4 *v1, const struct vec4 *v2)
+                    ^
+.deps\obs-sdk\include\graphics\vec4.h:132:20: style: The function 'vec4_norm' is never used. [unusedFunction]
+static inline void vec4_norm(struct vec4 *dst, const struct vec4 *v)
+                   ^
+.deps\obs-sdk\include\graphics\vec4.h:138:19: style: The function 'vec4_close' is never used. [unusedFunction]
+static inline int vec4_close(const struct vec4 *v1, const struct vec4 *v2, float epsilon)
+                  ^
+.deps\obs-sdk\include\graphics\vec4.h:145:20: style: The function 'vec4_min' is never used. [unusedFunction]
+static inline void vec4_min(struct vec4 *dst, const struct vec4 *v1, const struct vec4 *v2)
+                   ^
+.deps\obs-sdk\include\graphics\vec4.h:150:20: style: The function 'vec4_minf' is never used. [unusedFunction]
+static inline void vec4_minf(struct vec4 *dst, const struct vec4 *v, float f)
+                   ^
+.deps\obs-sdk\include\graphics\vec4.h:155:20: style: The function 'vec4_max' is never used. [unusedFunction]
+static inline void vec4_max(struct vec4 *dst, const struct vec4 *v1, const struct vec4 *v2)
+                   ^
+.deps\obs-sdk\include\graphics\vec4.h:160:20: style: The function 'vec4_maxf' is never used. [unusedFunction]
+static inline void vec4_maxf(struct vec4 *dst, const struct vec4 *v, float f)
+                   ^
+.deps\obs-sdk\include\graphics\vec4.h:165:20: style: The function 'vec4_abs' is never used. [unusedFunction]
+static inline void vec4_abs(struct vec4 *dst, const struct vec4 *v)
+                   ^
+.deps\obs-sdk\include\graphics\vec4.h:173:20: style: The function 'vec4_floor' is never used. [unusedFunction]
+static inline void vec4_floor(struct vec4 *dst, const struct vec4 *v)
+                   ^
+.deps\obs-sdk\include\graphics\vec4.h:181:20: style: The function 'vec4_ceil' is never used. [unusedFunction]
+static inline void vec4_ceil(struct vec4 *dst, const struct vec4 *v)
+                   ^
+.deps\obs-sdk\include\graphics\vec4.h:189:24: style: The function 'vec4_to_rgba' is never used. [unusedFunction]
+static inline uint32_t vec4_to_rgba(const struct vec4 *src)
+                       ^
+.deps\obs-sdk\include\graphics\vec4.h:200:24: style: The function 'vec4_to_bgra' is never used. [unusedFunction]
+static inline uint32_t vec4_to_bgra(const struct vec4 *src)
+                       ^
+.deps\obs-sdk\include\graphics\vec4.h:221:20: style: The function 'vec4_from_bgra' is never used. [unusedFunction]
+static inline void vec4_from_bgra(struct vec4 *dst, uint32_t bgra)
+                   ^
+.deps\obs-sdk\include\graphics\vec4.h:231:20: style: The function 'vec4_from_rgba_srgb' is never used. [unusedFunction]
+static inline void vec4_from_rgba_srgb(struct vec4 *dst, uint32_t rgba)
+                   ^
+.deps\obs-sdk\include\media-io\audio-io.h:178:22: style: The function 'get_audio_planes' is never used. [unusedFunction]
+static inline size_t get_audio_planes(enum audio_format format, enum speaker_layout speakers)
+                     ^
+.deps\obs-sdk\include\media-io\audio-io.h:183:22: style: The function 'get_audio_size' is never used. [unusedFunction]
+static inline size_t get_audio_size(enum audio_format format, enum speaker_layout speakers, uint32_t frames)
+                     ^
+.deps\obs-sdk\include\media-io\audio-io.h:190:22: style: The function 'get_total_audio_size' is never used. [unusedFunction]
+static inline size_t get_total_audio_size(enum audio_format format, enum speaker_layout speakers, uint32_t frames)
+                     ^
+.deps\obs-sdk\include\media-io\audio-io.h:195:24: style: The function 'audio_frames_to_ns' is never used. [unusedFunction]
+static inline uint64_t audio_frames_to_ns(size_t sample_rate, uint64_t frames)
+                       ^
+.deps\obs-sdk\include\media-io\audio-io.h:200:24: style: The function 'ns_to_audio_frames' is never used. [unusedFunction]
+static inline uint64_t ns_to_audio_frames(size_t sample_rate, uint64_t frames)
+                       ^
+.deps\obs-sdk\include\media-io\frame-rate.h:12:22: style: The function 'media_frames_per_second_to_frame_interval' is never used. [unusedFunction]
+static inline double media_frames_per_second_to_frame_interval(struct media_frames_per_second fps)
+                     ^
+.deps\obs-sdk\include\media-io\frame-rate.h:17:22: style: The function 'media_frames_per_second_to_fps' is never used. [unusedFunction]
+static inline double media_frames_per_second_to_fps(struct media_frames_per_second fps)
+                     ^
+.deps\obs-sdk\include\media-io\frame-rate.h:22:20: style: The function 'media_frames_per_second_is_valid' is never used. [unusedFunction]
+static inline bool media_frames_per_second_is_valid(struct media_frames_per_second fps)
+                   ^
+.deps\obs-sdk\include\media-io\video-io.h:177:27: style: The function 'get_video_format_name' is never used. [unusedFunction]
+static inline const char *get_video_format_name(enum video_format format)
+                          ^
+.deps\obs-sdk\include\media-io\video-io.h:236:27: style: The function 'get_video_colorspace_name' is never used. [unusedFunction]
+static inline const char *get_video_colorspace_name(enum video_colorspace cs)
+                          ^
+.deps\obs-sdk\include\media-io\video-io.h:264:27: style: The function 'get_video_range_name' is never used. [unusedFunction]
+static inline const char *get_video_range_name(enum video_format format, enum video_range_type range)
+                          ^
+.deps\obs-sdk\include\obs-data.h:302:27: style: The function 'obs_data_newref' is never used. [unusedFunction]
+static inline obs_data_t *obs_data_newref(obs_data_t *data)
+                          ^
+.deps\obs-sdk\include\obs-hotkey.h:264:20: style: The function 'obs_key_combination_is_empty' is never used. [unusedFunction]
+static inline bool obs_key_combination_is_empty(obs_key_combination_t combo)
+                   ^
+.deps\obs-sdk\include\obs.h:1697:28: style: The function 'obs_get_scene_by_name' is never used. [unusedFunction]
+static inline obs_scene_t *obs_get_scene_by_name(const char *name)
+                           ^
+.deps\obs-sdk\include\obs.h:1862:28: style: The function 'obs_group_or_scene_from_source' is never used. [unusedFunction]
+static inline obs_scene_t *obs_group_or_scene_from_source(const obs_source_t *source)
+                           ^
+.deps\obs-sdk\include\obs.h:2564:20: style: The function 'obs_source_frame_free' is never used. [unusedFunction]
+static inline void obs_source_frame_free(struct obs_source_frame *frame)
+                   ^
+.deps\obs-sdk\include\obs.h:2572:40: style: The function 'obs_source_frame_create' is never used. [unusedFunction]
+static inline struct obs_source_frame *obs_source_frame_create(enum video_format format, uint32_t width,
+                                       ^
+.deps\obs-sdk\include\obs.h:2582:20: style: The function 'obs_source_frame_destroy' is never used. [unusedFunction]
+static inline void obs_source_frame_destroy(struct obs_source_frame *frame)
+                   ^
+.deps\obs-sdk\include\util\bmem.h:76:21: style: The function 'bstrdup' is never used. [unusedFunction]
+static inline char *bstrdup(const char *str)
+                    ^
+.deps\obs-sdk\include\util\bmem.h:84:24: style: The function 'bwstrdup' is never used. [unusedFunction]
+static inline wchar_t *bwstrdup(const wchar_t *str)
+                       ^
+.deps\obs-sdk\include\util\darray.h:62:22: style: The function 'darray_alloc_size' is never used. [unusedFunction]
+static inline size_t darray_alloc_size(const size_t element_size, const struct darray *da)
+                     ^
+.deps\obs-sdk\include\util\darray.h:80:20: style: The function 'darray_reserve' is never used. [unusedFunction]
+static inline void darray_reserve(const size_t element_size, struct darray *dst, const size_t capacity)
+                   ^
+.deps\obs-sdk\include\util\darray.h:118:20: style: The function 'darray_clear' is never used. [unusedFunction]
+static inline void darray_clear(struct darray *dst)
+                   ^
+.deps\obs-sdk\include\util\darray.h:161:20: style: The function 'darray_move' is never used. [unusedFunction]
+static inline void darray_move(struct darray *dst, struct darray *src)
+                   ^
+.deps\obs-sdk\include\util\darray.h:225:20: style: The function 'darray_insert' is never used. [unusedFunction]
+static inline void darray_insert(const size_t element_size, struct darray *dst, const size_t idx, const void *item)
+                   ^
+.deps\obs-sdk\include\util\darray.h:246:21: style: The function 'darray_insert_new' is never used. [unusedFunction]
+static inline void *darray_insert_new(const size_t element_size, struct darray *dst, const size_t idx)
+                    ^
+.deps\obs-sdk\include\util\darray.h:282:20: style: The function 'darray_insert_darray' is never used. [unusedFunction]
+static inline void darray_insert_darray(const size_t element_size, struct darray *dst, const size_t idx,
+                   ^
+.deps\obs-sdk\include\util\darray.h:299:20: style: The function 'darray_erase_item' is never used. [unusedFunction]
+static inline void darray_erase_item(const size_t element_size, struct darray *dst, const void *item)
+                   ^
+.deps\obs-sdk\include\util\darray.h:306:20: style: The function 'darray_erase_range' is never used. [unusedFunction]
+static inline void darray_erase_range(const size_t element_size, struct darray *dst, const size_t start,
+                   ^
+.deps\obs-sdk\include\util\darray.h:332:20: style: The function 'darray_pop_front' is never used. [unusedFunction]
+static inline void darray_pop_front(const size_t element_size, struct darray *dst)
+                   ^
+.deps\obs-sdk\include\util\darray.h:340:20: style: The function 'darray_pop_back' is never used. [unusedFunction]
+static inline void darray_pop_back(const size_t element_size, struct darray *dst)
+                   ^
+.deps\obs-sdk\include\util\darray.h:348:20: style: The function 'darray_join' is never used. [unusedFunction]
+static inline void darray_join(const size_t element_size, struct darray *dst, struct darray *da)
+                   ^
+.deps\obs-sdk\include\util\darray.h:354:20: style: The function 'darray_split' is never used. [unusedFunction]
+static inline void darray_split(const size_t element_size, struct darray *dst1, struct darray *dst2,
+                   ^
+.deps\obs-sdk\include\util\darray.h:378:20: style: The function 'darray_move_item' is never used. [unusedFunction]
+static inline void darray_move_item(const size_t element_size, struct darray *dst, const size_t from, const size_t to)
+                   ^
+.deps\obs-sdk\include\util\darray.h:405:20: style: The function 'darray_swap' is never used. [unusedFunction]
+static inline void darray_swap(const size_t element_size, struct darray *dst, const size_t a, const size_t b)
+                   ^
+src\plugin\module.c:4:1: style: The function 'obs_module_set_pointer' is never used. [unusedFunction]
+OBS_DECLARE_MODULE()
+^
+src\plugin\module.c:4:1: style: The function 'obs_module_ver' is never used. [unusedFunction]
+OBS_DECLARE_MODULE()
+^
+src\plugin\module.c:6:27: style: The function 'obs_module_name' is never used. [unusedFunction]
+MODULE_EXPORT const char* obs_module_name(void) { return "Meta G Link Direct"; }
+                          ^
+src\plugin\module.c:8:27: style: The function 'obs_module_description' is never used. [unusedFunction]
+MODULE_EXPORT const char* obs_module_description(void) {
+                          ^
+src\plugin\module.c:12:27: style: The function 'obs_module_author' is never used. [unusedFunction]
+MODULE_EXPORT const char* obs_module_author(void) { return "Meta G Link Direct contributors"; }
+                          ^
+src\plugin\module.c:14:6: style: The function 'obs_module_load' is never used. [unusedFunction]
+bool obs_module_load(void) {
+     ^
+nofile:0:0: information: Active checkers: 177/189 (use --checkers-report=<filename> to see details) [checkersReport]
+

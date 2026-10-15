@@ -1,0 +1,44 @@
+[1/22] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp for CXX dependencies
+[2/22] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
+[3/22] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\windows\capabilities.cpp for CXX dependencies
+[4/22] Generating CXX dyndep file CMakeFiles\mgl_windows.dir\CXX.dd
+[5/22] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp for CXX dependencies
+[6/22] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp for CXX dependencies
+[7/22] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp for CXX dependencies
+[8/22] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\sdu.cpp.obj
+[9/22] Generating CXX dyndep file CMakeFiles\meta-g-link-probe.dir\CXX.dd
+[10/22] Generating CXX dyndep file CMakeFiles\mgl-sdu-tests.dir\CXX.dd
+[11/22] Generating CXX dyndep file CMakeFiles\mgl-module-tests.dir\CXX.dd
+[12/22] Linking CXX static library mgl_protocol.lib
+[13/22] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\capabilities.cpp.obj
+[14/22] Linking CXX static library mgl_windows.lib
+[15/22] Building CXX object CMakeFiles\meta-g-link-probe.dir\src\probe\main.cpp.obj
+[16/22] Building C object CMakeFiles\meta-g-link-direct.dir\src\plugin\module.c.obj
+[17/22] Building CXX object CMakeFiles\mgl-sdu-tests.dir\tests\sdu_tests.cpp.obj
+[18/22] Linking CXX executable meta-g-link-probe.exe
+[19/22] Linking C shared module meta-g-link-direct.dll
+[20/22] Linking CXX executable mgl-sdu-tests.exe
+[21/22] Building CXX object CMakeFiles\mgl-module-tests.dir\tests\module_tests.cpp.obj
+[22/22] Linking CXX executable mgl-module-tests.exe
+Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
+    Start 1: protocol-prefix
+1/2 Test #1: protocol-prefix ..................   Passed    0.01 sec
+    Start 2: module-abi
+2/2 Test #2: module-abi .......................   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.02 sec
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 3 tests in 137ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
+Describing Project task runner
+  [+] does not modify files with WhatIf 378ms (354ms|24ms)
+  [+] formats a disposable source when effects are requested 1.26s (1.26s|1ms)
+  [+] propagates native formatter errors 1.32s (1.32s|1ms)
+Tests completed in 3.38s
+Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0

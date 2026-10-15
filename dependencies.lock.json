@@ -1,0 +1,25 @@
+{
+  "obs": {
+    "version": "32.2.2",
+    "revision": "ba2f32bdf791005443988a4955e963663e16b1ed",
+    "url": "https://github.com/obsproject/obs-studio/releases/download/32.2.2/OBS-Studio-32.2.2-Sources.tar.gz",
+    "sha256": "ec81fb66b03e75ddb3076b576f62679c39262e0e9960cef3e17a40dc5d68e6b4",
+    "directory": "obs-studio-32.2.2-sources",
+    "prebuilt_version": "2026-07-15",
+    "prebuilt_windows_x64_sha256": "6f90e9598fa10cff5ad23cdcfae49b87868c07bf896b02cd464582b4ce2f2ba9",
+    "qt_windows_x64_sha256": "7c7f985711d80467bdc1795b6592275a27d5b0e5a2c7a61db1f2c1d08d6a5579"
+  },
+  "visor": { "revision": "e7077b4051b1e3e605c667aa2a010fbe41f346a0", "license": "AGPL-3.0" },
+  "cppcheck": {
+    "version": "2.22.0",
+    "url": "https://github.com/cppcheck-opensource/cppcheck/releases/download/2.22.0/cppcheck-2.22.0-x64-Setup.msi",
+    "sha256": "3929162bab7e71d1b9b18708ec054fb0188bfc8ea1660979ed95837f5a9f547b"
+  },
+  "tools": {
+    "cmake": "3.31.3", "llvm": "22.1.1", "powershell": "7.6.6",
+    "windows_sdk": "10.0.26100.0", "msvc": "19.44.35222.0", "jscpd": "5.4.1",
+    "node": "24.20.0", "npm": "11.19.0", "pester": "5.7.1", "psscriptanalyzer": "1.25.0",
+    "gitleaks": "8.30.1", "semgrep": "1.177.0", "osv_scanner": "2.6.0",
+    "actionlint": "1.7.12", "zizmor": "1.25.2"
+  }
+}

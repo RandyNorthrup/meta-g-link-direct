@@ -1,0 +1,14 @@
+{
+  "id": "native-exit-propagation",
+  "gate": "test:runner",
+  "baseline_exit": 0,
+  "mutated_exit": 1,
+  "restored_exit": 0,
+  "expected_diagnostic": "Expected 0 to be different from the actual value",
+  "observed_diagnostic": "Expected 0 to be different from the actual value, but got the same value.",
+  "path": "scripts/Invoke-Project.ps1",
+  "before": "f34458187fdd9585bba2d58ed8d2533d79b0ea45e9c27f3e70141df27a40eb85",
+  "mutated": "6317091c63172acbb754e1704c06ba88dc870ecaea9805583166c6dfdf6eed7f",
+  "after": "f34458187fdd9585bba2d58ed8d2533d79b0ea45e9c27f3e70141df27a40eb85",
+  "log": "reports/red/native-exit-propagation.txt"
+}

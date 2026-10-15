@@ -1,0 +1,193 @@
+{
+  "acceptance": [
+    "AC-AUTH",
+    "AC-FRAMING",
+    "AC-GATES",
+    "AC-MEDIA",
+    "AC-MODULE",
+    "AC-OBS"
+  ],
+  "declared_environment": {
+    "platform": "windows",
+    "tools": {
+      "cmake": "3.31.3",
+      "gitleaks": "8.30.1",
+      "llvm": "22.1.1",
+      "powershell": "7.6.6",
+      "python": "3.14.0"
+    }
+  },
+  "inputs": {
+    "behavior": [
+      {
+        "path": ".clang-format",
+        "sha256": null
+      },
+      {
+        "path": ".clang-tidy",
+        "sha256": null
+      },
+      {
+        "path": ".github/dependabot.yml",
+        "sha256": null
+      },
+      {
+        "path": ".github/workflows/quality.yml",
+        "sha256": null
+      },
+      {
+        "path": ".gitignore",
+        "sha256": "805140575fe430c97f253e0ab12572858d36e31e126961a4d094a12829167a6a"
+      },
+      {
+        "path": ".gitleaks.toml",
+        "sha256": null
+      },
+      {
+        "path": ".pre-commit-config.yaml",
+        "sha256": null
+      },
+      {
+        "path": ".semgrep.yml",
+        "sha256": null
+      },
+      {
+        "path": "AGENTS.md",
+        "sha256": "71fbdb1732ce2b68f11b7a92e8d3d6bbdc174885cd1eea36b81b770735936af9"
+      },
+      {
+        "path": "CHANGELOG.md",
+        "sha256": null
+      },
+      {
+        "path": "CMakeLists.txt",
+        "sha256": null
+      },
+      {
+        "path": "CMakePresets.json",
+        "sha256": null
+      },
+      {
+        "path": "LICENSE",
+        "sha256": null
+      },
+      {
+        "path": "PROJECT_BRIEF.md",
+        "sha256": "11ba1d3922963c5a72e269035c3e6fb03804ef3ac92258b7247f3a222235e380"
+      },
+      {
+        "path": "PSScriptAnalyzerSettings.psd1",
+        "sha256": null
+      },
+      {
+        "path": "README.md",
+        "sha256": null
+      },
+      {
+        "path": "THIRD_PARTY_NOTICES.md",
+        "sha256": null
+      },
+      {
+        "path": "data/locale/en-US.ini",
+        "sha256": null
+      },
+      {
+        "path": "dependencies.lock.json",
+        "sha256": null
+      },
+      {
+        "path": "include/mgl/capabilities.hpp",
+        "sha256": null
+      },
+      {
+        "path": "include/mgl/sdu.hpp",
+        "sha256": null
+      },
+      {
+        "path": "include/mgl/session.hpp",
+        "sha256": null
+      },
+      {
+        "path": "include/mgl/stream.hpp",
+        "sha256": null
+      },
+      {
+        "path": "scripts/Invoke-Project.ps1",
+        "sha256": null
+      },
+      {
+        "path": "src/media/decoder.cpp",
+        "sha256": null
+      },
+      {
+        "path": "src/media/stream.cpp",
+        "sha256": null
+      },
+      {
+        "path": "src/plugin/glasses_source.cpp",
+        "sha256": null
+      },
+      {
+        "path": "src/plugin/module.cpp",
+        "sha256": null
+      },
+      {
+        "path": "src/probe/main.cpp",
+        "sha256": null
+      },
+      {
+        "path": "src/protocol/sdu.cpp",
+        "sha256": null
+      },
+      {
+        "path": "src/windows/capabilities.cpp",
+        "sha256": null
+      },
+      {
+        "path": "src/windows/identity.cpp",
+        "sha256": null
+      },
+      {
+        "path": "src/windows/session.cpp",
+        "sha256": null
+      },
+      {
+        "path": "src/windows/wifi_group.cpp",
+        "sha256": null
+      },
+      {
+        "path": "tests/module_tests.cpp",
+        "sha256": null
+      },
+      {
+        "path": "tests/sdu_tests.cpp",
+        "sha256": null
+      },
+      {
+        "path": "tests/session_tests.cpp",
+        "sha256": null
+      },
+      {
+        "path": "tests/source_tests.cpp",
+        "sha256": null
+      },
+      {
+        "path": "tests/stream_tests.cpp",
+        "sha256": null
+      }
+    ],
+    "readiness": [
+      {
+        "path": "AGENTS.md",
+        "sha256": "71fbdb1732ce2b68f11b7a92e8d3d6bbdc174885cd1eea36b81b770735936af9"
+      },
+      {
+        "path": "PROJECT_BRIEF.md",
+        "sha256": "11ba1d3922963c5a72e269035c3e6fb03804ef3ac92258b7247f3a222235e380"
+      }
+    ]
+  },
+  "notice": "Fingerprints are observations, not proof that commands or reviews ran.",
+  "plan_sha256": "c3444aa6659711efc05ee2e58bc8e234256e9b315ad302c12e2a03193dc0e2ba",
+  "scope_sha256": "00703e3105d324d9d00af55d6c853b8730d7cb040a2e695a690b915bcf37013a"
+}

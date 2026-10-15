@@ -1,0 +1,1 @@
+Write-Error: Red drill failed or survived: native-exit-propagation. Inspect C:\Users\Randy\Coding\meta_g_link_direct\reports\red\native-exit-propagation.txt
