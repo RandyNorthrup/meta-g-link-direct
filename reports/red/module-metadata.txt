@@ -12,17 +12,15 @@ Total Test time (real) =   0.02 sec
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 3 tests in 140ms.
+Discovery found 3 tests in 114ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 350ms (329ms|21ms)
-The input line is too long.
-The syntax of the command is incorrect.
-  [+] formats a disposable source when effects are requested 887ms (886ms|2ms)
-  [+] propagates native formatter errors 913ms (912ms|1ms)
-Tests completed in 2.58s
+  [+] does not modify files with WhatIf 358ms (339ms|20ms)
+  [+] formats a disposable source when effects are requested 338ms (337ms|1ms)
+  [+] propagates native formatter errors 394ms (393ms|1ms)
+Tests completed in 1.46s
 Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
 MUTATED EXIT 1
@@ -60,17 +58,15 @@ Total Test time (real) =   0.02 sec
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 3 tests in 147ms.
+Discovery found 3 tests in 118ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 359ms (336ms|23ms)
-The input line is too long.
-The syntax of the command is incorrect.
-  [+] formats a disposable source when effects are requested 843ms (842ms|1ms)
-  [+] propagates native formatter errors 913ms (912ms|1ms)
-Tests completed in 2.56s
+  [+] does not modify files with WhatIf 384ms (363ms|22ms)
+  [+] formats a disposable source when effects are requested 347ms (345ms|1ms)
+  [+] propagates native formatter errors 391ms (390ms|1ms)
+Tests completed in 1.52s
 Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
 RESTORATION SHA256 35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c

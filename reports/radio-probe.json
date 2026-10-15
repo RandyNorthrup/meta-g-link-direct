@@ -1,0 +1,11 @@
+{
+  "exit_code": 2,
+  "observation": {
+    "wifi_interfaces": 0,
+    "bluetooth_radio": true,
+    "wifi_error": 0,
+    "bluetooth_error": 0,
+    "glasses_connection_tested": false
+  },
+  "scope": "Read-only local radio prerequisites; no glasses connection attempted"
+}

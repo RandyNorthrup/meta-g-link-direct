@@ -26,7 +26,7 @@ Preset CMake variables:
 [13/13] Linking CXX executable mgl-sdu-tests.exe
 Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows-asan
     Start 1: protocol-prefix
-1/2 Test #1: protocol-prefix ..................   Passed    0.03 sec
+1/2 Test #1: protocol-prefix ..................   Passed    0.02 sec
     Start 2: module-abi
 2/2 Test #2: module-abi .......................   Passed    0.04 sec
 
@@ -57,39 +57,39 @@ Preset CMake variables:
 [8/8] Linking CXX executable mgl-sdu-tests.exe
 Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows-asan
     Start 1: protocol-prefix
-1/2 Test #1: protocol-prefix ..................***Failed    0.10 sec
+1/2 Test #1: protocol-prefix ..................***Failed    0.03 sec
 =================================================================
-==30876==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x11f37b0a0034 at pc 0x7ff6849b53de bp 0x003e6171fe80 sp 0x003e6171fe88
-READ of size 4 at 0x11f37b0a0034 thread T0
-    #0 0x7ff6849b53dd in main C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:64
-    #1 0x7ff6849b704f in invoke_main D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:78
-    #2 0x7ff6849b704f in __scrt_common_main_seh D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:288
+==8120==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x120083ca0034 at pc 0x7ff736b753de bp 0x00441939f800 sp 0x00441939f808
+READ of size 4 at 0x120083ca0034 thread T0
+    #0 0x7ff736b753dd in main C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:64
+    #1 0x7ff736b7704f in invoke_main D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:78
+    #2 0x7ff736b7704f in __scrt_common_main_seh D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:288
     #3 0x7fff96dbdda6  (C:\WINDOWS\System32\KERNEL32.DLL+0x18002dda6)
     #4 0x7fff98f7ee4b  (C:\WINDOWS\SYSTEM32\ntdll.dll+0x18007ee4b)
 
-0x11f37b0a0034 is located 0 bytes after 4-byte region [0x11f37b0a0030,0x11f37b0a0034)
+0x120083ca0034 is located 0 bytes after 4-byte region [0x120083ca0030,0x120083ca0034)
 allocated by thread T0 here:
-    #0 0x7ff6849b654e in operator new[](unsigned __int64) D:\a\_work\1\s\src\vctools\asan\llvm\compiler-rt\lib\asan\asan_win_new_array_thunk.cpp:41
-    #1 0x7ff6849b537d in std::make_unique C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\memory:3636
-    #2 0x7ff6849b537d in main C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:62
-    #3 0x7ff6849b704f in invoke_main D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:78
-    #4 0x7ff6849b704f in __scrt_common_main_seh D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:288
+    #0 0x7ff736b7654e in operator new[](unsigned __int64) D:\a\_work\1\s\src\vctools\asan\llvm\compiler-rt\lib\asan\asan_win_new_array_thunk.cpp:41
+    #1 0x7ff736b7537d in std::make_unique C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\memory:3636
+    #2 0x7ff736b7537d in main C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:62
+    #3 0x7ff736b7704f in invoke_main D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:78
+    #4 0x7ff736b7704f in __scrt_common_main_seh D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:288
     #5 0x7fff96dbdda6  (C:\WINDOWS\System32\KERNEL32.DLL+0x18002dda6)
     #6 0x7fff98f7ee4b  (C:\WINDOWS\SYSTEM32\ntdll.dll+0x18007ee4b)
 
 SUMMARY: AddressSanitizer: heap-buffer-overflow C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:64 in main
 Shadow bytes around the buggy address:
-  0x11f37b09fd80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x11f37b09fe00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x11f37b09fe80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x11f37b09ff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x11f37b09ff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-=>0x11f37b0a0000: fa fa fd fd fa fa[04]fa fa fa 01 fa fa fa fd fd
-  0x11f37b0a0080: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-  0x11f37b0a0100: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-  0x11f37b0a0180: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-  0x11f37b0a0200: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-  0x11f37b0a0280: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x120083c9fd80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x120083c9fe00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x120083c9fe80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x120083c9ff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x120083c9ff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+=>0x120083ca0000: fa fa fd fd fa fa[04]fa fa fa 00 00 fa fa fa fa
+  0x120083ca0080: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x120083ca0100: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x120083ca0180: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x120083ca0200: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x120083ca0280: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
 Shadow byte legend (one shadow byte represents 8 application bytes):
   Addressable:           00
   Partially addressable: 01 02 03 04 05 06 07 
@@ -109,14 +109,14 @@ Shadow byte legend (one shadow byte represents 8 application bytes):
   ASan internal:           fe
   Left alloca redzone:     ca
   Right alloca redzone:    cb
-==30876==ABORTING
+==8120==ABORTING
 
     Start 2: module-abi
 2/2 Test #2: module-abi .......................   Passed    0.05 sec
 
 50% tests passed, 1 tests failed out of 2
 
-Total Test time (real) =   0.15 sec
+Total Test time (real) =   0.08 sec
 
 The following tests FAILED:
 	  1 - protocol-prefix (Failed)

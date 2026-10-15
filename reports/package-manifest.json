@@ -1,0 +1,28 @@
+{
+  "archive": "dist/foundation-0.1.0.zip",
+  "sha256": "5ca04a9a7a8afe3fc7a213366b8a80d0ca2293404602fd4ec2e471ef16e0736f",
+  "source_revision": "6959a50efcbc758757a716507080bac7066482a2",
+  "entries": [
+    {
+      "path": "data/obs-plugins/meta-g-link-direct/LICENSE",
+      "size": 34524,
+      "sha256": "8d56b405468aad11f87ab5763f901e276e08d9646ff5c8481b1762b6b789e9ed"
+    },
+    {
+      "path": "data/obs-plugins/meta-g-link-direct/THIRD_PARTY_NOTICES.md",
+      "size": 1752,
+      "sha256": "1dd8521c61703b03143386b81923cb8840d4777fdc65d2ae1ce40c63728ea1d6"
+    },
+    {
+      "path": "obs-plugins/64bit/meta-g-link-direct.dll",
+      "size": 35840,
+      "sha256": "74d13cff976c836f032cd639a539774be34a0d2162459c21dbad946163d6d06c"
+    },
+    {
+      "path": "README.md",
+      "size": 7476,
+      "sha256": "0244903cb9ac5f49cf5fc7e5c1ea48117c04ee84082d7d61bd1b3d526b5957b6"
+    }
+  ],
+  "scope": "Development module foundation only; no camera source or glasses proof."
+}

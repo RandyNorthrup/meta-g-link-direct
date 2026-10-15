@@ -1,0 +1,188 @@
+{
+  "acceptance": [
+    "AC-FRAMING"
+  ],
+  "declared_environment": {
+    "platform": "windows",
+    "tools": {
+      "actionlint": "1.7.12",
+      "cmake": "3.31.3",
+      "cppcheck": "2.22.0",
+      "gitleaks": "8.30.1",
+      "jscpd": "5.4.1",
+      "llvm": "22.1.1",
+      "msvc": "19.44.35222.0",
+      "node": "24.20.0",
+      "npm": "11.19.0",
+      "osv_scanner": "2.6.0",
+      "pester": "5.7.1",
+      "powershell": "7.6.6",
+      "precommit": "4.5.1",
+      "psscriptanalyzer": "1.25.0",
+      "python": "3.14.0",
+      "semgrep": "1.177.0",
+      "zizmor": "1.25.2"
+    }
+  },
+  "inputs": {
+    "behavior": [
+      {
+        "path": ".clang-format",
+        "sha256": "b8b235ad236526882c0fdc52d3a17194410d13a184ab572937de4fa2c231ecdd"
+      },
+      {
+        "path": ".clang-tidy",
+        "sha256": "c2f69f181a8cd59ba8bdc3fc46328b22c7c65705adf3daadd6e6ebba796a7464"
+      },
+      {
+        "path": ".cppcheck-obs.cfg",
+        "sha256": "43af454a083f4d7b44dcd22e48f191f8699f8eff272ded6fea1f9b7eb412364a"
+      },
+      {
+        "path": ".gitattributes",
+        "sha256": "ee43d446d24f0d2bdcbed79675723d60ce40dc884f727fe66e93a4adee84fda8"
+      },
+      {
+        "path": ".github/dependabot.yml",
+        "sha256": "52f52486fba5f32ef49c3ef1b216fac04888ad0847c64b57df89b28655fb82a3"
+      },
+      {
+        "path": ".github/workflows/quality.yml",
+        "sha256": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca"
+      },
+      {
+        "path": ".gitignore",
+        "sha256": "51afdd661c7a97f4fb20f0cbd4338ba95adc00b30b0a3d6d95c2190777e7a469"
+      },
+      {
+        "path": ".gitleaks.toml",
+        "sha256": "ce1b21983f8ff159aa5762beb7e973e1b2b2dfe8bd350cf39daa0ec2da2e711e"
+      },
+      {
+        "path": ".jscpd.json",
+        "sha256": "8aba253a1058ebdc4515d74367a37a0e53aac6451af06a760172c74100e1c4b6"
+      },
+      {
+        "path": ".pre-commit-config.yaml",
+        "sha256": "c2df117a2f7ab21bc8210e626bb67710515abe62fa76bc9011408dc15c5c188a"
+      },
+      {
+        "path": ".semgrep.yml",
+        "sha256": "c989195a0157c259c43150cb2edb54842800317827b5504004de5831110d6619"
+      },
+      {
+        "path": "AGENTS.md",
+        "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+      },
+      {
+        "path": "CHANGELOG.md",
+        "sha256": "ab623d802989bc87f67cf8942c822959d46ea34d92d8a9bcedebe1eec456ae76"
+      },
+      {
+        "path": "CMakeLists.txt",
+        "sha256": "ccc5cde490041c4086e9f076482ae31af2334d3d0132162109bb021aed490ae3"
+      },
+      {
+        "path": "CMakePresets.json",
+        "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+      },
+      {
+        "path": "LICENSE",
+        "sha256": "8d56b405468aad11f87ab5763f901e276e08d9646ff5c8481b1762b6b789e9ed"
+      },
+      {
+        "path": "PROJECT_BRIEF.md",
+        "sha256": "9f42752e917cd5cf9a77abffaf4ad4648ed79dac4a5354a9f1c287388b3a6f87"
+      },
+      {
+        "path": "PSScriptAnalyzerSettings.psd1",
+        "sha256": "427f99245961626682b7ed07663c63e67aeb9566d1bffe372aee05b98e32f2e0"
+      },
+      {
+        "path": "README.md",
+        "sha256": "0244903cb9ac5f49cf5fc7e5c1ea48117c04ee84082d7d61bd1b3d526b5957b6"
+      },
+      {
+        "path": "THIRD_PARTY_NOTICES.md",
+        "sha256": "1dd8521c61703b03143386b81923cb8840d4777fdc65d2ae1ce40c63728ea1d6"
+      },
+      {
+        "path": "dependencies.lock.json",
+        "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+      },
+      {
+        "path": "include/mgl/capabilities.hpp",
+        "sha256": "1aa70c0fd03120ae45b53da26fc11f7cd81c6b6255031683e92ce0c7365e0d8e"
+      },
+      {
+        "path": "include/mgl/sdu.hpp",
+        "sha256": "bf120c3f0f14cf566c1a298bd15002d00656de7828772ee1a141834328668db6"
+      },
+      {
+        "path": "package-lock.json",
+        "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+      },
+      {
+        "path": "package.json",
+        "sha256": "1053cfdf62f78e96e8f488835b6abaf6e7accdab3f0d868b68793d6aeb29a1e6"
+      },
+      {
+        "path": "scripts/Invoke-Project.ps1",
+        "sha256": "f34458187fdd9585bba2d58ed8d2533d79b0ea45e9c27f3e70141df27a40eb85"
+      },
+      {
+        "path": "src/plugin/module.c",
+        "sha256": "35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c"
+      },
+      {
+        "path": "src/probe/main.cpp",
+        "sha256": "1799a1e768ac3b121fe93084f901bc869827b63ea3da2111f074f9a56fe50080"
+      },
+      {
+        "path": "src/protocol/sdu.cpp",
+        "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+      },
+      {
+        "path": "src/windows/capabilities.cpp",
+        "sha256": "d7c5a85a690218456d9d9b3b0ce19c4b47d108cba4665fb474343c9af68db6d4"
+      },
+      {
+        "path": "tests/module_tests.cpp",
+        "sha256": "02470464448f4f2c0ed552d47cc10988b895ea37177ea71b26905a5b05b4a20b"
+      },
+      {
+        "path": "tests/runner.Tests.ps1",
+        "sha256": "08675144ad7cddc1213d848507220228d74999dcceeaf9034fac811a3876f5b1"
+      },
+      {
+        "path": "tests/sdu_tests.cpp",
+        "sha256": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd"
+      }
+    ],
+    "readiness": [
+      {
+        "path": "AGENTS.md",
+        "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+      },
+      {
+        "path": "CMakePresets.json",
+        "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+      },
+      {
+        "path": "PROJECT_BRIEF.md",
+        "sha256": "9f42752e917cd5cf9a77abffaf4ad4648ed79dac4a5354a9f1c287388b3a6f87"
+      },
+      {
+        "path": "dependencies.lock.json",
+        "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+      },
+      {
+        "path": "package-lock.json",
+        "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+      }
+    ]
+  },
+  "notice": "Fingerprints are observations, not proof that commands or reviews ran.",
+  "plan_sha256": "76619460b23934404133a9b78a5a748eccb1bbc0a312ab11984e3d92d21d656d",
+  "scope_sha256": "4949ca6b56599220219cfe4da1a57f8620b11118cf1c81c80acedd944e6d7b3c"
+}

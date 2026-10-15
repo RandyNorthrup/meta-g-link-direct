@@ -2,31 +2,27 @@ BASELINE EXIT 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 3 tests in 129ms.
+Discovery found 3 tests in 113ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 362ms (339ms|23ms)
-The input line is too long.
-The syntax of the command is incorrect.
-  [+] formats a disposable source when effects are requested 933ms (931ms|2ms)
-  [+] propagates native formatter errors 1s (979ms|25ms)
-Tests completed in 2.74s
+  [+] does not modify files with WhatIf 413ms (391ms|22ms)
+  [+] formats a disposable source when effects are requested 351ms (350ms|1ms)
+  [+] propagates native formatter errors 413ms (412ms|1ms)
+Tests completed in 1.56s
 Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
 MUTATED EXIT 1
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 3 tests in 145ms.
+Discovery found 3 tests in 114ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-The input line is too long.
-The syntax of the command is incorrect.
-  [-] does not modify files with WhatIf 1.06s (1.04s|23ms)
+  [-] does not modify files with WhatIf 437ms (417ms|20ms)
    Expected strings to be the same, but they were different.
    Expected length: 23
    Actual length:   25
@@ -36,11 +32,9 @@ The syntax of the command is incorrect.
               ---------^
    at [IO.File]::ReadAllText($samplePath) | Should -BeExactly $originalSample, C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1:26
    at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1:26
-The input line is too long.
-The syntax of the command is incorrect.
-  [+] formats a disposable source when effects are requested 999ms (997ms|2ms)
-  [+] propagates native formatter errors 998ms (997ms|1ms)
-Tests completed in 3.58s
+  [+] formats a disposable source when effects are requested 357ms (356ms|1ms)
+  [+] propagates native formatter errors 438ms (437ms|1ms)
+Tests completed in 1.65s
 Tests Passed: 2, Failed: 1, Skipped: 0, Inconclusive: 0, NotRun: 0
 Write-Error: Pester runner tests failed or discovery count changed
 
@@ -48,17 +42,15 @@ RESTORED EXIT 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 3 tests in 131ms.
+Discovery found 3 tests in 116ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 375ms (352ms|23ms)
-The input line is too long.
-The syntax of the command is incorrect.
-  [+] formats a disposable source when effects are requested 934ms (932ms|2ms)
-  [+] propagates native formatter errors 997ms (996ms|1ms)
-Tests completed in 2.76s
+  [+] does not modify files with WhatIf 369ms (346ms|22ms)
+  [+] formats a disposable source when effects are requested 339ms (337ms|1ms)
+  [+] propagates native formatter errors 409ms (409ms|1ms)
+Tests completed in 1.49s
 Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
-RESTORATION SHA256 3e757f4dc585af49c6438e196d96fe8f7c3287805a05c5c04174f9c40b0a68b5
+RESTORATION SHA256 f34458187fdd9585bba2d58ed8d2533d79b0ea45e9c27f3e70141df27a40eb85
