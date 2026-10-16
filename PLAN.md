@@ -9151,7 +9151,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
     ],
     "pending_operations": [],
     "next_action": "Continue active TASK-AUTH: connected WLAN adapter is detected, association is currently zero and Ethernet is up. Current Windows passive BLE scan fails with BluetoothError 9 TransportNotSupported; investigate that path and implement/test documented Classic RFCOMM without silent fallback or network/ownership changes. Then protected identity, reproducible authorized Meta setup with phone recovery explained, real device information with phone off and after glasses restart, and first frame. Do not request adapter model or restart product discovery. Keep successful BLE/callback-race, native audit, portable coverage/fuzz/Linux sanitizers, latest-firmware/media/OBS accessibility and >=120-minute gates open. Prior foundation ZIP remains historical.",
-    "source_revision": null
+    "source_revision": "19d2eba3f2ab87515a056fb75813774c910d782d"
   }
 }
 ```
