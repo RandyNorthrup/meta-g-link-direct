@@ -9,9 +9,9 @@ The confirmed product contract is in [PROJECT_BRIEF.md](PROJECT_BRIEF.md). [PLAN
 ## What exists
 
 - C++20 frame-prefix library ported from the pinned AGPL-3.0 Visor implementation. It distinguishes incomplete headers, valid frame lengths, and invalid types without allocating or receiving camera data.
-- Read-only native Windows WLAN/Bluetooth radio probe. It reports counts, availability and API error codes without scanning for glasses, pairing, changing networks, or exposing addresses.
+- Read-only native Windows WLAN/Bluetooth probe. Default reports radio presence and Wi-Fi association separately. Explicit `--discover` performs a bounded passive BLE scan using Visor's Meta company/service markers, reporting packet counts and native errors without names, addresses, payloads, pairing or network changes. A marker is only a candidate, not verified glasses identity.
 - C17 OBS module foundation compiled against the real OBS 32.2.2 SDK. An isolated loader test checks the DLL against the installed OBS runtime, its exports, and truthful development metadata. This is not a test of an OBS scene or streaming source.
-- Two CTest suites, including 83 independent framing/truncation/type cases, plus three Pester tests for actual formatting, WhatIf protection and native error propagation.
+- Two CTest suites, including 83 independent framing/truncation/type cases, three Pester runner tests and seven actual CLI tests covering radio/scan results, redacted fields, help and invalid arguments.
 - Native build, formatting, static analysis, dead-code/duplication checks, secret/SAST/dependency scanning, and maintained defect/restoration drills.
 
 ## Tested development environment
@@ -31,9 +31,13 @@ pwsh -NoProfile -File scripts/Invoke-Project.ps1 bootstrap
 pwsh -NoProfile -File scripts/Invoke-Project.ps1 configure
 pwsh -NoProfile -File scripts/Invoke-Project.ps1 build
 pwsh -NoProfile -File scripts/Invoke-Project.ps1 test
+pwsh -NoProfile -File scripts/Invoke-Project.ps1 probe
+pwsh -NoProfile -File scripts/Invoke-Project.ps1 discover
 ```
 
 The runner configures the Visual Studio environment only when required and reuses an existing matching environment. Owned builds use two parallel jobs. Generated dependencies, build files and local tools remain under ignored project directories.
+
+After building, run `out/windows/meta-g-link-probe.exe --help` for native exit codes. No arguments performs no BLE scan. `--discover` listens for up to ten seconds plus a two-second stop deadline; early native failure returns immediately. Counts are advertisement packets, not unique devices. Exit 6 means a completed scan found no Meta marker; exit 3 means native discovery failed. The PowerShell runner converts any nonzero native result to a task failure; use the executable directly when the exact native exit code matters. Tests include a real local scan, so physical driver failure is checked for honest reporting, not treated as a successful scan.
 
 OBS is discovered at its verified per-user installation. For another installation location, set the optional process environment variable `MGL_OBS_RUNTIME` to that installation's `bin/64bit` directory before configuring. The directory must contain `obs.dll`; it is a runtime path, not a credential. There is no `.env` loader or implemented Meta authentication configuration yet.
 
@@ -53,7 +57,7 @@ Windows AddressSanitizer runs in a separate build. Portable ASan/UBSan commands 
 ## Structure and ownership
 
 - `include/mgl/`, `src/protocol/`: portable framing contract and implementation.
-- `src/windows/`: local radio capabilities; later transport and identity code belongs here.
+- `src/windows/`: local radio capabilities and passive BLE discovery; later transport and identity code belongs here.
 - `src/probe/`: diagnostic CLI.
 - `src/plugin/`: native OBS module entry point; no camera source yet.
 - `tests/`: independent native examples and disposable-resource runner checks.
@@ -66,13 +70,15 @@ Cppcheck uses the same database with MSVC external-include spelling normalized, 
 
 ## Privacy and future credentials
 
-Current code enumerates local radios and exposes module metadata. It has no Meta login, stored owner identity, media recording, telemetry, automatic update check, or phone data importer. The accepted future policy requires protected local identity, explicit Forget, transient media buffers, requested redacted diagnostics, and OBS-controlled recording. Never put passwords, owner keys, tokens, Wi-Fi passphrases, raw captures, or private diagnostic bundles into this repository.
+Current code enumerates local radios, optionally scans BLE advertisements, and exposes module metadata. Scan state contains counters and errors; it does not retain device names, addresses or manufacturer payloads. It has no Meta login, stored owner identity, media recording, telemetry, automatic update check, or phone data importer. The accepted future policy requires protected local identity, explicit Forget, transient media buffers, requested redacted diagnostics, and OBS-controlled recording. Never put passwords, owner keys, tokens, Wi-Fi passphrases, raw captures, or private diagnostic bundles into this repository.
 
 ## Troubleshooting and next milestone
 
-The current probe observed Bluetooth present and no WLAN interface, returning its documented hardware-unavailable status. Connect the available adapter before real connection/media tests; actual Windows group-owner capability will be measured then. No adapter-model questionnaire is required.
+The connected adapter is now enumerated: one WLAN interface and a Bluetooth radio, with no local enumeration errors. Current Windows observation shows zero associated WLAN interfaces and Ethernet up; Ethernet may still put this PC on the same LAN as the glasses. The native BLE scan stopped with Bluetooth error 9 (`TransportNotSupported`), exit 3, before receiving packets. This establishes a failure of the current Windows BLE scan path, not an absence of glasses or proof that all Bluetooth transports are incompatible. See [current discovery verification](reports/DISCOVERY_VERIFICATION.md). No adapter-model questionnaire is required.
 
-Next: port discovery, direct transport and protected identity setup, establish a reproducible authorized Meta ownership flow if needed, and receive a real frame with the phone off. Meta AI on iPhone is the current companion; no supported local owner-key export has been established. New ownership and return-to-phone behavior must be explained and tested before changing the glasses.
+Same LAN is insufficient to open the camera. The [upstream protocol](https://github.com/macedonga/visor/wiki/Radios-and-links) first establishes an authenticated Bluetooth session, then negotiates the Wi-Fi endpoint. An existing phone bond may also suppress advertisements. There is no implemented direct TCP endpoint discovery or RFCOMM connection yet. Actual Windows group-owner capability remains untested.
+
+Next: investigate the current Windows BLE transport failure and the documented Classic RFCOMM route, then port direct transport and protected identity setup, establish a reproducible authorized Meta ownership flow if needed, and receive a real frame with the phone off. Meta AI on iPhone is the current companion; no supported local owner-key export has been established. New ownership and return-to-phone behavior must be explained and tested before changing the glasses.
 
 Do not infer current-firmware compatibility, 720p/30fps, latency, accessible source UI, or two-hour stability from the foundation tests. Those remain explicit hardware/OBS gates.
 

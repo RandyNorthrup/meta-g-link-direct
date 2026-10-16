@@ -1,0 +1,14 @@
+{
+  "observed_utc": "2026-10-15T23:57:40.9853907Z",
+  "native_exit_code": 3,
+  "elapsed_milliseconds": 27,
+  "bluetooth_error_symbol": "TransportNotSupported",
+  "ethernet_up_count": 1,
+  "wifi_physical_count": 1,
+  "wifi_up_count": 0,
+  "recognizable_glasses_pnp_entries": 0,
+  "pnp_name_match_is_not_bond_proof": true,
+  "glasses_lan_identity_verified": false,
+  "glasses_authentication_verified": false,
+  "quality_command_exit_code": 0
+}

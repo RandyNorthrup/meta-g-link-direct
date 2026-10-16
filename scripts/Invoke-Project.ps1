@@ -5,12 +5,13 @@ param(
     [ValidateSet('bootstrap', 'configure', 'build', 'test', 'format', 'format:check', 'lint',
         'typecheck', 'deadcode', 'security:audit', 'test:red', 'quality', 'package', 'probe',
         'lint:cpp', 'lint:powershell', 'lint:workflow', 'deadcode:cpp', 'deadcode:copies',
-        'security:secrets', 'security:sast', 'security:npm', 'security:osv', 'test:asan', 'test:runner')]
+        'security:secrets', 'security:sast', 'security:npm', 'security:osv', 'test:asan', 'test:runner',
+        'test:probe', 'discover')]
     [string]$Task = 'quality',
     [ValidateSet('all', 'parser-length', 'module-metadata', 'format', 'owned-header',
         'compiler-types', 'unused-code', 'script-analysis', 'workflow-security', 'secret-scanner',
         'unsafe-copy', 'duplicated-code', 'address-sanitizer', 'dependency-npm', 'dependency-osv',
-        'whatif-guard', 'native-exit-propagation')]
+        'whatif-guard', 'native-exit-propagation', 'probe-arguments')]
     [string]$Drill = 'all'
 )
 
@@ -254,6 +255,11 @@ function Invoke-RedDrillSet {
         $text.Replace('return "Meta G Link Direct";', 'return "Broken module name";')
     } -Gate test -ExpectedDiagnostic 'OBS module metadata does not match'
 
+    Invoke-RestoredDrill -Id probe-arguments -Path (Join-Path $projectRoot 'src/probe/main.cpp') -Mutate {
+        param($text)
+        $text.Replace('return InvalidArguments;', 'return InvalidArguments * EXIT_SUCCESS;')
+    } -Gate test -ExpectedDiagnostic 'invalid probe arguments must fail'
+
     Invoke-RestoredDrill -Id format -Path (Join-Path $projectRoot 'src/protocol/sdu.cpp') -Mutate {
         param($text)
         $text + "`nint red_drill_format( ){return 1;}`n"
@@ -347,7 +353,7 @@ function Invoke-RedDrillSet {
         param($text)
         $text.Replace('if ($LASTEXITCODE -ne 0) {', 'if ($false) {')
     } -Gate 'test:runner' -ExpectedDiagnostic 'Expected 0 to be different from the actual value'
-    $expectedDrillCount = if ($Drill -eq 'all') { 16 } else { 1 }
+    $expectedDrillCount = if ($Drill -eq 'all') { 17 } else { 1 }
     if ($script:DrillEvidence.Count -ne $expectedDrillCount) {
         throw 'Red-drill discovery did not match the requested scope'
     }
@@ -365,12 +371,20 @@ function Invoke-Task {
             Invoke-Task -Name build
             Invoke-Native -Command ctest -ArgumentList @('--preset', 'windows')
             Invoke-Task -Name 'test:runner'
+            Invoke-Task -Name 'test:probe'
         }
         'test:runner' {
             $result = Invoke-Pester -Path (Join-Path $projectRoot 'tests/runner.Tests.ps1') `
                 -PassThru -Output Detailed
             if ($result.TotalCount -eq 0 -or $result.FailedCount -ne 0 -or $result.PassedCount -ne 3) {
                 throw 'Pester runner tests failed or discovery count changed'
+            }
+        }
+        'test:probe' {
+            $result = Invoke-Pester -Path (Join-Path $projectRoot 'tests/probe.Tests.ps1') `
+                -PassThru -Output Detailed
+            if ($result.TotalCount -ne 7 -or $result.FailedCount -ne 0 -or $result.PassedCount -ne 7) {
+                throw 'Pester probe tests failed or discovery count changed'
             }
         }
         'test:asan' {
@@ -437,6 +451,9 @@ function Invoke-Task {
             Get-FileHash -LiteralPath $zip -Algorithm SHA256 | Format-List
         }
         probe { Invoke-Native -Command (Join-Path $buildRoot 'meta-g-link-probe.exe') }
+        discover {
+            Invoke-Native -Command (Join-Path $buildRoot 'meta-g-link-probe.exe') -ArgumentList '--discover'
+        }
         default { throw "Unknown project task: $Name" }
     }
 }

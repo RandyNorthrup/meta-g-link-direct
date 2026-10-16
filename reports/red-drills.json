@@ -28,6 +28,20 @@
     "log": "reports/red/module-metadata.txt"
   },
   {
+    "id": "probe-arguments",
+    "gate": "test",
+    "baseline_exit": 0,
+    "mutated_exit": 1,
+    "restored_exit": 0,
+    "expected_diagnostic": "invalid probe arguments must fail",
+    "observed_diagnostic": "Expected 5, because invalid probe arguments must fail, but got 0.",
+    "path": "src/probe/main.cpp",
+    "before": "a057a54f9c429cd802c9c2d8bb2516df1519bff55943e63f5e9751889fce2c11",
+    "mutated": "6400301fed1c9b2c2098c0fc3df457813b4afbc74d1ece68a075add4ac462dec",
+    "after": "a057a54f9c429cd802c9c2d8bb2516df1519bff55943e63f5e9751889fce2c11",
+    "log": "reports/red/probe-arguments.txt"
+  },
+  {
     "id": "format",
     "gate": "format:check",
     "baseline_exit": 0,
@@ -90,11 +104,11 @@
     "mutated_exit": 1,
     "restored_exit": 0,
     "expected_diagnostic": "PSUseApprovedVerbs",
-    "observed_diagnostic": "PSUseApprovedVerbs Warning  Invoke-Project.ps1 464  The cmdlet 'Badverb-RedDrill' uses an unapproved verb.",
+    "observed_diagnostic": "PSUseApprovedVerbs Warning  Invoke-Project.ps1 481  The cmdlet 'Badverb-RedDrill' uses an unapproved verb.",
     "path": "scripts/Invoke-Project.ps1",
-    "before": "f34458187fdd9585bba2d58ed8d2533d79b0ea45e9c27f3e70141df27a40eb85",
-    "mutated": "9c32be0adda020562fa3727ccd34e64553120926c808daa86761731f29dd9bb0",
-    "after": "f34458187fdd9585bba2d58ed8d2533d79b0ea45e9c27f3e70141df27a40eb85",
+    "before": "e7d38dd33f0aadf2f7c2b982462f6aea86878bcb0c3455fbee69903d67caa6d2",
+    "mutated": "0ce13f6cb38db07c7f6ded1d6899b533e7eeb5138b0dd6c50a6ecdf531149820",
+    "after": "e7d38dd33f0aadf2f7c2b982462f6aea86878bcb0c3455fbee69903d67caa6d2",
     "log": "reports/red/script-analysis.txt"
   },
   {
@@ -118,10 +132,10 @@
     "mutated_exit": 1,
     "restored_exit": 0,
     "expected_diagnostic": "leaks found",
-    "observed_diagnostic": "1:07PM WRN leaks found: 1",
+    "observed_diagnostic": "4:56PM WRN leaks found: 1",
     "path": "src/protocol/sdu.cpp",
     "before": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084",
-    "mutated": "cf9ff27c94759ecb629d586ecc3b4aa0442274170c2cfd180ceb73276f9f4999",
+    "mutated": "2d041a3361ab6d524c60a217c4881d9dbe553bd4f7b87574c8d87ef4a4a71dce",
     "after": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084",
     "log": "reports/red/secret-scanner.txt"
   },
@@ -146,7 +160,7 @@
     "mutated_exit": 1,
     "restored_exit": 0,
     "expected_diagnostic": "Found [1-9][0-9]* clones|threshold",
-    "observed_diagnostic": "ERROR: jscpd found too many duplicates (7.0%) over threshold (0.0%)",
+    "observed_diagnostic": "\u001b[90mFound 1 clones.\u001b[39m",
     "path": "src/protocol/sdu.cpp",
     "before": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084",
     "mutated": "21406acfb851f1a583b2a8e742638e4eb5e5f367c7195ef607eb5862fcd8d6df",
@@ -160,7 +174,7 @@
     "mutated_exit": 1,
     "restored_exit": 0,
     "expected_diagnostic": "AddressSanitizer: heap-buffer-overflow",
-    "observed_diagnostic": "==8120==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x120083ca0034 at pc 0x7ff736b753de bp 0x00441939f800 sp 0x00441939f808",
+    "observed_diagnostic": "==3660==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x121cb6ca0034 at pc 0x7ff736c653de bp 0x007bd59ff6e0 sp 0x007bd59ff6e8",
     "path": "tests/sdu_tests.cpp",
     "before": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd",
     "mutated": "f0b8a6f71a8f96f071d86024029c536756dd654d9beaea73b9a22d9535147d2e",
@@ -204,9 +218,9 @@
     "expected_diagnostic": "Expected strings to be the same",
     "observed_diagnostic": "Expected strings to be the same, but they were different.",
     "path": "scripts/Invoke-Project.ps1",
-    "before": "f34458187fdd9585bba2d58ed8d2533d79b0ea45e9c27f3e70141df27a40eb85",
-    "mutated": "f984215ef641a3fd7cbf07a4a75c8a0ca293cc75a2e510623b9872acea52f9ee",
-    "after": "f34458187fdd9585bba2d58ed8d2533d79b0ea45e9c27f3e70141df27a40eb85",
+    "before": "e7d38dd33f0aadf2f7c2b982462f6aea86878bcb0c3455fbee69903d67caa6d2",
+    "mutated": "120fcc5952c9ee26a1dc9306825eff2cd573e77ac173dc4d1486cd516d4327a8",
+    "after": "e7d38dd33f0aadf2f7c2b982462f6aea86878bcb0c3455fbee69903d67caa6d2",
     "log": "reports/red/whatif-guard.txt"
   },
   {
@@ -218,9 +232,9 @@
     "expected_diagnostic": "Expected 0 to be different from the actual value",
     "observed_diagnostic": "Expected 0 to be different from the actual value, but got the same value.",
     "path": "scripts/Invoke-Project.ps1",
-    "before": "f34458187fdd9585bba2d58ed8d2533d79b0ea45e9c27f3e70141df27a40eb85",
-    "mutated": "6317091c63172acbb754e1704c06ba88dc870ecaea9805583166c6dfdf6eed7f",
-    "after": "f34458187fdd9585bba2d58ed8d2533d79b0ea45e9c27f3e70141df27a40eb85",
+    "before": "e7d38dd33f0aadf2f7c2b982462f6aea86878bcb0c3455fbee69903d67caa6d2",
+    "mutated": "a9b187aa1b03c9bf32afd65453dd28deb05662dd79c099d3f13fd84dd579f7a6",
+    "after": "e7d38dd33f0aadf2f7c2b982462f6aea86878bcb0c3455fbee69903d67caa6d2",
     "log": "reports/red/native-exit-propagation.txt"
   }
 ]

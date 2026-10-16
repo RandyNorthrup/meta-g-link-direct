@@ -1,0 +1,125 @@
+5170 warnings generated.
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:29:22: error: escaped string literal can be written as a raw string literal [modernize-raw-string-literal,-warnings-as-errors]
+   29 |         std::cout << ",\"scan_duration_seconds\":10,\"advertisement_reports\":"
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                      R"(,"scan_duration_seconds":10,"advertisement_reports":)"
+Suppressed 5169 warnings (5169 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+1 warning treated as error
+4741 warnings generated.
+Suppressed 4741 warnings (4741 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+39616 warnings generated.
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\capabilities.cpp:38:21: error: do not use array subscript when the index is not an integer constant expression [cppcoreguidelines-pro-bounds-constant-array-index,-warnings-as-errors]
+   38 |                 if (list->InterfaceInfo[index].isState == wlan_interface_state_connected) {
+      |                     ^
+Suppressed 39615 warnings (39615 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+1 warning treated as error
+6313 warnings and 1 error generated.
+Error while processing C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp.
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:5:1: error: included header Windows.Devices.Bluetooth.Advertisement.h is not used directly [misc-include-cleaner,-warnings-as-errors]
+    5 | #include <winrt/Windows.Devices.Bluetooth.Advertisement.h>
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    6 | #include <winrt/Windows.Devices.Bluetooth.h>
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:6:1: error: included header Windows.Devices.Bluetooth.h is not used directly [misc-include-cleaner,-warnings-as-errors]
+    6 | #include <winrt/Windows.Devices.Bluetooth.h>
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    7 | #include <winrt/Windows.Foundation.Collections.h>
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:7:1: error: included header Windows.Foundation.Collections.h is not used directly [misc-include-cleaner,-warnings-as-errors]
+    7 | #include <winrt/Windows.Foundation.Collections.h>
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    8 | #include <winrt/Windows.Foundation.h>
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:8:1: error: included header Windows.Foundation.h is not used directly [misc-include-cleaner,-warnings-as-errors]
+    8 | #include <winrt/Windows.Foundation.h>
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    9 | #include <winrt/base.h>
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:21:58: error: no header providing "winrt::Windows::Devices::Bluetooth::Advertisement::BluetoothLEAdvertisementWatcher" is directly included [misc-include-cleaner,-warnings-as-errors]
+   18 | 
+   19 | namespace mgl {
+   20 | namespace {
+   21 | using winrt::Windows::Devices::Bluetooth::Advertisement::BluetoothLEAdvertisementWatcher;
+      |                                                          ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:47:62: error: no header providing "winrt::Windows::Devices::Bluetooth::Advertisement::BluetoothLEAdvertisement" is directly included [misc-include-cleaner,-warnings-as-errors]
+   47 |     const winrt::Windows::Devices::Bluetooth::Advertisement::BluetoothLEAdvertisement&
+      |                                                              ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:57:76: error: variable 'MetaService' cannot be implicitly captured in a lambda with no capture-default specified [clang-diagnostic-error]
+   57 |                                [](const auto& service) { return service == MetaService; });
+      |                                                                            ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\type_traits:1576:21: note: in instantiation of function template specialization 'mgl::(anonymous namespace)::hasMetaMarker(const winrt::Windows::Devices::Bluetooth::Advertisement::BluetoothLEAdvertisement &)::(lambda)::operator()<winrt::guid>' requested here
+ 1576 |         -> decltype(static_cast<_Callable&&>(_Obj)(static_cast<_Types&&>(_Args)...)) {
+      |                     ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\type_traits:1677:17: note: while substituting deduced template arguments into function template '_Call' [with _Callable = (lambda at C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:57:32) &, _Types = <winrt::guid &>]
+ 1677 |     -> decltype(_Invoker1<_Callable, _Ty1>::_Call(
+      |                 ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\concepts:254:39: note: while substituting deduced template arguments into function template 'invoke' [with _Callable = (lambda at C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:57:32) &, _Ty1 = winrt::guid &, _Types2 = <>]
+  254 |     _FTy&& _Fn, _ArgTys&&... _Args) { _STD invoke(static_cast<_FTy&&>(_Fn), static_cast<_ArgTys&&>(_Args)...); };
+      |                                       ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\yvals_core.h:1928:17: note: expanded from macro '_STD'
+ 1928 | #define _STD    ::std::
+      |                 ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\concepts:254:39: note: in instantiation of requirement here
+  254 |     _FTy&& _Fn, _ArgTys&&... _Args) { _STD invoke(static_cast<_FTy&&>(_Fn), static_cast<_ArgTys&&>(_Args)...); };
+      |                                       ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\yvals_core.h:1928:17: note: expanded from macro '_STD'
+ 1928 | #define _STD    ::std::
+      |                 ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\concepts:253:21: note: while substituting template arguments into constraint expression here
+  253 | concept invocable = requires(
+      |                     ^~~~~~~~~
+  254 |     _FTy&& _Fn, _ArgTys&&... _Args) { _STD invoke(static_cast<_FTy&&>(_Fn), static_cast<_ArgTys&&>(_Args)...); };
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\concepts:257:29: note: (skipping 1 context in backtrace; use -ftemplate-backtrace-limit=0 to see all)
+  257 | concept regular_invocable = invocable<_FTy, _ArgTys...>;
+      |                             ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\concepts:260:21: note: while checking the satisfaction of concept 'regular_invocable<const winrt::Windows::Foundation::Collections::IVector<winrt::guid> &, identity, (lambda at C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:57:32)>' requested here
+  260 | concept predicate = regular_invocable<_FTy, _ArgTys...> && _Boolean_testable<invoke_result_t<_FTy, _ArgTys...>>;
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\xutility:1038:36: note: while checking the satisfaction of concept 'predicate<const winrt::Windows::Foundation::Collections::IVector<winrt::guid> &, identity, (lambda at C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:57:32)>' requested here
+ 1038 |                                 && predicate<_Fn&, _Indirect_value_t<_It>> && predicate<_Fn&, iter_reference_t<_It>>;
+      |                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\algorithm:1382:13: note: while checking the satisfaction of concept 'indirect_unary_predicate<const winrt::Windows::Foundation::Collections::IVector<winrt::guid> &, identity, (lambda at C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:57:32)>' requested here
+ 1382 |             indirect_unary_predicate<projected<iterator_t<_Rng>, _Pj>> _Pr>
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:56:31: note: while checking constraint satisfaction for template 'operator()<const winrt::Windows::Foundation::Collections::IVector<winrt::guid> &, identity, (lambda at C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:57:32)>' required here
+   56 |            std::ranges::any_of(services,
+      |                               ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:56:31: note: while substituting deduced template arguments into function template 'operator()' [with _Rng = const winrt::Windows::Foundation::Collections::IVector<winrt::guid> &, _Pj = (no value), _Pr = (lambda at C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:57:32)]
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:50:27: note: 'MetaService' declared here
+   50 |     constexpr winrt::guid MetaService{
+      |                           ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:57:32: note: lambda expression begins here
+   57 |                                [](const auto& service) { return service == MetaService; });
+      |                                ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:57:32: note: capture 'MetaService' by value
+   57 |                                [](const auto& service) { return service == MetaService; });
+      |                                ^
+      |                                MetaService
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:57:32: note: capture 'MetaService' by reference
+   57 |                                [](const auto& service) { return service == MetaService; });
+      |                                ^
+      |                                &MetaService
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:57:33: note: default capture by value
+   57 |                                [](const auto& service) { return service == MetaService; });
+      |                                 ^
+      |                                 =
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:57:33: note: default capture by reference
+   57 |                                [](const auto& service) { return service == MetaService; });
+      |                                 ^
+      |                                 &
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:61:5: error: do not use namespace using-directives; use using-declarations instead [google-build-using-namespace,-warnings-as-errors]
+   61 |     using namespace winrt::Windows::Devices::Bluetooth::Advertisement;
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:63:26: error: no header providing "winrt::Windows::Devices::Bluetooth::Advertisement::BluetoothLEScanningMode" is directly included [misc-include-cleaner,-warnings-as-errors]
+   18 |     watcher.ScanningMode(BluetoothLEScanningMode::Passive);
+      |                          ^
+Suppressed 6305 warnings (6305 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+8 warnings treated as errors
+37736 warnings generated.
+Suppressed 37738 warnings (37736 in non-user code, 2 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+5169 warnings generated.
+Suppressed 5169 warnings (5169 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+Write-Error: clang-tidy rejected: main.cpp, capabilities.cpp, discovery.cpp

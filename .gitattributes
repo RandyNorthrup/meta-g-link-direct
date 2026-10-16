@@ -1,3 +1,5 @@
 * text=auto eol=lf
 *.ps1 text eol=lf
 *.psd1 text eol=lf
+# Evidence hashes bind exact tool output bytes, including native CRLF line endings.
+reports/** -text

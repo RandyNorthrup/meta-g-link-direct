@@ -1,0 +1,31 @@
+BASELINE EXIT 0
+[1/8] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp for CXX dependencies
+[2/8] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
+[3/8] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp for CXX dependencies
+[4/8] Generating CXX dyndep file CMakeFiles\mgl-sdu-tests.dir\CXX.dd
+[5/8] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\sdu.cpp.obj
+[6/8] Linking CXX static library mgl_protocol.lib
+[7/8] Building CXX object CMakeFiles\mgl-sdu-tests.dir\tests\sdu_tests.cpp.obj
+[8/8] Linking CXX executable mgl-sdu-tests.exe
+
+MUTATED EXIT 1
+[1/5] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp for CXX dependencies
+[2/5] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
+[3/5] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\sdu.cpp.obj
+FAILED: CMakeFiles/mgl_protocol.dir/src/protocol/sdu.cpp.obj 
+C:\PROGRA~1\MICROS~3\2022\COMMUN~1\VC\Tools\MSVC\1444~1.352\bin\Hostx64\x64\cl.exe  /nologo /TP  -IC:\Users\Randy\Coding\meta_g_link_direct\include /DWIN32 /D_WINDOWS /EHsc /O2 /Ob1 /DNDEBUG -std:c++20 -MD -Zi /W4 /WX /utf-8 /permissive- /showIncludes @CMakeFiles\mgl_protocol.dir\src\protocol\sdu.cpp.obj.modmap /FoCMakeFiles\mgl_protocol.dir\src\protocol\sdu.cpp.obj /FdCMakeFiles\mgl_protocol.dir\mgl_protocol.pdb /FS -c C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp
+C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp(47): error C2440: 'initializing': cannot convert from 'const char [16]' to 'const int'
+C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp(47): note: There is no context in which this conversion is possible
+C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp(47): error C2131: expression did not evaluate to a constant
+C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp(47): note: a non-constant (sub-)expression was encountered
+ninja: build stopped: subcommand failed.
+Write-Error: Native command failed (1): cmake
+
+RESTORED EXIT 0
+[1/5] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp for CXX dependencies
+[2/5] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
+[3/5] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\sdu.cpp.obj
+[4/5] Linking CXX static library mgl_protocol.lib
+[5/5] Linking CXX executable mgl-sdu-tests.exe
+
+RESTORATION SHA256 9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084

@@ -1,0 +1,14 @@
+{
+  "wifi_interfaces": 1,
+  "wifi_connected_interfaces": 0,
+  "bluetooth_radio": true,
+  "wifi_error": 0,
+  "bluetooth_error": 0,
+  "scan_duration_seconds": 10,
+  "advertisement_reports": 0,
+  "meta_advertisement_reports": 0,
+  "discovery_hresult": 0,
+  "discovery_bluetooth_error": 9,
+  "scan_completed": false,
+  "glasses_connection_tested": false
+}

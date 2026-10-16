@@ -1,0 +1,43 @@
+[1/6] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\windows\capabilities.cpp for CXX dependencies
+[2/6] Generating CXX dyndep file CMakeFiles\mgl_windows.dir\CXX.dd
+[3/5] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\capabilities.cpp.obj
+[4/5] Linking CXX static library mgl_windows.lib
+[5/5] Linking CXX executable meta-g-link-probe.exe
+Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
+    Start 1: protocol-prefix
+1/2 Test #1: protocol-prefix ..................   Passed    0.01 sec
+    Start 2: module-abi
+2/2 Test #2: module-abi .......................   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.02 sec
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 3 tests in 156ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
+Describing Project task runner
+  [+] does not modify files with WhatIf 379ms (358ms|21ms)
+  [+] formats a disposable source when effects are requested 313ms (312ms|1ms)
+  [+] propagates native formatter errors 400ms (399ms|1ms)
+Tests completed in 1.52s
+Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 6 tests in 25ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1'
+Describing Native read-only probe contract
+  [+] reports association separately and performs no implicit discovery 53ms (52ms|1ms)
+  [+] explains discovery limits without accessing glasses 20ms (20ms|1ms)
+  [+] rejects invalid argument sequence --invalid before scanning 24ms (22ms|2ms)
+  [+] rejects invalid argument sequence --discover extra before scanning 18ms (17ms|1ms)
+  [+] rejects invalid argument sequence --help extra before scanning 20ms (19ms|1ms)
+  [+] rejects invalid argument sequence extra --discover before scanning 18ms (18ms|1ms)
+Tests completed in 223ms
+Tests Passed: 6, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0

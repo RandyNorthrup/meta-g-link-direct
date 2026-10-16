@@ -1,0 +1,211 @@
+{
+  "checked_receipt_artifacts": 41,
+  "all_filter_hashes_match_raw": true,
+  "files": [
+    {
+      "path": "reports/DISCOVERY_VERIFICATION.md",
+      "git_blob": "85929ac677e5ea2e2973f2c54e02d915e65c08b2",
+      "sha256": "9bd7741f62d028b3806cca60f93f02ff1602a8417448b686f57866599ffabfea"
+    },
+    {
+      "path": "reports/VERIFICATION.md",
+      "git_blob": "c8479ec0d5fe0088e3f78f5418ab6956d981a980",
+      "sha256": "4b1c390345a4e2bb445ffd96faaca26b9b5226190e2368420f9c0023f41965a2"
+    },
+    {
+      "path": "reports/discovery-readiness-final.txt",
+      "git_blob": "e107c456b2ce31f345b178b0a7c59a5e528c72ff",
+      "sha256": "8e94d073aa2e205c586103445b9f9c9858b55453f941924589fd3915c06f297f"
+    },
+    {
+      "path": "reports/discovery-readiness.txt",
+      "git_blob": "678babd7bae4ca3c70f623dcf78a388cd5675615",
+      "sha256": "d6e208f3fff6c712ca97dd774688a396e6f2b05a4bc28b81550c627c355d57f0"
+    },
+    {
+      "path": "reports/foundation-red/address-sanitizer.txt",
+      "git_blob": "7af7d137ca1fb03a02f75afc6b18c0c693c92f04",
+      "sha256": "537d18b20f17cd3ebf3c8c1b76c7824c976514202361c4427adbfc4f5470f436"
+    },
+    {
+      "path": "reports/foundation-red/compiler-types.txt",
+      "git_blob": "384e42a3bfdc5770d994cc731d34173c0b98d553",
+      "sha256": "a7e224c803008efad05581d907b1cf92d64ed5dc2b18ddc13edc3e61594ce36f"
+    },
+    {
+      "path": "reports/foundation-red/dependency-npm.txt",
+      "git_blob": "8545414d74c7843943f55510ac879bb12c6e4336",
+      "sha256": "02d6d1b6cfe118449d8746927bd3e88e5cd96acd688c11dee6c8ce730f364c6b"
+    },
+    {
+      "path": "reports/foundation-red/dependency-osv.txt",
+      "git_blob": "f29f27dc43c0e39105601737e764afc699af8fcf",
+      "sha256": "0f4ec7667ba7545976e6f4b89b37630ae4c4a9c839353177cbb935a04b1b161b"
+    },
+    {
+      "path": "reports/foundation-red/duplicated-code.txt",
+      "git_blob": "dcd1e3126ef85a4b12e1ea342e69153a4dd864e1",
+      "sha256": "34aa70eeccf7c3c218914d604a72805519c10d0ab96c565a3e27d098df8e4895"
+    },
+    {
+      "path": "reports/foundation-red/format.txt",
+      "git_blob": "14adf2e69fba12ae820be4d4e4e0e26bf2786b35",
+      "sha256": "2709604244b5ea4ab4da49131d6d193bc361311b575793332a501dea5dee3c3b"
+    },
+    {
+      "path": "reports/foundation-red/module-metadata.txt",
+      "git_blob": "c3aa075f47fc592d6280fc131927604ff834afac",
+      "sha256": "567a809d4b60e91d028d2b27f45fa03b77af878d20010737e7a74f778a793a64"
+    },
+    {
+      "path": "reports/foundation-red/native-exit-propagation.txt",
+      "git_blob": "7494f1b11fe2a2f921096abbee1a7d0cb14b2e1c",
+      "sha256": "75d8d8a9c5714edc20a16f9b9472d43f46e7a57a0288593186708f32cf88c81c"
+    },
+    {
+      "path": "reports/foundation-red/owned-header.txt",
+      "git_blob": "51fce445a1034aff99fe4f49ccb19a7560ac070b",
+      "sha256": "fac6e378d9eeee7b448697bceb5b0cbb8ec96484b25910eea094fa0d11ae0531"
+    },
+    {
+      "path": "reports/foundation-red/parser-length.txt",
+      "git_blob": "ffbb8b3c9126b17b40bc984bb49429b7ae719aad",
+      "sha256": "8bc8158e1d561ec3f1f243c3a94dc64ef83a75f8575d93d98e57218710b6900d"
+    },
+    {
+      "path": "reports/foundation-red/script-analysis.txt",
+      "git_blob": "0bc66efbfda7c70a199ae44256498469e3be6bf3",
+      "sha256": "5d46cad10861f1ca95791580adc151d2002908cf892a9ef48b9fdb4ea2f95398"
+    },
+    {
+      "path": "reports/foundation-red/secret-scanner.txt",
+      "git_blob": "ca28b109efeefb6bdc5824d62fd6d91ecb5c0b71",
+      "sha256": "2e1fd97782814a8372e4c997e16aa9dd39e35d50eaadc8590dbfd818b2d7f94c"
+    },
+    {
+      "path": "reports/foundation-red/unsafe-copy.txt",
+      "git_blob": "65e613b314c82db8d37c26e10bcac42a8ffe1f59",
+      "sha256": "c8db8607f34ac8e2a1f449b36873aab4f0f3e17d4ad1a299520171cac8ed5277"
+    },
+    {
+      "path": "reports/foundation-red/unused-code.txt",
+      "git_blob": "56d17e0cd8737f93dcaf1c2a0422dccc6e04fec0",
+      "sha256": "6644c6b1f7e244c71347df207b9fb8a9df6a4f0dda4a2fbe5ea19cf7198cc0d1"
+    },
+    {
+      "path": "reports/foundation-red/whatif-guard.txt",
+      "git_blob": "6deb956897ea180c4025799f650cc2eaf15c44f3",
+      "sha256": "37f13af9529fe320c7d2027a04ff846aae24a13df23399ae7b1fe1dae8788b24"
+    },
+    {
+      "path": "reports/foundation-red/workflow-security.txt",
+      "git_blob": "cc109bff94216ab6cd01f4f281b4fd917b429177",
+      "sha256": "19e4cb7fa962c8103d15f12ac99efbf79c284e97c1eaf4b251064f3e7892133b"
+    },
+    {
+      "path": "reports/quality-discovery.txt",
+      "git_blob": "5574f8b99bf75413aee4591141047af4d8ad09bd",
+      "sha256": "9bd7cf92572afddc1cbff0e819fdd11b375b5c46c35d8e901e157b49c0cc8750"
+    },
+    {
+      "path": "reports/quality-package.txt",
+      "git_blob": "0e5bfbd65689e4d0a4db90e6b9b22dba75b59fe6",
+      "sha256": "50b0172b6be808fff7c2b24c1a5d2ad4dc3bf925cd9a2c5928209d566881f148"
+    },
+    {
+      "path": "reports/readiness-2.txt",
+      "git_blob": "705b82d6ee61caa6114164508042e4ba9577ee50",
+      "sha256": "77c46bcf7b127e7e47cb3945ccf4fa5c561a23728569af42e7c6a59d258b71c3"
+    },
+    {
+      "path": "reports/readiness.txt",
+      "git_blob": "20bcd2e7ad78acd2e3ec437bbd911bb31f853dc3",
+      "sha256": "b0569cc44129507979954b2b4ea85d5f92678265af6b1ae032274295951893e5"
+    },
+    {
+      "path": "reports/red/address-sanitizer.txt",
+      "git_blob": "4bd5f389041701f924eff3d51f50720e0e58eb24",
+      "sha256": "f26f74cac5eacb68cebac2487f9971eb0c8914f35afc8d1109e084d55317a0ae"
+    },
+    {
+      "path": "reports/red/compiler-types.txt",
+      "git_blob": "384e42a3bfdc5770d994cc731d34173c0b98d553",
+      "sha256": "a7e224c803008efad05581d907b1cf92d64ed5dc2b18ddc13edc3e61594ce36f"
+    },
+    {
+      "path": "reports/red/dependency-npm.txt",
+      "git_blob": "8545414d74c7843943f55510ac879bb12c6e4336",
+      "sha256": "02d6d1b6cfe118449d8746927bd3e88e5cd96acd688c11dee6c8ce730f364c6b"
+    },
+    {
+      "path": "reports/red/dependency-osv.txt",
+      "git_blob": "0bf9d97071bf04db1726b6b94773d63f1fc04103",
+      "sha256": "abf65731d3a8283dc39247b2f25bed39fd3fed130f04e3c9bac02d501fdbd54e"
+    },
+    {
+      "path": "reports/red/duplicated-code.txt",
+      "git_blob": "bd03ec73636a705c1a4f4cab7ea73c3b15eb8258",
+      "sha256": "a84e87de08359e5a39846eade11df7f3c1ffa402c936f75843fb1392d7ad9f65"
+    },
+    {
+      "path": "reports/red/format.txt",
+      "git_blob": "14adf2e69fba12ae820be4d4e4e0e26bf2786b35",
+      "sha256": "2709604244b5ea4ab4da49131d6d193bc361311b575793332a501dea5dee3c3b"
+    },
+    {
+      "path": "reports/red/module-metadata.txt",
+      "git_blob": "66ff575e2c9ba80b67696a68ed90a9267df1973c",
+      "sha256": "d79998c6522d0140b4b0c4111467f5d80b33b9c52fa9eadbfdc56ecd49ba8109"
+    },
+    {
+      "path": "reports/red/native-exit-propagation.txt",
+      "git_blob": "73fa3d31bc07c42462c3bd5dc8f983f4de5417f9",
+      "sha256": "568e9558ee370f7254eb81dfb6c69b7a46388ce50399320a9813ba435322d379"
+    },
+    {
+      "path": "reports/red/owned-header.txt",
+      "git_blob": "a9770d2f2ba97f432f0f4f429ab041ec2de4c38c",
+      "sha256": "c2473b7818ccdca3d372677f0df20c2d8fd1961b326696dcac1a909f947676c8"
+    },
+    {
+      "path": "reports/red/parser-length.txt",
+      "git_blob": "7ca07bc3d90f916ffcd298cbc11baf97b6df7321",
+      "sha256": "f4b55da49810882c3a99360adcb35a9223960cc304ee3354e076020489ac6bfa"
+    },
+    {
+      "path": "reports/red/probe-arguments.txt",
+      "git_blob": "4b7600a77d569b9177cc416d58933486f055081b",
+      "sha256": "a6b9a0ebb1a7c6465e53326e579fb57c32ad052261cfdd1ef86b4bfe2d525f87"
+    },
+    {
+      "path": "reports/red/script-analysis.txt",
+      "git_blob": "d2a42b4686c4dd7a2fdca7173662b02ba6764277",
+      "sha256": "574acb09fa37c4e046e1ddf80cedb0f053649f1f7dc2d83f7040d03bd76ca97f"
+    },
+    {
+      "path": "reports/red/secret-scanner.txt",
+      "git_blob": "315096bd0b03d43355a83cd4f8b2f26863ac6f63",
+      "sha256": "0957f74d758aaea77e980d9bc32d36045ae948404aef1f8d618e5cca90035de3"
+    },
+    {
+      "path": "reports/red/unsafe-copy.txt",
+      "git_blob": "3ce3544c3bdbb2cfc45b7ade38c8e96b288f3c69",
+      "sha256": "99f887c35e19935b50a5d4d23c7f2338618679b35e9d216f534d5a2274ccab25"
+    },
+    {
+      "path": "reports/red/unused-code.txt",
+      "git_blob": "15338c7d2c1f5d4eba0f0c52406b3e6369dfd878",
+      "sha256": "15d8d4407e78506c93dc673ea632fb05454034aafc78d5055743ba56b26dd9a2"
+    },
+    {
+      "path": "reports/red/whatif-guard.txt",
+      "git_blob": "20b5b9ea8de6439e0dbb5d04cd893c900abd5088",
+      "sha256": "8703f68c1c57632c622d4ee812aecdaeb78ad4e8e4691a351d7d8d3dbd236852"
+    },
+    {
+      "path": "reports/red/workflow-security.txt",
+      "git_blob": "cc109bff94216ab6cd01f4f281b4fd917b429177",
+      "sha256": "19e4cb7fa962c8103d15f12ac99efbf79c284e97c1eaf4b251064f3e7892133b"
+    }
+  ]
+}

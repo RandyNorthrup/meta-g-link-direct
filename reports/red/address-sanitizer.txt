@@ -11,28 +11,31 @@ Preset CMake variables:
 -- Configuring done (0.3s)
 -- Generating done (0.0s)
 -- Build files have been written to: C:/Users/Randy/Coding/meta_g_link_direct/out/windows-asan
-[1/19] Generating CXX dyndep file CMakeFiles\mgl_windows.dir\CXX.dd
-[2/17] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp for CXX dependencies
-[3/17] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
-[4/17] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp for CXX dependencies
-[5/17] Generating CXX dyndep file CMakeFiles\meta-g-link-probe.dir\CXX.dd
-[6/15] Generating CXX dyndep file CMakeFiles\mgl-sdu-tests.dir\CXX.dd
-[7/15] Generating CXX dyndep file CMakeFiles\mgl-module-tests.dir\CXX.dd
-[8/13] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\sdu.cpp.obj
-[9/13] Linking CXX static library mgl_protocol.lib
-[10/13] Building C object CMakeFiles\meta-g-link-direct.dir\src\plugin\module.c.obj
-[11/13] Linking C shared module meta-g-link-direct.dll
-[12/13] Building CXX object CMakeFiles\mgl-sdu-tests.dir\tests\sdu_tests.cpp.obj
-[13/13] Linking CXX executable mgl-sdu-tests.exe
+[1/21] Generating CXX dyndep file CMakeFiles\mgl_windows.dir\CXX.dd
+[2/18] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp for CXX dependencies
+[3/18] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
+[4/18] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp for CXX dependencies
+[5/18] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp for CXX dependencies
+[6/18] Generating CXX dyndep file CMakeFiles\meta-g-link-probe.dir\CXX.dd
+[7/18] Generating CXX dyndep file CMakeFiles\mgl-sdu-tests.dir\CXX.dd
+[8/18] Generating CXX dyndep file CMakeFiles\mgl-module-tests.dir\CXX.dd
+[9/16] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\sdu.cpp.obj
+[10/16] Linking CXX static library mgl_protocol.lib
+[11/16] Building CXX object CMakeFiles\meta-g-link-probe.dir\src\probe\main.cpp.obj
+[12/16] Building C object CMakeFiles\meta-g-link-direct.dir\src\plugin\module.c.obj
+[13/16] Linking CXX executable meta-g-link-probe.exe
+[14/16] Linking C shared module meta-g-link-direct.dll
+[15/16] Building CXX object CMakeFiles\mgl-sdu-tests.dir\tests\sdu_tests.cpp.obj
+[16/16] Linking CXX executable mgl-sdu-tests.exe
 Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows-asan
     Start 1: protocol-prefix
-1/2 Test #1: protocol-prefix ..................   Passed    0.02 sec
+1/2 Test #1: protocol-prefix ..................   Passed    0.03 sec
     Start 2: module-abi
-2/2 Test #2: module-abi .......................   Passed    0.04 sec
+2/2 Test #2: module-abi .......................   Passed    0.05 sec
 
 100% tests passed, 0 tests failed out of 2
 
-Total Test time (real) =   0.07 sec
+Total Test time (real) =   0.08 sec
 
 MUTATED EXIT 1
 Preset CMake variables:
@@ -47,8 +50,8 @@ Preset CMake variables:
 -- Configuring done (0.3s)
 -- Generating done (0.0s)
 -- Build files have been written to: C:/Users/Randy/Coding/meta_g_link_direct/out/windows-asan
-[1/16] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
-[2/14] Generating CXX dyndep file CMakeFiles\mgl_windows.dir\CXX.dd
+[1/17] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
+[2/15] Generating CXX dyndep file CMakeFiles\mgl_windows.dir\CXX.dd
 [3/12] Generating CXX dyndep file CMakeFiles\meta-g-link-probe.dir\CXX.dd
 [4/10] Generating CXX dyndep file CMakeFiles\mgl-module-tests.dir\CXX.dd
 [5/8] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp for CXX dependencies
@@ -59,37 +62,37 @@ Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows-asan
     Start 1: protocol-prefix
 1/2 Test #1: protocol-prefix ..................***Failed    0.03 sec
 =================================================================
-==8120==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x120083ca0034 at pc 0x7ff736b753de bp 0x00441939f800 sp 0x00441939f808
-READ of size 4 at 0x120083ca0034 thread T0
-    #0 0x7ff736b753dd in main C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:64
-    #1 0x7ff736b7704f in invoke_main D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:78
-    #2 0x7ff736b7704f in __scrt_common_main_seh D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:288
+==3660==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x121cb6ca0034 at pc 0x7ff736c653de bp 0x007bd59ff6e0 sp 0x007bd59ff6e8
+READ of size 4 at 0x121cb6ca0034 thread T0
+    #0 0x7ff736c653dd in main C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:64
+    #1 0x7ff736c6704f in invoke_main D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:78
+    #2 0x7ff736c6704f in __scrt_common_main_seh D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:288
     #3 0x7fff96dbdda6  (C:\WINDOWS\System32\KERNEL32.DLL+0x18002dda6)
     #4 0x7fff98f7ee4b  (C:\WINDOWS\SYSTEM32\ntdll.dll+0x18007ee4b)
 
-0x120083ca0034 is located 0 bytes after 4-byte region [0x120083ca0030,0x120083ca0034)
+0x121cb6ca0034 is located 0 bytes after 4-byte region [0x121cb6ca0030,0x121cb6ca0034)
 allocated by thread T0 here:
-    #0 0x7ff736b7654e in operator new[](unsigned __int64) D:\a\_work\1\s\src\vctools\asan\llvm\compiler-rt\lib\asan\asan_win_new_array_thunk.cpp:41
-    #1 0x7ff736b7537d in std::make_unique C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\memory:3636
-    #2 0x7ff736b7537d in main C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:62
-    #3 0x7ff736b7704f in invoke_main D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:78
-    #4 0x7ff736b7704f in __scrt_common_main_seh D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:288
+    #0 0x7ff736c6654e in operator new[](unsigned __int64) D:\a\_work\1\s\src\vctools\asan\llvm\compiler-rt\lib\asan\asan_win_new_array_thunk.cpp:41
+    #1 0x7ff736c6537d in std::make_unique C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\memory:3636
+    #2 0x7ff736c6537d in main C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:62
+    #3 0x7ff736c6704f in invoke_main D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:78
+    #4 0x7ff736c6704f in __scrt_common_main_seh D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:288
     #5 0x7fff96dbdda6  (C:\WINDOWS\System32\KERNEL32.DLL+0x18002dda6)
     #6 0x7fff98f7ee4b  (C:\WINDOWS\SYSTEM32\ntdll.dll+0x18007ee4b)
 
 SUMMARY: AddressSanitizer: heap-buffer-overflow C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:64 in main
 Shadow bytes around the buggy address:
-  0x120083c9fd80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x120083c9fe00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x120083c9fe80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x120083c9ff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x120083c9ff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-=>0x120083ca0000: fa fa fd fd fa fa[04]fa fa fa 00 00 fa fa fa fa
-  0x120083ca0080: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-  0x120083ca0100: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-  0x120083ca0180: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-  0x120083ca0200: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-  0x120083ca0280: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x121cb6c9fd80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x121cb6c9fe00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x121cb6c9fe80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x121cb6c9ff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x121cb6c9ff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+=>0x121cb6ca0000: fa fa fd fd fa fa[04]fa fa fa 00 00 fa fa fa fa
+  0x121cb6ca0080: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x121cb6ca0100: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x121cb6ca0180: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x121cb6ca0200: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x121cb6ca0280: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
 Shadow byte legend (one shadow byte represents 8 application bytes):
   Addressable:           00
   Partially addressable: 01 02 03 04 05 06 07 
@@ -109,14 +112,14 @@ Shadow byte legend (one shadow byte represents 8 application bytes):
   ASan internal:           fe
   Left alloca redzone:     ca
   Right alloca redzone:    cb
-==8120==ABORTING
+==3660==ABORTING
 
     Start 2: module-abi
-2/2 Test #2: module-abi .......................   Passed    0.05 sec
+2/2 Test #2: module-abi .......................   Passed    0.07 sec
 
 50% tests passed, 1 tests failed out of 2
 
-Total Test time (real) =   0.08 sec
+Total Test time (real) =   0.10 sec
 
 The following tests FAILED:
 	  1 - protocol-prefix (Failed)
@@ -136,8 +139,8 @@ Preset CMake variables:
 -- Configuring done (0.3s)
 -- Generating done (0.0s)
 -- Build files have been written to: C:/Users/Randy/Coding/meta_g_link_direct/out/windows-asan
-[1/16] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
-[2/14] Generating CXX dyndep file CMakeFiles\mgl_windows.dir\CXX.dd
+[1/17] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
+[2/15] Generating CXX dyndep file CMakeFiles\mgl_windows.dir\CXX.dd
 [3/12] Generating CXX dyndep file CMakeFiles\meta-g-link-probe.dir\CXX.dd
 [4/10] Generating CXX dyndep file CMakeFiles\mgl-module-tests.dir\CXX.dd
 [5/8] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp for CXX dependencies
@@ -146,12 +149,12 @@ Preset CMake variables:
 [8/8] Linking CXX executable mgl-sdu-tests.exe
 Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows-asan
     Start 1: protocol-prefix
-1/2 Test #1: protocol-prefix ..................   Passed    0.02 sec
+1/2 Test #1: protocol-prefix ..................   Passed    0.03 sec
     Start 2: module-abi
-2/2 Test #2: module-abi .......................   Passed    0.04 sec
+2/2 Test #2: module-abi .......................   Passed    0.05 sec
 
 100% tests passed, 0 tests failed out of 2
 
-Total Test time (real) =   0.07 sec
+Total Test time (real) =   0.08 sec
 
 RESTORATION SHA256 ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd

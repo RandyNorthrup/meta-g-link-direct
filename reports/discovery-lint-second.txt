@@ -1,0 +1,40 @@
+5169 warnings generated.
+Suppressed 5169 warnings (5169 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+4741 warnings generated.
+Suppressed 4741 warnings (4741 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+39617 warnings generated.
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\capabilities.cpp:39:52: error: do not implicitly decay an array into a pointer; consider using gsl::array_view or an explicit cast instead [cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay,-warnings-as-errors]
+   39 |             for (const auto& interface : std::span(list->InterfaceInfo, list->dwNumberOfItems)) {
+      |                                                    ^
+Suppressed 39615 warnings (39615 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+1 warning treated as error
+6308 warnings generated.
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:21:58: error: no header providing "winrt::Windows::Devices::Bluetooth::Advertisement::BluetoothLEAdvertisementWatcher" is directly included [misc-include-cleaner,-warnings-as-errors]
+   18 | 
+   19 | namespace mgl {
+   20 | namespace {
+   21 | using winrt::Windows::Devices::Bluetooth::Advertisement::BluetoothLEAdvertisementWatcher;
+      |                                                          ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:22:58: error: no header providing "winrt::Windows::Devices::Bluetooth::Advertisement::BluetoothLEScanningMode" is directly included [misc-include-cleaner,-warnings-as-errors]
+   18 | 
+   19 | namespace mgl {
+   20 | namespace {
+   21 | using winrt::Windows::Devices::Bluetooth::Advertisement::BluetoothLEAdvertisementWatcher;
+   22 | using winrt::Windows::Devices::Bluetooth::Advertisement::BluetoothLEScanningMode;
+      |                                                          ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:50:62: error: no header providing "winrt::Windows::Devices::Bluetooth::Advertisement::BluetoothLEAdvertisement" is directly included [misc-include-cleaner,-warnings-as-errors]
+   50 |     const winrt::Windows::Devices::Bluetooth::Advertisement::BluetoothLEAdvertisement&
+      |                                                              ^
+Suppressed 6305 warnings (6305 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+3 warnings treated as errors
+37736 warnings generated.
+Suppressed 37738 warnings (37736 in non-user code, 2 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+5169 warnings generated.
+Suppressed 5169 warnings (5169 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+Write-Error: clang-tidy rejected: capabilities.cpp, discovery.cpp

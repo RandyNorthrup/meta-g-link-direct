@@ -7,6 +7,7 @@
 namespace mgl {
 struct WirelessCapabilities {
     std::uint32_t wifi_interfaces;
+    std::uint32_t wifi_connected_interfaces;
     bool bluetooth_radio;
     std::uint32_t wifi_error;
     std::uint32_t bluetooth_error;

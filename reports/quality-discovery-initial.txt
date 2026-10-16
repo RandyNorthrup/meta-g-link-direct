@@ -1,0 +1,142 @@
+Gate: configure
+Preset CMake variables:
+
+  CMAKE_BUILD_TYPE="RelWithDebInfo"
+  CMAKE_CXX_COMPILER="cl"
+  CMAKE_C_COMPILER="cl"
+  CMAKE_PREFIX_PATH="C:/Users/Randy/Coding/meta_g_link_direct/.deps/obs-sdk"
+  CMAKE_SYSTEM_VERSION="10.0.26100.0"
+
+-- The C compiler identification is MSVC 19.44.35222.0
+-- The CXX compiler identification is MSVC 19.44.35222.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found SIMDe: C:/Users/Randy/Coding/meta_g_link_direct/.deps/obs-studio-32.2.2-sources/.deps/obs-deps-2026-07-15-x64/include (found version "0.8.2")
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - not found
+-- Found Threads: TRUE
+-- Configuring done (1.5s)
+-- Generating done (0.0s)
+-- Build files have been written to: C:/Users/Randy/Coding/meta_g_link_direct/out/windows
+Gate: build
+[1/24] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp for CXX dependencies
+[2/24] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\windows\capabilities.cpp for CXX dependencies
+[3/24] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
+[4/24] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp for CXX dependencies
+[5/24] Generating CXX dyndep file CMakeFiles\mgl_windows.dir\CXX.dd
+[6/24] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp for CXX dependencies
+[7/24] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp for CXX dependencies
+[8/24] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp for CXX dependencies
+[9/24] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\sdu.cpp.obj
+[10/24] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\capabilities.cpp.obj
+[11/24] Generating CXX dyndep file CMakeFiles\meta-g-link-probe.dir\CXX.dd
+[12/24] Generating CXX dyndep file CMakeFiles\mgl-sdu-tests.dir\CXX.dd
+[13/24] Generating CXX dyndep file CMakeFiles\mgl-module-tests.dir\CXX.dd
+[14/24] Linking CXX static library mgl_protocol.lib
+[15/24] Building CXX object CMakeFiles\meta-g-link-probe.dir\src\probe\main.cpp.obj
+[16/24] Building C object CMakeFiles\meta-g-link-direct.dir\src\plugin\module.c.obj
+[17/24] Building CXX object CMakeFiles\mgl-sdu-tests.dir\tests\sdu_tests.cpp.obj
+[18/24] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\discovery.cpp.obj
+[19/24] Linking CXX static library mgl_windows.lib
+[20/24] Linking CXX executable meta-g-link-probe.exe
+[21/24] Linking C shared module meta-g-link-direct.dll
+[22/24] Linking CXX executable mgl-sdu-tests.exe
+[23/24] Building CXX object CMakeFiles\mgl-module-tests.dir\tests\module_tests.cpp.obj
+[24/24] Linking CXX executable mgl-module-tests.exe
+Gate: format:check
+Gate: lint
+5169 warnings generated.
+Suppressed 5169 warnings (5169 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+4741 warnings generated.
+Suppressed 4741 warnings (4741 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+39615 warnings generated.
+Suppressed 39615 warnings (39615 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+6306 warnings generated.
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/base.h:6608:31: error: Called C++ object pointer is null [clang-analyzer-core.CallAndMessage,-warnings-as-errors]
+ 6608 |                 check_hresult((*(impl::abi_t<IActivationFactory>**)this)->ActivateInstance(put_abi(instance)));
+      |                               ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:116:9: note: Calling 'scanAdvertisements'
+  116 |         scanAdvertisements(state);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp:66:37: note: Calling default constructor for 'BluetoothLEAdvertisementWatcher'
+   66 |     BluetoothLEAdvertisementWatcher watcher;
+      |                                     ^~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/Windows.Devices.Bluetooth.Advertisement.h:3315:41: note: Calling 'call_factory_cast<winrt::Windows::Devices::Bluetooth::Advertisement::BluetoothLEAdvertisementWatcher (*)(const winrt::Windows::Foundation::IActivationFactory &), winrt::Windows::Devices::Bluetooth::Advertisement::BluetoothLEAdvertisementWatcher, winrt::Windows::Foundation::IActivationFactory, (lambda at C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt\Windows.Devices.Bluetooth.Advertisement.h:3315:189)>'
+ 3315 |         BluetoothLEAdvertisementWatcher(impl::call_factory_cast<BluetoothLEAdvertisementWatcher(*)(winrt::Windows::Foundation::IActivationFactory const&), BluetoothLEAdvertisementWatcher>([](winrt::Windows::Foundation::IActivationFactory const& f) { return f.template ActivateInstance<BluetoothLEAdvertisementWatcher>(); }))
+      |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/base.h:6478:17: note: Assuming field 'object' is null
+ 6478 |             if (factory.m_value.object)
+      |                 ^~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/base.h:6478:13: note: Taking false branch
+ 6478 |             if (factory.m_value.object)
+      |             ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/base.h:6484:16: note: Calling 'factory_cache_entry::call'
+ 6484 |         return factory.call(static_cast<CastType>(callback));
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/base.h:6423:27: note: Calling 'get_activation_factory<winrt::Windows::Foundation::IActivationFactory>'
+ 6423 |             auto object = get_activation_factory<Interface>(name_of<Class>());
+      |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/base.h:6176:16: note: Calling constructor for 'IActivationFactory'
+ 6176 |         return { result, take_ownership_from_abi };
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/base.h:6602:81: note: Calling constructor for 'IInspectable'
+ 6602 |             IActivationFactory(void* ptr, take_ownership_from_abi_t) noexcept : IInspectable(ptr, take_ownership_from_abi) {}
+      |                                                                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/base.h:2467:71: note: Calling constructor for 'IUnknown'
+ 2467 |         IInspectable(void* ptr, take_ownership_from_abi_t) noexcept : IUnknown(ptr, take_ownership_from_abi) {}
+      |                                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/base.h:2184:73: note: Assigning value
+ 2184 |         IUnknown(void* ptr, take_ownership_from_abi_t) noexcept : m_ptr(static_cast<impl::unknown_abi*>(ptr))
+      |                                                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/base.h:2467:71: note: Returning from constructor for 'IUnknown'
+ 2467 |         IInspectable(void* ptr, take_ownership_from_abi_t) noexcept : IUnknown(ptr, take_ownership_from_abi) {}
+      |                                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/base.h:6602:81: note: Returning from constructor for 'IInspectable'
+ 6602 |             IActivationFactory(void* ptr, take_ownership_from_abi_t) noexcept : IInspectable(ptr, take_ownership_from_abi) {}
+      |                                                                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/base.h:6176:16: note: Returning from constructor for 'IActivationFactory'
+ 6176 |         return { result, take_ownership_from_abi };
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/base.h:6423:27: note: Returning from 'get_activation_factory<winrt::Windows::Foundation::IActivationFactory>'
+ 6423 |             auto object = get_activation_factory<Interface>(name_of<Class>());
+      |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/base.h:6425:17: note: Assuming the condition is true
+ 6425 |             if (!object.template try_as<IAgileObject>())
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/base.h:6425:13: note: Taking true branch
+ 6425 |             if (!object.template try_as<IAgileObject>())
+      |             ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/base.h:6431:24: note: Calling 'operator()'
+ 6431 |                 return callback(object);
+      |                        ^~~~~~~~~~~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/Windows.Devices.Bluetooth.Advertisement.h:3315:258: note: Calling 'IActivationFactory::ActivateInstance'
+ 3315 |         BluetoothLEAdvertisementWatcher(impl::call_factory_cast<BluetoothLEAdvertisementWatcher(*)(winrt::Windows::Foundation::IActivationFactory const&), BluetoothLEAdvertisementWatcher>([](winrt::Windows::Foundation::IActivationFactory const& f) { return f.template ActivateInstance<BluetoothLEAdvertisementWatcher>(); }))
+      |                                                                                                                                                                                                                                                                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/base.h:6608:31: note: Called C++ object pointer is null
+ 6608 |                 check_hresult((*(impl::abi_t<IActivationFactory>**)this)->ActivateInstance(put_abi(instance)));
+      |                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Suppressed 6308 warnings (6305 in non-user code, 3 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+1 warning treated as error
+37736 warnings generated.
+Suppressed 37738 warnings (37736 in non-user code, 2 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+5169 warnings generated.
+Suppressed 5169 warnings (5169 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+Write-Error: clang-tidy rejected: discovery.cpp

@@ -12,6 +12,7 @@
 #include <wlanapi.h>
 
 #include <memory>
+#include <span>
 
 namespace mgl {
 namespace {
@@ -34,6 +35,13 @@ WirelessCapabilities inspectWirelessCapabilities() noexcept {
             const std::unique_ptr<WLAN_INTERFACE_INFO_LIST, decltype(&WlanFreeMemory)> list(
                 raw_list, &WlanFreeMemory);
             result.wifi_interfaces = list->dwNumberOfItems;
+            // WlanEnumInterfaces allocates the SDK's variable-length trailing array.
+            for (const auto& interface :
+                 std::span(&list->InterfaceInfo[0], list->dwNumberOfItems)) {
+                if (interface.isState == wlan_interface_state_connected) {
+                    ++result.wifi_connected_interfaces;
+                }
+            }
         }
     }
 

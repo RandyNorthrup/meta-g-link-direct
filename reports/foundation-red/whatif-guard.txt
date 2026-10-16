@@ -1,0 +1,56 @@
+BASELINE EXIT 0
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 3 tests in 113ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
+Describing Project task runner
+  [+] does not modify files with WhatIf 413ms (391ms|22ms)
+  [+] formats a disposable source when effects are requested 351ms (350ms|1ms)
+  [+] propagates native formatter errors 413ms (412ms|1ms)
+Tests completed in 1.56s
+Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+
+MUTATED EXIT 1
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 3 tests in 114ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
+Describing Project task runner
+  [-] does not modify files with WhatIf 437ms (417ms|20ms)
+   Expected strings to be the same, but they were different.
+   Expected length: 23
+   Actual length:   25
+   Strings differ at index 9.
+   Expected: 'int main( ){return 0;}\n'
+   But was:  'int main() { return 0; }\n'
+              ---------^
+   at [IO.File]::ReadAllText($samplePath) | Should -BeExactly $originalSample, C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1:26
+   at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1:26
+  [+] formats a disposable source when effects are requested 357ms (356ms|1ms)
+  [+] propagates native formatter errors 438ms (437ms|1ms)
+Tests completed in 1.65s
+Tests Passed: 2, Failed: 1, Skipped: 0, Inconclusive: 0, NotRun: 0
+Write-Error: Pester runner tests failed or discovery count changed
+
+RESTORED EXIT 0
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 3 tests in 116ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
+Describing Project task runner
+  [+] does not modify files with WhatIf 369ms (346ms|22ms)
+  [+] formats a disposable source when effects are requested 339ms (337ms|1ms)
+  [+] propagates native formatter errors 409ms (409ms|1ms)
+Tests completed in 1.49s
+Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+
+RESTORATION SHA256 f34458187fdd9585bba2d58ed8d2533d79b0ea45e9c27f3e70141df27a40eb85

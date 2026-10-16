@@ -1,0 +1,78 @@
+BASELINE EXIT 0
+ninja: no work to do.
+Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
+    Start 1: protocol-prefix
+1/2 Test #1: protocol-prefix ..................   Passed    0.00 sec
+    Start 2: module-abi
+2/2 Test #2: module-abi .......................   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.02 sec
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 3 tests in 116ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
+Describing Project task runner
+  [+] does not modify files with WhatIf 413ms (386ms|27ms)
+  [+] formats a disposable source when effects are requested 353ms (352ms|1ms)
+  [+] propagates native formatter errors 384ms (383ms|1ms)
+Tests completed in 1.53s
+Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+
+MUTATED EXIT 1
+[1/5] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp for CXX dependencies
+[2/5] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
+[3/5] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\sdu.cpp.obj
+[4/5] Linking CXX static library mgl_protocol.lib
+[5/5] Linking CXX executable mgl-sdu-tests.exe
+Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
+    Start 1: protocol-prefix
+1/2 Test #1: protocol-prefix ..................***Failed    0.01 sec
+DataX empty has 4 bytes: unexpected prefix status or frame length
+
+    Start 2: module-abi
+2/2 Test #2: module-abi .......................   Passed    0.01 sec
+
+50% tests passed, 1 tests failed out of 2
+
+Total Test time (real) =   0.02 sec
+
+The following tests FAILED:
+	  1 - protocol-prefix (Failed)
+Errors while running CTest
+Write-Error: Native command failed (8): ctest
+
+RESTORED EXIT 0
+[1/5] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp for CXX dependencies
+[2/5] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
+[3/5] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\sdu.cpp.obj
+[4/5] Linking CXX static library mgl_protocol.lib
+[5/5] Linking CXX executable mgl-sdu-tests.exe
+Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
+    Start 1: protocol-prefix
+1/2 Test #1: protocol-prefix ..................   Passed    0.01 sec
+    Start 2: module-abi
+2/2 Test #2: module-abi .......................   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.02 sec
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 3 tests in 120ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
+Describing Project task runner
+  [+] does not modify files with WhatIf 408ms (386ms|22ms)
+  [+] formats a disposable source when effects are requested 341ms (339ms|1ms)
+  [+] propagates native formatter errors 392ms (391ms|1ms)
+Tests completed in 1.53s
+Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+
+RESTORATION SHA256 9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084
