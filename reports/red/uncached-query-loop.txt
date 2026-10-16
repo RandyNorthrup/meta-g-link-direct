@@ -1,0 +1,55 @@
+BASELINE EXIT 0
+ninja: no work to do.
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 1 tests in 134ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\live.Tests.ps1'
+Describing Explicit live Classic service lookup
+  [+] queries available Classic peers without pairing or connecting 27.33s (27.31s|21ms)
+Tests completed in 27.76s
+Tests Passed: 1, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+
+MUTATED EXIT 1
+[1/8] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp for CXX dependencies
+[2/8] Generating CXX dyndep file CMakeFiles\mgl_windows.dir\CXX.dd
+[3/5] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\classic.cpp.obj
+[4/5] Linking CXX static library mgl_windows.lib
+[5/5] Linking CXX executable meta-g-link-probe.exe
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 1 tests in 158ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\live.Tests.ps1'
+Describing Explicit live Classic service lookup
+  [-] queries available Classic peers without pairing or connecting 20.77s (20.74s|29ms)
+   Expected the actual value to be greater than 0, because Live discovery must query available Classic peers, but got 0.
+   at $report.uncached_peer_queries | Should -BeGreaterThan 0 -Because 'Live discovery must query available Classic peers', C:\Users\Randy\Coding\meta_g_link_direct\tests\live.Tests.ps1:21
+   at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\live.Tests.ps1:21
+Tests completed in 21.3s
+Tests Passed: 0, Failed: 1, Skipped: 0, Inconclusive: 0, NotRun: 0
+Write-Error: Pester live SDP tests failed or discovery count changed
+
+RESTORED EXIT 0
+[1/8] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp for CXX dependencies
+[2/8] Generating CXX dyndep file CMakeFiles\mgl_windows.dir\CXX.dd
+[3/5] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\classic.cpp.obj
+[4/5] Linking CXX static library mgl_windows.lib
+[5/5] Linking CXX executable meta-g-link-probe.exe
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 1 tests in 126ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\live.Tests.ps1'
+Describing Explicit live Classic service lookup
+  [+] queries available Classic peers without pairing or connecting 27.84s (27.82s|22ms)
+Tests completed in 28.26s
+Tests Passed: 1, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+
+RESTORATION SHA256 ece9d6024a38f9d81fab43bdba941173b47153d0b9bacab449bc8f1b2c4fea13

@@ -1,0 +1,120 @@
+5169 warnings generated.
+Suppressed 5169 warnings (5169 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+45370 warnings generated.
+Suppressed 45370 warnings (45370 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+4748 warnings generated.
+Suppressed 4748 warnings (4748 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+4741 warnings generated.
+Suppressed 4741 warnings (4741 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+40445 warnings generated.
+Suppressed 40445 warnings (40445 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+38989 warnings generated.
+Suppressed 39003 warnings (38989 in non-user code, 14 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+6305 warnings generated.
+Suppressed 6308 warnings (6305 in non-user code, 3 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+39039 warnings generated.
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:82:9: error: comparison between 'signed' and 'unsigned' integers [modernize-use-integer-sign-comparison,-warnings-as-errors]
+   82 |     if (length != static_cast<int>(sizeof(error))) {
+      |         ^      ~~~~~~~~~~~~~~~~~~~~             ~
+      |         std::cmp_not_equal( ,                   )
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:91:6: error: function 'waitSocket' has cognitive complexity of 27 (threshold 25) [readability-function-cognitive-complexity,-warnings-as-errors]
+   91 | bool waitSocket(SOCKET socket, bool writing, std::chrono::steady_clock::time_point deadline,
+      |      ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:95:5: note: +1, including nesting penalty of 0, nesting level increased to 1
+   95 |     if (remaining <= std::chrono::microseconds::zero()) {
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:102:5: note: +1, including nesting penalty of 0, nesting level increased to 1
+  102 |     FD_SET(socket, &ready);
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um\winsock2.h:158:25: note: expanded from macro 'FD_SET'
+  158 | #define FD_SET(fd, set) do { \
+      |                         ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:102:5: note: +2, including nesting penalty of 1, nesting level increased to 2
+  102 |     FD_SET(socket, &ready);
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um\winsock2.h:160:5: note: expanded from macro 'FD_SET'
+  160 |     for (__i = 0; __i < ((fd_set FAR *)(set))->fd_count; __i++) { \
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:102:5: note: +3, including nesting penalty of 2, nesting level increased to 3
+  102 |     FD_SET(socket, &ready);
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um\winsock2.h:161:9: note: expanded from macro 'FD_SET'
+  161 |         if (((fd_set FAR *)(set))->fd_array[__i] == (fd)) { \
+      |         ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:102:5: note: +2, including nesting penalty of 1, nesting level increased to 2
+  102 |     FD_SET(socket, &ready);
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um\winsock2.h:165:5: note: expanded from macro 'FD_SET'
+  165 |     if (__i == ((fd_set FAR *)(set))->fd_count) { \
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:102:5: note: +3, including nesting penalty of 2, nesting level increased to 3
+  102 |     FD_SET(socket, &ready);
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um\winsock2.h:166:9: note: expanded from macro 'FD_SET'
+  166 |         if (((fd_set FAR *)(set))->fd_count < FD_SETSIZE) { \
+      |         ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:103:5: note: +1, including nesting penalty of 0, nesting level increased to 1
+  103 |     FD_SET(socket, &failed);
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um\winsock2.h:158:25: note: expanded from macro 'FD_SET'
+  158 | #define FD_SET(fd, set) do { \
+      |                         ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:103:5: note: +2, including nesting penalty of 1, nesting level increased to 2
+  103 |     FD_SET(socket, &failed);
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um\winsock2.h:160:5: note: expanded from macro 'FD_SET'
+  160 |     for (__i = 0; __i < ((fd_set FAR *)(set))->fd_count; __i++) { \
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:103:5: note: +3, including nesting penalty of 2, nesting level increased to 3
+  103 |     FD_SET(socket, &failed);
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um\winsock2.h:161:9: note: expanded from macro 'FD_SET'
+  161 |         if (((fd_set FAR *)(set))->fd_array[__i] == (fd)) { \
+      |         ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:103:5: note: +2, including nesting penalty of 1, nesting level increased to 2
+  103 |     FD_SET(socket, &failed);
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um\winsock2.h:165:5: note: expanded from macro 'FD_SET'
+  165 |     if (__i == ((fd_set FAR *)(set))->fd_count) { \
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:103:5: note: +3, including nesting penalty of 2, nesting level increased to 3
+  103 |     FD_SET(socket, &failed);
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um\winsock2.h:166:9: note: expanded from macro 'FD_SET'
+  166 |         if (((fd_set FAR *)(set))->fd_count < FD_SETSIZE) { \
+      |         ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:109:27: note: +1, including nesting penalty of 0, nesting level increased to 1
+  109 |         select(0, writing ? nullptr : &ready, writing ? &ready : nullptr, &failed, &timeout);
+      |                           ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:109:55: note: +1, including nesting penalty of 0, nesting level increased to 1
+  109 |         select(0, writing ? nullptr : &ready, writing ? &ready : nullptr, &failed, &timeout);
+      |                                                       ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:110:5: note: +1, including nesting penalty of 0, nesting level increased to 1
+  110 |     if (selected == 0) {
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:115:5: note: +1, including nesting penalty of 0, nesting level increased to 1
+  115 |     if (selected == SOCKET_ERROR) {
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:213:28: error: do not use reinterpret_cast [cppcoreguidelines-pro-type-reinterpret-cast,-warnings-as-errors]
+  213 |     const auto* endpoint = reinterpret_cast<const sockaddr*>(
+      |                            ^
+Suppressed 39036 warnings (39036 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+3 warnings treated as errors
+5171 warnings generated.
+Suppressed 5171 warnings (5171 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+37736 warnings generated.
+Suppressed 37738 warnings (37736 in non-user code, 2 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+5169 warnings generated.
+Suppressed 5169 warnings (5169 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+Write-Error: clang-tidy rejected: rfcomm.cpp

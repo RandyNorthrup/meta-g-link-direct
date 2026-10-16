@@ -1,0 +1,70 @@
+[1/12] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp for CXX dependencies
+[2/12] Generating CXX dyndep file CMakeFiles\meta-g-link-probe.dir\CXX.dd
+[3/11] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp for CXX dependencies
+[4/11] Generating CXX dyndep file CMakeFiles\mgl_windows.dir\CXX.dd
+[5/8] Building CXX object CMakeFiles\meta-g-link-probe.dir\src\probe\main.cpp.obj
+[6/8] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\rfcomm.cpp.obj
+[7/8] Linking CXX static library mgl_windows.lib
+[8/8] Linking CXX executable meta-g-link-probe.exe
+Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
+    Start 1: protocol-prefix
+1/3 Test #1: protocol-prefix ..................   Passed    0.01 sec
+    Start 2: private-address
+2/3 Test #2: private-address ..................   Passed    0.01 sec
+    Start 3: module-abi
+3/3 Test #3: module-abi .......................   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =   0.03 sec
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 3 tests in 154ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
+Describing Project task runner
+  [+] does not modify files with WhatIf 385ms (362ms|23ms)
+  [+] formats a disposable source when effects are requested 401ms (400ms|1ms)
+  [+] propagates native formatter errors 497ms (495ms|2ms)
+Tests completed in 1.73s
+Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 18 tests in 26ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1'
+Describing Native diagnostic probe contract
+  [+] rejects private input without echo or connection: --direct-classic-uuid 70ms (68ms|2ms)
+  [+] rejects private input without echo or connection: --direct-classic-channel7 44ms (43ms|1ms)
+  [+] rejects private input without echo or connection: --direct-classic-channel7 37ms (36ms|1ms)
+  [-] exports only requested redacted direct-probe diagnostics 63ms (62ms|1ms)
+   Expected strings to be the same, but they were different.
+   Expected length: 303
+   Actual length:   302
+   Strings differ at index 301.
+   Expected: '...hello_prefix":false,"documented_channel7":false,"glasses_authenticated":false}\r\n'
+   But was:  '...hello_prefix":false,"documented_channel7":false,"glasses_authenticated":false}\n'
+              ----------------------------------------------------------------------------------^
+   at $saved | Should -BeExactly $result.Out, C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:44
+   at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:44
+  [+] propagates requested diagnostic write failure 23ms (23ms|1ms)
+  [+] reports association separately and performs no implicit discovery 40ms (40ms|1ms)
+  [+] explains discovery limits without accessing glasses 24ms (24ms|1ms)
+  [+] reports actual scan completion or native failure with a matching exit code 34ms (34ms|0ms)
+  [+] performs explicit Classic inquiry without claiming an RFCOMM connection 5.22s (5.22s|2ms)
+  [+] rejects invalid argument sequence --pair-classic extra before scanning 25ms (24ms|1ms)
+  [+] rejects invalid argument sequence --direct-classic-uuid extra before scanning 17ms (17ms|0ms)
+  [+] rejects invalid argument sequence --discover-classic-live extra before scanning 21ms (20ms|0ms)
+  [+] rejects invalid argument sequence --invalid before scanning 20ms (19ms|0ms)
+  [+] rejects invalid argument sequence --discover extra before scanning 23ms (22ms|0ms)
+  [+] rejects invalid argument sequence --help extra before scanning 21ms (20ms|0ms)
+  [+] rejects invalid argument sequence extra --discover before scanning 23ms (23ms|1ms)
+  [+] rejects invalid argument sequence --connect-classic extra before scanning 21ms (21ms|1ms)
+  [+] rejects invalid argument sequence --discover-classic --connect-classic before scanning 19ms (19ms|1ms)
+Tests completed in 5.88s
+Tests Passed: 17, Failed: 1, Skipped: 0, Inconclusive: 0, NotRun: 0
+Write-Error: Pester probe tests failed or discovery count changed

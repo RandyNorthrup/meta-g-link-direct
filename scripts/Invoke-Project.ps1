@@ -6,12 +6,14 @@ param(
         'typecheck', 'deadcode', 'security:audit', 'test:red', 'quality', 'package', 'probe',
         'lint:cpp', 'lint:powershell', 'lint:workflow', 'deadcode:cpp', 'deadcode:copies',
         'security:secrets', 'security:sast', 'security:npm', 'security:osv', 'test:asan', 'test:runner',
-        'test:probe', 'discover', 'discover:classic', 'connect:classic')]
+        'test:probe', 'test:address', 'test:live', 'discover', 'discover:classic', 'connect:classic',
+        'discover:classic:live', 'connect:classic:live', 'pair:classic')]
     [string]$Task = 'quality',
     [ValidateSet('all', 'parser-length', 'module-metadata', 'format', 'owned-header',
         'compiler-types', 'unused-code', 'script-analysis', 'workflow-security', 'secret-scanner',
         'unsafe-copy', 'duplicated-code', 'address-sanitizer', 'dependency-npm', 'dependency-osv',
-        'whatif-guard', 'native-exit-propagation', 'probe-arguments', 'classic-connection-claim')]
+        'whatif-guard', 'native-exit-propagation', 'probe-arguments', 'classic-connection-claim',
+        'private-address-validation', 'uncached-query-loop')]
     [string]$Drill = 'all'
 )
 
@@ -265,6 +267,16 @@ function Invoke-RedDrillSet {
         $text.Replace('ClassicDiscovery result{};', 'ClassicDiscovery result{}; result.rfcomm_connected = true;')
     } -Gate test -ExpectedDiagnostic 'Classic discovery must not claim an RFCOMM connection'
 
+    Invoke-RestoredDrill -Id private-address-validation -Path (Join-Path $projectRoot 'src/protocol/address.cpp') -Mutate {
+        param($text)
+        $text.Replace('address == 0 || address == BroadcastAddress', 'address == BroadcastAddress')
+    } -Gate 'test:address' -ExpectedDiagnostic 'Malformed/reserved Bluetooth address accepted'
+
+    Invoke-RestoredDrill -Id uncached-query-loop -Path (Join-Path $projectRoot 'src/windows/classic.cpp') -Mutate {
+        param($text)
+        $text.Replace('for (const auto address : addresses)', 'for (const auto address : std::vector<std::uint64_t>{})')
+    } -Gate 'test:live' -ExpectedDiagnostic 'Live discovery must query available Classic peers'
+
     Invoke-RestoredDrill -Id format -Path (Join-Path $projectRoot 'src/protocol/sdu.cpp') -Mutate {
         param($text)
         $text + "`nint red_drill_format( ){return 1;}`n"
@@ -358,7 +370,7 @@ function Invoke-RedDrillSet {
         param($text)
         $text.Replace('if ($LASTEXITCODE -ne 0) {', 'if ($false) {')
     } -Gate 'test:runner' -ExpectedDiagnostic 'Expected 0 to be different from the actual value'
-    $expectedDrillCount = if ($Drill -eq 'all') { 18 } else { 1 }
+    $expectedDrillCount = if ($Drill -eq 'all') { 20 } else { 1 }
     if ($script:DrillEvidence.Count -ne $expectedDrillCount) {
         throw 'Red-drill discovery did not match the requested scope'
     }
@@ -388,8 +400,20 @@ function Invoke-Task {
         'test:probe' {
             $result = Invoke-Pester -Path (Join-Path $projectRoot 'tests/probe.Tests.ps1') `
                 -PassThru -Output Detailed
-            if ($result.TotalCount -ne 10 -or $result.FailedCount -ne 0 -or $result.PassedCount -ne 10) {
+            if ($result.TotalCount -ne 20 -or $result.FailedCount -ne 0 -or $result.PassedCount -ne 20) {
                 throw 'Pester probe tests failed or discovery count changed'
+            }
+        }
+        'test:address' {
+            Invoke-Task -Name build
+            Invoke-Native -Command ctest -ArgumentList @('--preset', 'windows', '-R', '^private-address$')
+        }
+        'test:live' {
+            Invoke-Task -Name build
+            $result = Invoke-Pester -Path (Join-Path $projectRoot 'tests/live.Tests.ps1') `
+                -PassThru -Output Detailed
+            if ($result.TotalCount -ne 1 -or $result.FailedCount -ne 0 -or $result.PassedCount -ne 1) {
+                throw 'Pester live SDP tests failed or discovery count changed'
             }
         }
         'test:asan' {
@@ -441,7 +465,7 @@ function Invoke-Task {
         'test:red' { Invoke-RedDrillSet }
         quality {
             foreach ($gate in @('configure', 'build', 'format:check', 'lint', 'deadcode',
-                    'security:audit', 'test', 'test:red')) {
+                    'security:audit', 'test', 'test:live', 'test:red')) {
                 Write-Output "Gate: $gate"
                 Invoke-Task -Name $gate
             }
@@ -465,6 +489,15 @@ function Invoke-Task {
         'connect:classic' {
             Invoke-Native -Command (Join-Path $buildRoot 'meta-g-link-probe.exe') -ArgumentList '--connect-classic'
         }
+        'discover:classic:live' {
+            Invoke-Native -Command (Join-Path $buildRoot 'meta-g-link-probe.exe') -ArgumentList '--discover-classic-live'
+        }
+        'connect:classic:live' {
+            Invoke-Native -Command (Join-Path $buildRoot 'meta-g-link-probe.exe') -ArgumentList '--connect-classic-live'
+        }
+        'pair:classic' {
+            Invoke-Native -Command (Join-Path $buildRoot 'meta-g-link-probe.exe') -ArgumentList '--pair-classic'
+        }
         default { throw "Unknown project task: $Name" }
     }
 }
@@ -478,7 +511,7 @@ if (-not $PSCmdlet.ShouldProcess($projectRoot, "Run project task $Task")) {
 Push-Location -LiteralPath $projectRoot
 try {
     if ($Task -in @('bootstrap', 'configure', 'build', 'typecheck', 'test', 'test:asan',
-            'lint', 'lint:cpp', 'quality', 'package')) {
+            'lint', 'lint:cpp', 'test:address', 'test:live', 'quality', 'package')) {
         Initialize-BuildEnvironment
     }
     Invoke-Task -Name $Task

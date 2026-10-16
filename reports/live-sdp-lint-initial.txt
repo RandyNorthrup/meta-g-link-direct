@@ -1,0 +1,40 @@
+5170 warnings generated.
+C:\Users\Randy\Coding\meta_g_link_direct\include\mgl/discovery.hpp:44:12: error: enum 'ClassicMode' uses a larger base type ('int', size: 4 bytes) than necessary for its value set, consider using 'std::uint8_t' (1 byte) as the base type to reduce its size [performance-enum-size,-warnings-as-errors]
+   44 | enum class ClassicMode { RegisteredDiscovery, RegisteredConnect, LiveDiscovery, LiveConnect };
+      |            ^
+Suppressed 5169 warnings (5169 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+1 warning treated as error
+4741 warnings generated.
+Suppressed 4741 warnings (4741 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+40445 warnings generated.
+Suppressed 40445 warnings (40445 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+38992 warnings generated.
+C:\Users\Randy\Coding\meta_g_link_direct\include\mgl/discovery.hpp:44:12: error: enum 'ClassicMode' uses a larger base type ('int', size: 4 bytes) than necessary for its value set, consider using 'std::uint8_t' (1 byte) as the base type to reduce its size [performance-enum-size,-warnings-as-errors]
+   44 | enum class ClassicMode { RegisteredDiscovery, RegisteredConnect, LiveDiscovery, LiveConnect };
+      |            ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp:83:24: error: no header providing "std::size_t" is directly included [misc-include-cleaner,-warnings-as-errors]
+    6 |         constexpr std::size_t MaximumLivePeers = 8;
+      |                        ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp:84:45: error: do not access members of unions; consider using (boost::)variant instead [cppcoreguidelines-pro-type-union-access,-warnings-as-errors]
+   84 |         const auto address = device.Address.ullLong;
+      |                                             ^
+Suppressed 39002 warnings (38989 in non-user code, 13 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+3 warnings treated as errors
+6306 warnings generated.
+C:\Users\Randy\Coding\meta_g_link_direct\include\mgl/discovery.hpp:44:12: error: enum 'ClassicMode' uses a larger base type ('int', size: 4 bytes) than necessary for its value set, consider using 'std::uint8_t' (1 byte) as the base type to reduce its size [performance-enum-size,-warnings-as-errors]
+   44 | enum class ClassicMode { RegisteredDiscovery, RegisteredConnect, LiveDiscovery, LiveConnect };
+      |            ^
+Suppressed 6308 warnings (6305 in non-user code, 3 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+1 warning treated as error
+37736 warnings generated.
+Suppressed 37738 warnings (37736 in non-user code, 2 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+5169 warnings generated.
+Suppressed 5169 warnings (5169 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+Write-Error: clang-tidy rejected: main.cpp, classic.cpp, discovery.cpp

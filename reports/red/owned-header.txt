@@ -2,6 +2,12 @@ BASELINE EXIT 0
 5169 warnings generated.
 Suppressed 5169 warnings (5169 in non-user code).
 Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+45370 warnings generated.
+Suppressed 45370 warnings (45370 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+4748 warnings generated.
+Suppressed 4748 warnings (4748 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
 4741 warnings generated.
 Suppressed 4741 warnings (4741 in non-user code).
 Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
@@ -9,10 +15,16 @@ Use -header-filter=.* or leave it as default to display errors from all non-syst
 Suppressed 40445 warnings (40445 in non-user code).
 Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
 38989 warnings generated.
-Suppressed 38998 warnings (38989 in non-user code, 9 NOLINT).
+Suppressed 39003 warnings (38989 in non-user code, 14 NOLINT).
 Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
 6305 warnings generated.
 Suppressed 6308 warnings (6305 in non-user code, 3 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+39033 warnings generated.
+Suppressed 39034 warnings (39033 in non-user code, 1 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+5171 warnings generated.
+Suppressed 5171 warnings (5171 in non-user code).
 Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
 37736 warnings generated.
 Suppressed 37738 warnings (37736 in non-user code, 2 NOLINT).
@@ -25,6 +37,12 @@ MUTATED EXIT 1
 5169 warnings generated.
 Suppressed 5169 warnings (5169 in non-user code).
 Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+45370 warnings generated.
+Suppressed 45370 warnings (45370 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+4748 warnings generated.
+Suppressed 4748 warnings (4748 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
 4742 warnings generated.
 C:\Users\Randy\Coding\meta_g_link_direct\include\mgl/sdu.hpp:23:12: error: variable 'red_drill_global' is non-const and globally accessible, consider making it const [cppcoreguidelines-avoid-non-const-global-variables,-warnings-as-errors]
    23 | inline int red_drill_global = 7;
@@ -36,10 +54,20 @@ Use -header-filter=.* or leave it as default to display errors from all non-syst
 Suppressed 40445 warnings (40445 in non-user code).
 Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
 38989 warnings generated.
-Suppressed 38998 warnings (38989 in non-user code, 9 NOLINT).
+Suppressed 39003 warnings (38989 in non-user code, 14 NOLINT).
 Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
 6305 warnings generated.
 Suppressed 6308 warnings (6305 in non-user code, 3 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+39034 warnings generated.
+C:\Users\Randy\Coding\meta_g_link_direct\include\mgl/sdu.hpp:23:12: error: variable 'red_drill_global' is non-const and globally accessible, consider making it const [cppcoreguidelines-avoid-non-const-global-variables,-warnings-as-errors]
+   23 | inline int red_drill_global = 7;
+      |            ^
+Suppressed 39034 warnings (39033 in non-user code, 1 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+1 warning treated as error
+5171 warnings generated.
+Suppressed 5171 warnings (5171 in non-user code).
 Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
 37736 warnings generated.
 Suppressed 37738 warnings (37736 in non-user code, 2 NOLINT).
@@ -51,11 +79,17 @@ C:\Users\Randy\Coding\meta_g_link_direct\include\mgl/sdu.hpp:23:12: error: varia
 Suppressed 5169 warnings (5169 in non-user code).
 Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
 1 warning treated as error
-Write-Error: clang-tidy rejected: sdu.cpp, sdu_tests.cpp
+Write-Error: clang-tidy rejected: sdu.cpp, rfcomm.cpp, sdu_tests.cpp
 
 RESTORED EXIT 0
 5169 warnings generated.
 Suppressed 5169 warnings (5169 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+45370 warnings generated.
+Suppressed 45370 warnings (45370 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+4748 warnings generated.
+Suppressed 4748 warnings (4748 in non-user code).
 Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
 4741 warnings generated.
 Suppressed 4741 warnings (4741 in non-user code).
@@ -64,10 +98,16 @@ Use -header-filter=.* or leave it as default to display errors from all non-syst
 Suppressed 40445 warnings (40445 in non-user code).
 Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
 38989 warnings generated.
-Suppressed 38998 warnings (38989 in non-user code, 9 NOLINT).
+Suppressed 39003 warnings (38989 in non-user code, 14 NOLINT).
 Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
 6305 warnings generated.
 Suppressed 6308 warnings (6305 in non-user code, 3 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+39033 warnings generated.
+Suppressed 39034 warnings (39033 in non-user code, 1 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+5171 warnings generated.
+Suppressed 5171 warnings (5171 in non-user code).
 Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
 37736 warnings generated.
 Suppressed 37738 warnings (37736 in non-user code, 2 NOLINT).

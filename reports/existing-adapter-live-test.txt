@@ -1,0 +1,12 @@
+ninja: no work to do.
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 1 tests in 154ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\live.Tests.ps1'
+Describing Explicit live Classic service lookup
+  [+] queries available Classic peers without pairing or connecting 30.49s (30.47s|23ms)
+Tests completed in 31s
+Tests Passed: 1, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0

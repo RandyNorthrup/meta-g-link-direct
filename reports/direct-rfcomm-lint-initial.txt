@@ -1,0 +1,256 @@
+5171 warnings generated.
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\private_input.hpp:10:8: error: constructor does not initialize these fields: error [cppcoreguidelines-pro-type-member-init,hicpp-member-init,-warnings-as-errors]
+   10 | struct PrivateAddressInput {
+      |        ^
+   11 |     std::optional<std::uint64_t> value;
+   12 |     std::uint32_t error;
+      |                        
+      |                        {}
+Suppressed 5169 warnings (5169 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+1 warning treated as error
+45374 warnings generated.
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\private_input.cpp:29:52: error: use of a signed integer operand with a binary bitwise operator [hicpp-signed-bitwise,-warnings-as-errors]
+   29 |             if (SetConsoleMode(input_, original_ & ~ENABLE_ECHO_INPUT) == FALSE) {
+      |                                                  ~ ^~~~~~~~~~~~~~~~~~
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\private_input.cpp:54:5: error: no header providing "HANDLE" is directly included [misc-include-cleaner,-warnings-as-errors]
+Suppressed 45371 warnings (45371 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+3 warnings treated as errors
+   20 |     HANDLE input_;
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\private_input.cpp:70:28: error: no header providing "std::size_t" is directly included [misc-include-cleaner,-warnings-as-errors]
+    5 |             constexpr std::size_t MaximumInputBuffer = 18;
+      |                            ^
+4752 warnings generated.
+C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\address.cpp:33:45: error: possibly unsafe 'operator[]', consider bounds-safe alternatives [cppcoreguidelines-pro-bounds-avoid-unchecked-container-access,-warnings-as-errors]
+   33 |     const char separator = separated ? input[2] : '\0';
+      |                                             ^~~
+C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\address.cpp:40:41: error: possibly unsafe 'operator[]', consider bounds-safe alternatives [cppcoreguidelines-pro-bounds-avoid-unchecked-container-access,-warnings-as-errors]
+   40 |         const auto high = hexDigit(input[index]);
+      |                                         ^~~~~~~
+C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\address.cpp:41:40: error: possibly unsafe 'operator[]', consider bounds-safe alternatives [cppcoreguidelines-pro-bounds-avoid-unchecked-container-access,-warnings-as-errors]
+   41 |         const auto low = hexDigit(input[index + 1]);
+      |                                        ^~~~~~~~~~~
+C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\address.cpp:45:53: error: possibly unsafe 'operator[]', consider bounds-safe alternatives [cppcoreguidelines-pro-bounds-avoid-unchecked-container-access,-warnings-as-errors]
+   45 |         if (separated && octet + 1 < Octets && input[index + 2] != separator) {
+      |                                                     ^~~~~~~~~~~
+Suppressed 4748 warnings (4748 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+4 warnings treated as errors
+4741 warnings generated.
+Suppressed 4741 warnings (4741 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+40445 warnings generated.
+Suppressed 40445 warnings (40445 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+38993 warnings generated.
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp:62:23: error: member 'result' of type 'ClassicDiscovery &' is a reference [cppcoreguidelines-avoid-const-or-ref-data-members,-warnings-as-errors]
+   62 |     ClassicDiscovery& result;
+      |                       ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp:73:5: error: do not declare C-style arrays, use 'std::array' instead [cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays,-warnings-as-errors]
+   73 |     wchar_t instruction[] =
+      |     ^~~~~~~~~~~~~~~~~~~~~
+Suppressed 39003 warnings (38989 in non-user code, 14 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+2 warnings treated as errors
+6305 warnings generated.
+Suppressed 6308 warnings (6305 in non-user code, 3 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+39056 warnings generated.
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:23:70: error: no header providing "MAKEWORD" is directly included [misc-include-cleaner,-warnings-as-errors]
+    6 |         result_.socket_error = static_cast<std::uint32_t>(WSAStartup(MAKEWORD(2, 2), &data));
+      |                                                                      ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:24:9: error: 'initialized_' should be initialized in a member initializer of the constructor [cppcoreguidelines-prefer-member-initializer,-warnings-as-errors]
+   21 |     explicit WinsockSession(DirectRfcommResult& result) : result_(result) {
+      |                                                                          , initialized_(result_.socket_error == 0)
+   22 |         WSADATA data{};
+   23 |         result_.socket_error = static_cast<std::uint32_t>(WSAStartup(MAKEWORD(2, 2), &data));
+   24 |         initialized_ = result_.socket_error == 0;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:44:61: error: 'socket' should use SOCK_CLOEXEC where possible [android-cloexec-socket,-warnings-as-errors]
+   44 |         : result_(result), value_(socket(AF_BTH, SOCK_STREAM, BTHPROTO_RFCOMM)) {
+      |                                                             ^
+      |                                                              | SOCK_CLOEXEC
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:45:13: error: comparison between 'signed' and 'unsigned' integers [modernize-use-integer-sign-comparison,-warnings-as-errors]
+   45 |         if (value_ == INVALID_SOCKET) {
+      |             ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:50:13: error: comparison between 'signed' and 'unsigned' integers [modernize-use-integer-sign-comparison,-warnings-as-errors]
+   50 |         if (value_ != INVALID_SOCKET && closesocket(value_) == SOCKET_ERROR) {
+      |             ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:65:6: error: function 'waitSocket' has cognitive complexity of 29 (threshold 25) [readability-function-cognitive-complexity,-warnings-as-errors]
+   65 | bool waitSocket(SOCKET socket, bool writing, std::chrono::steady_clock::time_point deadline,
+      |      ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:69:5: note: +1, including nesting penalty of 0, nesting level increased to 1
+   69 |     if (remaining <= std::chrono::microseconds::zero()) {
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:76:5: note: +1, including nesting penalty of 0, nesting level increased to 1
+   76 |     FD_SET(socket, &ready);
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um\winsock2.h:158:25: note: expanded from macro 'FD_SET'
+  158 | #define FD_SET(fd, set) do { \
+      |                         ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:76:5: note: +2, including nesting penalty of 1, nesting level increased to 2
+   76 |     FD_SET(socket, &ready);
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um\winsock2.h:160:5: note: expanded from macro 'FD_SET'
+  160 |     for (__i = 0; __i < ((fd_set FAR *)(set))->fd_count; __i++) { \
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:76:5: note: +3, including nesting penalty of 2, nesting level increased to 3
+   76 |     FD_SET(socket, &ready);
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um\winsock2.h:161:9: note: expanded from macro 'FD_SET'
+  161 |         if (((fd_set FAR *)(set))->fd_array[__i] == (fd)) { \
+      |         ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:76:5: note: +2, including nesting penalty of 1, nesting level increased to 2
+   76 |     FD_SET(socket, &ready);
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um\winsock2.h:165:5: note: expanded from macro 'FD_SET'
+  165 |     if (__i == ((fd_set FAR *)(set))->fd_count) { \
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:76:5: note: +3, including nesting penalty of 2, nesting level increased to 3
+   76 |     FD_SET(socket, &ready);
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um\winsock2.h:166:9: note: expanded from macro 'FD_SET'
+  166 |         if (((fd_set FAR *)(set))->fd_count < FD_SETSIZE) { \
+      |         ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:77:5: note: +1, including nesting penalty of 0, nesting level increased to 1
+   77 |     FD_SET(socket, &failed);
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um\winsock2.h:158:25: note: expanded from macro 'FD_SET'
+  158 | #define FD_SET(fd, set) do { \
+      |                         ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:77:5: note: +2, including nesting penalty of 1, nesting level increased to 2
+   77 |     FD_SET(socket, &failed);
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um\winsock2.h:160:5: note: expanded from macro 'FD_SET'
+  160 |     for (__i = 0; __i < ((fd_set FAR *)(set))->fd_count; __i++) { \
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:77:5: note: +3, including nesting penalty of 2, nesting level increased to 3
+   77 |     FD_SET(socket, &failed);
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um\winsock2.h:161:9: note: expanded from macro 'FD_SET'
+  161 |         if (((fd_set FAR *)(set))->fd_array[__i] == (fd)) { \
+      |         ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:77:5: note: +2, including nesting penalty of 1, nesting level increased to 2
+   77 |     FD_SET(socket, &failed);
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um\winsock2.h:165:5: note: expanded from macro 'FD_SET'
+  165 |     if (__i == ((fd_set FAR *)(set))->fd_count) { \
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:77:5: note: +3, including nesting penalty of 2, nesting level increased to 3
+   77 |     FD_SET(socket, &failed);
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um\winsock2.h:166:9: note: expanded from macro 'FD_SET'
+  166 |         if (((fd_set FAR *)(set))->fd_count < FD_SETSIZE) { \
+      |         ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:82:27: note: +1, including nesting penalty of 0, nesting level increased to 1
+   82 |         select(0, writing ? nullptr : &ready, writing ? &ready : nullptr, &failed, &timeout);
+      |                           ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:82:55: note: +1, including nesting penalty of 0, nesting level increased to 1
+   82 |         select(0, writing ? nullptr : &ready, writing ? &ready : nullptr, &failed, &timeout);
+      |                                                       ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:83:5: note: +1, including nesting penalty of 0, nesting level increased to 1
+   83 |     if (selected == 0) {
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:88:5: note: +1, including nesting penalty of 0, nesting level increased to 1
+   88 |     if (selected == SOCKET_ERROR) {
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:94:5: note: +1, including nesting penalty of 0, nesting level increased to 1
+   94 |     if (getsockopt(socket, SOL_SOCKET, SO_ERROR, error_buffer.data(), &length) == SOCKET_ERROR) {
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:99:5: note: +1, including nesting penalty of 0, nesting level increased to 1
+   99 |     if (length != sizeof(error)) {
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:71:31: error: no header providing "WSAETIMEDOUT" is directly included [misc-include-cleaner,-warnings-as-errors]
+    6 |         result.socket_error = WSAETIMEDOUT;
+      |                               ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:79:5: error: variable 'timeout' of type 'timeval' can be declared 'const' [misc-const-correctness,-warnings-as-errors]
+   79 |     timeval timeout{static_cast<long>(remaining.count() / MicrosPerSecond),
+      |     ^
+      |             const 
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:79:20: error: use designated initializer list to initialize 'timeval' [modernize-use-designated-initializers,-warnings-as-errors]
+   79 |     timeval timeout{static_cast<long>(remaining.count() / MicrosPerSecond),
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                     .tv_sec=
+   80 |                     static_cast<long>(remaining.count() % MicrosPerSecond)};
+      |                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                     .tv_usec=
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\um\winsock2.h:180:1: note: aggregate type is defined here
+  180 | struct timeval {
+      | ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:79:33: error: consider replacing 'long' with 'int32' [google-runtime-int,-warnings-as-errors]
+   79 |     timeval timeout{static_cast<long>(remaining.count() / MicrosPerSecond),
+      |                                 ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:80:33: error: consider replacing 'long' with 'int32' [google-runtime-int,-warnings-as-errors]
+   80 |                     static_cast<long>(remaining.count() % MicrosPerSecond)};
+      |                                 ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:100:31: error: no header providing "WSAEINVAL" is directly included [misc-include-cleaner,-warnings-as-errors]
+  100 |         result.socket_error = WSAEINVAL;
+      |                               ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:123:35: error: no header providing "WSAECONNRESET" is directly included [misc-include-cleaner,-warnings-as-errors]
+  123 |             result.socket_error = WSAECONNRESET;
+      |                                   ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:128:26: error: no header providing "WSAEWOULDBLOCK" is directly included [misc-include-cleaner,-warnings-as-errors]
+  128 |             if (error == WSAEWOULDBLOCK) {
+      |                          ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:151:35: error: no header providing "WSAEMSGSIZE" is directly included [misc-include-cleaner,-warnings-as-errors]
+  151 |             result.socket_error = WSAEMSGSIZE;
+      |                                   ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:190:17: error: use designated initializer list to initialize 'GUID' (aka 'struct _GUID') [modernize-use-designated-initializers,-warnings-as-errors]
+  190 |             GUID{0x8B0D2687, 0x42A4, 0x44CB, {0x94, 0x36, 0xFB, 0xA3, 0xB9, 0xB9, 0x6D, 0xE2}};
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                  .Data1=     .Data2= .Data3= .Data4=
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\shared\guiddef.h:22:9: note: aggregate type is defined here
+   22 | typedef struct _GUID {
+      |         ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:197:31: error: do not use reinterpret_cast [cppcoreguidelines-pro-type-reinterpret-cast,-warnings-as-errors]
+  197 |         connect(socket.get(), reinterpret_cast<const sockaddr*>(&remote),
+      |                               ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp:201:49: error: no header providing "WSAEINPROGRESS" is directly included [misc-include-cleaner,-warnings-as-errors]
+  201 |         if (error != WSAEWOULDBLOCK && error != WSAEINPROGRESS) {
+      |                                                 ^
+Suppressed 39036 warnings (39036 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+18 warnings treated as errors
+5170 warnings generated.
+C:\Users\Randy\Coding\meta_g_link_direct\tests\address_tests.cpp:9:5: error: an exception may be thrown in function 'main' which should not throw exceptions [bugprone-exception-escape,-warnings-as-errors]
+    9 | int main() {
+      |     ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\xiosbase:172:13: note: frame #0: unhandled exception of type 'failure' may be thrown in function 'clear' here
+  172 |             _THROW(failure(_Msg));
+      |             ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\yvals.h:481:21: note: expanded from macro '_THROW'
+  481 | #define _THROW(...) throw(__VA_ARGS__)
+      |                     ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\ios:40:9: note: frame #1: function 'clear' calls function 'clear' here
+   40 |         ios_base::clear(_State | (_Mystrbuf ? ios_base::goodbit : ios_base::badbit), _Reraise);
+      |         ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\ios:51:9: note: frame #2: function 'setstate' calls function 'clear' here
+   51 |         clear(rdstate() | _State, _Reraise);
+      |         ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\__msvc_ostream.hpp:573:17: note: frame #3: function 'flush' calls function 'setstate' here
+  573 |                 _CATCH_IO_END
+      |                 ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\iosfwd:30:9: note: expanded from macro '_CATCH_IO_END'
+   30 |         _Myios::setstate(ios_base::badbit, true); /* set badbit and rethrow */ \
+      |         ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\__msvc_ostream.hpp:102:13: note: frame #4: function 'sentry' calls function 'flush' here
+  102 |             _Tied->flush();
+      |             ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\__msvc_ostream.hpp:776:34: note: frame #5: function 'operator<<<std::char_traits<char>>' calls function 'sentry' here
+  776 |     const typename _Myos::sentry _Ok(_Ostr);
+      |                                  ^
+C:\Users\Randy\Coding\meta_g_link_direct\tests\address_tests.cpp:14:23: note: frame #6: function 'main' calls function 'operator<<<std::char_traits<char>>' here
+   14 |             std::cerr << "Address octet order or supported format incorrect\n";
+      |                       ^
+Suppressed 5169 warnings (5169 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+1 warning treated as error
+37736 warnings generated.
+Suppressed 37738 warnings (37736 in non-user code, 2 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+5169 warnings generated.
+Suppressed 5169 warnings (5169 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+Write-Error: clang-tidy rejected: main.cpp, private_input.cpp, address.cpp, classic.cpp, rfcomm.cpp, address_tests.cpp

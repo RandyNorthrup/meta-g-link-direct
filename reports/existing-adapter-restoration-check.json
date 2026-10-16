@@ -1,0 +1,7 @@
+{
+  "drills": 20,
+  "independently_checked_current_restoration": true,
+  "all_baselines_green": true,
+  "all_mutations_rejected": true,
+  "all_restored_green": true
+}

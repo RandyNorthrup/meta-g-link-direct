@@ -2,160 +2,205 @@ BASELINE EXIT 0
 ninja: no work to do.
 Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
     Start 1: protocol-prefix
-1/2 Test #1: protocol-prefix ..................   Passed    0.00 sec
-    Start 2: module-abi
-2/2 Test #2: module-abi .......................   Passed    0.01 sec
+1/3 Test #1: protocol-prefix ..................   Passed    0.00 sec
+    Start 2: private-address
+2/3 Test #2: private-address ..................   Passed    0.00 sec
+    Start 3: module-abi
+3/3 Test #3: module-abi .......................   Passed    0.01 sec
 
-100% tests passed, 0 tests failed out of 2
+100% tests passed, 0 tests failed out of 3
 
 Total Test time (real) =   0.02 sec
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 3 tests in 131ms.
+Discovery found 3 tests in 153ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 401ms (376ms|25ms)
-  [+] formats a disposable source when effects are requested 417ms (415ms|2ms)
-  [+] propagates native formatter errors 438ms (437ms|1ms)
-Tests completed in 1.69s
+  [+] does not modify files with WhatIf 440ms (416ms|23ms)
+  [+] formats a disposable source when effects are requested 520ms (518ms|2ms)
+  [+] propagates native formatter errors 498ms (497ms|1ms)
+Tests completed in 1.91s
 Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 10 tests in 25ms.
+Discovery found 20 tests in 31ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1'
-Describing Native read-only probe contract
-  [+] reports association separately and performs no implicit discovery 102ms (101ms|1ms)
-  [+] explains discovery limits without accessing glasses 38ms (37ms|1ms)
-  [+] reports actual scan completion or native failure with a matching exit code 41ms (39ms|1ms)
-  [+] performs explicit Classic inquiry without claiming an RFCOMM connection 5.18s (5.18s|1ms)
-  [+] rejects invalid argument sequence --invalid before scanning 32ms (31ms|2ms)
-  [+] rejects invalid argument sequence --discover extra before scanning 22ms (21ms|1ms)
-  [+] rejects invalid argument sequence --help extra before scanning 20ms (19ms|1ms)
-  [+] rejects invalid argument sequence extra --discover before scanning 21ms (21ms|1ms)
-  [+] rejects invalid argument sequence --connect-classic extra before scanning 24ms (24ms|1ms)
-  [+] rejects invalid argument sequence --discover-classic --connect-classic before scanning 28ms (26ms|2ms)
-Tests completed in 5.59s
-Tests Passed: 10, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+Describing Native diagnostic probe contract
+  [+] rejects private input without echo or connection: --direct-classic-uuid 169ms (166ms|3ms)
+  [+] rejects private input without echo or connection: --direct-classic-channel7 29ms (28ms|1ms)
+  [+] rejects private input without echo or connection: --direct-classic-channel7 27ms (26ms|1ms)
+  [+] rejects private input without echo or connection: --direct-classic-uuid 35ms (34ms|1ms)
+  [+] rejects private input without echo or connection: --direct-classic-uuid 29ms (28ms|1ms)
+  [+] exports only requested redacted direct-probe diagnostics 27ms (26ms|1ms)
+  [+] propagates requested diagnostic write failure 28ms (28ms|1ms)
+  [+] reports association separately and performs no implicit discovery 51ms (50ms|1ms)
+  [+] explains discovery limits without accessing glasses 44ms (43ms|1ms)
+  [+] reports actual scan completion or native failure with a matching exit code 60ms (60ms|1ms)
+  [+] performs explicit Classic inquiry without claiming an RFCOMM connection 5.24s (5.24s|1ms)
+  [+] rejects invalid argument sequence --pair-classic extra before scanning 29ms (28ms|1ms)
+  [+] rejects invalid argument sequence --direct-classic-uuid extra before scanning 24ms (23ms|1ms)
+  [+] rejects invalid argument sequence --discover-classic-live extra before scanning 19ms (19ms|1ms)
+  [+] rejects invalid argument sequence --invalid before scanning 29ms (28ms|1ms)
+  [+] rejects invalid argument sequence --discover extra before scanning 25ms (24ms|1ms)
+  [+] rejects invalid argument sequence --help extra before scanning 22ms (21ms|1ms)
+  [+] rejects invalid argument sequence extra --discover before scanning 18ms (17ms|0ms)
+  [+] rejects invalid argument sequence --connect-classic extra before scanning 20ms (20ms|0ms)
+  [+] rejects invalid argument sequence --discover-classic --connect-classic before scanning 28ms (28ms|1ms)
+Tests completed in 6.07s
+Tests Passed: 20, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
 MUTATED EXIT 1
-[1/4] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp for CXX dependencies
-[2/4] Generating CXX dyndep file CMakeFiles\meta-g-link-probe.dir\CXX.dd
+[1/5] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp for CXX dependencies
+[2/5] Generating CXX dyndep file CMakeFiles\meta-g-link-probe.dir\CXX.dd
 [3/4] Building CXX object CMakeFiles\meta-g-link-probe.dir\src\probe\main.cpp.obj
 [4/4] Linking CXX executable meta-g-link-probe.exe
 Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
     Start 1: protocol-prefix
-1/2 Test #1: protocol-prefix ..................   Passed    0.01 sec
-    Start 2: module-abi
-2/2 Test #2: module-abi .......................   Passed    0.02 sec
+1/3 Test #1: protocol-prefix ..................   Passed    0.00 sec
+    Start 2: private-address
+2/3 Test #2: private-address ..................   Passed    0.01 sec
+    Start 3: module-abi
+3/3 Test #3: module-abi .......................   Passed    0.01 sec
 
-100% tests passed, 0 tests failed out of 2
+100% tests passed, 0 tests failed out of 3
 
 Total Test time (real) =   0.03 sec
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 3 tests in 138ms.
+Discovery found 3 tests in 128ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 453ms (426ms|27ms)
-  [+] formats a disposable source when effects are requested 437ms (435ms|2ms)
-  [+] propagates native formatter errors 511ms (510ms|1ms)
+  [+] does not modify files with WhatIf 441ms (417ms|24ms)
+  [+] formats a disposable source when effects are requested 419ms (417ms|2ms)
+  [+] propagates native formatter errors 438ms (437ms|1ms)
+Tests completed in 1.71s
+Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 20 tests in 25ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1'
+Describing Native diagnostic probe contract
+  [+] rejects private input without echo or connection: --direct-classic-uuid 92ms (90ms|3ms)
+  [+] rejects private input without echo or connection: --direct-classic-channel7 24ms (24ms|1ms)
+  [+] rejects private input without echo or connection: --direct-classic-channel7 25ms (24ms|1ms)
+  [+] rejects private input without echo or connection: --direct-classic-uuid 35ms (34ms|1ms)
+  [+] rejects private input without echo or connection: --direct-classic-uuid 27ms (26ms|1ms)
+  [+] exports only requested redacted direct-probe diagnostics 29ms (28ms|1ms)
+  [+] propagates requested diagnostic write failure 30ms (29ms|1ms)
+  [+] reports association separately and performs no implicit discovery 49ms (48ms|1ms)
+  [+] explains discovery limits without accessing glasses 44ms (43ms|1ms)
+  [+] reports actual scan completion or native failure with a matching exit code 33ms (32ms|1ms)
+  [+] performs explicit Classic inquiry without claiming an RFCOMM connection 5.23s (5.23s|1ms)
+  [-] rejects invalid argument sequence --pair-classic extra before scanning 37ms (35ms|2ms)
+   Expected 5, because invalid probe arguments must fail, but got 0.
+   at $result.Code | Should -Be 5 -Because 'invalid probe arguments must fail', C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:153
+   at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:153
+  [-] rejects invalid argument sequence --direct-classic-uuid extra before scanning 19ms (19ms|0ms)
+   Expected 5, because invalid probe arguments must fail, but got 0.
+   at $result.Code | Should -Be 5 -Because 'invalid probe arguments must fail', C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:153
+   at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:153
+  [-] rejects invalid argument sequence --discover-classic-live extra before scanning 18ms (18ms|1ms)
+   Expected 5, because invalid probe arguments must fail, but got 0.
+   at $result.Code | Should -Be 5 -Because 'invalid probe arguments must fail', C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:153
+   at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:153
+  [-] rejects invalid argument sequence --invalid before scanning 18ms (17ms|1ms)
+   Expected 5, because invalid probe arguments must fail, but got 0.
+   at $result.Code | Should -Be 5 -Because 'invalid probe arguments must fail', C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:153
+   at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:153
+  [-] rejects invalid argument sequence --discover extra before scanning 21ms (20ms|1ms)
+   Expected 5, because invalid probe arguments must fail, but got 0.
+   at $result.Code | Should -Be 5 -Because 'invalid probe arguments must fail', C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:153
+   at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:153
+  [-] rejects invalid argument sequence --help extra before scanning 25ms (24ms|1ms)
+   Expected 5, because invalid probe arguments must fail, but got 0.
+   at $result.Code | Should -Be 5 -Because 'invalid probe arguments must fail', C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:153
+   at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:153
+  [-] rejects invalid argument sequence extra --discover before scanning 19ms (19ms|0ms)
+   Expected 5, because invalid probe arguments must fail, but got 0.
+   at $result.Code | Should -Be 5 -Because 'invalid probe arguments must fail', C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:153
+   at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:153
+  [-] rejects invalid argument sequence --connect-classic extra before scanning 25ms (24ms|1ms)
+   Expected 5, because invalid probe arguments must fail, but got 0.
+   at $result.Code | Should -Be 5 -Because 'invalid probe arguments must fail', C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:153
+   at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:153
+  [-] rejects invalid argument sequence --discover-classic --connect-classic before scanning 20ms (19ms|1ms)
+   Expected 5, because invalid probe arguments must fail, but got 0.
+   at $result.Code | Should -Be 5 -Because 'invalid probe arguments must fail', C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:153
+   at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:153
+Tests completed in 5.96s
+Tests Passed: 11, Failed: 9, Skipped: 0, Inconclusive: 0, NotRun: 0
+Write-Error: Pester probe tests failed or discovery count changed
+
+RESTORED EXIT 0
+[1/5] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp for CXX dependencies
+[2/5] Generating CXX dyndep file CMakeFiles\meta-g-link-probe.dir\CXX.dd
+[3/4] Building CXX object CMakeFiles\meta-g-link-probe.dir\src\probe\main.cpp.obj
+[4/4] Linking CXX executable meta-g-link-probe.exe
+Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
+    Start 1: protocol-prefix
+1/3 Test #1: protocol-prefix ..................   Passed    0.01 sec
+    Start 2: private-address
+2/3 Test #2: private-address ..................   Passed    0.01 sec
+    Start 3: module-abi
+3/3 Test #3: module-abi .......................   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =   0.05 sec
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 3 tests in 142ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
+Describing Project task runner
+  [+] does not modify files with WhatIf 477ms (452ms|25ms)
+  [+] formats a disposable source when effects are requested 433ms (431ms|2ms)
+  [+] propagates native formatter errors 505ms (504ms|1ms)
 Tests completed in 1.87s
 Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 10 tests in 25ms.
+Discovery found 20 tests in 27ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1'
-Describing Native read-only probe contract
-  [+] reports association separately and performs no implicit discovery 107ms (106ms|1ms)
-  [+] explains discovery limits without accessing glasses 22ms (22ms|1ms)
-  [+] reports actual scan completion or native failure with a matching exit code 35ms (34ms|1ms)
-  [+] performs explicit Classic inquiry without claiming an RFCOMM connection 8.5s (8.5s|1ms)
-  [-] rejects invalid argument sequence --invalid before scanning 44ms (41ms|2ms)
-   Expected 5, because invalid probe arguments must fail, but got 0.
-   at $result.Code | Should -Be 5 -Because 'invalid probe arguments must fail', C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:121
-   at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:121
-  [-] rejects invalid argument sequence --discover extra before scanning 20ms (19ms|1ms)
-   Expected 5, because invalid probe arguments must fail, but got 0.
-   at $result.Code | Should -Be 5 -Because 'invalid probe arguments must fail', C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:121
-   at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:121
-  [-] rejects invalid argument sequence --help extra before scanning 21ms (20ms|0ms)
-   Expected 5, because invalid probe arguments must fail, but got 0.
-   at $result.Code | Should -Be 5 -Because 'invalid probe arguments must fail', C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:121
-   at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:121
-  [-] rejects invalid argument sequence extra --discover before scanning 19ms (18ms|1ms)
-   Expected 5, because invalid probe arguments must fail, but got 0.
-   at $result.Code | Should -Be 5 -Because 'invalid probe arguments must fail', C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:121
-   at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:121
-  [-] rejects invalid argument sequence --connect-classic extra before scanning 25ms (24ms|1ms)
-   Expected 5, because invalid probe arguments must fail, but got 0.
-   at $result.Code | Should -Be 5 -Because 'invalid probe arguments must fail', C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:121
-   at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:121
-  [-] rejects invalid argument sequence --discover-classic --connect-classic before scanning 30ms (30ms|1ms)
-   Expected 5, because invalid probe arguments must fail, but got 0.
-   at $result.Code | Should -Be 5 -Because 'invalid probe arguments must fail', C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:121
-   at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1:121
-Tests completed in 8.95s
-Tests Passed: 4, Failed: 6, Skipped: 0, Inconclusive: 0, NotRun: 0
-Write-Error: Pester probe tests failed or discovery count changed
+Describing Native diagnostic probe contract
+  [+] rejects private input without echo or connection: --direct-classic-uuid 100ms (96ms|5ms)
+  [+] rejects private input without echo or connection: --direct-classic-channel7 33ms (32ms|1ms)
+  [+] rejects private input without echo or connection: --direct-classic-channel7 33ms (32ms|1ms)
+  [+] rejects private input without echo or connection: --direct-classic-uuid 33ms (33ms|1ms)
+  [+] rejects private input without echo or connection: --direct-classic-uuid 29ms (28ms|1ms)
+  [+] exports only requested redacted direct-probe diagnostics 25ms (24ms|1ms)
+  [+] propagates requested diagnostic write failure 26ms (25ms|1ms)
+  [+] reports association separately and performs no implicit discovery 51ms (51ms|1ms)
+  [+] explains discovery limits without accessing glasses 31ms (30ms|1ms)
+  [+] reports actual scan completion or native failure with a matching exit code 43ms (42ms|1ms)
+  [+] performs explicit Classic inquiry without claiming an RFCOMM connection 5.22s (5.22s|1ms)
+  [+] rejects invalid argument sequence --pair-classic extra before scanning 27ms (26ms|1ms)
+  [+] rejects invalid argument sequence --direct-classic-uuid extra before scanning 20ms (19ms|1ms)
+  [+] rejects invalid argument sequence --discover-classic-live extra before scanning 29ms (28ms|1ms)
+  [+] rejects invalid argument sequence --invalid before scanning 21ms (20ms|1ms)
+  [+] rejects invalid argument sequence --discover extra before scanning 34ms (34ms|1ms)
+  [+] rejects invalid argument sequence --help extra before scanning 22ms (22ms|1ms)
+  [+] rejects invalid argument sequence extra --discover before scanning 20ms (19ms|1ms)
+  [+] rejects invalid argument sequence --connect-classic extra before scanning 24ms (23ms|1ms)
+  [+] rejects invalid argument sequence --discover-classic --connect-classic before scanning 25ms (24ms|1ms)
+Tests completed in 5.94s
+Tests Passed: 20, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
-RESTORED EXIT 0
-[1/4] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp for CXX dependencies
-[2/4] Generating CXX dyndep file CMakeFiles\meta-g-link-probe.dir\CXX.dd
-[3/4] Building CXX object CMakeFiles\meta-g-link-probe.dir\src\probe\main.cpp.obj
-[4/4] Linking CXX executable meta-g-link-probe.exe
-Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
-    Start 1: protocol-prefix
-1/2 Test #1: protocol-prefix ..................   Passed    0.00 sec
-    Start 2: module-abi
-2/2 Test #2: module-abi .......................   Passed    0.01 sec
-
-100% tests passed, 0 tests failed out of 2
-
-Total Test time (real) =   0.02 sec
-Pester v5.7.1
-
-Starting discovery in 1 files.
-Discovery found 3 tests in 145ms.
-Running tests.
-
-Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
-Describing Project task runner
-  [+] does not modify files with WhatIf 491ms (466ms|25ms)
-  [+] formats a disposable source when effects are requested 493ms (491ms|2ms)
-  [+] propagates native formatter errors 589ms (588ms|1ms)
-Tests completed in 2.11s
-Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
-Pester v5.7.1
-
-Starting discovery in 1 files.
-Discovery found 10 tests in 26ms.
-Running tests.
-
-Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1'
-Describing Native read-only probe contract
-  [+] reports association separately and performs no implicit discovery 144ms (142ms|1ms)
-  [+] explains discovery limits without accessing glasses 37ms (35ms|2ms)
-  [+] reports actual scan completion or native failure with a matching exit code 62ms (59ms|3ms)
-  [+] performs explicit Classic inquiry without claiming an RFCOMM connection 5.24s (5.24s|1ms)
-  [+] rejects invalid argument sequence --invalid before scanning 40ms (37ms|3ms)
-  [+] rejects invalid argument sequence --discover extra before scanning 25ms (24ms|1ms)
-  [+] rejects invalid argument sequence --help extra before scanning 23ms (23ms|1ms)
-  [+] rejects invalid argument sequence extra --discover before scanning 24ms (23ms|1ms)
-  [+] rejects invalid argument sequence --connect-classic extra before scanning 27ms (27ms|1ms)
-  [+] rejects invalid argument sequence --discover-classic --connect-classic before scanning 35ms (34ms|1ms)
-Tests completed in 5.75s
-Tests Passed: 10, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
-
-RESTORATION SHA256 6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93
+RESTORATION SHA256 4d212ca8471cb367652754e1a04d16844001d9f1192d30ae910d0fdc2e4b8c18

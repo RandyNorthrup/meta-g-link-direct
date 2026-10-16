@@ -1,0 +1,31 @@
+{
+  "acceptance": 6,
+  "checks": [
+    "schema",
+    "record-graph",
+    "owned-paths",
+    "active-path-ownership",
+    "environment",
+    "readiness-receipts",
+    "completed-receipts",
+    "checkpoint-freshness"
+  ],
+  "claim_scope": "Structural and recorded-evidence checks; semantic review remains required.",
+  "evidence": 71,
+  "findings": [
+    {
+      "code": "checkpoint-inputs-stale",
+      "location": "checkpoint",
+      "message": "Source changed since the checkpoint; re-observe before proceeding"
+    },
+    {
+      "code": "checkpoint-scope-stale",
+      "location": "checkpoint",
+      "message": "Scoped semantic inputs changed since the checkpoint"
+    }
+  ],
+  "passed": false,
+  "requirements": 4,
+  "stage": "resume",
+  "tasks": 4
+}
