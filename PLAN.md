@@ -13731,7 +13731,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
     ],
     "pending_operations": [],
     "next_action": "TASK-AUTH hardware acceptance is blocked: valid controller query reports LE unsupported, Classic supported, HCI/LMP fields 4; user reports glasses absent from Windows pairing and no other Bluetooth controller. Need a Windows-compatible LE+Classic controller to test the documented initial bond path. No purchase, reset, ownership/driver/service/network change or firmware downgrade authorized. Then rerun capabilities/discovery and Windows pairing; test explicit Classic socket. Registered-service lookup is not complete uncached SDP: if a real bond exists but lookup is empty, investigate direct uncached RFCOMM service lookup. Implement and prove protected identity, authorized Meta setup/recovery and actual device info with phone off and after glasses restart. Real socket success/cancellation, latest firmware, media, group-owner operation, OBS accessibility, >=120-minute run and existing audit/coverage/fuzz/Linux/race gates remain open. Preserve current source and prior reports; no repeated adapter-model/product interview.",
-    "source_revision": null
+    "source_revision": "8c519edd818341a047b01b7f305849b41b603635"
   }
 }
 ```
