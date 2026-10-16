@@ -1,0 +1,180 @@
+5170 warnings generated.
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:26:5: error: function 'runProbe' has cognitive complexity of 27 (threshold 25) [readability-function-cognitive-complexity,-warnings-as-errors]
+   26 | int runProbe(std::string_view mode) {
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:30:75: note: +1, including nesting penalty of 0, nesting level increased to 1
+   30 |               << ",\"bluetooth_radio\":" << (capabilities.bluetooth_radio ? "true" : "false")
+      |                                                                           ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:35:57: note: +1, including nesting penalty of 0, nesting level increased to 1
+   35 |               << (capabilities.bluetooth_features_valid ? "true" : "false")
+      |                                                         ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:37:55: note: +1, including nesting penalty of 0, nesting level increased to 1
+   37 |               << (capabilities.bluetooth_le_supported ? "true" : "false")
+      |                                                       ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:39:60: note: +1, including nesting penalty of 0, nesting level increased to 1
+   39 |               << (capabilities.bluetooth_classic_supported ? "true" : "false")
+      |                                                            ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:47:25: note: +1, including nesting penalty of 0, nesting level increased to 1
+   47 |                         ? EXIT_SUCCESS
+      |                         ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:46:54: note: +1
+   46 |     int exit_code = capabilities.wifi_interfaces > 0 && capabilities.bluetooth_radio
+      |                                                      ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:49:5: note: +1, including nesting penalty of 0, nesting level increased to 1
+   49 |     if (capabilities.wifi_error != 0 || capabilities.bluetooth_error != 0) {
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:49:38: note: +1
+   49 |     if (capabilities.wifi_error != 0 || capabilities.bluetooth_error != 0) {
+      |                                      ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:52:5: note: +1, including nesting penalty of 0, nesting level increased to 1
+   52 |     if (mode == "--discover") {
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:59:74: note: +2, including nesting penalty of 1, nesting level increased to 2
+   59 |                   << ",\"scan_completed\":" << (discovery.scan_completed ? "true" : "false");
+      |                                                                          ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:61:9: note: +2, including nesting penalty of 1, nesting level increased to 2
+   61 |         if (discovery.hresult != 0 || discovery.bluetooth_error != 0 || !discovery.scan_completed) {
+      |         ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:61:70: note: +1
+   61 |         if (discovery.hresult != 0 || discovery.bluetooth_error != 0 || !discovery.scan_completed) {
+      |                                                                      ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:63:16: note: +1, nesting level increased to 2
+   63 |         } else if (exit_code == EXIT_SUCCESS && discovery.meta_advertisement_reports == 0) {
+      |                ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:63:46: note: +1
+   63 |         } else if (exit_code == EXIT_SUCCESS && discovery.meta_advertisement_reports == 0) {
+      |                                              ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:67:5: note: +1, including nesting penalty of 0, nesting level increased to 1
+   67 |     if (mode == "--discover-classic" || mode == "--connect-classic") {
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:67:38: note: +1
+   67 |     if (mode == "--discover-classic" || mode == "--connect-classic") {
+      |                                      ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:73:9: note: +2, including nesting penalty of 1, nesting level increased to 2
+   73 |         if (classic.classic_error != 0 || classic.rfcomm_hresult != 0 ||
+      |         ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:74:54: note: +1
+   74 |             (!connect && !classic.inquiry_completed) ||
+      |                                                      ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:74:23: note: +1
+   74 |             (!connect && !classic.inquiry_completed) ||
+      |                       ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:75:61: note: +1
+   75 |             (connect && classic.rfcomm_connection_attempted && !classic.rfcomm_connected)) {
+      |                                                             ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:77:16: note: +1, nesting level increased to 2
+   77 |         } else if (classic.rfcomm_ambiguous) {
+      |                ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:79:16: note: +1, nesting level increased to 2
+   79 |         } else if (exit_code == EXIT_SUCCESS && classic.meta_rfcomm_services == 0) {
+      |                ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:79:46: note: +1
+   79 |         } else if (exit_code == EXIT_SUCCESS && classic.meta_rfcomm_services == 0) {
+      |                                              ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp:84:22: note: +1, including nesting penalty of 0, nesting level increased to 1
+   84 |     return std::cout ? exit_code : ProbeFailed;
+      |                      ^
+Suppressed 5169 warnings (5169 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+1 warning treated as error
+4741 warnings generated.
+Suppressed 4741 warnings (4741 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+40445 warnings generated.
+Suppressed 40445 warnings (40445 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+38994 warnings generated.
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/Windows.Devices.Bluetooth.Rfcomm.h:217:27: error: Called C++ object pointer is null [clang-analyzer-core.CallAndMessage,-warnings-as-errors]
+  217 |             check_hresult(_winrt_abi_type->FromIdAsync(*(void**)(&deviceId), &asyncOp));
+      |                           ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp:156:9: note: Assuming 'connect' is true
+  156 |     if (!connect) {
+      |         ^~~~~~~~
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp:156:5: note: Taking false branch
+  156 |     if (!connect) {
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp:161:9: note: Calling 'inspectServices'
+  161 |         inspectServices(connect, result);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp:127:5: note: Taking false branch
+  127 |     if (!awaitOperation(lookup, result)) {
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp:132:31: note: Assuming the condition is false
+  132 |     result.rfcomm_ambiguous = services.Size() > 1;
+      |                               ^~~~~~~~~~~~~~~~~~~
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp:133:10: note: 'connect' is true
+  133 |     if (!connect || services.Size() != 1) {
+      |          ^~~~~~~
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp:133:9: note: Left side of '||' is false
+  133 |     if (!connect || services.Size() != 1) {
+      |         ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp:133:21: note: Assuming the condition is false
+  133 |     if (!connect || services.Size() != 1) {
+      |                     ^~~~~~~~~~~~~~~~~~~~
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp:133:5: note: Taking false branch
+  133 |     if (!connect || services.Size() != 1) {
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp:136:26: note: Calling 'RfcommDeviceService::FromIdAsync'
+  136 |     const auto opening = RfcommDeviceService::FromIdAsync(services.GetAt(0).Id());
+      |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/Windows.Devices.Bluetooth.Rfcomm.h:990:16: note: Calling 'call_factory<winrt::Windows::Devices::Bluetooth::Rfcomm::RfcommDeviceService, winrt::Windows::Devices::Bluetooth::Rfcomm::IRfcommDeviceServiceStatics, (lambda at C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt\Windows.Devices.Bluetooth.Rfcomm.h:990:85)>'
+  990 |         return impl::call_factory<RfcommDeviceService, IRfcommDeviceServiceStatics>([&](IRfcommDeviceServiceStatics const& f) { return f.FromIdAsync(deviceId); });
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/base.h:6461:17: note: Assuming field 'object' is null
+ 6461 |             if (factory.m_value.object)
+      |                 ^~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/base.h:6461:13: note: Taking false branch
+ 6461 |             if (factory.m_value.object)
+      |             ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/base.h:6467:16: note: Calling 'factory_cache_entry::call'
+ 6467 |         return factory.call(callback);
+      |                ^~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/base.h:6425:17: note: Assuming the condition is true
+ 6425 |             if (!object.template try_as<IAgileObject>())
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/base.h:6425:13: note: Taking true branch
+ 6425 |             if (!object.template try_as<IAgileObject>())
+      |             ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/base.h:6431:24: note: Calling 'operator()'
+ 6431 |                 return callback(object);
+      |                        ^~~~~~~~~~~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/Windows.Devices.Bluetooth.Rfcomm.h:990:136: note: Calling 'consume_Windows_Devices_Bluetooth_Rfcomm_IRfcommDeviceServiceStatics::FromIdAsync'
+  990 |         return impl::call_factory<RfcommDeviceService, IRfcommDeviceServiceStatics>([&](IRfcommDeviceServiceStatics const& f) { return f.FromIdAsync(deviceId); });
+      |                                                                                                                                        ^~~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/Windows.Devices.Bluetooth.Rfcomm.h:206:24: note: 'is_same_v' is true
+  206 |         if constexpr (!std::is_same_v<D, winrt::Windows::Devices::Bluetooth::Rfcomm::IRfcommDeviceServiceStatics>)
+      |                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/Windows.Devices.Bluetooth.Rfcomm.h:206:9: note: Taking false branch
+  206 |         if constexpr (!std::is_same_v<D, winrt::Windows::Devices::Bluetooth::Rfcomm::IRfcommDeviceServiceStatics>)
+      |         ^
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/Windows.Devices.Bluetooth.Rfcomm.h:216:13: note: '_winrt_abi_type' initialized to a null pointer value
+  216 |             auto const _winrt_abi_type = *(abi_t<winrt::Windows::Devices::Bluetooth::Rfcomm::IRfcommDeviceServiceStatics>**)this;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Program Files (x86)\Windows Kits\10\\include\10.0.26100.0\\cppwinrt\winrt/Windows.Devices.Bluetooth.Rfcomm.h:217:27: note: Called C++ object pointer is null
+  217 |             check_hresult(_winrt_abi_type->FromIdAsync(*(void**)(&deviceId), &asyncOp));
+      |                           ^~~~~~~~~~~~~~~
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp:45:39: error: no header providing "TRUE" is directly included [misc-include-cleaner,-warnings-as-errors]
+   45 |     parameters.fReturnAuthenticated = TRUE;
+      |                                       ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp:50:15: error: no header providing "UCHAR" is directly included [misc-include-cleaner,-warnings-as-errors]
+    6 |     constexpr UCHAR InquiryUnits = 4; // Windows defines each unit as 1.28 seconds.
+      |               ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp:64:5: error: avoid do-while loops [cppcoreguidelines-avoid-do-while,-warnings-as-errors]
+   64 |     do {
+      |     ^
+C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp:66:38: error: no header providing "FALSE" is directly included [misc-include-cleaner,-warnings-as-errors]
+   66 |         if (device.fAuthenticated != FALSE) {
+      |                                      ^
+Suppressed 38995 warnings (38989 in non-user code, 6 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+5 warnings treated as errors
+6305 warnings generated.
+Suppressed 6308 warnings (6305 in non-user code, 3 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+37736 warnings generated.
+Suppressed 37738 warnings (37736 in non-user code, 2 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+5169 warnings generated.
+Suppressed 5169 warnings (5169 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+Write-Error: clang-tidy rejected: main.cpp, classic.cpp

@@ -1,0 +1,72 @@
+{
+  "acceptance": 6,
+  "checks": [
+    "schema",
+    "record-graph",
+    "owned-paths",
+    "active-path-ownership",
+    "environment",
+    "readiness-receipts",
+    "completed-receipts",
+    "behavior-receipts",
+    "task-completion"
+  ],
+  "claim_scope": "Structural and recorded-evidence checks; semantic review remains required.",
+  "evidence": 67,
+  "findings": [
+    {
+      "code": "evidence-coverage",
+      "location": "AC-AUTH",
+      "message": "No passing manual receipt covers this acceptance criterion"
+    },
+    {
+      "code": "evidence-coverage",
+      "location": "AC-MEDIA",
+      "message": "No passing behavior receipt covers this acceptance criterion"
+    },
+    {
+      "code": "evidence-coverage",
+      "location": "AC-MEDIA",
+      "message": "No passing manual receipt covers this acceptance criterion"
+    },
+    {
+      "code": "evidence-coverage",
+      "location": "AC-MEDIA",
+      "message": "No passing red receipt covers this acceptance criterion"
+    },
+    {
+      "code": "evidence-coverage",
+      "location": "AC-OBS",
+      "message": "No passing behavior receipt covers this acceptance criterion"
+    },
+    {
+      "code": "evidence-coverage",
+      "location": "AC-OBS",
+      "message": "No passing manual receipt covers this acceptance criterion"
+    },
+    {
+      "code": "evidence-coverage",
+      "location": "AC-OBS",
+      "message": "No passing red receipt covers this acceptance criterion"
+    },
+    {
+      "code": "task-unverified",
+      "location": "TASK-AUTH",
+      "message": "Task is blocked, not verified"
+    },
+    {
+      "code": "task-unverified",
+      "location": "TASK-MEDIA",
+      "message": "Task is planned, not verified"
+    },
+    {
+      "code": "task-unverified",
+      "location": "TASK-OBS",
+      "message": "Task is planned, not verified"
+    }
+  ],
+  "passed": false,
+  "requirements": 4,
+  "stage": "closure",
+  "tasks": 4
+}

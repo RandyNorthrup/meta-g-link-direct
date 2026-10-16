@@ -1,0 +1,20 @@
+BASELINE EXIT 0
+No findings to report. Good job!
+
+MUTATED EXIT 1
+error[unpinned-uses]: unpinned action reference
+  --> C:\Users\Randy\Coding\meta_g_link_direct\.github\workflows\quality.yml:17:15
+   |
+17 |       - uses: actions/checkout@v6 # v6
+   |               ^^^^^^^^^^^^^^^^^^^ action is not pinned to a hash (required by blanket policy)
+   |
+   = note: audit confidence → High
+   = help: audit documentation → https://docs.zizmor.sh/audits/#unpinned-uses
+
+1 finding: 0 informational, 0 low, 0 medium, 1 high
+Write-Error: Native command failed (14): zizmor
+
+RESTORED EXIT 0
+No findings to report. Good job!
+
+RESTORATION SHA256 ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca

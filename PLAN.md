@@ -18,7 +18,7 @@ Official references: [OBS template](https://github.com/obsproject/obs-plugintemp
 
 M0 (TASK-SETUP) creates the native build and quality foundation, a bounded no-allocation prefix parser, read-only local radio diagnostics, and a C17/MSVC OBS module with metadata only. Its independent vectors and mutation protect framing; isolated loader checks protect ABI/metadata; gate drills protect command wiring. Required security checks include staged/history secret scans, SAST, dependency inventory, and workflow lint. Package only the development foundation with explicit status; it must not appear as a functional camera source. Documentation, upstream notices and exact command evidence are part of this milestone. Parser inputs are bounded; performance profiling begins when real receive/decode workloads exist, not with invented benchmark claims.
 
-M1 (TASK-AUTH) ports actual connection/identity behavior and validates it on glasses. A local iPhone export remains optional research; it is not a prerequisite now that Meta authentication is permitted. A reproducible application-token/ownership path, protected local key storage, explicit timeouts/cancellation and return-to-phone behavior must be proved. Review credential exposure and session teardown; tests/drills must reject bad trust signatures and swallowed timeouts. The current discovery increment extends the existing radio/CLI paths and adds a Windows SDK C++/WinRT passive watcher with bounded wait/stop, shared callback lifetime, aggregate packet counts and explicit errors. Company 0x01AB or service FD5F marks a candidate, not a verified model. No names, addresses or payloads are retained. Seven real CLI tests and the probe-arguments drill cover argument, schema and error-reporting contracts; a successful BLE packet path still requires suitable hardware. No ownership change occurs merely because a build/probe command runs. Update the brief if product constraints change, and README/CHANGELOG when behavior exists.
+M1 (TASK-AUTH) ports actual connection/identity behavior and validates it on glasses. A local iPhone export remains optional research; it is not a prerequisite now that Meta authentication is permitted. A reproducible application-token/ownership path, protected local key storage, explicit timeouts/cancellation and return-to-phone behavior must be proved. Review credential exposure and session teardown; tests/drills must reject bad trust signatures and swallowed timeouts. The current discovery increment extends the existing radio/CLI paths and adds a Windows SDK C++/WinRT passive watcher with bounded wait/stop, shared callback lifetime, aggregate packet counts and explicit errors. Company 0x01AB or service FD5F marks a candidate, not a verified model. No names, addresses or payloads are retained. Classic diagnostics now use explicit inquiry and Windows-registered Meta UUID lookup, with a separate single-paired-service encrypted/authenticated socket check, per-operation deadlines/cancellation and explicit close. This sends no application frames and is not a complete uncached SDP scan. Shared Apartment lifetime is extracted for actual BLE and Classic consumers. Ten real CLI tests plus argument and connection-claim drills cover diagnostic contracts; a successful BLE packet path still requires suitable hardware. No ownership change occurs merely because a build/probe command runs. Update the brief if product constraints change, and README/CHANGELOG when behavior exists.
 
 M2 (TASK-MEDIA) ports the actual Wi-Fi group-owner/access-point role, frame reassembly, HEVC/AAC decode, timing and supported quality selection. Test malformed/truncated/oversized input, codec configuration changes, bounded queues, timestamps and decoder errors with intended red drills. Measure real resolution/fps, independent end-to-end latency, CPU/memory and thermal behavior. Audio remains optional. Record exact current stable firmware; do not demand a downgrade or treat an Android upstream result as Windows proof. Update use/troubleshooting and privacy documentation with actual behavior.
 
@@ -34,7 +34,7 @@ Detailed logs and context belong under reports/. Do not copy full command output
 
 ## Open technical verification and deferred public scope
 
-The connected Wi-Fi adapter is now enumerated, with zero associated WLAN interfaces and Ethernet up. Current passive BLE discovery returns Windows Bluetooth error 9 (TransportNotSupported), before receiving packets. This does not establish that the glasses are absent or that Classic RFCOMM is incompatible. Investigate the Windows BLE path and documented Classic route; actual Wi-Fi group-owner capability remains untested. No adapter-model interview is required. Current-firmware direct operation, authorized desktop setup, iPhone/Meta coexistence, actual video quality/latency and battery/thermal behavior over 120 minutes all require new evidence. Technical investigation owns these, due before their respective hardware milestone, with no calendar deadline supplied.
+The connected Wi-Fi adapter is now enumerated, with zero associated WLAN interfaces and Ethernet up. Current passive BLE discovery returns Windows Bluetooth error 9 (TransportNotSupported), before receiving packets. This does not establish that the glasses are absent or that Classic RFCOMM is incompatible. Native controller feature inspection now reports LE unsupported and Classic supported, with HCI/LMP version fields 4 and no query error. Classic inquiry returns two device reports and one Windows bond, but zero registered Meta RFCOMM services; explicit connection check returns not-found without opening a socket. Randy reports glasses absent from Windows pairing and no other Bluetooth controller. Current hardware blocks the documented initial LE bonding route. An LE-capable Bluetooth controller is the next hardware prerequisite; no purchase, driver replacement or firmware downgrade is authorized. Actual Wi-Fi group-owner capability remains untested. No adapter-model interview is required. Current-firmware direct operation, authorized desktop setup, iPhone/Meta coexistence, actual video quality/latency and battery/thermal behavior over 120 minutes all require new evidence. Technical investigation owns these, due before their respective hardware milestone, with no calendar deadline supplied.
 
 Public repository, hosted CI execution, public distribution support, signing/provenance services, procurement, public incident response and broader platforms are deferred by the personal-prototype contract. Randy owns reopening these decisions if distribution is requested. No remote/publishing/signing identity is created during M0.
 
@@ -42,7 +42,7 @@ Public repository, hosted CI execution, public distribution support, signing/pro
 
 The actual native build uses MSVC for both languages because CMake rejects a mixed clang-cl/MSVC project and OBS's util_uint64.h needs `_udiv128`, which clang-cl does not implement ([LLVM issue 59168](https://github.com/llvm/llvm-project/issues/59168)). Owned libraries remain C++20; the small OBS ABI file is C17 with `/W4 /WX /analyze`. C++ clang-tidy consumes the actual MSVC compilation database. No compiler-version macro is spoofed in production and no private OBS declaration is introduced.
 
-The copied strict clang-tidy preset contained contradictory static/anonymous-namespace rules. Disable only llvm-prefer-static-over-anonymous-namespace while retaining misc-use-anonymous-namespace; this is a style conflict, not a correctness suppression. Three declarations in src/windows/discovery.cpp carry line-scoped misc-include-cleaner annotations because LLVM 22 cannot map generated C++/WinRT impl headers back to the included public SDK projection; IWYU keep comments retain required public projection headers. No generated/private SDK declarations are copied or substituted, and the compiler still parses the actual SDK. Revisit when the SDK or LLVM changes. Two exact-signature GetProcAddress conversions in tests/module_tests.cpp carry scoped cppcoreguidelines-pro-type-reinterpret-cast annotations after independent non-null/export checks; this is the documented dynamic Windows ABI boundary. Existing Windows umbrella headers are kept with IWYU comments because SDK leaf headers require their prerequisites.
+The copied strict clang-tidy preset contained contradictory static/anonymous-namespace rules. Disable only llvm-prefer-static-over-anonymous-namespace while retaining misc-use-anonymous-namespace; this is a style conflict, not a correctness suppression. Three declarations in src/windows/discovery.cpp and nine declarations in src/windows/classic.cpp carry line-scoped misc-include-cleaner annotations because LLVM 22 cannot map generated C++/WinRT impl headers back to the included public SDK projection; IWYU keep comments retain required public projection headers. No generated/private SDK declarations are copied or substituted, and the compiler still parses the actual SDK. Revisit when the SDK or LLVM changes. Two exact-signature GetProcAddress conversions in tests/module_tests.cpp carry scoped cppcoreguidelines-pro-type-reinterpret-cast annotations after independent non-null/export checks; this is the documented dynamic Windows ABI boundary. Existing Windows umbrella headers are kept with IWYU comments because SDK leaf headers require their prerequisites.
 
 Cppcheck initially lost MSVC `-external:I` include paths. Generate only an analysis copy of compile_commands.json with those paths normalized and the observed compiler builtins added. The .cppcheck-obs.cfg models six real externally loaded OBS entry points; it does not mark arbitrary functions as used. Suppress only missingIncludeSystem informational notices from the deliberately model-based std/windows analysis and findings under the external .deps header tree. The real compiler/LLVM gates still parse owned and system headers; missing quoted owned headers and owned unusedFunction findings remain failures. Native dependency headers are not certified by this scope. Revisit these analysis decisions on toolchain/OBS upgrades; the header and unused-function drills must continue to fail as intended.
 
@@ -391,7 +391,26 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "EV-DISCOVERY-RED-DEPENDENCY-NPM",
         "EV-DISCOVERY-RED-DEPENDENCY-OSV",
         "EV-DISCOVERY-RED-WHATIF-GUARD",
-        "EV-DISCOVERY-RED-NATIVE-EXIT-PROPAGATION"
+        "EV-DISCOVERY-RED-NATIVE-EXIT-PROPAGATION",
+        "EV-CLASSIC-SOFTWARE",
+        "EV-CLASSIC-RED-PARSER-LENGTH",
+        "EV-CLASSIC-RED-MODULE-METADATA",
+        "EV-CLASSIC-RED-PROBE-ARGUMENTS",
+        "EV-CLASSIC-RED-CLASSIC-CONNECTION-CLAIM",
+        "EV-CLASSIC-RED-FORMAT",
+        "EV-CLASSIC-RED-OWNED-HEADER",
+        "EV-CLASSIC-RED-COMPILER-TYPES",
+        "EV-CLASSIC-RED-UNUSED-CODE",
+        "EV-CLASSIC-RED-SCRIPT-ANALYSIS",
+        "EV-CLASSIC-RED-WORKFLOW-SECURITY",
+        "EV-CLASSIC-RED-SECRET-SCANNER",
+        "EV-CLASSIC-RED-UNSAFE-COPY",
+        "EV-CLASSIC-RED-DUPLICATED-CODE",
+        "EV-CLASSIC-RED-ADDRESS-SANITIZER",
+        "EV-CLASSIC-RED-DEPENDENCY-NPM",
+        "EV-CLASSIC-RED-DEPENDENCY-OSV",
+        "EV-CLASSIC-RED-WHATIF-GUARD",
+        "EV-CLASSIC-RED-NATIVE-EXIT-PROPAGATION"
       ],
       "blocker": null,
       "superseded_by": null
@@ -473,15 +492,26 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         {
           "path": ".gitattributes",
           "action": "modify"
+        },
+        {
+          "path": "src/windows/classic.cpp",
+          "action": "create"
+        },
+        {
+          "path": "src/windows/apartment.hpp",
+          "action": "create"
         }
       ],
-      "status": "active",
+      "status": "blocked",
       "evidence": [
         "EV-DISCOVERY-CLI-SOFTWARE",
         "EV-DISCOVERY-RED-PROBE-ARGUMENTS",
-        "EV-DISCOVERY-HARDWARE-DEFERRED"
+        "EV-DISCOVERY-HARDWARE-DEFERRED",
+        "EV-CLASSIC-SOFTWARE-PARTIAL",
+        "EV-CLASSIC-RED-CLASSIC-CONNECTION-CLAIM",
+        "EV-CLASSIC-HARDWARE-DEFERRED"
       ],
-      "blocker": null,
+      "blocker": "Controller feature query reports LE unsupported, with no other Bluetooth controller available. Glasses do not appear in Windows pairing; zero registered Meta RFCOMM services. Need LE-capable controller for documented initial bond route before actual direct transport/authentication proof. Session/identity/Meta setup code also remains incomplete; no ownership change or purchase is authorized.",
       "superseded_by": null
     },
     {
@@ -4552,7 +4582,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "AC-OBS"
       ],
       "kind": "readiness",
-      "status": "pass",
+      "status": "stale",
       "command": [],
       "method": "Reviewed current requirements, canonical reuse, native error/lifetime/privacy behavior, SDK analysis boundary, hardware limitations and evidence storage. Readiness only.",
       "environment": {
@@ -4606,7 +4636,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       ],
       "scope_sha256": "9370e4308f66344887276f29998e98d3b1a91edc9647b889dd44f8ddc823690c",
       "red": null,
-      "reason": null
+      "reason": "TASK-AUTH expands to explicit Classic inquiry/service/connection checks and shared apartment lifetime. New readiness review required."
     },
     {
       "id": "EV-DISCOVERY-SOFTWARE",
@@ -4616,7 +4646,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "AC-MODULE"
       ],
       "kind": "behavior",
-      "status": "pass",
+      "status": "stale",
       "command": [
         "pwsh",
         "-NoProfile",
@@ -4788,7 +4818,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       ],
       "scope_sha256": "7617422964d1b91ba5e497bd6c1d8fa9e5e9361baec02c04cd81cf7cbe5f6d74",
       "red": null,
-      "reason": null
+      "reason": "Classic/controller increment changed source, observation inputs and plan prose. Retain prior proof; fresh affected software/drills/readiness required."
     },
     {
       "id": "EV-DISCOVERY-CLI-SOFTWARE",
@@ -4796,7 +4826,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "AC-AUTH"
       ],
       "kind": "behavior",
-      "status": "pass",
+      "status": "stale",
       "command": [
         "pwsh",
         "-NoProfile",
@@ -4996,7 +5026,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       ],
       "scope_sha256": "1da1f86af911fd12f5f6264eefa89edd8d42c03dd2ecfdc6d793ed3abd7a107f",
       "red": null,
-      "reason": null
+      "reason": "Classic/controller increment changed source, observation inputs and plan prose. Retain prior proof; fresh affected software/drills/readiness required."
     },
     {
       "id": "EV-DISCOVERY-GIT-INTEGRITY",
@@ -5006,7 +5036,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "AC-MODULE"
       ],
       "kind": "behavior",
-      "status": "pass",
+      "status": "stale",
       "command": [
         "python",
         "-"
@@ -5175,7 +5205,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       ],
       "scope_sha256": "7617422964d1b91ba5e497bd6c1d8fa9e5e9361baec02c04cd81cf7cbe5f6d74",
       "red": null,
-      "reason": null
+      "reason": "Classic/controller increment changed source, observation inputs and plan prose. Retain prior proof; fresh affected software/drills/readiness required."
     },
     {
       "id": "EV-DISCOVERY-RED-PARSER-LENGTH",
@@ -5183,7 +5213,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "AC-FRAMING"
       ],
       "kind": "red",
-      "status": "pass",
+      "status": "stale",
       "command": [
         "pwsh",
         "-NoProfile",
@@ -5218,7 +5248,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       },
       "exit_code": 0,
       "artifact": {
-        "path": "reports/red/parser-length.txt",
+        "path": "reports/discovery-red/parser-length.txt",
         "sha256": "f4b55da49810882c3a99360adcb35a9223960cc304ee3354e076020489ac6bfa"
       },
       "inputs": [
@@ -5382,7 +5412,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
           }
         ]
       },
-      "reason": null
+      "reason": "Classic/controller increment changed source, observation inputs and plan prose. Retain prior proof; fresh affected software/drills/readiness required."
     },
     {
       "id": "EV-DISCOVERY-RED-MODULE-METADATA",
@@ -5390,7 +5420,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "AC-MODULE"
       ],
       "kind": "red",
-      "status": "pass",
+      "status": "stale",
       "command": [
         "pwsh",
         "-NoProfile",
@@ -5425,7 +5455,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       },
       "exit_code": 0,
       "artifact": {
-        "path": "reports/red/module-metadata.txt",
+        "path": "reports/discovery-red/module-metadata.txt",
         "sha256": "d79998c6522d0140b4b0c4111467f5d80b33b9c52fa9eadbfdc56ecd49ba8109"
       },
       "inputs": [
@@ -5589,7 +5619,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
           }
         ]
       },
-      "reason": null
+      "reason": "Classic/controller increment changed source, observation inputs and plan prose. Retain prior proof; fresh affected software/drills/readiness required."
     },
     {
       "id": "EV-DISCOVERY-RED-PROBE-ARGUMENTS",
@@ -5598,7 +5628,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "AC-GATES"
       ],
       "kind": "red",
-      "status": "pass",
+      "status": "stale",
       "command": [
         "pwsh",
         "-NoProfile",
@@ -5633,7 +5663,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       },
       "exit_code": 0,
       "artifact": {
-        "path": "reports/red/probe-arguments.txt",
+        "path": "reports/discovery-red/probe-arguments.txt",
         "sha256": "a6b9a0ebb1a7c6465e53326e579fb57c32ad052261cfdd1ef86b4bfe2d525f87"
       },
       "inputs": [
@@ -5825,7 +5855,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
           }
         ]
       },
-      "reason": null
+      "reason": "This combined AC-AUTH/AC-GATES receipt depends on expanded TASK-AUTH paths. Preserve prior result; rerun after Classic implementation."
     },
     {
       "id": "EV-DISCOVERY-RED-FORMAT",
@@ -5833,7 +5863,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "AC-GATES"
       ],
       "kind": "red",
-      "status": "pass",
+      "status": "stale",
       "command": [
         "pwsh",
         "-NoProfile",
@@ -5868,7 +5898,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       },
       "exit_code": 0,
       "artifact": {
-        "path": "reports/red/format.txt",
+        "path": "reports/discovery-red/format.txt",
         "sha256": "2709604244b5ea4ab4da49131d6d193bc361311b575793332a501dea5dee3c3b"
       },
       "inputs": [
@@ -6032,7 +6062,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
           }
         ]
       },
-      "reason": null
+      "reason": "Classic/controller increment changed source, observation inputs and plan prose. Retain prior proof; fresh affected software/drills/readiness required."
     },
     {
       "id": "EV-DISCOVERY-RED-OWNED-HEADER",
@@ -6040,7 +6070,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "AC-GATES"
       ],
       "kind": "red",
-      "status": "pass",
+      "status": "stale",
       "command": [
         "pwsh",
         "-NoProfile",
@@ -6075,7 +6105,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       },
       "exit_code": 0,
       "artifact": {
-        "path": "reports/red/owned-header.txt",
+        "path": "reports/discovery-red/owned-header.txt",
         "sha256": "c2473b7818ccdca3d372677f0df20c2d8fd1961b326696dcac1a909f947676c8"
       },
       "inputs": [
@@ -6239,7 +6269,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
           }
         ]
       },
-      "reason": null
+      "reason": "Classic/controller increment changed source, observation inputs and plan prose. Retain prior proof; fresh affected software/drills/readiness required."
     },
     {
       "id": "EV-DISCOVERY-RED-COMPILER-TYPES",
@@ -6247,7 +6277,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "AC-GATES"
       ],
       "kind": "red",
-      "status": "pass",
+      "status": "stale",
       "command": [
         "pwsh",
         "-NoProfile",
@@ -6282,7 +6312,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       },
       "exit_code": 0,
       "artifact": {
-        "path": "reports/red/compiler-types.txt",
+        "path": "reports/discovery-red/compiler-types.txt",
         "sha256": "a7e224c803008efad05581d907b1cf92d64ed5dc2b18ddc13edc3e61594ce36f"
       },
       "inputs": [
@@ -6446,7 +6476,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
           }
         ]
       },
-      "reason": null
+      "reason": "Classic/controller increment changed source, observation inputs and plan prose. Retain prior proof; fresh affected software/drills/readiness required."
     },
     {
       "id": "EV-DISCOVERY-RED-UNUSED-CODE",
@@ -6454,7 +6484,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "AC-GATES"
       ],
       "kind": "red",
-      "status": "pass",
+      "status": "stale",
       "command": [
         "pwsh",
         "-NoProfile",
@@ -6489,7 +6519,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       },
       "exit_code": 0,
       "artifact": {
-        "path": "reports/red/unused-code.txt",
+        "path": "reports/discovery-red/unused-code.txt",
         "sha256": "15d8d4407e78506c93dc673ea632fb05454034aafc78d5055743ba56b26dd9a2"
       },
       "inputs": [
@@ -6653,7 +6683,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
           }
         ]
       },
-      "reason": null
+      "reason": "Classic/controller increment changed source, observation inputs and plan prose. Retain prior proof; fresh affected software/drills/readiness required."
     },
     {
       "id": "EV-DISCOVERY-RED-SCRIPT-ANALYSIS",
@@ -6661,7 +6691,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "AC-GATES"
       ],
       "kind": "red",
-      "status": "pass",
+      "status": "stale",
       "command": [
         "pwsh",
         "-NoProfile",
@@ -6696,7 +6726,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       },
       "exit_code": 0,
       "artifact": {
-        "path": "reports/red/script-analysis.txt",
+        "path": "reports/discovery-red/script-analysis.txt",
         "sha256": "574acb09fa37c4e046e1ddf80cedb0f053649f1f7dc2d83f7040d03bd76ca97f"
       },
       "inputs": [
@@ -6860,7 +6890,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
           }
         ]
       },
-      "reason": null
+      "reason": "Classic/controller increment changed source, observation inputs and plan prose. Retain prior proof; fresh affected software/drills/readiness required."
     },
     {
       "id": "EV-DISCOVERY-RED-WORKFLOW-SECURITY",
@@ -6868,7 +6898,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "AC-GATES"
       ],
       "kind": "red",
-      "status": "pass",
+      "status": "stale",
       "command": [
         "pwsh",
         "-NoProfile",
@@ -6903,7 +6933,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       },
       "exit_code": 0,
       "artifact": {
-        "path": "reports/red/workflow-security.txt",
+        "path": "reports/discovery-red/workflow-security.txt",
         "sha256": "19e4cb7fa962c8103d15f12ac99efbf79c284e97c1eaf4b251064f3e7892133b"
       },
       "inputs": [
@@ -7067,7 +7097,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
           }
         ]
       },
-      "reason": null
+      "reason": "Classic/controller increment changed source, observation inputs and plan prose. Retain prior proof; fresh affected software/drills/readiness required."
     },
     {
       "id": "EV-DISCOVERY-RED-SECRET-SCANNER",
@@ -7075,7 +7105,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "AC-GATES"
       ],
       "kind": "red",
-      "status": "pass",
+      "status": "stale",
       "command": [
         "pwsh",
         "-NoProfile",
@@ -7110,7 +7140,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       },
       "exit_code": 0,
       "artifact": {
-        "path": "reports/red/secret-scanner.txt",
+        "path": "reports/discovery-red/secret-scanner.txt",
         "sha256": "0957f74d758aaea77e980d9bc32d36045ae948404aef1f8d618e5cca90035de3"
       },
       "inputs": [
@@ -7274,7 +7304,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
           }
         ]
       },
-      "reason": null
+      "reason": "Classic/controller increment changed source, observation inputs and plan prose. Retain prior proof; fresh affected software/drills/readiness required."
     },
     {
       "id": "EV-DISCOVERY-RED-UNSAFE-COPY",
@@ -7282,7 +7312,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "AC-GATES"
       ],
       "kind": "red",
-      "status": "pass",
+      "status": "stale",
       "command": [
         "pwsh",
         "-NoProfile",
@@ -7317,7 +7347,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       },
       "exit_code": 0,
       "artifact": {
-        "path": "reports/red/unsafe-copy.txt",
+        "path": "reports/discovery-red/unsafe-copy.txt",
         "sha256": "99f887c35e19935b50a5d4d23c7f2338618679b35e9d216f534d5a2274ccab25"
       },
       "inputs": [
@@ -7481,7 +7511,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
           }
         ]
       },
-      "reason": null
+      "reason": "Classic/controller increment changed source, observation inputs and plan prose. Retain prior proof; fresh affected software/drills/readiness required."
     },
     {
       "id": "EV-DISCOVERY-RED-DUPLICATED-CODE",
@@ -7489,7 +7519,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "AC-GATES"
       ],
       "kind": "red",
-      "status": "pass",
+      "status": "stale",
       "command": [
         "pwsh",
         "-NoProfile",
@@ -7524,7 +7554,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       },
       "exit_code": 0,
       "artifact": {
-        "path": "reports/red/duplicated-code.txt",
+        "path": "reports/discovery-red/duplicated-code.txt",
         "sha256": "a84e87de08359e5a39846eade11df7f3c1ffa402c936f75843fb1392d7ad9f65"
       },
       "inputs": [
@@ -7688,7 +7718,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
           }
         ]
       },
-      "reason": null
+      "reason": "Classic/controller increment changed source, observation inputs and plan prose. Retain prior proof; fresh affected software/drills/readiness required."
     },
     {
       "id": "EV-DISCOVERY-RED-ADDRESS-SANITIZER",
@@ -7696,7 +7726,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "AC-GATES"
       ],
       "kind": "red",
-      "status": "pass",
+      "status": "stale",
       "command": [
         "pwsh",
         "-NoProfile",
@@ -7731,7 +7761,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       },
       "exit_code": 0,
       "artifact": {
-        "path": "reports/red/address-sanitizer.txt",
+        "path": "reports/discovery-red/address-sanitizer.txt",
         "sha256": "f26f74cac5eacb68cebac2487f9971eb0c8914f35afc8d1109e084d55317a0ae"
       },
       "inputs": [
@@ -7895,7 +7925,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
           }
         ]
       },
-      "reason": null
+      "reason": "Classic/controller increment changed source, observation inputs and plan prose. Retain prior proof; fresh affected software/drills/readiness required."
     },
     {
       "id": "EV-DISCOVERY-RED-DEPENDENCY-NPM",
@@ -7903,7 +7933,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "AC-GATES"
       ],
       "kind": "red",
-      "status": "pass",
+      "status": "stale",
       "command": [
         "pwsh",
         "-NoProfile",
@@ -7938,7 +7968,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       },
       "exit_code": 0,
       "artifact": {
-        "path": "reports/red/dependency-npm.txt",
+        "path": "reports/discovery-red/dependency-npm.txt",
         "sha256": "02d6d1b6cfe118449d8746927bd3e88e5cd96acd688c11dee6c8ce730f364c6b"
       },
       "inputs": [
@@ -8102,7 +8132,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
           }
         ]
       },
-      "reason": null
+      "reason": "Classic/controller increment changed source, observation inputs and plan prose. Retain prior proof; fresh affected software/drills/readiness required."
     },
     {
       "id": "EV-DISCOVERY-RED-DEPENDENCY-OSV",
@@ -8110,7 +8140,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "AC-GATES"
       ],
       "kind": "red",
-      "status": "pass",
+      "status": "stale",
       "command": [
         "pwsh",
         "-NoProfile",
@@ -8145,7 +8175,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       },
       "exit_code": 0,
       "artifact": {
-        "path": "reports/red/dependency-osv.txt",
+        "path": "reports/discovery-red/dependency-osv.txt",
         "sha256": "abf65731d3a8283dc39247b2f25bed39fd3fed130f04e3c9bac02d501fdbd54e"
       },
       "inputs": [
@@ -8309,7 +8339,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
           }
         ]
       },
-      "reason": null
+      "reason": "Classic/controller increment changed source, observation inputs and plan prose. Retain prior proof; fresh affected software/drills/readiness required."
     },
     {
       "id": "EV-DISCOVERY-RED-WHATIF-GUARD",
@@ -8317,7 +8347,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "AC-GATES"
       ],
       "kind": "red",
-      "status": "pass",
+      "status": "stale",
       "command": [
         "pwsh",
         "-NoProfile",
@@ -8352,7 +8382,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       },
       "exit_code": 0,
       "artifact": {
-        "path": "reports/red/whatif-guard.txt",
+        "path": "reports/discovery-red/whatif-guard.txt",
         "sha256": "8703f68c1c57632c622d4ee812aecdaeb78ad4e8e4691a351d7d8d3dbd236852"
       },
       "inputs": [
@@ -8516,7 +8546,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
           }
         ]
       },
-      "reason": null
+      "reason": "Classic/controller increment changed source, observation inputs and plan prose. Retain prior proof; fresh affected software/drills/readiness required."
     },
     {
       "id": "EV-DISCOVERY-RED-NATIVE-EXIT-PROPAGATION",
@@ -8524,7 +8554,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "AC-GATES"
       ],
       "kind": "red",
-      "status": "pass",
+      "status": "stale",
       "command": [
         "pwsh",
         "-NoProfile",
@@ -8559,7 +8589,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       },
       "exit_code": 0,
       "artifact": {
-        "path": "reports/red/native-exit-propagation.txt",
+        "path": "reports/discovery-red/native-exit-propagation.txt",
         "sha256": "568e9558ee370f7254eb81dfb6c69b7a46388ce50399320a9813ba435322d379"
       },
       "inputs": [
@@ -8723,7 +8753,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
           }
         ]
       },
-      "reason": null
+      "reason": "Classic/controller increment changed source, observation inputs and plan prose. Retain prior proof; fresh affected software/drills/readiness required."
     },
     {
       "id": "EV-DISCOVERY-HARDWARE-DEFERRED",
@@ -8926,10 +8956,4552 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       "scope_sha256": "1da1f86af911fd12f5f6264eefa89edd8d42c03dd2ecfdc6d793ed3abd7a107f",
       "red": null,
       "reason": "Current Windows BLE scan returns TransportNotSupported and direct identity/session implementation is incomplete. Next investigate Windows BLE and Classic RFCOMM, then authorized Meta setup and actual phone-off device-info proof."
+    },
+    {
+      "id": "EV-CLASSIC-READINESS",
+      "acceptance": [
+        "AC-AUTH",
+        "AC-FRAMING",
+        "AC-GATES",
+        "AC-MEDIA",
+        "AC-MODULE",
+        "AC-OBS"
+      ],
+      "kind": "readiness",
+      "status": "stale",
+      "command": [],
+      "method": "Reviewed the concrete controller/Classic transport increment, safety/failure/lifetime and test contracts; no authenticated-device-info proof claimed.",
+      "environment": {
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "msvc": "19.44.35222.0",
+          "cppcheck": "2.22.0"
+        },
+        "platform": "windows"
+      },
+      "exit_code": null,
+      "artifact": {
+        "path": "reports/classic-readiness.txt",
+        "sha256": "b3347aa98f827f91f8f8292fc29f23a8d2be19419dfaa8c418a00be39993ef2d"
+      },
+      "inputs": [
+        {
+          "path": "AGENTS.md",
+          "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+        },
+        {
+          "path": "CMakePresets.json",
+          "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "sha256": "9df26e151e5b4903db5f9e1783c29f373701a1eff9556d641660ec29cbfb9fc5"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+        }
+      ],
+      "scope_sha256": "7ee960dad2b4fbb39122aeb6d411870ecf3bbb3d1b00d30c0b8fe18c345878d4",
+      "red": null,
+      "reason": "Classic/controller increment changed source, observation inputs and plan prose. Retain prior proof; fresh affected software/drills/readiness required."
+    },
+    {
+      "id": "EV-CLASSIC-READINESS-FINAL",
+      "acceptance": [
+        "AC-AUTH",
+        "AC-FRAMING",
+        "AC-GATES",
+        "AC-MEDIA",
+        "AC-MODULE",
+        "AC-OBS"
+      ],
+      "kind": "readiness",
+      "status": "pass",
+      "command": [],
+      "method": "Reviewed the completed controller/Classic increment, canonical reuse, explicit connection and failure/lifetime contracts, actual hardware blocker and unchanged full acceptance; readiness only.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": null,
+      "artifact": {
+        "path": "reports/classic-readiness-final.txt",
+        "sha256": "1175576c1b90d40dba9fe3a5065628bb414c8f5a6627b8faea30aa297562f230"
+      },
+      "inputs": [
+        {
+          "path": "AGENTS.md",
+          "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+        },
+        {
+          "path": "CMakePresets.json",
+          "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "sha256": "6ca6ac0e1a29f6c3603fdcbf5b63ac3b87682eb44c12821d297370923aa59b98"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+        }
+      ],
+      "scope_sha256": "01cf799d672aba8cf8101db16f84ae9f7bced698e8c85fabd293b4d9afa436fb",
+      "red": null,
+      "reason": null
+    },
+    {
+      "id": "EV-CLASSIC-SOFTWARE",
+      "acceptance": [
+        "AC-FRAMING",
+        "AC-GATES",
+        "AC-MODULE"
+      ],
+      "kind": "behavior",
+      "status": "pass",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/Invoke-Project.ps1",
+        "quality"
+      ],
+      "method": "Actual full quality aggregate exited 0: two CTest suites, 3 runner and 10 CLI tests, configured analysis/security, Windows ASan and all 18 defect/restoration drills. Scope is software foundation/diagnostics, not current glasses or refreshed ZIP.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/quality-classic.txt",
+        "sha256": "ac9ad85cee977eb799613116868c874dec5f86266ef5869ac4d6be5d682b61b1"
+      },
+      "inputs": [
+        {
+          "path": ".clang-format",
+          "sha256": "b8b235ad236526882c0fdc52d3a17194410d13a184ab572937de4fa2c231ecdd"
+        },
+        {
+          "path": ".clang-tidy",
+          "sha256": "c2f69f181a8cd59ba8bdc3fc46328b22c7c65705adf3daadd6e6ebba796a7464"
+        },
+        {
+          "path": ".cppcheck-obs.cfg",
+          "sha256": "43af454a083f4d7b44dcd22e48f191f8699f8eff272ded6fea1f9b7eb412364a"
+        },
+        {
+          "path": ".gitattributes",
+          "sha256": "7615f5cb3052a2fddfa34520ad43cd3bc9e3058dd913432bf602201e89a1b4d8"
+        },
+        {
+          "path": ".github/dependabot.yml",
+          "sha256": "52f52486fba5f32ef49c3ef1b216fac04888ad0847c64b57df89b28655fb82a3"
+        },
+        {
+          "path": ".github/workflows/quality.yml",
+          "sha256": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca"
+        },
+        {
+          "path": ".gitignore",
+          "sha256": "51afdd661c7a97f4fb20f0cbd4338ba95adc00b30b0a3d6d95c2190777e7a469"
+        },
+        {
+          "path": ".gitleaks.toml",
+          "sha256": "ce1b21983f8ff159aa5762beb7e973e1b2b2dfe8bd350cf39daa0ec2da2e711e"
+        },
+        {
+          "path": ".jscpd.json",
+          "sha256": "8aba253a1058ebdc4515d74367a37a0e53aac6451af06a760172c74100e1c4b6"
+        },
+        {
+          "path": ".pre-commit-config.yaml",
+          "sha256": "c2df117a2f7ab21bc8210e626bb67710515abe62fa76bc9011408dc15c5c188a"
+        },
+        {
+          "path": ".semgrep.yml",
+          "sha256": "c989195a0157c259c43150cb2edb54842800317827b5504004de5831110d6619"
+        },
+        {
+          "path": "AGENTS.md",
+          "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "sha256": "88bafdc9b7bd3137d745d5b878b0659b4ef0a62b08ed1823e862ae517f530c76"
+        },
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "fbe5a8b24c73db413803cecf3b92e021d31c6f18f257e18973e180a9e6db6816"
+        },
+        {
+          "path": "CMakePresets.json",
+          "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "8d56b405468aad11f87ab5763f901e276e08d9646ff5c8481b1762b6b789e9ed"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "sha256": "6ca6ac0e1a29f6c3603fdcbf5b63ac3b87682eb44c12821d297370923aa59b98"
+        },
+        {
+          "path": "PSScriptAnalyzerSettings.psd1",
+          "sha256": "427f99245961626682b7ed07663c63e67aeb9566d1bffe372aee05b98e32f2e0"
+        },
+        {
+          "path": "README.md",
+          "sha256": "f1b4656a1cf03c28eec4f130c288c9aeace0af403b6268297996aaaaac124f8c"
+        },
+        {
+          "path": "THIRD_PARTY_NOTICES.md",
+          "sha256": "59164c6e7cf8ca233d358995d20ade680da3d520d3e79a56014bf6b35b9df2d4"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+        },
+        {
+          "path": "include/mgl/capabilities.hpp",
+          "sha256": "7daa77cf5c2f1334d1843c853be556e79981cfcde164e1cd31b303efc60430cc"
+        },
+        {
+          "path": "include/mgl/sdu.hpp",
+          "sha256": "bf120c3f0f14cf566c1a298bd15002d00656de7828772ee1a141834328668db6"
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+        },
+        {
+          "path": "package.json",
+          "sha256": "1053cfdf62f78e96e8f488835b6abaf6e7accdab3f0d868b68793d6aeb29a1e6"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93"
+        },
+        {
+          "path": "src/protocol/sdu.cpp",
+          "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+        },
+        {
+          "path": "src/windows/capabilities.cpp",
+          "sha256": "e25b5e87758b9d4dab91706663babd60fdc0e1059d36ad1a2ea9d59bdf6d156e"
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "02470464448f4f2c0ed552d47cc10988b895ea37177ea71b26905a5b05b4a20b"
+        },
+        {
+          "path": "tests/runner.Tests.ps1",
+          "sha256": "08675144ad7cddc1213d848507220228d74999dcceeaf9034fac811a3876f5b1"
+        },
+        {
+          "path": "tests/sdu_tests.cpp",
+          "sha256": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd"
+        }
+      ],
+      "scope_sha256": "a7e10dfc390635734e0a1978de9c102afc08ef00acdd09c73a3ef6a10929ddf9",
+      "red": null,
+      "reason": null
+    },
+    {
+      "id": "EV-CLASSIC-SOFTWARE-PARTIAL",
+      "acceptance": [
+        "AC-AUTH"
+      ],
+      "kind": "behavior",
+      "status": "pass",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/Invoke-Project.ps1",
+        "quality"
+      ],
+      "method": "Partial enabling diagnostic/Classic code evidence only. Actual aggregate passed; current registered Meta service count is zero and no real socket was opened. No authenticated device-info, identity/setup, phone-off or firmware claim.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/quality-classic.txt",
+        "sha256": "ac9ad85cee977eb799613116868c874dec5f86266ef5869ac4d6be5d682b61b1"
+      },
+      "inputs": [
+        {
+          "path": ".clang-format",
+          "sha256": "b8b235ad236526882c0fdc52d3a17194410d13a184ab572937de4fa2c231ecdd"
+        },
+        {
+          "path": ".clang-tidy",
+          "sha256": "c2f69f181a8cd59ba8bdc3fc46328b22c7c65705adf3daadd6e6ebba796a7464"
+        },
+        {
+          "path": ".cppcheck-obs.cfg",
+          "sha256": "43af454a083f4d7b44dcd22e48f191f8699f8eff272ded6fea1f9b7eb412364a"
+        },
+        {
+          "path": ".gitattributes",
+          "sha256": "7615f5cb3052a2fddfa34520ad43cd3bc9e3058dd913432bf602201e89a1b4d8"
+        },
+        {
+          "path": ".github/dependabot.yml",
+          "sha256": "52f52486fba5f32ef49c3ef1b216fac04888ad0847c64b57df89b28655fb82a3"
+        },
+        {
+          "path": ".github/workflows/quality.yml",
+          "sha256": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca"
+        },
+        {
+          "path": ".gitignore",
+          "sha256": "51afdd661c7a97f4fb20f0cbd4338ba95adc00b30b0a3d6d95c2190777e7a469"
+        },
+        {
+          "path": ".gitleaks.toml",
+          "sha256": "ce1b21983f8ff159aa5762beb7e973e1b2b2dfe8bd350cf39daa0ec2da2e711e"
+        },
+        {
+          "path": ".jscpd.json",
+          "sha256": "8aba253a1058ebdc4515d74367a37a0e53aac6451af06a760172c74100e1c4b6"
+        },
+        {
+          "path": ".pre-commit-config.yaml",
+          "sha256": "c2df117a2f7ab21bc8210e626bb67710515abe62fa76bc9011408dc15c5c188a"
+        },
+        {
+          "path": ".semgrep.yml",
+          "sha256": "c989195a0157c259c43150cb2edb54842800317827b5504004de5831110d6619"
+        },
+        {
+          "path": "AGENTS.md",
+          "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "sha256": "88bafdc9b7bd3137d745d5b878b0659b4ef0a62b08ed1823e862ae517f530c76"
+        },
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "fbe5a8b24c73db413803cecf3b92e021d31c6f18f257e18973e180a9e6db6816"
+        },
+        {
+          "path": "CMakePresets.json",
+          "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "8d56b405468aad11f87ab5763f901e276e08d9646ff5c8481b1762b6b789e9ed"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "sha256": "6ca6ac0e1a29f6c3603fdcbf5b63ac3b87682eb44c12821d297370923aa59b98"
+        },
+        {
+          "path": "PSScriptAnalyzerSettings.psd1",
+          "sha256": "427f99245961626682b7ed07663c63e67aeb9566d1bffe372aee05b98e32f2e0"
+        },
+        {
+          "path": "README.md",
+          "sha256": "f1b4656a1cf03c28eec4f130c288c9aeace0af403b6268297996aaaaac124f8c"
+        },
+        {
+          "path": "THIRD_PARTY_NOTICES.md",
+          "sha256": "59164c6e7cf8ca233d358995d20ade680da3d520d3e79a56014bf6b35b9df2d4"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+        },
+        {
+          "path": "include/mgl/capabilities.hpp",
+          "sha256": "7daa77cf5c2f1334d1843c853be556e79981cfcde164e1cd31b303efc60430cc"
+        },
+        {
+          "path": "include/mgl/discovery.hpp",
+          "sha256": "bb88b637251d5047c072be3313b8e95961ec9125aab550ea7cded2a9cdba3fdf"
+        },
+        {
+          "path": "include/mgl/sdu.hpp",
+          "sha256": "bf120c3f0f14cf566c1a298bd15002d00656de7828772ee1a141834328668db6"
+        },
+        {
+          "path": "include/mgl/session.hpp",
+          "sha256": null
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+        },
+        {
+          "path": "package.json",
+          "sha256": "1053cfdf62f78e96e8f488835b6abaf6e7accdab3f0d868b68793d6aeb29a1e6"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93"
+        },
+        {
+          "path": "src/protocol/sdu.cpp",
+          "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+        },
+        {
+          "path": "src/windows/apartment.hpp",
+          "sha256": "c392d69883555a5da3111f7e5a2f916a0e36b812ad609494f8fac00cf0d3ef29"
+        },
+        {
+          "path": "src/windows/capabilities.cpp",
+          "sha256": "e25b5e87758b9d4dab91706663babd60fdc0e1059d36ad1a2ea9d59bdf6d156e"
+        },
+        {
+          "path": "src/windows/classic.cpp",
+          "sha256": "acc4fc04304855d957d6b7ec2fe98d920c68371bf2e47b7acb6871cfa20cded5"
+        },
+        {
+          "path": "src/windows/discovery.cpp",
+          "sha256": "5066920f2c8bb1fc0dd143857978b72668e3e41c18aedb7af8ba95f4145fcccf"
+        },
+        {
+          "path": "src/windows/identity.cpp",
+          "sha256": null
+        },
+        {
+          "path": "src/windows/session.cpp",
+          "sha256": null
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "02470464448f4f2c0ed552d47cc10988b895ea37177ea71b26905a5b05b4a20b"
+        },
+        {
+          "path": "tests/probe.Tests.ps1",
+          "sha256": "f09f29301bf1b36a7289c3ff6c1798d6c50ef50a1a9f14244447b9cd100791fa"
+        },
+        {
+          "path": "tests/runner.Tests.ps1",
+          "sha256": "08675144ad7cddc1213d848507220228d74999dcceeaf9034fac811a3876f5b1"
+        },
+        {
+          "path": "tests/sdu_tests.cpp",
+          "sha256": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd"
+        },
+        {
+          "path": "tests/session_tests.cpp",
+          "sha256": null
+        }
+      ],
+      "scope_sha256": "ee96b278f196fcb30773677615edb7b4cd5be2f4f987167d0fea867b99e33081",
+      "red": null,
+      "reason": null
+    },
+    {
+      "id": "EV-CLASSIC-RED-PARSER-LENGTH",
+      "acceptance": [
+        "AC-FRAMING"
+      ],
+      "kind": "red",
+      "status": "pass",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/Invoke-Project.ps1",
+        "test:red",
+        "-Drill",
+        "parser-length"
+      ],
+      "method": "Inspected actual intended diagnostic and failure, then independently verified exact current byte/hash restoration. Change DataxHeader from 4 to 5 without modifying the independent expected frame lengths.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/red/parser-length.txt",
+        "sha256": "3f44e5b99d0bee827fe3f0a016133feaa38297471d4171a652d05aaa10c6e422"
+      },
+      "inputs": [
+        {
+          "path": ".clang-format",
+          "sha256": "b8b235ad236526882c0fdc52d3a17194410d13a184ab572937de4fa2c231ecdd"
+        },
+        {
+          "path": ".clang-tidy",
+          "sha256": "c2f69f181a8cd59ba8bdc3fc46328b22c7c65705adf3daadd6e6ebba796a7464"
+        },
+        {
+          "path": ".cppcheck-obs.cfg",
+          "sha256": "43af454a083f4d7b44dcd22e48f191f8699f8eff272ded6fea1f9b7eb412364a"
+        },
+        {
+          "path": ".gitattributes",
+          "sha256": "7615f5cb3052a2fddfa34520ad43cd3bc9e3058dd913432bf602201e89a1b4d8"
+        },
+        {
+          "path": ".github/dependabot.yml",
+          "sha256": "52f52486fba5f32ef49c3ef1b216fac04888ad0847c64b57df89b28655fb82a3"
+        },
+        {
+          "path": ".github/workflows/quality.yml",
+          "sha256": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca"
+        },
+        {
+          "path": ".gitignore",
+          "sha256": "51afdd661c7a97f4fb20f0cbd4338ba95adc00b30b0a3d6d95c2190777e7a469"
+        },
+        {
+          "path": ".gitleaks.toml",
+          "sha256": "ce1b21983f8ff159aa5762beb7e973e1b2b2dfe8bd350cf39daa0ec2da2e711e"
+        },
+        {
+          "path": ".jscpd.json",
+          "sha256": "8aba253a1058ebdc4515d74367a37a0e53aac6451af06a760172c74100e1c4b6"
+        },
+        {
+          "path": ".pre-commit-config.yaml",
+          "sha256": "c2df117a2f7ab21bc8210e626bb67710515abe62fa76bc9011408dc15c5c188a"
+        },
+        {
+          "path": ".semgrep.yml",
+          "sha256": "c989195a0157c259c43150cb2edb54842800317827b5504004de5831110d6619"
+        },
+        {
+          "path": "AGENTS.md",
+          "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "sha256": "88bafdc9b7bd3137d745d5b878b0659b4ef0a62b08ed1823e862ae517f530c76"
+        },
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "fbe5a8b24c73db413803cecf3b92e021d31c6f18f257e18973e180a9e6db6816"
+        },
+        {
+          "path": "CMakePresets.json",
+          "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "8d56b405468aad11f87ab5763f901e276e08d9646ff5c8481b1762b6b789e9ed"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "sha256": "6ca6ac0e1a29f6c3603fdcbf5b63ac3b87682eb44c12821d297370923aa59b98"
+        },
+        {
+          "path": "PSScriptAnalyzerSettings.psd1",
+          "sha256": "427f99245961626682b7ed07663c63e67aeb9566d1bffe372aee05b98e32f2e0"
+        },
+        {
+          "path": "README.md",
+          "sha256": "f1b4656a1cf03c28eec4f130c288c9aeace0af403b6268297996aaaaac124f8c"
+        },
+        {
+          "path": "THIRD_PARTY_NOTICES.md",
+          "sha256": "59164c6e7cf8ca233d358995d20ade680da3d520d3e79a56014bf6b35b9df2d4"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+        },
+        {
+          "path": "include/mgl/capabilities.hpp",
+          "sha256": "7daa77cf5c2f1334d1843c853be556e79981cfcde164e1cd31b303efc60430cc"
+        },
+        {
+          "path": "include/mgl/sdu.hpp",
+          "sha256": "bf120c3f0f14cf566c1a298bd15002d00656de7828772ee1a141834328668db6"
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+        },
+        {
+          "path": "package.json",
+          "sha256": "1053cfdf62f78e96e8f488835b6abaf6e7accdab3f0d868b68793d6aeb29a1e6"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93"
+        },
+        {
+          "path": "src/protocol/sdu.cpp",
+          "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+        },
+        {
+          "path": "src/windows/capabilities.cpp",
+          "sha256": "e25b5e87758b9d4dab91706663babd60fdc0e1059d36ad1a2ea9d59bdf6d156e"
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "02470464448f4f2c0ed552d47cc10988b895ea37177ea71b26905a5b05b4a20b"
+        },
+        {
+          "path": "tests/runner.Tests.ps1",
+          "sha256": "08675144ad7cddc1213d848507220228d74999dcceeaf9034fac811a3876f5b1"
+        },
+        {
+          "path": "tests/sdu_tests.cpp",
+          "sha256": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd"
+        }
+      ],
+      "scope_sha256": "a7e10dfc390635734e0a1978de9c102afc08ef00acdd09c73a3ef6a10929ddf9",
+      "red": {
+        "mutation": "Change DataxHeader from 4 to 5 without modifying the independent expected frame lengths.",
+        "baseline_exit": 0,
+        "mutated_exit": 1,
+        "restored_exit": 0,
+        "expected_diagnostic": "DataX empty has 4 bytes: unexpected prefix status or frame length",
+        "observed_diagnostic": "DataX empty has 4 bytes: unexpected prefix status or frame length",
+        "before": [
+          {
+            "path": "src/protocol/sdu.cpp",
+            "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+          }
+        ],
+        "mutated": [
+          {
+            "path": "src/protocol/sdu.cpp",
+            "sha256": "fcea87b9c7e60b81822b0cadc2362def9e3cd413011a19130199b857b6660278"
+          }
+        ],
+        "after": [
+          {
+            "path": "src/protocol/sdu.cpp",
+            "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+          }
+        ]
+      },
+      "reason": null
+    },
+    {
+      "id": "EV-CLASSIC-RED-MODULE-METADATA",
+      "acceptance": [
+        "AC-MODULE"
+      ],
+      "kind": "red",
+      "status": "pass",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/Invoke-Project.ps1",
+        "test:red",
+        "-Drill",
+        "module-metadata"
+      ],
+      "method": "Inspected actual intended diagnostic and failure, then independently verified exact current byte/hash restoration. Change the exported module name to Broken module name.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/red/module-metadata.txt",
+        "sha256": "5f5bcf19e162247d90d6fe539b62272ee5547b5cab0236de909294d2a8905458"
+      },
+      "inputs": [
+        {
+          "path": ".clang-format",
+          "sha256": "b8b235ad236526882c0fdc52d3a17194410d13a184ab572937de4fa2c231ecdd"
+        },
+        {
+          "path": ".clang-tidy",
+          "sha256": "c2f69f181a8cd59ba8bdc3fc46328b22c7c65705adf3daadd6e6ebba796a7464"
+        },
+        {
+          "path": ".cppcheck-obs.cfg",
+          "sha256": "43af454a083f4d7b44dcd22e48f191f8699f8eff272ded6fea1f9b7eb412364a"
+        },
+        {
+          "path": ".gitattributes",
+          "sha256": "7615f5cb3052a2fddfa34520ad43cd3bc9e3058dd913432bf602201e89a1b4d8"
+        },
+        {
+          "path": ".github/dependabot.yml",
+          "sha256": "52f52486fba5f32ef49c3ef1b216fac04888ad0847c64b57df89b28655fb82a3"
+        },
+        {
+          "path": ".github/workflows/quality.yml",
+          "sha256": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca"
+        },
+        {
+          "path": ".gitignore",
+          "sha256": "51afdd661c7a97f4fb20f0cbd4338ba95adc00b30b0a3d6d95c2190777e7a469"
+        },
+        {
+          "path": ".gitleaks.toml",
+          "sha256": "ce1b21983f8ff159aa5762beb7e973e1b2b2dfe8bd350cf39daa0ec2da2e711e"
+        },
+        {
+          "path": ".jscpd.json",
+          "sha256": "8aba253a1058ebdc4515d74367a37a0e53aac6451af06a760172c74100e1c4b6"
+        },
+        {
+          "path": ".pre-commit-config.yaml",
+          "sha256": "c2df117a2f7ab21bc8210e626bb67710515abe62fa76bc9011408dc15c5c188a"
+        },
+        {
+          "path": ".semgrep.yml",
+          "sha256": "c989195a0157c259c43150cb2edb54842800317827b5504004de5831110d6619"
+        },
+        {
+          "path": "AGENTS.md",
+          "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "sha256": "88bafdc9b7bd3137d745d5b878b0659b4ef0a62b08ed1823e862ae517f530c76"
+        },
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "fbe5a8b24c73db413803cecf3b92e021d31c6f18f257e18973e180a9e6db6816"
+        },
+        {
+          "path": "CMakePresets.json",
+          "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "8d56b405468aad11f87ab5763f901e276e08d9646ff5c8481b1762b6b789e9ed"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "sha256": "6ca6ac0e1a29f6c3603fdcbf5b63ac3b87682eb44c12821d297370923aa59b98"
+        },
+        {
+          "path": "PSScriptAnalyzerSettings.psd1",
+          "sha256": "427f99245961626682b7ed07663c63e67aeb9566d1bffe372aee05b98e32f2e0"
+        },
+        {
+          "path": "README.md",
+          "sha256": "f1b4656a1cf03c28eec4f130c288c9aeace0af403b6268297996aaaaac124f8c"
+        },
+        {
+          "path": "THIRD_PARTY_NOTICES.md",
+          "sha256": "59164c6e7cf8ca233d358995d20ade680da3d520d3e79a56014bf6b35b9df2d4"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+        },
+        {
+          "path": "include/mgl/capabilities.hpp",
+          "sha256": "7daa77cf5c2f1334d1843c853be556e79981cfcde164e1cd31b303efc60430cc"
+        },
+        {
+          "path": "include/mgl/sdu.hpp",
+          "sha256": "bf120c3f0f14cf566c1a298bd15002d00656de7828772ee1a141834328668db6"
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+        },
+        {
+          "path": "package.json",
+          "sha256": "1053cfdf62f78e96e8f488835b6abaf6e7accdab3f0d868b68793d6aeb29a1e6"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93"
+        },
+        {
+          "path": "src/protocol/sdu.cpp",
+          "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+        },
+        {
+          "path": "src/windows/capabilities.cpp",
+          "sha256": "e25b5e87758b9d4dab91706663babd60fdc0e1059d36ad1a2ea9d59bdf6d156e"
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "02470464448f4f2c0ed552d47cc10988b895ea37177ea71b26905a5b05b4a20b"
+        },
+        {
+          "path": "tests/runner.Tests.ps1",
+          "sha256": "08675144ad7cddc1213d848507220228d74999dcceeaf9034fac811a3876f5b1"
+        },
+        {
+          "path": "tests/sdu_tests.cpp",
+          "sha256": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd"
+        }
+      ],
+      "scope_sha256": "a7e10dfc390635734e0a1978de9c102afc08ef00acdd09c73a3ef6a10929ddf9",
+      "red": {
+        "mutation": "Change the exported module name to Broken module name.",
+        "baseline_exit": 0,
+        "mutated_exit": 1,
+        "restored_exit": 0,
+        "expected_diagnostic": "OBS module metadata does not match development-foundation contract",
+        "observed_diagnostic": "OBS module metadata does not match development-foundation contract",
+        "before": [
+          {
+            "path": "src/plugin/module.c",
+            "sha256": "35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c"
+          }
+        ],
+        "mutated": [
+          {
+            "path": "src/plugin/module.c",
+            "sha256": "608f7c48d09ad85b57cce8de7cc22fedeeea6017210dfd2cc37efc9da082004b"
+          }
+        ],
+        "after": [
+          {
+            "path": "src/plugin/module.c",
+            "sha256": "35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c"
+          }
+        ]
+      },
+      "reason": null
+    },
+    {
+      "id": "EV-CLASSIC-RED-PROBE-ARGUMENTS",
+      "acceptance": [
+        "AC-AUTH",
+        "AC-GATES"
+      ],
+      "kind": "red",
+      "status": "pass",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/Invoke-Project.ps1",
+        "test:red",
+        "-Drill",
+        "probe-arguments"
+      ],
+      "method": "Inspected actual intended diagnostic and failure, then independently verified exact current byte/hash restoration. Return exit 0 for rejected native probe arguments while preserving independent CLI assertions expecting exit 5.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/red/probe-arguments.txt",
+        "sha256": "6925a39ebc56fec5b35749f42ca0b84c694abca7517d684a0a300c7cc23e5295"
+      },
+      "inputs": [
+        {
+          "path": ".clang-format",
+          "sha256": "b8b235ad236526882c0fdc52d3a17194410d13a184ab572937de4fa2c231ecdd"
+        },
+        {
+          "path": ".clang-tidy",
+          "sha256": "c2f69f181a8cd59ba8bdc3fc46328b22c7c65705adf3daadd6e6ebba796a7464"
+        },
+        {
+          "path": ".cppcheck-obs.cfg",
+          "sha256": "43af454a083f4d7b44dcd22e48f191f8699f8eff272ded6fea1f9b7eb412364a"
+        },
+        {
+          "path": ".gitattributes",
+          "sha256": "7615f5cb3052a2fddfa34520ad43cd3bc9e3058dd913432bf602201e89a1b4d8"
+        },
+        {
+          "path": ".github/dependabot.yml",
+          "sha256": "52f52486fba5f32ef49c3ef1b216fac04888ad0847c64b57df89b28655fb82a3"
+        },
+        {
+          "path": ".github/workflows/quality.yml",
+          "sha256": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca"
+        },
+        {
+          "path": ".gitignore",
+          "sha256": "51afdd661c7a97f4fb20f0cbd4338ba95adc00b30b0a3d6d95c2190777e7a469"
+        },
+        {
+          "path": ".gitleaks.toml",
+          "sha256": "ce1b21983f8ff159aa5762beb7e973e1b2b2dfe8bd350cf39daa0ec2da2e711e"
+        },
+        {
+          "path": ".jscpd.json",
+          "sha256": "8aba253a1058ebdc4515d74367a37a0e53aac6451af06a760172c74100e1c4b6"
+        },
+        {
+          "path": ".pre-commit-config.yaml",
+          "sha256": "c2df117a2f7ab21bc8210e626bb67710515abe62fa76bc9011408dc15c5c188a"
+        },
+        {
+          "path": ".semgrep.yml",
+          "sha256": "c989195a0157c259c43150cb2edb54842800317827b5504004de5831110d6619"
+        },
+        {
+          "path": "AGENTS.md",
+          "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "sha256": "88bafdc9b7bd3137d745d5b878b0659b4ef0a62b08ed1823e862ae517f530c76"
+        },
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "fbe5a8b24c73db413803cecf3b92e021d31c6f18f257e18973e180a9e6db6816"
+        },
+        {
+          "path": "CMakePresets.json",
+          "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "8d56b405468aad11f87ab5763f901e276e08d9646ff5c8481b1762b6b789e9ed"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "sha256": "6ca6ac0e1a29f6c3603fdcbf5b63ac3b87682eb44c12821d297370923aa59b98"
+        },
+        {
+          "path": "PSScriptAnalyzerSettings.psd1",
+          "sha256": "427f99245961626682b7ed07663c63e67aeb9566d1bffe372aee05b98e32f2e0"
+        },
+        {
+          "path": "README.md",
+          "sha256": "f1b4656a1cf03c28eec4f130c288c9aeace0af403b6268297996aaaaac124f8c"
+        },
+        {
+          "path": "THIRD_PARTY_NOTICES.md",
+          "sha256": "59164c6e7cf8ca233d358995d20ade680da3d520d3e79a56014bf6b35b9df2d4"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+        },
+        {
+          "path": "include/mgl/capabilities.hpp",
+          "sha256": "7daa77cf5c2f1334d1843c853be556e79981cfcde164e1cd31b303efc60430cc"
+        },
+        {
+          "path": "include/mgl/discovery.hpp",
+          "sha256": "bb88b637251d5047c072be3313b8e95961ec9125aab550ea7cded2a9cdba3fdf"
+        },
+        {
+          "path": "include/mgl/sdu.hpp",
+          "sha256": "bf120c3f0f14cf566c1a298bd15002d00656de7828772ee1a141834328668db6"
+        },
+        {
+          "path": "include/mgl/session.hpp",
+          "sha256": null
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+        },
+        {
+          "path": "package.json",
+          "sha256": "1053cfdf62f78e96e8f488835b6abaf6e7accdab3f0d868b68793d6aeb29a1e6"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93"
+        },
+        {
+          "path": "src/protocol/sdu.cpp",
+          "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+        },
+        {
+          "path": "src/windows/apartment.hpp",
+          "sha256": "c392d69883555a5da3111f7e5a2f916a0e36b812ad609494f8fac00cf0d3ef29"
+        },
+        {
+          "path": "src/windows/capabilities.cpp",
+          "sha256": "e25b5e87758b9d4dab91706663babd60fdc0e1059d36ad1a2ea9d59bdf6d156e"
+        },
+        {
+          "path": "src/windows/classic.cpp",
+          "sha256": "acc4fc04304855d957d6b7ec2fe98d920c68371bf2e47b7acb6871cfa20cded5"
+        },
+        {
+          "path": "src/windows/discovery.cpp",
+          "sha256": "5066920f2c8bb1fc0dd143857978b72668e3e41c18aedb7af8ba95f4145fcccf"
+        },
+        {
+          "path": "src/windows/identity.cpp",
+          "sha256": null
+        },
+        {
+          "path": "src/windows/session.cpp",
+          "sha256": null
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "02470464448f4f2c0ed552d47cc10988b895ea37177ea71b26905a5b05b4a20b"
+        },
+        {
+          "path": "tests/probe.Tests.ps1",
+          "sha256": "f09f29301bf1b36a7289c3ff6c1798d6c50ef50a1a9f14244447b9cd100791fa"
+        },
+        {
+          "path": "tests/runner.Tests.ps1",
+          "sha256": "08675144ad7cddc1213d848507220228d74999dcceeaf9034fac811a3876f5b1"
+        },
+        {
+          "path": "tests/sdu_tests.cpp",
+          "sha256": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd"
+        },
+        {
+          "path": "tests/session_tests.cpp",
+          "sha256": null
+        }
+      ],
+      "scope_sha256": "ee96b278f196fcb30773677615edb7b4cd5be2f4f987167d0fea867b99e33081",
+      "red": {
+        "mutation": "Return exit 0 for rejected native probe arguments while preserving independent CLI assertions expecting exit 5.",
+        "baseline_exit": 0,
+        "mutated_exit": 1,
+        "restored_exit": 0,
+        "expected_diagnostic": "Expected 5, because invalid probe arguments must fail, but got 0.",
+        "observed_diagnostic": "Expected 5, because invalid probe arguments must fail, but got 0.",
+        "before": [
+          {
+            "path": "src/probe/main.cpp",
+            "sha256": "6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93"
+          }
+        ],
+        "mutated": [
+          {
+            "path": "src/probe/main.cpp",
+            "sha256": "5aef00e35f3bac7f73790627efb088ec21ca7e1ce99852948f04c8426991b7fe"
+          }
+        ],
+        "after": [
+          {
+            "path": "src/probe/main.cpp",
+            "sha256": "6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93"
+          }
+        ]
+      },
+      "reason": null
+    },
+    {
+      "id": "EV-CLASSIC-RED-CLASSIC-CONNECTION-CLAIM",
+      "acceptance": [
+        "AC-AUTH",
+        "AC-GATES"
+      ],
+      "kind": "red",
+      "status": "pass",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/Invoke-Project.ps1",
+        "test:red",
+        "-Drill",
+        "classic-connection-claim"
+      ],
+      "method": "Inspected actual intended diagnostic and failure, then independently verified exact current byte/hash restoration. Initialize Classic diagnostic result with rfcomm_connected true; independent query-only CLI assertion must reject the false connection claim.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/red/classic-connection-claim.txt",
+        "sha256": "faf0c58d203eeb8f351ac9366b829f7cdb5aedd25931dccb1bc287e9aeeb724f"
+      },
+      "inputs": [
+        {
+          "path": ".clang-format",
+          "sha256": "b8b235ad236526882c0fdc52d3a17194410d13a184ab572937de4fa2c231ecdd"
+        },
+        {
+          "path": ".clang-tidy",
+          "sha256": "c2f69f181a8cd59ba8bdc3fc46328b22c7c65705adf3daadd6e6ebba796a7464"
+        },
+        {
+          "path": ".cppcheck-obs.cfg",
+          "sha256": "43af454a083f4d7b44dcd22e48f191f8699f8eff272ded6fea1f9b7eb412364a"
+        },
+        {
+          "path": ".gitattributes",
+          "sha256": "7615f5cb3052a2fddfa34520ad43cd3bc9e3058dd913432bf602201e89a1b4d8"
+        },
+        {
+          "path": ".github/dependabot.yml",
+          "sha256": "52f52486fba5f32ef49c3ef1b216fac04888ad0847c64b57df89b28655fb82a3"
+        },
+        {
+          "path": ".github/workflows/quality.yml",
+          "sha256": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca"
+        },
+        {
+          "path": ".gitignore",
+          "sha256": "51afdd661c7a97f4fb20f0cbd4338ba95adc00b30b0a3d6d95c2190777e7a469"
+        },
+        {
+          "path": ".gitleaks.toml",
+          "sha256": "ce1b21983f8ff159aa5762beb7e973e1b2b2dfe8bd350cf39daa0ec2da2e711e"
+        },
+        {
+          "path": ".jscpd.json",
+          "sha256": "8aba253a1058ebdc4515d74367a37a0e53aac6451af06a760172c74100e1c4b6"
+        },
+        {
+          "path": ".pre-commit-config.yaml",
+          "sha256": "c2df117a2f7ab21bc8210e626bb67710515abe62fa76bc9011408dc15c5c188a"
+        },
+        {
+          "path": ".semgrep.yml",
+          "sha256": "c989195a0157c259c43150cb2edb54842800317827b5504004de5831110d6619"
+        },
+        {
+          "path": "AGENTS.md",
+          "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "sha256": "88bafdc9b7bd3137d745d5b878b0659b4ef0a62b08ed1823e862ae517f530c76"
+        },
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "fbe5a8b24c73db413803cecf3b92e021d31c6f18f257e18973e180a9e6db6816"
+        },
+        {
+          "path": "CMakePresets.json",
+          "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "8d56b405468aad11f87ab5763f901e276e08d9646ff5c8481b1762b6b789e9ed"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "sha256": "6ca6ac0e1a29f6c3603fdcbf5b63ac3b87682eb44c12821d297370923aa59b98"
+        },
+        {
+          "path": "PSScriptAnalyzerSettings.psd1",
+          "sha256": "427f99245961626682b7ed07663c63e67aeb9566d1bffe372aee05b98e32f2e0"
+        },
+        {
+          "path": "README.md",
+          "sha256": "f1b4656a1cf03c28eec4f130c288c9aeace0af403b6268297996aaaaac124f8c"
+        },
+        {
+          "path": "THIRD_PARTY_NOTICES.md",
+          "sha256": "59164c6e7cf8ca233d358995d20ade680da3d520d3e79a56014bf6b35b9df2d4"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+        },
+        {
+          "path": "include/mgl/capabilities.hpp",
+          "sha256": "7daa77cf5c2f1334d1843c853be556e79981cfcde164e1cd31b303efc60430cc"
+        },
+        {
+          "path": "include/mgl/discovery.hpp",
+          "sha256": "bb88b637251d5047c072be3313b8e95961ec9125aab550ea7cded2a9cdba3fdf"
+        },
+        {
+          "path": "include/mgl/sdu.hpp",
+          "sha256": "bf120c3f0f14cf566c1a298bd15002d00656de7828772ee1a141834328668db6"
+        },
+        {
+          "path": "include/mgl/session.hpp",
+          "sha256": null
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+        },
+        {
+          "path": "package.json",
+          "sha256": "1053cfdf62f78e96e8f488835b6abaf6e7accdab3f0d868b68793d6aeb29a1e6"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93"
+        },
+        {
+          "path": "src/protocol/sdu.cpp",
+          "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+        },
+        {
+          "path": "src/windows/apartment.hpp",
+          "sha256": "c392d69883555a5da3111f7e5a2f916a0e36b812ad609494f8fac00cf0d3ef29"
+        },
+        {
+          "path": "src/windows/capabilities.cpp",
+          "sha256": "e25b5e87758b9d4dab91706663babd60fdc0e1059d36ad1a2ea9d59bdf6d156e"
+        },
+        {
+          "path": "src/windows/classic.cpp",
+          "sha256": "acc4fc04304855d957d6b7ec2fe98d920c68371bf2e47b7acb6871cfa20cded5"
+        },
+        {
+          "path": "src/windows/discovery.cpp",
+          "sha256": "5066920f2c8bb1fc0dd143857978b72668e3e41c18aedb7af8ba95f4145fcccf"
+        },
+        {
+          "path": "src/windows/identity.cpp",
+          "sha256": null
+        },
+        {
+          "path": "src/windows/session.cpp",
+          "sha256": null
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "02470464448f4f2c0ed552d47cc10988b895ea37177ea71b26905a5b05b4a20b"
+        },
+        {
+          "path": "tests/probe.Tests.ps1",
+          "sha256": "f09f29301bf1b36a7289c3ff6c1798d6c50ef50a1a9f14244447b9cd100791fa"
+        },
+        {
+          "path": "tests/runner.Tests.ps1",
+          "sha256": "08675144ad7cddc1213d848507220228d74999dcceeaf9034fac811a3876f5b1"
+        },
+        {
+          "path": "tests/sdu_tests.cpp",
+          "sha256": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd"
+        },
+        {
+          "path": "tests/session_tests.cpp",
+          "sha256": null
+        }
+      ],
+      "scope_sha256": "ee96b278f196fcb30773677615edb7b4cd5be2f4f987167d0fea867b99e33081",
+      "red": {
+        "mutation": "Initialize Classic diagnostic result with rfcomm_connected true; independent query-only CLI assertion must reject the false connection claim.",
+        "baseline_exit": 0,
+        "mutated_exit": 1,
+        "restored_exit": 0,
+        "expected_diagnostic": "Expected $false, because Classic discovery must not claim an RFCOMM connection, but got $true.",
+        "observed_diagnostic": "Expected $false, because Classic discovery must not claim an RFCOMM connection, but got $true.",
+        "before": [
+          {
+            "path": "src/windows/classic.cpp",
+            "sha256": "acc4fc04304855d957d6b7ec2fe98d920c68371bf2e47b7acb6871cfa20cded5"
+          }
+        ],
+        "mutated": [
+          {
+            "path": "src/windows/classic.cpp",
+            "sha256": "6adfa1beee9641c6be93619deaf105b2da90b6e4b925ecd7c225bd770e210ed4"
+          }
+        ],
+        "after": [
+          {
+            "path": "src/windows/classic.cpp",
+            "sha256": "acc4fc04304855d957d6b7ec2fe98d920c68371bf2e47b7acb6871cfa20cded5"
+          }
+        ]
+      },
+      "reason": null
+    },
+    {
+      "id": "EV-CLASSIC-RED-FORMAT",
+      "acceptance": [
+        "AC-GATES"
+      ],
+      "kind": "red",
+      "status": "pass",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/Invoke-Project.ps1",
+        "test:red",
+        "-Drill",
+        "format"
+      ],
+      "method": "Inspected actual intended diagnostic and failure, then independently verified exact current byte/hash restoration. Append an intentionally unformatted function.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/red/format.txt",
+        "sha256": "2709604244b5ea4ab4da49131d6d193bc361311b575793332a501dea5dee3c3b"
+      },
+      "inputs": [
+        {
+          "path": ".clang-format",
+          "sha256": "b8b235ad236526882c0fdc52d3a17194410d13a184ab572937de4fa2c231ecdd"
+        },
+        {
+          "path": ".clang-tidy",
+          "sha256": "c2f69f181a8cd59ba8bdc3fc46328b22c7c65705adf3daadd6e6ebba796a7464"
+        },
+        {
+          "path": ".cppcheck-obs.cfg",
+          "sha256": "43af454a083f4d7b44dcd22e48f191f8699f8eff272ded6fea1f9b7eb412364a"
+        },
+        {
+          "path": ".gitattributes",
+          "sha256": "7615f5cb3052a2fddfa34520ad43cd3bc9e3058dd913432bf602201e89a1b4d8"
+        },
+        {
+          "path": ".github/dependabot.yml",
+          "sha256": "52f52486fba5f32ef49c3ef1b216fac04888ad0847c64b57df89b28655fb82a3"
+        },
+        {
+          "path": ".github/workflows/quality.yml",
+          "sha256": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca"
+        },
+        {
+          "path": ".gitignore",
+          "sha256": "51afdd661c7a97f4fb20f0cbd4338ba95adc00b30b0a3d6d95c2190777e7a469"
+        },
+        {
+          "path": ".gitleaks.toml",
+          "sha256": "ce1b21983f8ff159aa5762beb7e973e1b2b2dfe8bd350cf39daa0ec2da2e711e"
+        },
+        {
+          "path": ".jscpd.json",
+          "sha256": "8aba253a1058ebdc4515d74367a37a0e53aac6451af06a760172c74100e1c4b6"
+        },
+        {
+          "path": ".pre-commit-config.yaml",
+          "sha256": "c2df117a2f7ab21bc8210e626bb67710515abe62fa76bc9011408dc15c5c188a"
+        },
+        {
+          "path": ".semgrep.yml",
+          "sha256": "c989195a0157c259c43150cb2edb54842800317827b5504004de5831110d6619"
+        },
+        {
+          "path": "AGENTS.md",
+          "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "sha256": "88bafdc9b7bd3137d745d5b878b0659b4ef0a62b08ed1823e862ae517f530c76"
+        },
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "fbe5a8b24c73db413803cecf3b92e021d31c6f18f257e18973e180a9e6db6816"
+        },
+        {
+          "path": "CMakePresets.json",
+          "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "8d56b405468aad11f87ab5763f901e276e08d9646ff5c8481b1762b6b789e9ed"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "sha256": "6ca6ac0e1a29f6c3603fdcbf5b63ac3b87682eb44c12821d297370923aa59b98"
+        },
+        {
+          "path": "PSScriptAnalyzerSettings.psd1",
+          "sha256": "427f99245961626682b7ed07663c63e67aeb9566d1bffe372aee05b98e32f2e0"
+        },
+        {
+          "path": "README.md",
+          "sha256": "f1b4656a1cf03c28eec4f130c288c9aeace0af403b6268297996aaaaac124f8c"
+        },
+        {
+          "path": "THIRD_PARTY_NOTICES.md",
+          "sha256": "59164c6e7cf8ca233d358995d20ade680da3d520d3e79a56014bf6b35b9df2d4"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+        },
+        {
+          "path": "include/mgl/capabilities.hpp",
+          "sha256": "7daa77cf5c2f1334d1843c853be556e79981cfcde164e1cd31b303efc60430cc"
+        },
+        {
+          "path": "include/mgl/sdu.hpp",
+          "sha256": "bf120c3f0f14cf566c1a298bd15002d00656de7828772ee1a141834328668db6"
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+        },
+        {
+          "path": "package.json",
+          "sha256": "1053cfdf62f78e96e8f488835b6abaf6e7accdab3f0d868b68793d6aeb29a1e6"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93"
+        },
+        {
+          "path": "src/protocol/sdu.cpp",
+          "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+        },
+        {
+          "path": "src/windows/capabilities.cpp",
+          "sha256": "e25b5e87758b9d4dab91706663babd60fdc0e1059d36ad1a2ea9d59bdf6d156e"
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "02470464448f4f2c0ed552d47cc10988b895ea37177ea71b26905a5b05b4a20b"
+        },
+        {
+          "path": "tests/runner.Tests.ps1",
+          "sha256": "08675144ad7cddc1213d848507220228d74999dcceeaf9034fac811a3876f5b1"
+        },
+        {
+          "path": "tests/sdu_tests.cpp",
+          "sha256": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd"
+        }
+      ],
+      "scope_sha256": "a7e10dfc390635734e0a1978de9c102afc08ef00acdd09c73a3ef6a10929ddf9",
+      "red": {
+        "mutation": "Append an intentionally unformatted function.",
+        "baseline_exit": 0,
+        "mutated_exit": 1,
+        "restored_exit": 0,
+        "expected_diagnostic": "C:\\Users\\Randy\\Coding\\meta_g_link_direct\\src\\protocol\\sdu.cpp:47:22: error: code should be clang-formatted [-Wclang-format-violations]",
+        "observed_diagnostic": "C:\\Users\\Randy\\Coding\\meta_g_link_direct\\src\\protocol\\sdu.cpp:47:22: error: code should be clang-formatted [-Wclang-format-violations]",
+        "before": [
+          {
+            "path": "src/protocol/sdu.cpp",
+            "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+          }
+        ],
+        "mutated": [
+          {
+            "path": "src/protocol/sdu.cpp",
+            "sha256": "c2a1d1a6c8b7489cbb25561dddadb31309d7ac5c15f880bbeb3c90288eabb038"
+          }
+        ],
+        "after": [
+          {
+            "path": "src/protocol/sdu.cpp",
+            "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+          }
+        ]
+      },
+      "reason": null
+    },
+    {
+      "id": "EV-CLASSIC-RED-OWNED-HEADER",
+      "acceptance": [
+        "AC-GATES"
+      ],
+      "kind": "red",
+      "status": "pass",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/Invoke-Project.ps1",
+        "test:red",
+        "-Drill",
+        "owned-header"
+      ],
+      "method": "Inspected actual intended diagnostic and failure, then independently verified exact current byte/hash restoration. Append a mutable inline global to an owned header.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/red/owned-header.txt",
+        "sha256": "a4069569c2f35b911ebd4d44bb106999eadca9d59eb95028260f93c882d41ca2"
+      },
+      "inputs": [
+        {
+          "path": ".clang-format",
+          "sha256": "b8b235ad236526882c0fdc52d3a17194410d13a184ab572937de4fa2c231ecdd"
+        },
+        {
+          "path": ".clang-tidy",
+          "sha256": "c2f69f181a8cd59ba8bdc3fc46328b22c7c65705adf3daadd6e6ebba796a7464"
+        },
+        {
+          "path": ".cppcheck-obs.cfg",
+          "sha256": "43af454a083f4d7b44dcd22e48f191f8699f8eff272ded6fea1f9b7eb412364a"
+        },
+        {
+          "path": ".gitattributes",
+          "sha256": "7615f5cb3052a2fddfa34520ad43cd3bc9e3058dd913432bf602201e89a1b4d8"
+        },
+        {
+          "path": ".github/dependabot.yml",
+          "sha256": "52f52486fba5f32ef49c3ef1b216fac04888ad0847c64b57df89b28655fb82a3"
+        },
+        {
+          "path": ".github/workflows/quality.yml",
+          "sha256": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca"
+        },
+        {
+          "path": ".gitignore",
+          "sha256": "51afdd661c7a97f4fb20f0cbd4338ba95adc00b30b0a3d6d95c2190777e7a469"
+        },
+        {
+          "path": ".gitleaks.toml",
+          "sha256": "ce1b21983f8ff159aa5762beb7e973e1b2b2dfe8bd350cf39daa0ec2da2e711e"
+        },
+        {
+          "path": ".jscpd.json",
+          "sha256": "8aba253a1058ebdc4515d74367a37a0e53aac6451af06a760172c74100e1c4b6"
+        },
+        {
+          "path": ".pre-commit-config.yaml",
+          "sha256": "c2df117a2f7ab21bc8210e626bb67710515abe62fa76bc9011408dc15c5c188a"
+        },
+        {
+          "path": ".semgrep.yml",
+          "sha256": "c989195a0157c259c43150cb2edb54842800317827b5504004de5831110d6619"
+        },
+        {
+          "path": "AGENTS.md",
+          "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "sha256": "88bafdc9b7bd3137d745d5b878b0659b4ef0a62b08ed1823e862ae517f530c76"
+        },
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "fbe5a8b24c73db413803cecf3b92e021d31c6f18f257e18973e180a9e6db6816"
+        },
+        {
+          "path": "CMakePresets.json",
+          "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "8d56b405468aad11f87ab5763f901e276e08d9646ff5c8481b1762b6b789e9ed"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "sha256": "6ca6ac0e1a29f6c3603fdcbf5b63ac3b87682eb44c12821d297370923aa59b98"
+        },
+        {
+          "path": "PSScriptAnalyzerSettings.psd1",
+          "sha256": "427f99245961626682b7ed07663c63e67aeb9566d1bffe372aee05b98e32f2e0"
+        },
+        {
+          "path": "README.md",
+          "sha256": "f1b4656a1cf03c28eec4f130c288c9aeace0af403b6268297996aaaaac124f8c"
+        },
+        {
+          "path": "THIRD_PARTY_NOTICES.md",
+          "sha256": "59164c6e7cf8ca233d358995d20ade680da3d520d3e79a56014bf6b35b9df2d4"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+        },
+        {
+          "path": "include/mgl/capabilities.hpp",
+          "sha256": "7daa77cf5c2f1334d1843c853be556e79981cfcde164e1cd31b303efc60430cc"
+        },
+        {
+          "path": "include/mgl/sdu.hpp",
+          "sha256": "bf120c3f0f14cf566c1a298bd15002d00656de7828772ee1a141834328668db6"
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+        },
+        {
+          "path": "package.json",
+          "sha256": "1053cfdf62f78e96e8f488835b6abaf6e7accdab3f0d868b68793d6aeb29a1e6"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93"
+        },
+        {
+          "path": "src/protocol/sdu.cpp",
+          "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+        },
+        {
+          "path": "src/windows/capabilities.cpp",
+          "sha256": "e25b5e87758b9d4dab91706663babd60fdc0e1059d36ad1a2ea9d59bdf6d156e"
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "02470464448f4f2c0ed552d47cc10988b895ea37177ea71b26905a5b05b4a20b"
+        },
+        {
+          "path": "tests/runner.Tests.ps1",
+          "sha256": "08675144ad7cddc1213d848507220228d74999dcceeaf9034fac811a3876f5b1"
+        },
+        {
+          "path": "tests/sdu_tests.cpp",
+          "sha256": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd"
+        }
+      ],
+      "scope_sha256": "a7e10dfc390635734e0a1978de9c102afc08ef00acdd09c73a3ef6a10929ddf9",
+      "red": {
+        "mutation": "Append a mutable inline global to an owned header.",
+        "baseline_exit": 0,
+        "mutated_exit": 1,
+        "restored_exit": 0,
+        "expected_diagnostic": "C:\\Users\\Randy\\Coding\\meta_g_link_direct\\include\\mgl/sdu.hpp:23:12: error: variable 'red_drill_global' is non-const and globally accessible, consider making it const [cppcoreguidelines-avoid-non-const-global-variables,-warnings-as-errors]",
+        "observed_diagnostic": "C:\\Users\\Randy\\Coding\\meta_g_link_direct\\include\\mgl/sdu.hpp:23:12: error: variable 'red_drill_global' is non-const and globally accessible, consider making it const [cppcoreguidelines-avoid-non-const-global-variables,-warnings-as-errors]",
+        "before": [
+          {
+            "path": "include/mgl/sdu.hpp",
+            "sha256": "bf120c3f0f14cf566c1a298bd15002d00656de7828772ee1a141834328668db6"
+          }
+        ],
+        "mutated": [
+          {
+            "path": "include/mgl/sdu.hpp",
+            "sha256": "220f387016dea2b2cb31874833a09fd753ad9998873937e5cdfba7cb762fe0ec"
+          }
+        ],
+        "after": [
+          {
+            "path": "include/mgl/sdu.hpp",
+            "sha256": "bf120c3f0f14cf566c1a298bd15002d00656de7828772ee1a141834328668db6"
+          }
+        ]
+      },
+      "reason": null
+    },
+    {
+      "id": "EV-CLASSIC-RED-COMPILER-TYPES",
+      "acceptance": [
+        "AC-GATES"
+      ],
+      "kind": "red",
+      "status": "pass",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/Invoke-Project.ps1",
+        "test:red",
+        "-Drill",
+        "compiler-types"
+      ],
+      "method": "Inspected actual intended diagnostic and failure, then independently verified exact current byte/hash restoration. Initialize an integer constant from a string literal.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/red/compiler-types.txt",
+        "sha256": "a7e224c803008efad05581d907b1cf92d64ed5dc2b18ddc13edc3e61594ce36f"
+      },
+      "inputs": [
+        {
+          "path": ".clang-format",
+          "sha256": "b8b235ad236526882c0fdc52d3a17194410d13a184ab572937de4fa2c231ecdd"
+        },
+        {
+          "path": ".clang-tidy",
+          "sha256": "c2f69f181a8cd59ba8bdc3fc46328b22c7c65705adf3daadd6e6ebba796a7464"
+        },
+        {
+          "path": ".cppcheck-obs.cfg",
+          "sha256": "43af454a083f4d7b44dcd22e48f191f8699f8eff272ded6fea1f9b7eb412364a"
+        },
+        {
+          "path": ".gitattributes",
+          "sha256": "7615f5cb3052a2fddfa34520ad43cd3bc9e3058dd913432bf602201e89a1b4d8"
+        },
+        {
+          "path": ".github/dependabot.yml",
+          "sha256": "52f52486fba5f32ef49c3ef1b216fac04888ad0847c64b57df89b28655fb82a3"
+        },
+        {
+          "path": ".github/workflows/quality.yml",
+          "sha256": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca"
+        },
+        {
+          "path": ".gitignore",
+          "sha256": "51afdd661c7a97f4fb20f0cbd4338ba95adc00b30b0a3d6d95c2190777e7a469"
+        },
+        {
+          "path": ".gitleaks.toml",
+          "sha256": "ce1b21983f8ff159aa5762beb7e973e1b2b2dfe8bd350cf39daa0ec2da2e711e"
+        },
+        {
+          "path": ".jscpd.json",
+          "sha256": "8aba253a1058ebdc4515d74367a37a0e53aac6451af06a760172c74100e1c4b6"
+        },
+        {
+          "path": ".pre-commit-config.yaml",
+          "sha256": "c2df117a2f7ab21bc8210e626bb67710515abe62fa76bc9011408dc15c5c188a"
+        },
+        {
+          "path": ".semgrep.yml",
+          "sha256": "c989195a0157c259c43150cb2edb54842800317827b5504004de5831110d6619"
+        },
+        {
+          "path": "AGENTS.md",
+          "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "sha256": "88bafdc9b7bd3137d745d5b878b0659b4ef0a62b08ed1823e862ae517f530c76"
+        },
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "fbe5a8b24c73db413803cecf3b92e021d31c6f18f257e18973e180a9e6db6816"
+        },
+        {
+          "path": "CMakePresets.json",
+          "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "8d56b405468aad11f87ab5763f901e276e08d9646ff5c8481b1762b6b789e9ed"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "sha256": "6ca6ac0e1a29f6c3603fdcbf5b63ac3b87682eb44c12821d297370923aa59b98"
+        },
+        {
+          "path": "PSScriptAnalyzerSettings.psd1",
+          "sha256": "427f99245961626682b7ed07663c63e67aeb9566d1bffe372aee05b98e32f2e0"
+        },
+        {
+          "path": "README.md",
+          "sha256": "f1b4656a1cf03c28eec4f130c288c9aeace0af403b6268297996aaaaac124f8c"
+        },
+        {
+          "path": "THIRD_PARTY_NOTICES.md",
+          "sha256": "59164c6e7cf8ca233d358995d20ade680da3d520d3e79a56014bf6b35b9df2d4"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+        },
+        {
+          "path": "include/mgl/capabilities.hpp",
+          "sha256": "7daa77cf5c2f1334d1843c853be556e79981cfcde164e1cd31b303efc60430cc"
+        },
+        {
+          "path": "include/mgl/sdu.hpp",
+          "sha256": "bf120c3f0f14cf566c1a298bd15002d00656de7828772ee1a141834328668db6"
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+        },
+        {
+          "path": "package.json",
+          "sha256": "1053cfdf62f78e96e8f488835b6abaf6e7accdab3f0d868b68793d6aeb29a1e6"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93"
+        },
+        {
+          "path": "src/protocol/sdu.cpp",
+          "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+        },
+        {
+          "path": "src/windows/capabilities.cpp",
+          "sha256": "e25b5e87758b9d4dab91706663babd60fdc0e1059d36ad1a2ea9d59bdf6d156e"
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "02470464448f4f2c0ed552d47cc10988b895ea37177ea71b26905a5b05b4a20b"
+        },
+        {
+          "path": "tests/runner.Tests.ps1",
+          "sha256": "08675144ad7cddc1213d848507220228d74999dcceeaf9034fac811a3876f5b1"
+        },
+        {
+          "path": "tests/sdu_tests.cpp",
+          "sha256": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd"
+        }
+      ],
+      "scope_sha256": "a7e10dfc390635734e0a1978de9c102afc08ef00acdd09c73a3ef6a10929ddf9",
+      "red": {
+        "mutation": "Initialize an integer constant from a string literal.",
+        "baseline_exit": 0,
+        "mutated_exit": 1,
+        "restored_exit": 0,
+        "expected_diagnostic": "C:\\Users\\Randy\\Coding\\meta_g_link_direct\\src\\protocol\\sdu.cpp(47): error C2440: 'initializing': cannot convert from 'const char [16]' to 'const int'",
+        "observed_diagnostic": "C:\\Users\\Randy\\Coding\\meta_g_link_direct\\src\\protocol\\sdu.cpp(47): error C2440: 'initializing': cannot convert from 'const char [16]' to 'const int'",
+        "before": [
+          {
+            "path": "src/protocol/sdu.cpp",
+            "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+          }
+        ],
+        "mutated": [
+          {
+            "path": "src/protocol/sdu.cpp",
+            "sha256": "4d3f32e4a31af074ff96c5ef217d361573917be607688d49acd001562970bc96"
+          }
+        ],
+        "after": [
+          {
+            "path": "src/protocol/sdu.cpp",
+            "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+          }
+        ]
+      },
+      "reason": null
+    },
+    {
+      "id": "EV-CLASSIC-RED-UNUSED-CODE",
+      "acceptance": [
+        "AC-GATES"
+      ],
+      "kind": "red",
+      "status": "pass",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/Invoke-Project.ps1",
+        "test:red",
+        "-Drill",
+        "unused-code"
+      ],
+      "method": "Inspected actual intended diagnostic and failure, then independently verified exact current byte/hash restoration. Append an unreferenced function to owned protocol source.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/red/unused-code.txt",
+        "sha256": "cc104eeecdc5dfaaeadc7ee06971302147aa1b0d154c23e59ba5062d39ca5eb1"
+      },
+      "inputs": [
+        {
+          "path": ".clang-format",
+          "sha256": "b8b235ad236526882c0fdc52d3a17194410d13a184ab572937de4fa2c231ecdd"
+        },
+        {
+          "path": ".clang-tidy",
+          "sha256": "c2f69f181a8cd59ba8bdc3fc46328b22c7c65705adf3daadd6e6ebba796a7464"
+        },
+        {
+          "path": ".cppcheck-obs.cfg",
+          "sha256": "43af454a083f4d7b44dcd22e48f191f8699f8eff272ded6fea1f9b7eb412364a"
+        },
+        {
+          "path": ".gitattributes",
+          "sha256": "7615f5cb3052a2fddfa34520ad43cd3bc9e3058dd913432bf602201e89a1b4d8"
+        },
+        {
+          "path": ".github/dependabot.yml",
+          "sha256": "52f52486fba5f32ef49c3ef1b216fac04888ad0847c64b57df89b28655fb82a3"
+        },
+        {
+          "path": ".github/workflows/quality.yml",
+          "sha256": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca"
+        },
+        {
+          "path": ".gitignore",
+          "sha256": "51afdd661c7a97f4fb20f0cbd4338ba95adc00b30b0a3d6d95c2190777e7a469"
+        },
+        {
+          "path": ".gitleaks.toml",
+          "sha256": "ce1b21983f8ff159aa5762beb7e973e1b2b2dfe8bd350cf39daa0ec2da2e711e"
+        },
+        {
+          "path": ".jscpd.json",
+          "sha256": "8aba253a1058ebdc4515d74367a37a0e53aac6451af06a760172c74100e1c4b6"
+        },
+        {
+          "path": ".pre-commit-config.yaml",
+          "sha256": "c2df117a2f7ab21bc8210e626bb67710515abe62fa76bc9011408dc15c5c188a"
+        },
+        {
+          "path": ".semgrep.yml",
+          "sha256": "c989195a0157c259c43150cb2edb54842800317827b5504004de5831110d6619"
+        },
+        {
+          "path": "AGENTS.md",
+          "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "sha256": "88bafdc9b7bd3137d745d5b878b0659b4ef0a62b08ed1823e862ae517f530c76"
+        },
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "fbe5a8b24c73db413803cecf3b92e021d31c6f18f257e18973e180a9e6db6816"
+        },
+        {
+          "path": "CMakePresets.json",
+          "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "8d56b405468aad11f87ab5763f901e276e08d9646ff5c8481b1762b6b789e9ed"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "sha256": "6ca6ac0e1a29f6c3603fdcbf5b63ac3b87682eb44c12821d297370923aa59b98"
+        },
+        {
+          "path": "PSScriptAnalyzerSettings.psd1",
+          "sha256": "427f99245961626682b7ed07663c63e67aeb9566d1bffe372aee05b98e32f2e0"
+        },
+        {
+          "path": "README.md",
+          "sha256": "f1b4656a1cf03c28eec4f130c288c9aeace0af403b6268297996aaaaac124f8c"
+        },
+        {
+          "path": "THIRD_PARTY_NOTICES.md",
+          "sha256": "59164c6e7cf8ca233d358995d20ade680da3d520d3e79a56014bf6b35b9df2d4"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+        },
+        {
+          "path": "include/mgl/capabilities.hpp",
+          "sha256": "7daa77cf5c2f1334d1843c853be556e79981cfcde164e1cd31b303efc60430cc"
+        },
+        {
+          "path": "include/mgl/sdu.hpp",
+          "sha256": "bf120c3f0f14cf566c1a298bd15002d00656de7828772ee1a141834328668db6"
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+        },
+        {
+          "path": "package.json",
+          "sha256": "1053cfdf62f78e96e8f488835b6abaf6e7accdab3f0d868b68793d6aeb29a1e6"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93"
+        },
+        {
+          "path": "src/protocol/sdu.cpp",
+          "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+        },
+        {
+          "path": "src/windows/capabilities.cpp",
+          "sha256": "e25b5e87758b9d4dab91706663babd60fdc0e1059d36ad1a2ea9d59bdf6d156e"
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "02470464448f4f2c0ed552d47cc10988b895ea37177ea71b26905a5b05b4a20b"
+        },
+        {
+          "path": "tests/runner.Tests.ps1",
+          "sha256": "08675144ad7cddc1213d848507220228d74999dcceeaf9034fac811a3876f5b1"
+        },
+        {
+          "path": "tests/sdu_tests.cpp",
+          "sha256": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd"
+        }
+      ],
+      "scope_sha256": "a7e10dfc390635734e0a1978de9c102afc08ef00acdd09c73a3ef6a10929ddf9",
+      "red": {
+        "mutation": "Append an unreferenced function to owned protocol source.",
+        "baseline_exit": 0,
+        "mutated_exit": 1,
+        "restored_exit": 0,
+        "expected_diagnostic": "C:\\Users\\Randy\\Coding\\meta_g_link_direct\\src\\protocol\\sdu.cpp:47:5: style: The function 'red_drill_unused_function' is never used. [unusedFunction]",
+        "observed_diagnostic": "C:\\Users\\Randy\\Coding\\meta_g_link_direct\\src\\protocol\\sdu.cpp:47:5: style: The function 'red_drill_unused_function' is never used. [unusedFunction]",
+        "before": [
+          {
+            "path": "src/protocol/sdu.cpp",
+            "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+          }
+        ],
+        "mutated": [
+          {
+            "path": "src/protocol/sdu.cpp",
+            "sha256": "56c7aca4962c137d9b9bfddaedb756fb220fc33620f0f3888c0b25de525b780a"
+          }
+        ],
+        "after": [
+          {
+            "path": "src/protocol/sdu.cpp",
+            "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+          }
+        ]
+      },
+      "reason": null
+    },
+    {
+      "id": "EV-CLASSIC-RED-SCRIPT-ANALYSIS",
+      "acceptance": [
+        "AC-GATES"
+      ],
+      "kind": "red",
+      "status": "pass",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/Invoke-Project.ps1",
+        "test:red",
+        "-Drill",
+        "script-analysis"
+      ],
+      "method": "Inspected actual intended diagnostic and failure, then independently verified exact current byte/hash restoration. Append a function with an unapproved PowerShell verb.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/red/script-analysis.txt",
+        "sha256": "33fe20ff3bc402ecd9615bf6fc97fe10d4edbef721f4877bb6a881adff8522d2"
+      },
+      "inputs": [
+        {
+          "path": ".clang-format",
+          "sha256": "b8b235ad236526882c0fdc52d3a17194410d13a184ab572937de4fa2c231ecdd"
+        },
+        {
+          "path": ".clang-tidy",
+          "sha256": "c2f69f181a8cd59ba8bdc3fc46328b22c7c65705adf3daadd6e6ebba796a7464"
+        },
+        {
+          "path": ".cppcheck-obs.cfg",
+          "sha256": "43af454a083f4d7b44dcd22e48f191f8699f8eff272ded6fea1f9b7eb412364a"
+        },
+        {
+          "path": ".gitattributes",
+          "sha256": "7615f5cb3052a2fddfa34520ad43cd3bc9e3058dd913432bf602201e89a1b4d8"
+        },
+        {
+          "path": ".github/dependabot.yml",
+          "sha256": "52f52486fba5f32ef49c3ef1b216fac04888ad0847c64b57df89b28655fb82a3"
+        },
+        {
+          "path": ".github/workflows/quality.yml",
+          "sha256": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca"
+        },
+        {
+          "path": ".gitignore",
+          "sha256": "51afdd661c7a97f4fb20f0cbd4338ba95adc00b30b0a3d6d95c2190777e7a469"
+        },
+        {
+          "path": ".gitleaks.toml",
+          "sha256": "ce1b21983f8ff159aa5762beb7e973e1b2b2dfe8bd350cf39daa0ec2da2e711e"
+        },
+        {
+          "path": ".jscpd.json",
+          "sha256": "8aba253a1058ebdc4515d74367a37a0e53aac6451af06a760172c74100e1c4b6"
+        },
+        {
+          "path": ".pre-commit-config.yaml",
+          "sha256": "c2df117a2f7ab21bc8210e626bb67710515abe62fa76bc9011408dc15c5c188a"
+        },
+        {
+          "path": ".semgrep.yml",
+          "sha256": "c989195a0157c259c43150cb2edb54842800317827b5504004de5831110d6619"
+        },
+        {
+          "path": "AGENTS.md",
+          "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "sha256": "88bafdc9b7bd3137d745d5b878b0659b4ef0a62b08ed1823e862ae517f530c76"
+        },
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "fbe5a8b24c73db413803cecf3b92e021d31c6f18f257e18973e180a9e6db6816"
+        },
+        {
+          "path": "CMakePresets.json",
+          "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "8d56b405468aad11f87ab5763f901e276e08d9646ff5c8481b1762b6b789e9ed"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "sha256": "6ca6ac0e1a29f6c3603fdcbf5b63ac3b87682eb44c12821d297370923aa59b98"
+        },
+        {
+          "path": "PSScriptAnalyzerSettings.psd1",
+          "sha256": "427f99245961626682b7ed07663c63e67aeb9566d1bffe372aee05b98e32f2e0"
+        },
+        {
+          "path": "README.md",
+          "sha256": "f1b4656a1cf03c28eec4f130c288c9aeace0af403b6268297996aaaaac124f8c"
+        },
+        {
+          "path": "THIRD_PARTY_NOTICES.md",
+          "sha256": "59164c6e7cf8ca233d358995d20ade680da3d520d3e79a56014bf6b35b9df2d4"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+        },
+        {
+          "path": "include/mgl/capabilities.hpp",
+          "sha256": "7daa77cf5c2f1334d1843c853be556e79981cfcde164e1cd31b303efc60430cc"
+        },
+        {
+          "path": "include/mgl/sdu.hpp",
+          "sha256": "bf120c3f0f14cf566c1a298bd15002d00656de7828772ee1a141834328668db6"
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+        },
+        {
+          "path": "package.json",
+          "sha256": "1053cfdf62f78e96e8f488835b6abaf6e7accdab3f0d868b68793d6aeb29a1e6"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93"
+        },
+        {
+          "path": "src/protocol/sdu.cpp",
+          "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+        },
+        {
+          "path": "src/windows/capabilities.cpp",
+          "sha256": "e25b5e87758b9d4dab91706663babd60fdc0e1059d36ad1a2ea9d59bdf6d156e"
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "02470464448f4f2c0ed552d47cc10988b895ea37177ea71b26905a5b05b4a20b"
+        },
+        {
+          "path": "tests/runner.Tests.ps1",
+          "sha256": "08675144ad7cddc1213d848507220228d74999dcceeaf9034fac811a3876f5b1"
+        },
+        {
+          "path": "tests/sdu_tests.cpp",
+          "sha256": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd"
+        }
+      ],
+      "scope_sha256": "a7e10dfc390635734e0a1978de9c102afc08ef00acdd09c73a3ef6a10929ddf9",
+      "red": {
+        "mutation": "Append a function with an unapproved PowerShell verb.",
+        "baseline_exit": 0,
+        "mutated_exit": 1,
+        "restored_exit": 0,
+        "expected_diagnostic": "PSUseApprovedVerbs Warning  Invoke-Project.ps1 492  The cmdlet 'Badverb-RedDrill' uses an unapproved verb.",
+        "observed_diagnostic": "PSUseApprovedVerbs Warning  Invoke-Project.ps1 492  The cmdlet 'Badverb-RedDrill' uses an unapproved verb.",
+        "before": [
+          {
+            "path": "scripts/Invoke-Project.ps1",
+            "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+          }
+        ],
+        "mutated": [
+          {
+            "path": "scripts/Invoke-Project.ps1",
+            "sha256": "a42e3eab7a57b5c28bf42c62def3bd82b9b995cb3dd3d21a18d3fdec559bfcf0"
+          }
+        ],
+        "after": [
+          {
+            "path": "scripts/Invoke-Project.ps1",
+            "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+          }
+        ]
+      },
+      "reason": null
+    },
+    {
+      "id": "EV-CLASSIC-RED-WORKFLOW-SECURITY",
+      "acceptance": [
+        "AC-GATES"
+      ],
+      "kind": "red",
+      "status": "pass",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/Invoke-Project.ps1",
+        "test:red",
+        "-Drill",
+        "workflow-security"
+      ],
+      "method": "Inspected actual intended diagnostic and failure, then independently verified exact current byte/hash restoration. Replace the pinned checkout commit SHA with a movable version tag.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/red/workflow-security.txt",
+        "sha256": "19e4cb7fa962c8103d15f12ac99efbf79c284e97c1eaf4b251064f3e7892133b"
+      },
+      "inputs": [
+        {
+          "path": ".clang-format",
+          "sha256": "b8b235ad236526882c0fdc52d3a17194410d13a184ab572937de4fa2c231ecdd"
+        },
+        {
+          "path": ".clang-tidy",
+          "sha256": "c2f69f181a8cd59ba8bdc3fc46328b22c7c65705adf3daadd6e6ebba796a7464"
+        },
+        {
+          "path": ".cppcheck-obs.cfg",
+          "sha256": "43af454a083f4d7b44dcd22e48f191f8699f8eff272ded6fea1f9b7eb412364a"
+        },
+        {
+          "path": ".gitattributes",
+          "sha256": "7615f5cb3052a2fddfa34520ad43cd3bc9e3058dd913432bf602201e89a1b4d8"
+        },
+        {
+          "path": ".github/dependabot.yml",
+          "sha256": "52f52486fba5f32ef49c3ef1b216fac04888ad0847c64b57df89b28655fb82a3"
+        },
+        {
+          "path": ".github/workflows/quality.yml",
+          "sha256": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca"
+        },
+        {
+          "path": ".gitignore",
+          "sha256": "51afdd661c7a97f4fb20f0cbd4338ba95adc00b30b0a3d6d95c2190777e7a469"
+        },
+        {
+          "path": ".gitleaks.toml",
+          "sha256": "ce1b21983f8ff159aa5762beb7e973e1b2b2dfe8bd350cf39daa0ec2da2e711e"
+        },
+        {
+          "path": ".jscpd.json",
+          "sha256": "8aba253a1058ebdc4515d74367a37a0e53aac6451af06a760172c74100e1c4b6"
+        },
+        {
+          "path": ".pre-commit-config.yaml",
+          "sha256": "c2df117a2f7ab21bc8210e626bb67710515abe62fa76bc9011408dc15c5c188a"
+        },
+        {
+          "path": ".semgrep.yml",
+          "sha256": "c989195a0157c259c43150cb2edb54842800317827b5504004de5831110d6619"
+        },
+        {
+          "path": "AGENTS.md",
+          "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "sha256": "88bafdc9b7bd3137d745d5b878b0659b4ef0a62b08ed1823e862ae517f530c76"
+        },
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "fbe5a8b24c73db413803cecf3b92e021d31c6f18f257e18973e180a9e6db6816"
+        },
+        {
+          "path": "CMakePresets.json",
+          "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "8d56b405468aad11f87ab5763f901e276e08d9646ff5c8481b1762b6b789e9ed"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "sha256": "6ca6ac0e1a29f6c3603fdcbf5b63ac3b87682eb44c12821d297370923aa59b98"
+        },
+        {
+          "path": "PSScriptAnalyzerSettings.psd1",
+          "sha256": "427f99245961626682b7ed07663c63e67aeb9566d1bffe372aee05b98e32f2e0"
+        },
+        {
+          "path": "README.md",
+          "sha256": "f1b4656a1cf03c28eec4f130c288c9aeace0af403b6268297996aaaaac124f8c"
+        },
+        {
+          "path": "THIRD_PARTY_NOTICES.md",
+          "sha256": "59164c6e7cf8ca233d358995d20ade680da3d520d3e79a56014bf6b35b9df2d4"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+        },
+        {
+          "path": "include/mgl/capabilities.hpp",
+          "sha256": "7daa77cf5c2f1334d1843c853be556e79981cfcde164e1cd31b303efc60430cc"
+        },
+        {
+          "path": "include/mgl/sdu.hpp",
+          "sha256": "bf120c3f0f14cf566c1a298bd15002d00656de7828772ee1a141834328668db6"
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+        },
+        {
+          "path": "package.json",
+          "sha256": "1053cfdf62f78e96e8f488835b6abaf6e7accdab3f0d868b68793d6aeb29a1e6"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93"
+        },
+        {
+          "path": "src/protocol/sdu.cpp",
+          "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+        },
+        {
+          "path": "src/windows/capabilities.cpp",
+          "sha256": "e25b5e87758b9d4dab91706663babd60fdc0e1059d36ad1a2ea9d59bdf6d156e"
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "02470464448f4f2c0ed552d47cc10988b895ea37177ea71b26905a5b05b4a20b"
+        },
+        {
+          "path": "tests/runner.Tests.ps1",
+          "sha256": "08675144ad7cddc1213d848507220228d74999dcceeaf9034fac811a3876f5b1"
+        },
+        {
+          "path": "tests/sdu_tests.cpp",
+          "sha256": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd"
+        }
+      ],
+      "scope_sha256": "a7e10dfc390635734e0a1978de9c102afc08ef00acdd09c73a3ef6a10929ddf9",
+      "red": {
+        "mutation": "Replace the pinned checkout commit SHA with a movable version tag.",
+        "baseline_exit": 0,
+        "mutated_exit": 1,
+        "restored_exit": 0,
+        "expected_diagnostic": "error[unpinned-uses]: unpinned action reference",
+        "observed_diagnostic": "error[unpinned-uses]: unpinned action reference",
+        "before": [
+          {
+            "path": ".github/workflows/quality.yml",
+            "sha256": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca"
+          }
+        ],
+        "mutated": [
+          {
+            "path": ".github/workflows/quality.yml",
+            "sha256": "a151bb006b4d7e858647ffe9c81521c98e2e2d9a3c12cfa60555e229a57afd76"
+          }
+        ],
+        "after": [
+          {
+            "path": ".github/workflows/quality.yml",
+            "sha256": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca"
+          }
+        ]
+      },
+      "reason": null
+    },
+    {
+      "id": "EV-CLASSIC-RED-SECRET-SCANNER",
+      "acceptance": [
+        "AC-GATES"
+      ],
+      "kind": "red",
+      "status": "pass",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/Invoke-Project.ps1",
+        "test:red",
+        "-Drill",
+        "secret-scanner"
+      ],
+      "method": "Inspected actual intended diagnostic and failure, then independently verified exact current byte/hash restoration. Append a randomized base32 AWS-key-shaped synthetic canary; scanner output is redacted.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/red/secret-scanner.txt",
+        "sha256": "5905311978ec592f3778b1949b8e04a13feb723ec252d83bedb41b0759fe43e5"
+      },
+      "inputs": [
+        {
+          "path": ".clang-format",
+          "sha256": "b8b235ad236526882c0fdc52d3a17194410d13a184ab572937de4fa2c231ecdd"
+        },
+        {
+          "path": ".clang-tidy",
+          "sha256": "c2f69f181a8cd59ba8bdc3fc46328b22c7c65705adf3daadd6e6ebba796a7464"
+        },
+        {
+          "path": ".cppcheck-obs.cfg",
+          "sha256": "43af454a083f4d7b44dcd22e48f191f8699f8eff272ded6fea1f9b7eb412364a"
+        },
+        {
+          "path": ".gitattributes",
+          "sha256": "7615f5cb3052a2fddfa34520ad43cd3bc9e3058dd913432bf602201e89a1b4d8"
+        },
+        {
+          "path": ".github/dependabot.yml",
+          "sha256": "52f52486fba5f32ef49c3ef1b216fac04888ad0847c64b57df89b28655fb82a3"
+        },
+        {
+          "path": ".github/workflows/quality.yml",
+          "sha256": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca"
+        },
+        {
+          "path": ".gitignore",
+          "sha256": "51afdd661c7a97f4fb20f0cbd4338ba95adc00b30b0a3d6d95c2190777e7a469"
+        },
+        {
+          "path": ".gitleaks.toml",
+          "sha256": "ce1b21983f8ff159aa5762beb7e973e1b2b2dfe8bd350cf39daa0ec2da2e711e"
+        },
+        {
+          "path": ".jscpd.json",
+          "sha256": "8aba253a1058ebdc4515d74367a37a0e53aac6451af06a760172c74100e1c4b6"
+        },
+        {
+          "path": ".pre-commit-config.yaml",
+          "sha256": "c2df117a2f7ab21bc8210e626bb67710515abe62fa76bc9011408dc15c5c188a"
+        },
+        {
+          "path": ".semgrep.yml",
+          "sha256": "c989195a0157c259c43150cb2edb54842800317827b5504004de5831110d6619"
+        },
+        {
+          "path": "AGENTS.md",
+          "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "sha256": "88bafdc9b7bd3137d745d5b878b0659b4ef0a62b08ed1823e862ae517f530c76"
+        },
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "fbe5a8b24c73db413803cecf3b92e021d31c6f18f257e18973e180a9e6db6816"
+        },
+        {
+          "path": "CMakePresets.json",
+          "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "8d56b405468aad11f87ab5763f901e276e08d9646ff5c8481b1762b6b789e9ed"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "sha256": "6ca6ac0e1a29f6c3603fdcbf5b63ac3b87682eb44c12821d297370923aa59b98"
+        },
+        {
+          "path": "PSScriptAnalyzerSettings.psd1",
+          "sha256": "427f99245961626682b7ed07663c63e67aeb9566d1bffe372aee05b98e32f2e0"
+        },
+        {
+          "path": "README.md",
+          "sha256": "f1b4656a1cf03c28eec4f130c288c9aeace0af403b6268297996aaaaac124f8c"
+        },
+        {
+          "path": "THIRD_PARTY_NOTICES.md",
+          "sha256": "59164c6e7cf8ca233d358995d20ade680da3d520d3e79a56014bf6b35b9df2d4"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+        },
+        {
+          "path": "include/mgl/capabilities.hpp",
+          "sha256": "7daa77cf5c2f1334d1843c853be556e79981cfcde164e1cd31b303efc60430cc"
+        },
+        {
+          "path": "include/mgl/sdu.hpp",
+          "sha256": "bf120c3f0f14cf566c1a298bd15002d00656de7828772ee1a141834328668db6"
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+        },
+        {
+          "path": "package.json",
+          "sha256": "1053cfdf62f78e96e8f488835b6abaf6e7accdab3f0d868b68793d6aeb29a1e6"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93"
+        },
+        {
+          "path": "src/protocol/sdu.cpp",
+          "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+        },
+        {
+          "path": "src/windows/capabilities.cpp",
+          "sha256": "e25b5e87758b9d4dab91706663babd60fdc0e1059d36ad1a2ea9d59bdf6d156e"
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "02470464448f4f2c0ed552d47cc10988b895ea37177ea71b26905a5b05b4a20b"
+        },
+        {
+          "path": "tests/runner.Tests.ps1",
+          "sha256": "08675144ad7cddc1213d848507220228d74999dcceeaf9034fac811a3876f5b1"
+        },
+        {
+          "path": "tests/sdu_tests.cpp",
+          "sha256": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd"
+        }
+      ],
+      "scope_sha256": "a7e10dfc390635734e0a1978de9c102afc08ef00acdd09c73a3ef6a10929ddf9",
+      "red": {
+        "mutation": "Append a randomized base32 AWS-key-shaped synthetic canary; scanner output is redacted.",
+        "baseline_exit": 0,
+        "mutated_exit": 1,
+        "restored_exit": 0,
+        "expected_diagnostic": "5:27PM WRN leaks found: 1",
+        "observed_diagnostic": "5:27PM WRN leaks found: 1",
+        "before": [
+          {
+            "path": "src/protocol/sdu.cpp",
+            "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+          }
+        ],
+        "mutated": [
+          {
+            "path": "src/protocol/sdu.cpp",
+            "sha256": "f0ebd63ca32fd73579696a76480919f96355d11dd02914da5106e08a51828188"
+          }
+        ],
+        "after": [
+          {
+            "path": "src/protocol/sdu.cpp",
+            "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+          }
+        ]
+      },
+      "reason": null
+    },
+    {
+      "id": "EV-CLASSIC-RED-UNSAFE-COPY",
+      "acceptance": [
+        "AC-GATES"
+      ],
+      "kind": "red",
+      "status": "pass",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/Invoke-Project.ps1",
+        "test:red",
+        "-Drill",
+        "unsafe-copy"
+      ],
+      "method": "Inspected actual intended diagnostic and failure, then independently verified exact current byte/hash restoration. Append an unbounded strcpy call.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/red/unsafe-copy.txt",
+        "sha256": "cdff4eaecd0f629359cab9a72b22153d6c3737e24b28ff56fe4508d705d79b7c"
+      },
+      "inputs": [
+        {
+          "path": ".clang-format",
+          "sha256": "b8b235ad236526882c0fdc52d3a17194410d13a184ab572937de4fa2c231ecdd"
+        },
+        {
+          "path": ".clang-tidy",
+          "sha256": "c2f69f181a8cd59ba8bdc3fc46328b22c7c65705adf3daadd6e6ebba796a7464"
+        },
+        {
+          "path": ".cppcheck-obs.cfg",
+          "sha256": "43af454a083f4d7b44dcd22e48f191f8699f8eff272ded6fea1f9b7eb412364a"
+        },
+        {
+          "path": ".gitattributes",
+          "sha256": "7615f5cb3052a2fddfa34520ad43cd3bc9e3058dd913432bf602201e89a1b4d8"
+        },
+        {
+          "path": ".github/dependabot.yml",
+          "sha256": "52f52486fba5f32ef49c3ef1b216fac04888ad0847c64b57df89b28655fb82a3"
+        },
+        {
+          "path": ".github/workflows/quality.yml",
+          "sha256": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca"
+        },
+        {
+          "path": ".gitignore",
+          "sha256": "51afdd661c7a97f4fb20f0cbd4338ba95adc00b30b0a3d6d95c2190777e7a469"
+        },
+        {
+          "path": ".gitleaks.toml",
+          "sha256": "ce1b21983f8ff159aa5762beb7e973e1b2b2dfe8bd350cf39daa0ec2da2e711e"
+        },
+        {
+          "path": ".jscpd.json",
+          "sha256": "8aba253a1058ebdc4515d74367a37a0e53aac6451af06a760172c74100e1c4b6"
+        },
+        {
+          "path": ".pre-commit-config.yaml",
+          "sha256": "c2df117a2f7ab21bc8210e626bb67710515abe62fa76bc9011408dc15c5c188a"
+        },
+        {
+          "path": ".semgrep.yml",
+          "sha256": "c989195a0157c259c43150cb2edb54842800317827b5504004de5831110d6619"
+        },
+        {
+          "path": "AGENTS.md",
+          "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "sha256": "88bafdc9b7bd3137d745d5b878b0659b4ef0a62b08ed1823e862ae517f530c76"
+        },
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "fbe5a8b24c73db413803cecf3b92e021d31c6f18f257e18973e180a9e6db6816"
+        },
+        {
+          "path": "CMakePresets.json",
+          "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "8d56b405468aad11f87ab5763f901e276e08d9646ff5c8481b1762b6b789e9ed"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "sha256": "6ca6ac0e1a29f6c3603fdcbf5b63ac3b87682eb44c12821d297370923aa59b98"
+        },
+        {
+          "path": "PSScriptAnalyzerSettings.psd1",
+          "sha256": "427f99245961626682b7ed07663c63e67aeb9566d1bffe372aee05b98e32f2e0"
+        },
+        {
+          "path": "README.md",
+          "sha256": "f1b4656a1cf03c28eec4f130c288c9aeace0af403b6268297996aaaaac124f8c"
+        },
+        {
+          "path": "THIRD_PARTY_NOTICES.md",
+          "sha256": "59164c6e7cf8ca233d358995d20ade680da3d520d3e79a56014bf6b35b9df2d4"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+        },
+        {
+          "path": "include/mgl/capabilities.hpp",
+          "sha256": "7daa77cf5c2f1334d1843c853be556e79981cfcde164e1cd31b303efc60430cc"
+        },
+        {
+          "path": "include/mgl/sdu.hpp",
+          "sha256": "bf120c3f0f14cf566c1a298bd15002d00656de7828772ee1a141834328668db6"
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+        },
+        {
+          "path": "package.json",
+          "sha256": "1053cfdf62f78e96e8f488835b6abaf6e7accdab3f0d868b68793d6aeb29a1e6"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93"
+        },
+        {
+          "path": "src/protocol/sdu.cpp",
+          "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+        },
+        {
+          "path": "src/windows/capabilities.cpp",
+          "sha256": "e25b5e87758b9d4dab91706663babd60fdc0e1059d36ad1a2ea9d59bdf6d156e"
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "02470464448f4f2c0ed552d47cc10988b895ea37177ea71b26905a5b05b4a20b"
+        },
+        {
+          "path": "tests/runner.Tests.ps1",
+          "sha256": "08675144ad7cddc1213d848507220228d74999dcceeaf9034fac811a3876f5b1"
+        },
+        {
+          "path": "tests/sdu_tests.cpp",
+          "sha256": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd"
+        }
+      ],
+      "scope_sha256": "a7e10dfc390635734e0a1978de9c102afc08ef00acdd09c73a3ef6a10929ddf9",
+      "red": {
+        "mutation": "Append an unbounded strcpy call.",
+        "baseline_exit": 0,
+        "mutated_exit": 1,
+        "restored_exit": 0,
+        "expected_diagnostic": "\u276f\u276f\u2771 mgl-unsafe-string-copy",
+        "observed_diagnostic": "\u276f\u276f\u2771 mgl-unsafe-string-copy",
+        "before": [
+          {
+            "path": "src/protocol/sdu.cpp",
+            "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+          }
+        ],
+        "mutated": [
+          {
+            "path": "src/protocol/sdu.cpp",
+            "sha256": "8c973ff6b7b7e0be339225d7c4a427203011da68c5fda6414bea6ec6c0ea0b03"
+          }
+        ],
+        "after": [
+          {
+            "path": "src/protocol/sdu.cpp",
+            "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+          }
+        ]
+      },
+      "reason": null
+    },
+    {
+      "id": "EV-CLASSIC-RED-DUPLICATED-CODE",
+      "acceptance": [
+        "AC-GATES"
+      ],
+      "kind": "red",
+      "status": "pass",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/Invoke-Project.ps1",
+        "test:red",
+        "-Drill",
+        "duplicated-code"
+      ],
+      "method": "Inspected actual intended diagnostic and failure, then independently verified exact current byte/hash restoration. Insert a duplicate frame-prefix implementation under another function name.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/red/duplicated-code.txt",
+        "sha256": "f1612962fd7241445290f4eb551503161d0cca9b197412e2431541cbc783dc4b"
+      },
+      "inputs": [
+        {
+          "path": ".clang-format",
+          "sha256": "b8b235ad236526882c0fdc52d3a17194410d13a184ab572937de4fa2c231ecdd"
+        },
+        {
+          "path": ".clang-tidy",
+          "sha256": "c2f69f181a8cd59ba8bdc3fc46328b22c7c65705adf3daadd6e6ebba796a7464"
+        },
+        {
+          "path": ".cppcheck-obs.cfg",
+          "sha256": "43af454a083f4d7b44dcd22e48f191f8699f8eff272ded6fea1f9b7eb412364a"
+        },
+        {
+          "path": ".gitattributes",
+          "sha256": "7615f5cb3052a2fddfa34520ad43cd3bc9e3058dd913432bf602201e89a1b4d8"
+        },
+        {
+          "path": ".github/dependabot.yml",
+          "sha256": "52f52486fba5f32ef49c3ef1b216fac04888ad0847c64b57df89b28655fb82a3"
+        },
+        {
+          "path": ".github/workflows/quality.yml",
+          "sha256": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca"
+        },
+        {
+          "path": ".gitignore",
+          "sha256": "51afdd661c7a97f4fb20f0cbd4338ba95adc00b30b0a3d6d95c2190777e7a469"
+        },
+        {
+          "path": ".gitleaks.toml",
+          "sha256": "ce1b21983f8ff159aa5762beb7e973e1b2b2dfe8bd350cf39daa0ec2da2e711e"
+        },
+        {
+          "path": ".jscpd.json",
+          "sha256": "8aba253a1058ebdc4515d74367a37a0e53aac6451af06a760172c74100e1c4b6"
+        },
+        {
+          "path": ".pre-commit-config.yaml",
+          "sha256": "c2df117a2f7ab21bc8210e626bb67710515abe62fa76bc9011408dc15c5c188a"
+        },
+        {
+          "path": ".semgrep.yml",
+          "sha256": "c989195a0157c259c43150cb2edb54842800317827b5504004de5831110d6619"
+        },
+        {
+          "path": "AGENTS.md",
+          "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "sha256": "88bafdc9b7bd3137d745d5b878b0659b4ef0a62b08ed1823e862ae517f530c76"
+        },
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "fbe5a8b24c73db413803cecf3b92e021d31c6f18f257e18973e180a9e6db6816"
+        },
+        {
+          "path": "CMakePresets.json",
+          "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "8d56b405468aad11f87ab5763f901e276e08d9646ff5c8481b1762b6b789e9ed"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "sha256": "6ca6ac0e1a29f6c3603fdcbf5b63ac3b87682eb44c12821d297370923aa59b98"
+        },
+        {
+          "path": "PSScriptAnalyzerSettings.psd1",
+          "sha256": "427f99245961626682b7ed07663c63e67aeb9566d1bffe372aee05b98e32f2e0"
+        },
+        {
+          "path": "README.md",
+          "sha256": "f1b4656a1cf03c28eec4f130c288c9aeace0af403b6268297996aaaaac124f8c"
+        },
+        {
+          "path": "THIRD_PARTY_NOTICES.md",
+          "sha256": "59164c6e7cf8ca233d358995d20ade680da3d520d3e79a56014bf6b35b9df2d4"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+        },
+        {
+          "path": "include/mgl/capabilities.hpp",
+          "sha256": "7daa77cf5c2f1334d1843c853be556e79981cfcde164e1cd31b303efc60430cc"
+        },
+        {
+          "path": "include/mgl/sdu.hpp",
+          "sha256": "bf120c3f0f14cf566c1a298bd15002d00656de7828772ee1a141834328668db6"
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+        },
+        {
+          "path": "package.json",
+          "sha256": "1053cfdf62f78e96e8f488835b6abaf6e7accdab3f0d868b68793d6aeb29a1e6"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93"
+        },
+        {
+          "path": "src/protocol/sdu.cpp",
+          "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+        },
+        {
+          "path": "src/windows/capabilities.cpp",
+          "sha256": "e25b5e87758b9d4dab91706663babd60fdc0e1059d36ad1a2ea9d59bdf6d156e"
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "02470464448f4f2c0ed552d47cc10988b895ea37177ea71b26905a5b05b4a20b"
+        },
+        {
+          "path": "tests/runner.Tests.ps1",
+          "sha256": "08675144ad7cddc1213d848507220228d74999dcceeaf9034fac811a3876f5b1"
+        },
+        {
+          "path": "tests/sdu_tests.cpp",
+          "sha256": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd"
+        }
+      ],
+      "scope_sha256": "a7e10dfc390635734e0a1978de9c102afc08ef00acdd09c73a3ef6a10929ddf9",
+      "red": {
+        "mutation": "Insert a duplicate frame-prefix implementation under another function name.",
+        "baseline_exit": 0,
+        "mutated_exit": 1,
+        "restored_exit": 0,
+        "expected_diagnostic": "ERROR: jscpd found too many duplicates (2.9%) over threshold (0.0%)",
+        "observed_diagnostic": "ERROR: jscpd found too many duplicates (2.9%) over threshold (0.0%)",
+        "before": [
+          {
+            "path": "src/protocol/sdu.cpp",
+            "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+          }
+        ],
+        "mutated": [
+          {
+            "path": "src/protocol/sdu.cpp",
+            "sha256": "21406acfb851f1a583b2a8e742638e4eb5e5f367c7195ef607eb5862fcd8d6df"
+          }
+        ],
+        "after": [
+          {
+            "path": "src/protocol/sdu.cpp",
+            "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+          }
+        ]
+      },
+      "reason": null
+    },
+    {
+      "id": "EV-CLASSIC-RED-ADDRESS-SANITIZER",
+      "acceptance": [
+        "AC-GATES"
+      ],
+      "kind": "red",
+      "status": "pass",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/Invoke-Project.ps1",
+        "test:red",
+        "-Drill",
+        "address-sanitizer"
+      ],
+      "method": "Inspected actual intended diagnostic and failure, then independently verified exact current byte/hash restoration. Inject a runtime heap-buffer read past a one-element allocation in test code.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/red/address-sanitizer.txt",
+        "sha256": "b143217a1dbd668ff88504950d32ef8e66a43e72a8fef6af86793591630f4da9"
+      },
+      "inputs": [
+        {
+          "path": ".clang-format",
+          "sha256": "b8b235ad236526882c0fdc52d3a17194410d13a184ab572937de4fa2c231ecdd"
+        },
+        {
+          "path": ".clang-tidy",
+          "sha256": "c2f69f181a8cd59ba8bdc3fc46328b22c7c65705adf3daadd6e6ebba796a7464"
+        },
+        {
+          "path": ".cppcheck-obs.cfg",
+          "sha256": "43af454a083f4d7b44dcd22e48f191f8699f8eff272ded6fea1f9b7eb412364a"
+        },
+        {
+          "path": ".gitattributes",
+          "sha256": "7615f5cb3052a2fddfa34520ad43cd3bc9e3058dd913432bf602201e89a1b4d8"
+        },
+        {
+          "path": ".github/dependabot.yml",
+          "sha256": "52f52486fba5f32ef49c3ef1b216fac04888ad0847c64b57df89b28655fb82a3"
+        },
+        {
+          "path": ".github/workflows/quality.yml",
+          "sha256": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca"
+        },
+        {
+          "path": ".gitignore",
+          "sha256": "51afdd661c7a97f4fb20f0cbd4338ba95adc00b30b0a3d6d95c2190777e7a469"
+        },
+        {
+          "path": ".gitleaks.toml",
+          "sha256": "ce1b21983f8ff159aa5762beb7e973e1b2b2dfe8bd350cf39daa0ec2da2e711e"
+        },
+        {
+          "path": ".jscpd.json",
+          "sha256": "8aba253a1058ebdc4515d74367a37a0e53aac6451af06a760172c74100e1c4b6"
+        },
+        {
+          "path": ".pre-commit-config.yaml",
+          "sha256": "c2df117a2f7ab21bc8210e626bb67710515abe62fa76bc9011408dc15c5c188a"
+        },
+        {
+          "path": ".semgrep.yml",
+          "sha256": "c989195a0157c259c43150cb2edb54842800317827b5504004de5831110d6619"
+        },
+        {
+          "path": "AGENTS.md",
+          "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "sha256": "88bafdc9b7bd3137d745d5b878b0659b4ef0a62b08ed1823e862ae517f530c76"
+        },
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "fbe5a8b24c73db413803cecf3b92e021d31c6f18f257e18973e180a9e6db6816"
+        },
+        {
+          "path": "CMakePresets.json",
+          "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "8d56b405468aad11f87ab5763f901e276e08d9646ff5c8481b1762b6b789e9ed"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "sha256": "6ca6ac0e1a29f6c3603fdcbf5b63ac3b87682eb44c12821d297370923aa59b98"
+        },
+        {
+          "path": "PSScriptAnalyzerSettings.psd1",
+          "sha256": "427f99245961626682b7ed07663c63e67aeb9566d1bffe372aee05b98e32f2e0"
+        },
+        {
+          "path": "README.md",
+          "sha256": "f1b4656a1cf03c28eec4f130c288c9aeace0af403b6268297996aaaaac124f8c"
+        },
+        {
+          "path": "THIRD_PARTY_NOTICES.md",
+          "sha256": "59164c6e7cf8ca233d358995d20ade680da3d520d3e79a56014bf6b35b9df2d4"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+        },
+        {
+          "path": "include/mgl/capabilities.hpp",
+          "sha256": "7daa77cf5c2f1334d1843c853be556e79981cfcde164e1cd31b303efc60430cc"
+        },
+        {
+          "path": "include/mgl/sdu.hpp",
+          "sha256": "bf120c3f0f14cf566c1a298bd15002d00656de7828772ee1a141834328668db6"
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+        },
+        {
+          "path": "package.json",
+          "sha256": "1053cfdf62f78e96e8f488835b6abaf6e7accdab3f0d868b68793d6aeb29a1e6"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93"
+        },
+        {
+          "path": "src/protocol/sdu.cpp",
+          "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+        },
+        {
+          "path": "src/windows/capabilities.cpp",
+          "sha256": "e25b5e87758b9d4dab91706663babd60fdc0e1059d36ad1a2ea9d59bdf6d156e"
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "02470464448f4f2c0ed552d47cc10988b895ea37177ea71b26905a5b05b4a20b"
+        },
+        {
+          "path": "tests/runner.Tests.ps1",
+          "sha256": "08675144ad7cddc1213d848507220228d74999dcceeaf9034fac811a3876f5b1"
+        },
+        {
+          "path": "tests/sdu_tests.cpp",
+          "sha256": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd"
+        }
+      ],
+      "scope_sha256": "a7e10dfc390635734e0a1978de9c102afc08ef00acdd09c73a3ef6a10929ddf9",
+      "red": {
+        "mutation": "Inject a runtime heap-buffer read past a one-element allocation in test code.",
+        "baseline_exit": 0,
+        "mutated_exit": 1,
+        "restored_exit": 0,
+        "expected_diagnostic": "==17628==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x11a9d56a0034 at pc 0x7ff726e053de bp 0x0073b65dfc70 sp 0x0073b65dfc78",
+        "observed_diagnostic": "==17628==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x11a9d56a0034 at pc 0x7ff726e053de bp 0x0073b65dfc70 sp 0x0073b65dfc78",
+        "before": [
+          {
+            "path": "tests/sdu_tests.cpp",
+            "sha256": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd"
+          }
+        ],
+        "mutated": [
+          {
+            "path": "tests/sdu_tests.cpp",
+            "sha256": "f0b8a6f71a8f96f071d86024029c536756dd654d9beaea73b9a22d9535147d2e"
+          }
+        ],
+        "after": [
+          {
+            "path": "tests/sdu_tests.cpp",
+            "sha256": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd"
+          }
+        ]
+      },
+      "reason": null
+    },
+    {
+      "id": "EV-CLASSIC-RED-DEPENDENCY-NPM",
+      "acceptance": [
+        "AC-GATES"
+      ],
+      "kind": "red",
+      "status": "pass",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/Invoke-Project.ps1",
+        "test:red",
+        "-Drill",
+        "dependency-npm"
+      ],
+      "method": "Inspected actual intended diagnostic and failure, then independently verified exact current byte/hash restoration. Temporarily add vulnerable lodash 4.17.20 metadata to the lockfile without installing it.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/red/dependency-npm.txt",
+        "sha256": "02d6d1b6cfe118449d8746927bd3e88e5cd96acd688c11dee6c8ce730f364c6b"
+      },
+      "inputs": [
+        {
+          "path": ".clang-format",
+          "sha256": "b8b235ad236526882c0fdc52d3a17194410d13a184ab572937de4fa2c231ecdd"
+        },
+        {
+          "path": ".clang-tidy",
+          "sha256": "c2f69f181a8cd59ba8bdc3fc46328b22c7c65705adf3daadd6e6ebba796a7464"
+        },
+        {
+          "path": ".cppcheck-obs.cfg",
+          "sha256": "43af454a083f4d7b44dcd22e48f191f8699f8eff272ded6fea1f9b7eb412364a"
+        },
+        {
+          "path": ".gitattributes",
+          "sha256": "7615f5cb3052a2fddfa34520ad43cd3bc9e3058dd913432bf602201e89a1b4d8"
+        },
+        {
+          "path": ".github/dependabot.yml",
+          "sha256": "52f52486fba5f32ef49c3ef1b216fac04888ad0847c64b57df89b28655fb82a3"
+        },
+        {
+          "path": ".github/workflows/quality.yml",
+          "sha256": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca"
+        },
+        {
+          "path": ".gitignore",
+          "sha256": "51afdd661c7a97f4fb20f0cbd4338ba95adc00b30b0a3d6d95c2190777e7a469"
+        },
+        {
+          "path": ".gitleaks.toml",
+          "sha256": "ce1b21983f8ff159aa5762beb7e973e1b2b2dfe8bd350cf39daa0ec2da2e711e"
+        },
+        {
+          "path": ".jscpd.json",
+          "sha256": "8aba253a1058ebdc4515d74367a37a0e53aac6451af06a760172c74100e1c4b6"
+        },
+        {
+          "path": ".pre-commit-config.yaml",
+          "sha256": "c2df117a2f7ab21bc8210e626bb67710515abe62fa76bc9011408dc15c5c188a"
+        },
+        {
+          "path": ".semgrep.yml",
+          "sha256": "c989195a0157c259c43150cb2edb54842800317827b5504004de5831110d6619"
+        },
+        {
+          "path": "AGENTS.md",
+          "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "sha256": "88bafdc9b7bd3137d745d5b878b0659b4ef0a62b08ed1823e862ae517f530c76"
+        },
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "fbe5a8b24c73db413803cecf3b92e021d31c6f18f257e18973e180a9e6db6816"
+        },
+        {
+          "path": "CMakePresets.json",
+          "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "8d56b405468aad11f87ab5763f901e276e08d9646ff5c8481b1762b6b789e9ed"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "sha256": "6ca6ac0e1a29f6c3603fdcbf5b63ac3b87682eb44c12821d297370923aa59b98"
+        },
+        {
+          "path": "PSScriptAnalyzerSettings.psd1",
+          "sha256": "427f99245961626682b7ed07663c63e67aeb9566d1bffe372aee05b98e32f2e0"
+        },
+        {
+          "path": "README.md",
+          "sha256": "f1b4656a1cf03c28eec4f130c288c9aeace0af403b6268297996aaaaac124f8c"
+        },
+        {
+          "path": "THIRD_PARTY_NOTICES.md",
+          "sha256": "59164c6e7cf8ca233d358995d20ade680da3d520d3e79a56014bf6b35b9df2d4"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+        },
+        {
+          "path": "include/mgl/capabilities.hpp",
+          "sha256": "7daa77cf5c2f1334d1843c853be556e79981cfcde164e1cd31b303efc60430cc"
+        },
+        {
+          "path": "include/mgl/sdu.hpp",
+          "sha256": "bf120c3f0f14cf566c1a298bd15002d00656de7828772ee1a141834328668db6"
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+        },
+        {
+          "path": "package.json",
+          "sha256": "1053cfdf62f78e96e8f488835b6abaf6e7accdab3f0d868b68793d6aeb29a1e6"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93"
+        },
+        {
+          "path": "src/protocol/sdu.cpp",
+          "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+        },
+        {
+          "path": "src/windows/capabilities.cpp",
+          "sha256": "e25b5e87758b9d4dab91706663babd60fdc0e1059d36ad1a2ea9d59bdf6d156e"
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "02470464448f4f2c0ed552d47cc10988b895ea37177ea71b26905a5b05b4a20b"
+        },
+        {
+          "path": "tests/runner.Tests.ps1",
+          "sha256": "08675144ad7cddc1213d848507220228d74999dcceeaf9034fac811a3876f5b1"
+        },
+        {
+          "path": "tests/sdu_tests.cpp",
+          "sha256": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd"
+        }
+      ],
+      "scope_sha256": "a7e10dfc390635734e0a1978de9c102afc08ef00acdd09c73a3ef6a10929ddf9",
+      "red": {
+        "mutation": "Temporarily add vulnerable lodash 4.17.20 metadata to the lockfile without installing it.",
+        "baseline_exit": 0,
+        "mutated_exit": 1,
+        "restored_exit": 0,
+        "expected_diagnostic": "Command Injection in lodash - https://github.com/advisories/GHSA-35jh-r3h4-6jhm",
+        "observed_diagnostic": "Command Injection in lodash - https://github.com/advisories/GHSA-35jh-r3h4-6jhm",
+        "before": [
+          {
+            "path": "package-lock.json",
+            "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+          }
+        ],
+        "mutated": [
+          {
+            "path": "package-lock.json",
+            "sha256": "7b71deea65dd1a92bd9d3da7a5a5073784dfcdc976cc9a7958d545444376b122"
+          }
+        ],
+        "after": [
+          {
+            "path": "package-lock.json",
+            "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+          }
+        ]
+      },
+      "reason": null
+    },
+    {
+      "id": "EV-CLASSIC-RED-DEPENDENCY-OSV",
+      "acceptance": [
+        "AC-GATES"
+      ],
+      "kind": "red",
+      "status": "pass",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/Invoke-Project.ps1",
+        "test:red",
+        "-Drill",
+        "dependency-osv"
+      ],
+      "method": "Inspected actual intended diagnostic and failure, then independently verified exact current byte/hash restoration. Temporarily add vulnerable lodash 4.17.20 metadata to the lockfile without installing it.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/red/dependency-osv.txt",
+        "sha256": "5b4e0cc057aa573956f29b56807754217c671c49218b94519cbe330362d27e67"
+      },
+      "inputs": [
+        {
+          "path": ".clang-format",
+          "sha256": "b8b235ad236526882c0fdc52d3a17194410d13a184ab572937de4fa2c231ecdd"
+        },
+        {
+          "path": ".clang-tidy",
+          "sha256": "c2f69f181a8cd59ba8bdc3fc46328b22c7c65705adf3daadd6e6ebba796a7464"
+        },
+        {
+          "path": ".cppcheck-obs.cfg",
+          "sha256": "43af454a083f4d7b44dcd22e48f191f8699f8eff272ded6fea1f9b7eb412364a"
+        },
+        {
+          "path": ".gitattributes",
+          "sha256": "7615f5cb3052a2fddfa34520ad43cd3bc9e3058dd913432bf602201e89a1b4d8"
+        },
+        {
+          "path": ".github/dependabot.yml",
+          "sha256": "52f52486fba5f32ef49c3ef1b216fac04888ad0847c64b57df89b28655fb82a3"
+        },
+        {
+          "path": ".github/workflows/quality.yml",
+          "sha256": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca"
+        },
+        {
+          "path": ".gitignore",
+          "sha256": "51afdd661c7a97f4fb20f0cbd4338ba95adc00b30b0a3d6d95c2190777e7a469"
+        },
+        {
+          "path": ".gitleaks.toml",
+          "sha256": "ce1b21983f8ff159aa5762beb7e973e1b2b2dfe8bd350cf39daa0ec2da2e711e"
+        },
+        {
+          "path": ".jscpd.json",
+          "sha256": "8aba253a1058ebdc4515d74367a37a0e53aac6451af06a760172c74100e1c4b6"
+        },
+        {
+          "path": ".pre-commit-config.yaml",
+          "sha256": "c2df117a2f7ab21bc8210e626bb67710515abe62fa76bc9011408dc15c5c188a"
+        },
+        {
+          "path": ".semgrep.yml",
+          "sha256": "c989195a0157c259c43150cb2edb54842800317827b5504004de5831110d6619"
+        },
+        {
+          "path": "AGENTS.md",
+          "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "sha256": "88bafdc9b7bd3137d745d5b878b0659b4ef0a62b08ed1823e862ae517f530c76"
+        },
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "fbe5a8b24c73db413803cecf3b92e021d31c6f18f257e18973e180a9e6db6816"
+        },
+        {
+          "path": "CMakePresets.json",
+          "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "8d56b405468aad11f87ab5763f901e276e08d9646ff5c8481b1762b6b789e9ed"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "sha256": "6ca6ac0e1a29f6c3603fdcbf5b63ac3b87682eb44c12821d297370923aa59b98"
+        },
+        {
+          "path": "PSScriptAnalyzerSettings.psd1",
+          "sha256": "427f99245961626682b7ed07663c63e67aeb9566d1bffe372aee05b98e32f2e0"
+        },
+        {
+          "path": "README.md",
+          "sha256": "f1b4656a1cf03c28eec4f130c288c9aeace0af403b6268297996aaaaac124f8c"
+        },
+        {
+          "path": "THIRD_PARTY_NOTICES.md",
+          "sha256": "59164c6e7cf8ca233d358995d20ade680da3d520d3e79a56014bf6b35b9df2d4"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+        },
+        {
+          "path": "include/mgl/capabilities.hpp",
+          "sha256": "7daa77cf5c2f1334d1843c853be556e79981cfcde164e1cd31b303efc60430cc"
+        },
+        {
+          "path": "include/mgl/sdu.hpp",
+          "sha256": "bf120c3f0f14cf566c1a298bd15002d00656de7828772ee1a141834328668db6"
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+        },
+        {
+          "path": "package.json",
+          "sha256": "1053cfdf62f78e96e8f488835b6abaf6e7accdab3f0d868b68793d6aeb29a1e6"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93"
+        },
+        {
+          "path": "src/protocol/sdu.cpp",
+          "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+        },
+        {
+          "path": "src/windows/capabilities.cpp",
+          "sha256": "e25b5e87758b9d4dab91706663babd60fdc0e1059d36ad1a2ea9d59bdf6d156e"
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "02470464448f4f2c0ed552d47cc10988b895ea37177ea71b26905a5b05b4a20b"
+        },
+        {
+          "path": "tests/runner.Tests.ps1",
+          "sha256": "08675144ad7cddc1213d848507220228d74999dcceeaf9034fac811a3876f5b1"
+        },
+        {
+          "path": "tests/sdu_tests.cpp",
+          "sha256": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd"
+        }
+      ],
+      "scope_sha256": "a7e10dfc390635734e0a1978de9c102afc08ef00acdd09c73a3ef6a10929ddf9",
+      "red": {
+        "mutation": "Temporarily add vulnerable lodash 4.17.20 metadata to the lockfile without installing it.",
+        "baseline_exit": 0,
+        "mutated_exit": 1,
+        "restored_exit": 0,
+        "expected_diagnostic": "| https://osv.dev/GHSA-35jh-r3h4-6jhm | 8.1  | npm       | lodash (dev) | 4.17.20 | 4.17.21       | package-lock.json |",
+        "observed_diagnostic": "| https://osv.dev/GHSA-35jh-r3h4-6jhm | 8.1  | npm       | lodash (dev) | 4.17.20 | 4.17.21       | package-lock.json |",
+        "before": [
+          {
+            "path": "package-lock.json",
+            "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+          }
+        ],
+        "mutated": [
+          {
+            "path": "package-lock.json",
+            "sha256": "7b71deea65dd1a92bd9d3da7a5a5073784dfcdc976cc9a7958d545444376b122"
+          }
+        ],
+        "after": [
+          {
+            "path": "package-lock.json",
+            "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+          }
+        ]
+      },
+      "reason": null
+    },
+    {
+      "id": "EV-CLASSIC-RED-WHATIF-GUARD",
+      "acceptance": [
+        "AC-GATES"
+      ],
+      "kind": "red",
+      "status": "pass",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/Invoke-Project.ps1",
+        "test:red",
+        "-Drill",
+        "whatif-guard"
+      ],
+      "method": "Inspected actual intended diagnostic and failure, then independently verified exact current byte/hash restoration. Bypass the common ShouldProcess guard; the disposable WhatIf effect assertion must fail.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/red/whatif-guard.txt",
+        "sha256": "ea7e1b0d01788932fe4415ea6e6c3f1aa7d74179c01ebdc82bdfd5c790e5803a"
+      },
+      "inputs": [
+        {
+          "path": ".clang-format",
+          "sha256": "b8b235ad236526882c0fdc52d3a17194410d13a184ab572937de4fa2c231ecdd"
+        },
+        {
+          "path": ".clang-tidy",
+          "sha256": "c2f69f181a8cd59ba8bdc3fc46328b22c7c65705adf3daadd6e6ebba796a7464"
+        },
+        {
+          "path": ".cppcheck-obs.cfg",
+          "sha256": "43af454a083f4d7b44dcd22e48f191f8699f8eff272ded6fea1f9b7eb412364a"
+        },
+        {
+          "path": ".gitattributes",
+          "sha256": "7615f5cb3052a2fddfa34520ad43cd3bc9e3058dd913432bf602201e89a1b4d8"
+        },
+        {
+          "path": ".github/dependabot.yml",
+          "sha256": "52f52486fba5f32ef49c3ef1b216fac04888ad0847c64b57df89b28655fb82a3"
+        },
+        {
+          "path": ".github/workflows/quality.yml",
+          "sha256": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca"
+        },
+        {
+          "path": ".gitignore",
+          "sha256": "51afdd661c7a97f4fb20f0cbd4338ba95adc00b30b0a3d6d95c2190777e7a469"
+        },
+        {
+          "path": ".gitleaks.toml",
+          "sha256": "ce1b21983f8ff159aa5762beb7e973e1b2b2dfe8bd350cf39daa0ec2da2e711e"
+        },
+        {
+          "path": ".jscpd.json",
+          "sha256": "8aba253a1058ebdc4515d74367a37a0e53aac6451af06a760172c74100e1c4b6"
+        },
+        {
+          "path": ".pre-commit-config.yaml",
+          "sha256": "c2df117a2f7ab21bc8210e626bb67710515abe62fa76bc9011408dc15c5c188a"
+        },
+        {
+          "path": ".semgrep.yml",
+          "sha256": "c989195a0157c259c43150cb2edb54842800317827b5504004de5831110d6619"
+        },
+        {
+          "path": "AGENTS.md",
+          "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "sha256": "88bafdc9b7bd3137d745d5b878b0659b4ef0a62b08ed1823e862ae517f530c76"
+        },
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "fbe5a8b24c73db413803cecf3b92e021d31c6f18f257e18973e180a9e6db6816"
+        },
+        {
+          "path": "CMakePresets.json",
+          "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "8d56b405468aad11f87ab5763f901e276e08d9646ff5c8481b1762b6b789e9ed"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "sha256": "6ca6ac0e1a29f6c3603fdcbf5b63ac3b87682eb44c12821d297370923aa59b98"
+        },
+        {
+          "path": "PSScriptAnalyzerSettings.psd1",
+          "sha256": "427f99245961626682b7ed07663c63e67aeb9566d1bffe372aee05b98e32f2e0"
+        },
+        {
+          "path": "README.md",
+          "sha256": "f1b4656a1cf03c28eec4f130c288c9aeace0af403b6268297996aaaaac124f8c"
+        },
+        {
+          "path": "THIRD_PARTY_NOTICES.md",
+          "sha256": "59164c6e7cf8ca233d358995d20ade680da3d520d3e79a56014bf6b35b9df2d4"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+        },
+        {
+          "path": "include/mgl/capabilities.hpp",
+          "sha256": "7daa77cf5c2f1334d1843c853be556e79981cfcde164e1cd31b303efc60430cc"
+        },
+        {
+          "path": "include/mgl/sdu.hpp",
+          "sha256": "bf120c3f0f14cf566c1a298bd15002d00656de7828772ee1a141834328668db6"
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+        },
+        {
+          "path": "package.json",
+          "sha256": "1053cfdf62f78e96e8f488835b6abaf6e7accdab3f0d868b68793d6aeb29a1e6"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93"
+        },
+        {
+          "path": "src/protocol/sdu.cpp",
+          "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+        },
+        {
+          "path": "src/windows/capabilities.cpp",
+          "sha256": "e25b5e87758b9d4dab91706663babd60fdc0e1059d36ad1a2ea9d59bdf6d156e"
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "02470464448f4f2c0ed552d47cc10988b895ea37177ea71b26905a5b05b4a20b"
+        },
+        {
+          "path": "tests/runner.Tests.ps1",
+          "sha256": "08675144ad7cddc1213d848507220228d74999dcceeaf9034fac811a3876f5b1"
+        },
+        {
+          "path": "tests/sdu_tests.cpp",
+          "sha256": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd"
+        }
+      ],
+      "scope_sha256": "a7e10dfc390635734e0a1978de9c102afc08ef00acdd09c73a3ef6a10929ddf9",
+      "red": {
+        "mutation": "Bypass the common ShouldProcess guard; the disposable WhatIf effect assertion must fail.",
+        "baseline_exit": 0,
+        "mutated_exit": 1,
+        "restored_exit": 0,
+        "expected_diagnostic": "Expected strings to be the same, but they were different.",
+        "observed_diagnostic": "Expected strings to be the same, but they were different.",
+        "before": [
+          {
+            "path": "scripts/Invoke-Project.ps1",
+            "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+          }
+        ],
+        "mutated": [
+          {
+            "path": "scripts/Invoke-Project.ps1",
+            "sha256": "c3e141c6870f1a1e0a59d402bc8d825c4159ce222c359f471e89f4373d6392e8"
+          }
+        ],
+        "after": [
+          {
+            "path": "scripts/Invoke-Project.ps1",
+            "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+          }
+        ]
+      },
+      "reason": null
+    },
+    {
+      "id": "EV-CLASSIC-RED-NATIVE-EXIT-PROPAGATION",
+      "acceptance": [
+        "AC-GATES"
+      ],
+      "kind": "red",
+      "status": "pass",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/Invoke-Project.ps1",
+        "test:red",
+        "-Drill",
+        "native-exit-propagation"
+      ],
+      "method": "Inspected actual intended diagnostic and failure, then independently verified exact current byte/hash restoration. Bypass the native exit-code guard; the real formatter-failure assertion must fail.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/red/native-exit-propagation.txt",
+        "sha256": "3e90a622279e1b762b563c4592660140082d27c96b72ccc79ff5d9d1201a9abd"
+      },
+      "inputs": [
+        {
+          "path": ".clang-format",
+          "sha256": "b8b235ad236526882c0fdc52d3a17194410d13a184ab572937de4fa2c231ecdd"
+        },
+        {
+          "path": ".clang-tidy",
+          "sha256": "c2f69f181a8cd59ba8bdc3fc46328b22c7c65705adf3daadd6e6ebba796a7464"
+        },
+        {
+          "path": ".cppcheck-obs.cfg",
+          "sha256": "43af454a083f4d7b44dcd22e48f191f8699f8eff272ded6fea1f9b7eb412364a"
+        },
+        {
+          "path": ".gitattributes",
+          "sha256": "7615f5cb3052a2fddfa34520ad43cd3bc9e3058dd913432bf602201e89a1b4d8"
+        },
+        {
+          "path": ".github/dependabot.yml",
+          "sha256": "52f52486fba5f32ef49c3ef1b216fac04888ad0847c64b57df89b28655fb82a3"
+        },
+        {
+          "path": ".github/workflows/quality.yml",
+          "sha256": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca"
+        },
+        {
+          "path": ".gitignore",
+          "sha256": "51afdd661c7a97f4fb20f0cbd4338ba95adc00b30b0a3d6d95c2190777e7a469"
+        },
+        {
+          "path": ".gitleaks.toml",
+          "sha256": "ce1b21983f8ff159aa5762beb7e973e1b2b2dfe8bd350cf39daa0ec2da2e711e"
+        },
+        {
+          "path": ".jscpd.json",
+          "sha256": "8aba253a1058ebdc4515d74367a37a0e53aac6451af06a760172c74100e1c4b6"
+        },
+        {
+          "path": ".pre-commit-config.yaml",
+          "sha256": "c2df117a2f7ab21bc8210e626bb67710515abe62fa76bc9011408dc15c5c188a"
+        },
+        {
+          "path": ".semgrep.yml",
+          "sha256": "c989195a0157c259c43150cb2edb54842800317827b5504004de5831110d6619"
+        },
+        {
+          "path": "AGENTS.md",
+          "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "sha256": "88bafdc9b7bd3137d745d5b878b0659b4ef0a62b08ed1823e862ae517f530c76"
+        },
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "fbe5a8b24c73db413803cecf3b92e021d31c6f18f257e18973e180a9e6db6816"
+        },
+        {
+          "path": "CMakePresets.json",
+          "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "8d56b405468aad11f87ab5763f901e276e08d9646ff5c8481b1762b6b789e9ed"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "sha256": "6ca6ac0e1a29f6c3603fdcbf5b63ac3b87682eb44c12821d297370923aa59b98"
+        },
+        {
+          "path": "PSScriptAnalyzerSettings.psd1",
+          "sha256": "427f99245961626682b7ed07663c63e67aeb9566d1bffe372aee05b98e32f2e0"
+        },
+        {
+          "path": "README.md",
+          "sha256": "f1b4656a1cf03c28eec4f130c288c9aeace0af403b6268297996aaaaac124f8c"
+        },
+        {
+          "path": "THIRD_PARTY_NOTICES.md",
+          "sha256": "59164c6e7cf8ca233d358995d20ade680da3d520d3e79a56014bf6b35b9df2d4"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+        },
+        {
+          "path": "include/mgl/capabilities.hpp",
+          "sha256": "7daa77cf5c2f1334d1843c853be556e79981cfcde164e1cd31b303efc60430cc"
+        },
+        {
+          "path": "include/mgl/sdu.hpp",
+          "sha256": "bf120c3f0f14cf566c1a298bd15002d00656de7828772ee1a141834328668db6"
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+        },
+        {
+          "path": "package.json",
+          "sha256": "1053cfdf62f78e96e8f488835b6abaf6e7accdab3f0d868b68793d6aeb29a1e6"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93"
+        },
+        {
+          "path": "src/protocol/sdu.cpp",
+          "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+        },
+        {
+          "path": "src/windows/capabilities.cpp",
+          "sha256": "e25b5e87758b9d4dab91706663babd60fdc0e1059d36ad1a2ea9d59bdf6d156e"
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "02470464448f4f2c0ed552d47cc10988b895ea37177ea71b26905a5b05b4a20b"
+        },
+        {
+          "path": "tests/runner.Tests.ps1",
+          "sha256": "08675144ad7cddc1213d848507220228d74999dcceeaf9034fac811a3876f5b1"
+        },
+        {
+          "path": "tests/sdu_tests.cpp",
+          "sha256": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd"
+        }
+      ],
+      "scope_sha256": "a7e10dfc390635734e0a1978de9c102afc08ef00acdd09c73a3ef6a10929ddf9",
+      "red": {
+        "mutation": "Bypass the native exit-code guard; the real formatter-failure assertion must fail.",
+        "baseline_exit": 0,
+        "mutated_exit": 1,
+        "restored_exit": 0,
+        "expected_diagnostic": "Expected 0 to be different from the actual value, but got the same value.",
+        "observed_diagnostic": "Expected 0 to be different from the actual value, but got the same value.",
+        "before": [
+          {
+            "path": "scripts/Invoke-Project.ps1",
+            "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+          }
+        ],
+        "mutated": [
+          {
+            "path": "scripts/Invoke-Project.ps1",
+            "sha256": "e6695e155c57a62cdbb07987fe01fa0a3b552a4177efb16c5f96a00907164e02"
+          }
+        ],
+        "after": [
+          {
+            "path": "scripts/Invoke-Project.ps1",
+            "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+          }
+        ]
+      },
+      "reason": null
+    },
+    {
+      "id": "EV-CLASSIC-HARDWARE-DEFERRED",
+      "acceptance": [
+        "AC-AUTH"
+      ],
+      "kind": "manual",
+      "status": "deferred",
+      "command": [],
+      "method": "Actual native feature query/inquiry/connection checks and user pairing/controller responses are recorded in the report and classic-observation-final.json. No actual socket, authentication or phone-off session occurred.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": null,
+      "artifact": {
+        "path": "reports/CLASSIC_VERIFICATION.md",
+        "sha256": "71d35e6d3a62023a816db7398d913c8d8858c3ad781d338702d12e7ab5feabec"
+      },
+      "inputs": [
+        {
+          "path": ".clang-format",
+          "sha256": "b8b235ad236526882c0fdc52d3a17194410d13a184ab572937de4fa2c231ecdd"
+        },
+        {
+          "path": ".clang-tidy",
+          "sha256": "c2f69f181a8cd59ba8bdc3fc46328b22c7c65705adf3daadd6e6ebba796a7464"
+        },
+        {
+          "path": ".cppcheck-obs.cfg",
+          "sha256": "43af454a083f4d7b44dcd22e48f191f8699f8eff272ded6fea1f9b7eb412364a"
+        },
+        {
+          "path": ".gitattributes",
+          "sha256": "7615f5cb3052a2fddfa34520ad43cd3bc9e3058dd913432bf602201e89a1b4d8"
+        },
+        {
+          "path": ".github/dependabot.yml",
+          "sha256": "52f52486fba5f32ef49c3ef1b216fac04888ad0847c64b57df89b28655fb82a3"
+        },
+        {
+          "path": ".github/workflows/quality.yml",
+          "sha256": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca"
+        },
+        {
+          "path": ".gitignore",
+          "sha256": "51afdd661c7a97f4fb20f0cbd4338ba95adc00b30b0a3d6d95c2190777e7a469"
+        },
+        {
+          "path": ".gitleaks.toml",
+          "sha256": "ce1b21983f8ff159aa5762beb7e973e1b2b2dfe8bd350cf39daa0ec2da2e711e"
+        },
+        {
+          "path": ".jscpd.json",
+          "sha256": "8aba253a1058ebdc4515d74367a37a0e53aac6451af06a760172c74100e1c4b6"
+        },
+        {
+          "path": ".pre-commit-config.yaml",
+          "sha256": "c2df117a2f7ab21bc8210e626bb67710515abe62fa76bc9011408dc15c5c188a"
+        },
+        {
+          "path": ".semgrep.yml",
+          "sha256": "c989195a0157c259c43150cb2edb54842800317827b5504004de5831110d6619"
+        },
+        {
+          "path": "AGENTS.md",
+          "sha256": "24745ad096dfa94b67d46bfca08acb8b9d3e1ff0e95e725658bc4b49c490a634"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "sha256": "88bafdc9b7bd3137d745d5b878b0659b4ef0a62b08ed1823e862ae517f530c76"
+        },
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "fbe5a8b24c73db413803cecf3b92e021d31c6f18f257e18973e180a9e6db6816"
+        },
+        {
+          "path": "CMakePresets.json",
+          "sha256": "10ddf515194db5a77acbf0a7007c5a29120ea0725c023e1e17e6a47a47a655bb"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "8d56b405468aad11f87ab5763f901e276e08d9646ff5c8481b1762b6b789e9ed"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "sha256": "6ca6ac0e1a29f6c3603fdcbf5b63ac3b87682eb44c12821d297370923aa59b98"
+        },
+        {
+          "path": "PSScriptAnalyzerSettings.psd1",
+          "sha256": "427f99245961626682b7ed07663c63e67aeb9566d1bffe372aee05b98e32f2e0"
+        },
+        {
+          "path": "README.md",
+          "sha256": "f1b4656a1cf03c28eec4f130c288c9aeace0af403b6268297996aaaaac124f8c"
+        },
+        {
+          "path": "THIRD_PARTY_NOTICES.md",
+          "sha256": "59164c6e7cf8ca233d358995d20ade680da3d520d3e79a56014bf6b35b9df2d4"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "d2a77c6df8d744ce9c52e723d127f0812a5c26749b8c251f83a9c0b01deb8b2e"
+        },
+        {
+          "path": "include/mgl/capabilities.hpp",
+          "sha256": "7daa77cf5c2f1334d1843c853be556e79981cfcde164e1cd31b303efc60430cc"
+        },
+        {
+          "path": "include/mgl/discovery.hpp",
+          "sha256": "bb88b637251d5047c072be3313b8e95961ec9125aab550ea7cded2a9cdba3fdf"
+        },
+        {
+          "path": "include/mgl/sdu.hpp",
+          "sha256": "bf120c3f0f14cf566c1a298bd15002d00656de7828772ee1a141834328668db6"
+        },
+        {
+          "path": "include/mgl/session.hpp",
+          "sha256": null
+        },
+        {
+          "path": "package-lock.json",
+          "sha256": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16"
+        },
+        {
+          "path": "package.json",
+          "sha256": "1053cfdf62f78e96e8f488835b6abaf6e7accdab3f0d868b68793d6aeb29a1e6"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93"
+        },
+        {
+          "path": "src/protocol/sdu.cpp",
+          "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
+        },
+        {
+          "path": "src/windows/apartment.hpp",
+          "sha256": "c392d69883555a5da3111f7e5a2f916a0e36b812ad609494f8fac00cf0d3ef29"
+        },
+        {
+          "path": "src/windows/capabilities.cpp",
+          "sha256": "e25b5e87758b9d4dab91706663babd60fdc0e1059d36ad1a2ea9d59bdf6d156e"
+        },
+        {
+          "path": "src/windows/classic.cpp",
+          "sha256": "acc4fc04304855d957d6b7ec2fe98d920c68371bf2e47b7acb6871cfa20cded5"
+        },
+        {
+          "path": "src/windows/discovery.cpp",
+          "sha256": "5066920f2c8bb1fc0dd143857978b72668e3e41c18aedb7af8ba95f4145fcccf"
+        },
+        {
+          "path": "src/windows/identity.cpp",
+          "sha256": null
+        },
+        {
+          "path": "src/windows/session.cpp",
+          "sha256": null
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "02470464448f4f2c0ed552d47cc10988b895ea37177ea71b26905a5b05b4a20b"
+        },
+        {
+          "path": "tests/probe.Tests.ps1",
+          "sha256": "f09f29301bf1b36a7289c3ff6c1798d6c50ef50a1a9f14244447b9cd100791fa"
+        },
+        {
+          "path": "tests/runner.Tests.ps1",
+          "sha256": "08675144ad7cddc1213d848507220228d74999dcceeaf9034fac811a3876f5b1"
+        },
+        {
+          "path": "tests/sdu_tests.cpp",
+          "sha256": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd"
+        },
+        {
+          "path": "tests/session_tests.cpp",
+          "sha256": null
+        }
+      ],
+      "scope_sha256": "ee96b278f196fcb30773677615edb7b4cd5be2f4f987167d0fea867b99e33081",
+      "red": null,
+      "reason": "Current controller validly reports LE unsupported; glasses absent from Windows pairing, zero registered Meta services and no other controller available. Need Windows-compatible LE/Classic controller for documented initial bond route; native session/identity/Meta setup remains incomplete. No purchase or ownership change authorized."
     }
   ],
   "checkpoint": {
-    "scope_sha256": "9370e4308f66344887276f29998e98d3b1a91edc9647b889dd44f8ddc823690c",
+    "scope_sha256": "01cf799d672aba8cf8101db16f84ae9f7bced698e8c85fabd293b4d9afa436fb",
     "inputs": [
       {
         "path": ".clang-format",
@@ -8981,11 +13553,11 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       },
       {
         "path": "CHANGELOG.md",
-        "sha256": "5955536ae2525d156a58713c5553067dc8d884ebdad9548f2add75b354e4dd19"
+        "sha256": "88bafdc9b7bd3137d745d5b878b0659b4ef0a62b08ed1823e862ae517f530c76"
       },
       {
         "path": "CMakeLists.txt",
-        "sha256": "27213f1d7ac878840fd67c71b76f461e94d3ce2e8293a24fa495155260e58329"
+        "sha256": "fbe5a8b24c73db413803cecf3b92e021d31c6f18f257e18973e180a9e6db6816"
       },
       {
         "path": "CMakePresets.json",
@@ -8997,7 +13569,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       },
       {
         "path": "PROJECT_BRIEF.md",
-        "sha256": "9df26e151e5b4903db5f9e1783c29f373701a1eff9556d641660ec29cbfb9fc5"
+        "sha256": "6ca6ac0e1a29f6c3603fdcbf5b63ac3b87682eb44c12821d297370923aa59b98"
       },
       {
         "path": "PSScriptAnalyzerSettings.psd1",
@@ -9005,11 +13577,11 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       },
       {
         "path": "README.md",
-        "sha256": "3374f9bb5b18ae2efae65f26b79e2c79700aaec77598d5f0b075567c95c2d23f"
+        "sha256": "f1b4656a1cf03c28eec4f130c288c9aeace0af403b6268297996aaaaac124f8c"
       },
       {
         "path": "THIRD_PARTY_NOTICES.md",
-        "sha256": "65748fd4ba4368a75c5ebe73197e9b6669ac1b5f0da4530f28a45a1c1b0d8ae0"
+        "sha256": "59164c6e7cf8ca233d358995d20ade680da3d520d3e79a56014bf6b35b9df2d4"
       },
       {
         "path": "data/locale/en-US.ini",
@@ -9021,11 +13593,11 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       },
       {
         "path": "include/mgl/capabilities.hpp",
-        "sha256": "8ef4bd4ff07c056768c65fe23db496cd44c7b317eddb1f35f97c26d28258c0da"
+        "sha256": "7daa77cf5c2f1334d1843c853be556e79981cfcde164e1cd31b303efc60430cc"
       },
       {
         "path": "include/mgl/discovery.hpp",
-        "sha256": "bd5393d7bdd19d2de67308be56c8a7c2f46492607be7b161779176822fc5570f"
+        "sha256": "bb88b637251d5047c072be3313b8e95961ec9125aab550ea7cded2a9cdba3fdf"
       },
       {
         "path": "include/mgl/sdu.hpp",
@@ -9049,7 +13621,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       },
       {
         "path": "scripts/Invoke-Project.ps1",
-        "sha256": "e7d38dd33f0aadf2f7c2b982462f6aea86878bcb0c3455fbee69903d67caa6d2"
+        "sha256": "44131bcfa9133afa43d91eeefba4e79e3b5c875c03c74341f4229357b3230f0c"
       },
       {
         "path": "src/media/decoder.cpp",
@@ -9069,19 +13641,27 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       },
       {
         "path": "src/probe/main.cpp",
-        "sha256": "a057a54f9c429cd802c9c2d8bb2516df1519bff55943e63f5e9751889fce2c11"
+        "sha256": "6f82802c41680e45a76227cbe2144bb0cab4c4ebee17015daf813c958c091f93"
       },
       {
         "path": "src/protocol/sdu.cpp",
         "sha256": "9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084"
       },
       {
+        "path": "src/windows/apartment.hpp",
+        "sha256": "c392d69883555a5da3111f7e5a2f916a0e36b812ad609494f8fac00cf0d3ef29"
+      },
+      {
         "path": "src/windows/capabilities.cpp",
-        "sha256": "c5d20224035f211a156ab4af6cbdc298429cc704918db92e636abf1201afbf9b"
+        "sha256": "e25b5e87758b9d4dab91706663babd60fdc0e1059d36ad1a2ea9d59bdf6d156e"
+      },
+      {
+        "path": "src/windows/classic.cpp",
+        "sha256": "acc4fc04304855d957d6b7ec2fe98d920c68371bf2e47b7acb6871cfa20cded5"
       },
       {
         "path": "src/windows/discovery.cpp",
-        "sha256": "adea862c34b41e7877a75e7d4d8f9b2aa0eecb541fdf4ec11994ccae61f9cabc"
+        "sha256": "5066920f2c8bb1fc0dd143857978b72668e3e41c18aedb7af8ba95f4145fcccf"
       },
       {
         "path": "src/windows/identity.cpp",
@@ -9101,7 +13681,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       },
       {
         "path": "tests/probe.Tests.ps1",
-        "sha256": "f75abfbfd1ab1bc8f263805e87cacb4cf036fec7e69cd7f6f4edde2ccd8c7879"
+        "sha256": "f09f29301bf1b36a7289c3ff6c1798d6c50ef50a1a9f14244447b9cd100791fa"
       },
       {
         "path": "tests/runner.Tests.ps1",
@@ -9125,6 +13705,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       }
     ],
     "environment": {
+      "platform": "windows",
       "tools": {
         "python": "3.14.0",
         "cmake": "3.31.3",
@@ -9143,15 +13724,14 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "precommit": "4.5.1",
         "cppcheck": "2.22.0",
         "msvc": "19.44.35222.0"
-      },
-      "platform": "windows"
+      }
     },
     "verified_tasks": [
       "TASK-SETUP"
     ],
     "pending_operations": [],
-    "next_action": "Continue active TASK-AUTH: connected WLAN adapter is detected, association is currently zero and Ethernet is up. Current Windows passive BLE scan fails with BluetoothError 9 TransportNotSupported; investigate that path and implement/test documented Classic RFCOMM without silent fallback or network/ownership changes. Then protected identity, reproducible authorized Meta setup with phone recovery explained, real device information with phone off and after glasses restart, and first frame. Do not request adapter model or restart product discovery. Keep successful BLE/callback-race, native audit, portable coverage/fuzz/Linux sanitizers, latest-firmware/media/OBS accessibility and >=120-minute gates open. Prior foundation ZIP remains historical.",
-    "source_revision": "19d2eba3f2ab87515a056fb75813774c910d782d"
+    "next_action": "TASK-AUTH hardware acceptance is blocked: valid controller query reports LE unsupported, Classic supported, HCI/LMP fields 4; user reports glasses absent from Windows pairing and no other Bluetooth controller. Need a Windows-compatible LE+Classic controller to test the documented initial bond path. No purchase, reset, ownership/driver/service/network change or firmware downgrade authorized. Then rerun capabilities/discovery and Windows pairing; test explicit Classic socket. Registered-service lookup is not complete uncached SDP: if a real bond exists but lookup is empty, investigate direct uncached RFCOMM service lookup. Implement and prove protected identity, authorized Meta setup/recovery and actual device info with phone off and after glasses restart. Real socket success/cancellation, latest firmware, media, group-owner operation, OBS accessibility, >=120-minute run and existing audit/coverage/fuzz/Linux/race gates remain open. Preserve current source and prior reports; no repeated adapter-model/product interview.",
+    "source_revision": null
   }
 }
 ```

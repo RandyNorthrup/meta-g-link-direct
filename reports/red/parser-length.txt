@@ -12,33 +12,36 @@ Total Test time (real) =   0.02 sec
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 3 tests in 126ms.
+Discovery found 3 tests in 143ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 425ms (401ms|24ms)
-  [+] formats a disposable source when effects are requested 393ms (392ms|2ms)
-  [+] propagates native formatter errors 460ms (460ms|1ms)
-Tests completed in 1.72s
+  [+] does not modify files with WhatIf 465ms (436ms|29ms)
+  [+] formats a disposable source when effects are requested 468ms (466ms|2ms)
+  [+] propagates native formatter errors 458ms (457ms|1ms)
+Tests completed in 1.86s
 Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 7 tests in 22ms.
+Discovery found 10 tests in 22ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1'
 Describing Native read-only probe contract
-  [+] reports association separately and performs no implicit discovery 75ms (74ms|1ms)
-  [+] explains discovery limits without accessing glasses 21ms (20ms|1ms)
-  [+] reports actual scan completion or native failure with a matching exit code 34ms (33ms|1ms)
-  [+] rejects invalid argument sequence --invalid before scanning 26ms (24ms|2ms)
-  [+] rejects invalid argument sequence --discover extra before scanning 31ms (31ms|1ms)
-  [+] rejects invalid argument sequence --help extra before scanning 24ms (23ms|1ms)
-  [+] rejects invalid argument sequence extra --discover before scanning 25ms (25ms|1ms)
-Tests completed in 321ms
-Tests Passed: 7, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+  [+] reports association separately and performs no implicit discovery 108ms (107ms|1ms)
+  [+] explains discovery limits without accessing glasses 27ms (26ms|1ms)
+  [+] reports actual scan completion or native failure with a matching exit code 37ms (36ms|1ms)
+  [+] performs explicit Classic inquiry without claiming an RFCOMM connection 5.22s (5.22s|1ms)
+  [+] rejects invalid argument sequence --invalid before scanning 45ms (43ms|2ms)
+  [+] rejects invalid argument sequence --discover extra before scanning 21ms (20ms|1ms)
+  [+] rejects invalid argument sequence --help extra before scanning 28ms (27ms|1ms)
+  [+] rejects invalid argument sequence extra --discover before scanning 28ms (28ms|1ms)
+  [+] rejects invalid argument sequence --connect-classic extra before scanning 26ms (25ms|1ms)
+  [+] rejects invalid argument sequence --discover-classic --connect-classic before scanning 33ms (32ms|1ms)
+Tests completed in 5.65s
+Tests Passed: 10, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
 MUTATED EXIT 1
 [1/5] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp for CXX dependencies
@@ -73,40 +76,43 @@ Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
     Start 1: protocol-prefix
 1/2 Test #1: protocol-prefix ..................   Passed    0.01 sec
     Start 2: module-abi
-2/2 Test #2: module-abi .......................   Passed    0.01 sec
+2/2 Test #2: module-abi .......................   Passed    0.02 sec
 
 100% tests passed, 0 tests failed out of 2
 
-Total Test time (real) =   0.02 sec
+Total Test time (real) =   0.03 sec
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 3 tests in 128ms.
+Discovery found 3 tests in 156ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 417ms (393ms|24ms)
-  [+] formats a disposable source when effects are requested 398ms (397ms|1ms)
-  [+] propagates native formatter errors 442ms (441ms|1ms)
-Tests completed in 1.69s
+  [+] does not modify files with WhatIf 534ms (479ms|55ms)
+  [+] formats a disposable source when effects are requested 431ms (430ms|2ms)
+  [+] propagates native formatter errors 491ms (490ms|1ms)
+Tests completed in 1.95s
 Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 7 tests in 25ms.
+Discovery found 10 tests in 25ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1'
 Describing Native read-only probe contract
-  [+] reports association separately and performs no implicit discovery 58ms (57ms|1ms)
-  [+] explains discovery limits without accessing glasses 71ms (70ms|1ms)
-  [+] reports actual scan completion or native failure with a matching exit code 43ms (42ms|1ms)
-  [+] rejects invalid argument sequence --invalid before scanning 34ms (31ms|3ms)
+  [+] reports association separately and performs no implicit discovery 95ms (94ms|1ms)
+  [+] explains discovery limits without accessing glasses 27ms (27ms|1ms)
+  [+] reports actual scan completion or native failure with a matching exit code 42ms (41ms|1ms)
+  [+] performs explicit Classic inquiry without claiming an RFCOMM connection 7.14s (7.14s|3ms)
+  [+] rejects invalid argument sequence --invalid before scanning 48ms (43ms|6ms)
   [+] rejects invalid argument sequence --discover extra before scanning 26ms (25ms|1ms)
-  [+] rejects invalid argument sequence --help extra before scanning 23ms (22ms|1ms)
-  [+] rejects invalid argument sequence extra --discover before scanning 23ms (22ms|1ms)
-Tests completed in 367ms
-Tests Passed: 7, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+  [+] rejects invalid argument sequence --help extra before scanning 30ms (29ms|1ms)
+  [+] rejects invalid argument sequence extra --discover before scanning 26ms (26ms|1ms)
+  [+] rejects invalid argument sequence --connect-classic extra before scanning 36ms (36ms|1ms)
+  [+] rejects invalid argument sequence --discover-classic --connect-classic before scanning 31ms (30ms|1ms)
+Tests completed in 7.6s
+Tests Passed: 10, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
 RESTORATION SHA256 9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084

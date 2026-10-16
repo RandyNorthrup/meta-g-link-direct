@@ -11,6 +11,7 @@ All notable changes to this project will be documented here. The project uses se
 - Portable frame-prefix library with incomplete/invalid/ready results and independent boundary examples.
 - Read-only Windows radio diagnostics and an OBS metadata module that explicitly does not implement a camera source.
 - Wi-Fi association counts and an explicit bounded passive BLE discovery command, with redacted report counts, native failure propagation, seven real CLI contract tests and an invalid-argument regression drill. The current Windows BLE scan returns `TransportNotSupported`; authenticated glasses operation remains unproved.
+- Native controller feature inspection, explicit Classic inquiry/registered Meta-service discovery, and a separate bounded RFCOMM socket open/close check restricted to one Windows-paired service. Reuse one private apartment lifetime. Ten CLI tests and a connection-claim drill protect diagnostics. Current controller reports LE unsupported; Classic inquiry works but no registered Meta service is present, so no glasses socket connection was attempted.
 - Isolated native module loading, parser tests, disposable-resource PowerShell runner tests, separate Windows AddressSanitizer build, local quality tasks and defect/restoration drills.
 - Local pre-commit checks and a hardened portable CI workflow definition. Hosted CI has not run.
 

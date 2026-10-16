@@ -11,6 +11,7 @@ The project is licensed under GNU AGPL version 3. See `LICENSE`.
 - Ported implementation: `core/transport/src/main/kotlin/com/macedonga/visor/core/transport/Sdu.kt` to `src/protocol/sdu.cpp` and its declared interface.
 - Changes: C++20 span-based prefix inspection, explicit incomplete/invalid/ready result, no allocation or exception on invalid input, independent C++ test vectors and boundary cases.
 - Discovery reference: `app/src/main/kotlin/com/macedonga/visor/setup/NearbyGlasses.kt` at the same revision supplies the Meta manufacturer/service marker convention used in `src/windows/discovery.cpp`. The Windows implementation uses the installed SDK's public C++/WinRT watcher and reports aggregate packet counts only; product decoding, bonding and ownership code have not been ported.
+- Classic reference: `core/transport/src/main/kotlin/com/macedonga/visor/core/transport/BluetoothRfcommTransport.kt` supplies the Meta service UUID and paired-peer prerequisite used by `src/windows/classic.cpp`. The Windows implementation uses public SDK inquiry, registered service enumeration and explicit socket check; it does not yet port AirShield frame I/O or authenticated session behavior.
 - Other Visor identity, streaming and Wi-Fi sources are currently research references only. No working Windows connection port is claimed.
 
 ## OBS Studio

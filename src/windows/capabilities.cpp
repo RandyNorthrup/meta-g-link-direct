@@ -4,12 +4,17 @@
 #include <windows.h> // IWYU pragma: keep — Windows API headers require the umbrella prerequisites.
 
 #include <bluetoothapis.h>
+#include <bthdef.h>
 #include <errhandlingapi.h>
 #include <handleapi.h>
+#include <ioapiset.h>
 #include <minwindef.h>
 #include <winerror.h>
+#include <winioctl.h>
 #include <winnt.h>
 #include <wlanapi.h>
+
+#include <bthioctl.h> // IWYU pragma: keep — requires CTL_CODE from winioctl.h above.
 
 #include <memory>
 #include <span>
@@ -54,6 +59,22 @@ WirelessCapabilities inspectWirelessCapabilities() noexcept {
             raw_find, &BluetoothFindRadioClose);
         const std::unique_ptr<void, decltype(&CloseHandle)> radio(raw_radio, &CloseHandle);
         result.bluetooth_radio = true;
+        BTH_LOCAL_RADIO_INFO information{};
+        DWORD returned = 0;
+        if (DeviceIoControl(radio.get(), IOCTL_BTH_GET_LOCAL_INFO, nullptr, 0, &information,
+                            sizeof(information), &returned, nullptr) == FALSE) {
+            result.bluetooth_features_error = GetLastError();
+        } else if (returned != sizeof(information)) {
+            result.bluetooth_features_error = ERROR_INVALID_DATA;
+        } else {
+            result.bluetooth_features_valid = true;
+            result.bluetooth_le_supported =
+                LMP_LE_SUPPORTED(information.radioInfo.lmpSupportedFeatures) != 0;
+            result.bluetooth_classic_supported =
+                LMP_BR_EDR_NOT_SUPPORTED(information.radioInfo.lmpSupportedFeatures) == 0;
+            result.bluetooth_hci_version = information.hciVersion;
+            result.bluetooth_lmp_version = information.radioInfo.lmpVersion;
+        }
     } else {
         const auto error = GetLastError();
         result.bluetooth_error = error == ERROR_NO_MORE_ITEMS ? ERROR_SUCCESS : error;

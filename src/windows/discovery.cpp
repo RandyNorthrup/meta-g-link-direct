@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Discovery markers follow Visor NearbyGlasses.kt at the revision in THIRD_PARTY_NOTICES.md.
 #include "mgl/discovery.hpp"
+#include "apartment.hpp"
 
 #include <winrt/Windows.Devices.Bluetooth.Advertisement.h> // IWYU pragma: keep
 #include <winrt/Windows.Devices.Bluetooth.h>               // IWYU pragma: keep
@@ -28,16 +29,6 @@ using winrt::Windows::Devices::Bluetooth::Advertisement::
     BluetoothLEScanningMode; // NOLINT(misc-include-cleaner)
 constexpr winrt::guid MetaService{
     0x0000FD5F, 0x0000, 0x1000, {0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB}};
-
-class Apartment final {
-  public:
-    Apartment() { winrt::init_apartment(winrt::apartment_type::multi_threaded); }
-    ~Apartment() { winrt::uninit_apartment(); }
-    Apartment(const Apartment&) = delete;
-    Apartment& operator=(const Apartment&) = delete;
-    Apartment(Apartment&&) = delete;
-    Apartment& operator=(Apartment&&) = delete;
-};
 
 struct ScanState {
     std::mutex mutex;

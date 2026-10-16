@@ -11,6 +11,12 @@ struct WirelessCapabilities {
     bool bluetooth_radio;
     std::uint32_t wifi_error;
     std::uint32_t bluetooth_error;
+    std::uint32_t bluetooth_features_error;
+    bool bluetooth_features_valid;
+    bool bluetooth_le_supported;
+    bool bluetooth_classic_supported;
+    std::uint8_t bluetooth_hci_version;
+    std::uint8_t bluetooth_lmp_version;
 };
 
 // Enumerates local radios only. Does not scan for, pair, connect to or change a device.

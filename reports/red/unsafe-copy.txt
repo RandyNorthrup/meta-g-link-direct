@@ -4,11 +4,11 @@ BASELINE EXIT 0
 ┌─────────────┐
 │ Scan Status │
 └─────────────┘
-  Scanning 8 files tracked by git with 3 Code rules:
+  Scanning 10 files tracked by git with 3 Code rules:
                                                                                                                         
   Language   Rules   Files          Origin   Rules                                                                      
  ──────────────────────────        ────────────────                                                                     
-  cpp            3       7          Custom       3                                                                      
+  cpp            3       9          Custom       3                                                                      
   c              2       1                                                                                              
                                                                                                                         
                 
@@ -19,11 +19,11 @@ BASELINE EXIT 0
 ✅ Scan completed successfully.
  • Findings: 0 (0 blocking)
  • Rules run: 3
- • Targets scanned: 8
+ • Targets scanned: 10
  • Parsed lines: ~100.0%
  • Scan was limited to files tracked by git
  • For a detailed list of skipped files and lines, run semgrep with the --verbose flag
-Ran 3 rules on 8 files: 0 findings.
+Ran 3 rules on 10 files: 0 findings.
 
 MUTATED EXIT 1
                
@@ -31,11 +31,11 @@ MUTATED EXIT 1
 ┌─────────────┐
 │ Scan Status │
 └─────────────┘
-  Scanning 8 files tracked by git with 3 Code rules:
+  Scanning 10 files tracked by git with 3 Code rules:
                                                                                                                         
   Language   Rules   Files          Origin   Rules                                                                      
  ──────────────────────────        ────────────────                                                                     
-  cpp            3       7          Custom       3                                                                      
+  cpp            3       9          Custom       3                                                                      
   c              2       1                                                                                              
                                                                                                                         
                 
@@ -46,11 +46,11 @@ MUTATED EXIT 1
 ✅ Scan completed successfully.
  • Findings: 1 (1 blocking)
  • Rules run: 3
- • Targets scanned: 8
+ • Targets scanned: 10
  • Parsed lines: ~100.0%
  • Scan was limited to files tracked by git
  • For a detailed list of skipped files and lines, run semgrep with the --verbose flag
-Ran 3 rules on 8 files: 1 finding.
+Ran 3 rules on 10 files: 1 finding.
                   
                   
 ┌────────────────┐
@@ -72,11 +72,11 @@ RESTORED EXIT 0
 ┌─────────────┐
 │ Scan Status │
 └─────────────┘
-  Scanning 8 files tracked by git with 3 Code rules:
+  Scanning 10 files tracked by git with 3 Code rules:
                                                                                                                         
   Language   Rules   Files          Origin   Rules                                                                      
  ──────────────────────────        ────────────────                                                                     
-  cpp            3       7          Custom       3                                                                      
+  cpp            3       9          Custom       3                                                                      
   c              2       1                                                                                              
                                                                                                                         
                 
@@ -87,10 +87,10 @@ RESTORED EXIT 0
 ✅ Scan completed successfully.
  • Findings: 0 (0 blocking)
  • Rules run: 3
- • Targets scanned: 8
+ • Targets scanned: 10
  • Parsed lines: ~100.0%
  • Scan was limited to files tracked by git
  • For a detailed list of skipped files and lines, run semgrep with the --verbose flag
-Ran 3 rules on 8 files: 0 findings.
+Ran 3 rules on 10 files: 0 findings.
 
 RESTORATION SHA256 9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084

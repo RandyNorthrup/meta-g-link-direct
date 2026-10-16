@@ -1,0 +1,50 @@
+BASELINE EXIT 0
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 3 tests in 120ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
+Describing Project task runner
+  [+] does not modify files with WhatIf 402ms (378ms|24ms)
+  [+] formats a disposable source when effects are requested 491ms (489ms|1ms)
+  [+] propagates native formatter errors 445ms (444ms|1ms)
+Tests completed in 1.74s
+Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+
+MUTATED EXIT 1
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 3 tests in 123ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
+Describing Project task runner
+  [+] does not modify files with WhatIf 396ms (374ms|22ms)
+  [+] formats a disposable source when effects are requested 385ms (383ms|2ms)
+  [-] propagates native formatter errors 414ms (413ms|1ms)
+   Expected 0 to be different from the actual value, but got the same value.
+   at $LASTEXITCODE | Should -Not -Be 0, C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1:41
+   at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1:41
+Tests completed in 1.68s
+Tests Passed: 2, Failed: 1, Skipped: 0, Inconclusive: 0, NotRun: 0
+Write-Error: Pester runner tests failed or discovery count changed
+
+RESTORED EXIT 0
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 3 tests in 119ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
+Describing Project task runner
+  [+] does not modify files with WhatIf 410ms (384ms|26ms)
+  [+] formats a disposable source when effects are requested 378ms (377ms|1ms)
+  [+] propagates native formatter errors 452ms (451ms|1ms)
+Tests completed in 1.7s
+Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+
+RESTORATION SHA256 e7d38dd33f0aadf2f7c2b982462f6aea86878bcb0c3455fbee69903d67caa6d2

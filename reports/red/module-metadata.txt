@@ -2,43 +2,46 @@ BASELINE EXIT 0
 ninja: no work to do.
 Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
     Start 1: protocol-prefix
-1/2 Test #1: protocol-prefix ..................   Passed    0.00 sec
+1/2 Test #1: protocol-prefix ..................   Passed    0.01 sec
     Start 2: module-abi
-2/2 Test #2: module-abi .......................   Passed    0.01 sec
+2/2 Test #2: module-abi .......................   Passed    0.02 sec
 
 100% tests passed, 0 tests failed out of 2
 
-Total Test time (real) =   0.02 sec
+Total Test time (real) =   0.03 sec
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 3 tests in 123ms.
+Discovery found 3 tests in 159ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 439ms (416ms|23ms)
-  [+] formats a disposable source when effects are requested 429ms (427ms|1ms)
-  [+] propagates native formatter errors 445ms (444ms|1ms)
-Tests completed in 1.71s
+  [+] does not modify files with WhatIf 445ms (419ms|26ms)
+  [+] formats a disposable source when effects are requested 490ms (488ms|2ms)
+  [+] propagates native formatter errors 504ms (503ms|1ms)
+Tests completed in 1.94s
 Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 7 tests in 20ms.
+Discovery found 10 tests in 32ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1'
 Describing Native read-only probe contract
-  [+] reports association separately and performs no implicit discovery 76ms (75ms|1ms)
-  [+] explains discovery limits without accessing glasses 24ms (23ms|1ms)
-  [+] reports actual scan completion or native failure with a matching exit code 42ms (41ms|1ms)
-  [+] rejects invalid argument sequence --invalid before scanning 29ms (26ms|2ms)
-  [+] rejects invalid argument sequence --discover extra before scanning 26ms (25ms|1ms)
-  [+] rejects invalid argument sequence --help extra before scanning 22ms (21ms|1ms)
-  [+] rejects invalid argument sequence extra --discover before scanning 21ms (21ms|1ms)
-Tests completed in 321ms
-Tests Passed: 7, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+  [+] reports association separately and performs no implicit discovery 98ms (96ms|1ms)
+  [+] explains discovery limits without accessing glasses 24ms (24ms|1ms)
+  [+] reports actual scan completion or native failure with a matching exit code 46ms (45ms|1ms)
+  [+] performs explicit Classic inquiry without claiming an RFCOMM connection 5.22s (5.22s|1ms)
+  [+] rejects invalid argument sequence --invalid before scanning 40ms (38ms|2ms)
+  [+] rejects invalid argument sequence --discover extra before scanning 24ms (23ms|1ms)
+  [+] rejects invalid argument sequence --help extra before scanning 20ms (20ms|1ms)
+  [+] rejects invalid argument sequence extra --discover before scanning 26ms (26ms|1ms)
+  [+] rejects invalid argument sequence --connect-classic extra before scanning 35ms (34ms|1ms)
+  [+] rejects invalid argument sequence --discover-classic --connect-classic before scanning 33ms (32ms|1ms)
+Tests completed in 5.65s
+Tests Passed: 10, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
 MUTATED EXIT 1
 [1/2] Building C object CMakeFiles\meta-g-link-direct.dir\src\plugin\module.c.obj
@@ -75,32 +78,35 @@ Total Test time (real) =   0.02 sec
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 3 tests in 143ms.
+Discovery found 3 tests in 141ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 484ms (460ms|24ms)
-  [+] formats a disposable source when effects are requested 374ms (372ms|1ms)
-  [+] propagates native formatter errors 424ms (423ms|1ms)
-Tests completed in 1.72s
+  [+] does not modify files with WhatIf 450ms (423ms|26ms)
+  [+] formats a disposable source when effects are requested 420ms (418ms|2ms)
+  [+] propagates native formatter errors 492ms (491ms|1ms)
+Tests completed in 1.83s
 Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 7 tests in 23ms.
+Discovery found 10 tests in 22ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1'
 Describing Native read-only probe contract
-  [+] reports association separately and performs no implicit discovery 62ms (61ms|1ms)
-  [+] explains discovery limits without accessing glasses 21ms (21ms|1ms)
-  [+] reports actual scan completion or native failure with a matching exit code 32ms (32ms|1ms)
-  [+] rejects invalid argument sequence --invalid before scanning 27ms (25ms|2ms)
-  [+] rejects invalid argument sequence --discover extra before scanning 33ms (33ms|1ms)
-  [+] rejects invalid argument sequence --help extra before scanning 22ms (21ms|1ms)
-  [+] rejects invalid argument sequence extra --discover before scanning 24ms (24ms|1ms)
-Tests completed in 310ms
-Tests Passed: 7, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+  [+] reports association separately and performs no implicit discovery 101ms (100ms|1ms)
+  [+] explains discovery limits without accessing glasses 23ms (23ms|1ms)
+  [+] reports actual scan completion or native failure with a matching exit code 34ms (34ms|1ms)
+  [+] performs explicit Classic inquiry without claiming an RFCOMM connection 7.36s (7.36s|1ms)
+  [+] rejects invalid argument sequence --invalid before scanning 33ms (31ms|2ms)
+  [+] rejects invalid argument sequence --discover extra before scanning 29ms (28ms|1ms)
+  [+] rejects invalid argument sequence --help extra before scanning 20ms (19ms|1ms)
+  [+] rejects invalid argument sequence extra --discover before scanning 27ms (26ms|1ms)
+  [+] rejects invalid argument sequence --connect-classic extra before scanning 22ms (22ms|1ms)
+  [+] rejects invalid argument sequence --discover-classic --connect-classic before scanning 32ms (32ms|1ms)
+Tests completed in 7.76s
+Tests Passed: 10, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
 RESTORATION SHA256 35f8b9adde13bf628bd2218aa275fb10dd74807f78ccbb164efdca35352cc46c

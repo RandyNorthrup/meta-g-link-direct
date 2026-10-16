@@ -1,0 +1,62 @@
+{
+  "observed_utc": "2026-10-16T00:28:24.0735185Z",
+  "user_reports_glasses_missing_from_windows": true,
+  "user_reports_no_other_bluetooth_controller": true,
+  "quality_exit_code": 0,
+  "inquiry": {
+    "native_exit_code": 6,
+    "elapsed_milliseconds": 5211,
+    "result": {
+      "wifi_interfaces": 1,
+      "wifi_connected_interfaces": 0,
+      "bluetooth_radio": true,
+      "wifi_error": 0,
+      "bluetooth_error": 0,
+      "bluetooth_features_error": 0,
+      "bluetooth_features_valid": true,
+      "bluetooth_le_supported": false,
+      "bluetooth_classic_supported": true,
+      "bluetooth_hci_version": 4,
+      "bluetooth_lmp_version": 4,
+      "classic_devices": 2,
+      "classic_paired_devices": 1,
+      "classic_error": 0,
+      "meta_rfcomm_services": 0,
+      "rfcomm_hresult": 0,
+      "inquiry_completed": true,
+      "rfcomm_timed_out": false,
+      "rfcomm_ambiguous": false,
+      "rfcomm_connection_attempted": false,
+      "rfcomm_connected": false,
+      "glasses_connection_tested": false
+    }
+  },
+  "connection": {
+    "native_exit_code": 6,
+    "elapsed_milliseconds": 37,
+    "result": {
+      "wifi_interfaces": 1,
+      "wifi_connected_interfaces": 0,
+      "bluetooth_radio": true,
+      "wifi_error": 0,
+      "bluetooth_error": 0,
+      "bluetooth_features_error": 0,
+      "bluetooth_features_valid": true,
+      "bluetooth_le_supported": false,
+      "bluetooth_classic_supported": true,
+      "bluetooth_hci_version": 4,
+      "bluetooth_lmp_version": 4,
+      "classic_devices": 0,
+      "classic_paired_devices": 0,
+      "classic_error": 0,
+      "meta_rfcomm_services": 0,
+      "rfcomm_hresult": 0,
+      "inquiry_completed": false,
+      "rfcomm_timed_out": false,
+      "rfcomm_ambiguous": false,
+      "rfcomm_connection_attempted": false,
+      "rfcomm_connected": false,
+      "glasses_connection_tested": false
+    }
+  }
+}

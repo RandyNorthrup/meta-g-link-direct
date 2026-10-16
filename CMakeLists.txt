@@ -35,7 +35,7 @@ endfunction()
 mgl_owned_target(mgl_protocol)
 
 if(WIN32)
-  add_library(mgl_windows STATIC src/windows/capabilities.cpp src/windows/discovery.cpp)
+  add_library(mgl_windows STATIC src/windows/capabilities.cpp src/windows/discovery.cpp src/windows/classic.cpp)
   target_include_directories(mgl_windows PUBLIC include)
   target_compile_definitions(mgl_windows PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
   target_link_libraries(mgl_windows PRIVATE wlanapi bthprops windowsapp)

@@ -6,12 +6,12 @@ param(
         'typecheck', 'deadcode', 'security:audit', 'test:red', 'quality', 'package', 'probe',
         'lint:cpp', 'lint:powershell', 'lint:workflow', 'deadcode:cpp', 'deadcode:copies',
         'security:secrets', 'security:sast', 'security:npm', 'security:osv', 'test:asan', 'test:runner',
-        'test:probe', 'discover')]
+        'test:probe', 'discover', 'discover:classic', 'connect:classic')]
     [string]$Task = 'quality',
     [ValidateSet('all', 'parser-length', 'module-metadata', 'format', 'owned-header',
         'compiler-types', 'unused-code', 'script-analysis', 'workflow-security', 'secret-scanner',
         'unsafe-copy', 'duplicated-code', 'address-sanitizer', 'dependency-npm', 'dependency-osv',
-        'whatif-guard', 'native-exit-propagation', 'probe-arguments')]
+        'whatif-guard', 'native-exit-propagation', 'probe-arguments', 'classic-connection-claim')]
     [string]$Drill = 'all'
 )
 
@@ -260,6 +260,11 @@ function Invoke-RedDrillSet {
         $text.Replace('return InvalidArguments;', 'return InvalidArguments * EXIT_SUCCESS;')
     } -Gate test -ExpectedDiagnostic 'invalid probe arguments must fail'
 
+    Invoke-RestoredDrill -Id classic-connection-claim -Path (Join-Path $projectRoot 'src/windows/classic.cpp') -Mutate {
+        param($text)
+        $text.Replace('ClassicDiscovery result{};', 'ClassicDiscovery result{}; result.rfcomm_connected = true;')
+    } -Gate test -ExpectedDiagnostic 'Classic discovery must not claim an RFCOMM connection'
+
     Invoke-RestoredDrill -Id format -Path (Join-Path $projectRoot 'src/protocol/sdu.cpp') -Mutate {
         param($text)
         $text + "`nint red_drill_format( ){return 1;}`n"
@@ -353,7 +358,7 @@ function Invoke-RedDrillSet {
         param($text)
         $text.Replace('if ($LASTEXITCODE -ne 0) {', 'if ($false) {')
     } -Gate 'test:runner' -ExpectedDiagnostic 'Expected 0 to be different from the actual value'
-    $expectedDrillCount = if ($Drill -eq 'all') { 17 } else { 1 }
+    $expectedDrillCount = if ($Drill -eq 'all') { 18 } else { 1 }
     if ($script:DrillEvidence.Count -ne $expectedDrillCount) {
         throw 'Red-drill discovery did not match the requested scope'
     }
@@ -383,7 +388,7 @@ function Invoke-Task {
         'test:probe' {
             $result = Invoke-Pester -Path (Join-Path $projectRoot 'tests/probe.Tests.ps1') `
                 -PassThru -Output Detailed
-            if ($result.TotalCount -ne 7 -or $result.FailedCount -ne 0 -or $result.PassedCount -ne 7) {
+            if ($result.TotalCount -ne 10 -or $result.FailedCount -ne 0 -or $result.PassedCount -ne 10) {
                 throw 'Pester probe tests failed or discovery count changed'
             }
         }
@@ -453,6 +458,12 @@ function Invoke-Task {
         probe { Invoke-Native -Command (Join-Path $buildRoot 'meta-g-link-probe.exe') }
         discover {
             Invoke-Native -Command (Join-Path $buildRoot 'meta-g-link-probe.exe') -ArgumentList '--discover'
+        }
+        'discover:classic' {
+            Invoke-Native -Command (Join-Path $buildRoot 'meta-g-link-probe.exe') -ArgumentList '--discover-classic'
+        }
+        'connect:classic' {
+            Invoke-Native -Command (Join-Path $buildRoot 'meta-g-link-probe.exe') -ArgumentList '--connect-classic'
         }
         default { throw "Unknown project task: $Name" }
     }

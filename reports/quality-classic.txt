@@ -1,0 +1,222 @@
+Gate: configure
+Preset CMake variables:
+
+  CMAKE_BUILD_TYPE="RelWithDebInfo"
+  CMAKE_CXX_COMPILER="cl"
+  CMAKE_C_COMPILER="cl"
+  CMAKE_PREFIX_PATH="C:/Users/Randy/Coding/meta_g_link_direct/.deps/obs-sdk"
+  CMAKE_SYSTEM_VERSION="10.0.26100.0"
+
+-- The C compiler identification is MSVC 19.44.35222.0
+-- The CXX compiler identification is MSVC 19.44.35222.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found SIMDe: C:/Users/Randy/Coding/meta_g_link_direct/.deps/obs-studio-32.2.2-sources/.deps/obs-deps-2026-07-15-x64/include (found version "0.8.2")
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - not found
+-- Found Threads: TRUE
+-- Configuring done (1.6s)
+-- Generating done (0.0s)
+-- Build files have been written to: C:/Users/Randy/Coding/meta_g_link_direct/out/windows
+Gate: build
+[1/26] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp for CXX dependencies
+[2/26] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\windows\capabilities.cpp for CXX dependencies
+[3/26] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp for CXX dependencies
+[4/26] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
+[5/26] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp for CXX dependencies
+[6/26] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp for CXX dependencies
+[7/26] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp for CXX dependencies
+[8/26] Generating CXX dyndep file CMakeFiles\mgl_windows.dir\CXX.dd
+[9/26] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp for CXX dependencies
+[10/26] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\sdu.cpp.obj
+[11/26] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\capabilities.cpp.obj
+[12/26] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\discovery.cpp.obj
+[13/26] Generating CXX dyndep file CMakeFiles\meta-g-link-probe.dir\CXX.dd
+[14/26] Generating CXX dyndep file CMakeFiles\mgl-sdu-tests.dir\CXX.dd
+[15/26] Generating CXX dyndep file CMakeFiles\mgl-module-tests.dir\CXX.dd
+[16/26] Linking CXX static library mgl_protocol.lib
+[17/26] Building CXX object CMakeFiles\meta-g-link-probe.dir\src\probe\main.cpp.obj
+[18/26] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\classic.cpp.obj
+[19/26] Linking CXX static library mgl_windows.lib
+[20/26] Building C object CMakeFiles\meta-g-link-direct.dir\src\plugin\module.c.obj
+[21/26] Building CXX object CMakeFiles\mgl-sdu-tests.dir\tests\sdu_tests.cpp.obj
+[22/26] Linking CXX executable meta-g-link-probe.exe
+[23/26] Linking C shared module meta-g-link-direct.dll
+[24/26] Linking CXX executable mgl-sdu-tests.exe
+[25/26] Building CXX object CMakeFiles\mgl-module-tests.dir\tests\module_tests.cpp.obj
+[26/26] Linking CXX executable mgl-module-tests.exe
+Gate: format:check
+Gate: lint
+5169 warnings generated.
+Suppressed 5169 warnings (5169 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+4741 warnings generated.
+Suppressed 4741 warnings (4741 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+40445 warnings generated.
+Suppressed 40445 warnings (40445 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+38989 warnings generated.
+Suppressed 38998 warnings (38989 in non-user code, 9 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+6305 warnings generated.
+Suppressed 6308 warnings (6305 in non-user code, 3 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+37736 warnings generated.
+Suppressed 37738 warnings (37736 in non-user code, 2 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+5169 warnings generated.
+Suppressed 5169 warnings (5169 in non-user code).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+No findings to report. Good job!
+Gate: deadcode
+Checking C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp ...
+Checking C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp: WIN32=1;_WINDOWS=1;NDEBUG=1;_WIN32=1;_WIN64=1;_MSC_VER=1944;_M_X64=100...
+1/8 files checked 12% done
+Checking C:\Users\Randy\Coding\meta_g_link_direct\src\windows\capabilities.cpp ...
+Checking C:\Users\Randy\Coding\meta_g_link_direct\src\windows\capabilities.cpp: NOMINMAX=1;WIN32_LEAN_AND_MEAN=1;WIN32=1;_WINDOWS=1;NDEBUG=1;_WIN32=1;_WIN64=1;_MSC_VER=1944;_M_X64=100...
+2/8 files checked 25% done
+Checking C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp ...
+Checking C:\Users\Randy\Coding\meta_g_link_direct\src\windows\discovery.cpp: NOMINMAX=1;WIN32_LEAN_AND_MEAN=1;WIN32=1;_WINDOWS=1;NDEBUG=1;_WIN32=1;_WIN64=1;_MSC_VER=1944;_M_X64=100...
+3/8 files checked 37% done
+Checking C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp ...
+Checking C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp: NOMINMAX=1;WIN32_LEAN_AND_MEAN=1;WIN32=1;_WINDOWS=1;NDEBUG=1;_WIN32=1;_WIN64=1;_MSC_VER=1944;_M_X64=100...
+4/8 files checked 50% done
+Checking C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp ...
+Checking C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp: WIN32=1;_WINDOWS=1;NDEBUG=1;_WIN32=1;_WIN64=1;_MSC_VER=1944;_M_X64=100...
+5/8 files checked 62% done
+Checking C:\Users\Randy\Coding\meta_g_link_direct\src\plugin\module.c ...
+Checking C:\Users\Randy\Coding\meta_g_link_direct\src\plugin\module.c: HAVE_OBSCONFIG_H=1;MGL_VERSION="0.1.0";meta_g_link_direct_EXPORTS=1;WIN32=1;_WINDOWS=1;NDEBUG=1;_WIN32=1;_WIN64=1;_MSC_VER=1944;_M_X64=100...
+6/8 files checked 75% done
+Checking C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp ...
+Checking C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp: WIN32=1;_WINDOWS=1;NDEBUG=1;_WIN32=1;_WIN64=1;_MSC_VER=1944;_M_X64=100...
+7/8 files checked 87% done
+Checking C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp ...
+Checking C:\Users\Randy\Coding\meta_g_link_direct\tests\module_tests.cpp: NOMINMAX=1;WIN32_LEAN_AND_MEAN=1;WIN32=1;_WINDOWS=1;NDEBUG=1;_WIN32=1;_WIN64=1;_MSC_VER=1944;_M_X64=100...
+8/8 files checked 100% done
+nofile:0:0: information: Active checkers: 177/189 (use --checkers-report=<filename> to see details) [checkersReport]
+
+Using config from .jscpd.json
+[90mNo duplicates found.[39m
+[90m┌────────┬────────────────┬─────────────┬──────────────┬──────────────┬──────────────────┬───────────────────┐[39m
+[90m│[39m[31m Format [39m[90m│[39m[31m Files analyzed [39m[90m│[39m[31m Total lines [39m[90m│[39m[31m Total tokens [39m[90m│[39m[31m Clones found [39m[90m│[39m[31m Duplicated lines [39m[90m│[39m[31m Duplicated tokens [39m[90m│[39m
+[90m├────────┼────────────────┼─────────────┼──────────────┼──────────────┼──────────────────┼───────────────────┤[39m
+[90m│[39m cpp    [90m│[39m 7              [90m│[39m 738         [90m│[39m 5461         [90m│[39m 0            [90m│[39m 0 (0.00%)        [90m│[39m 0 (0.00%)         [90m│[39m
+[90m├────────┼────────────────┼─────────────┼──────────────┼──────────────┼──────────────────┼───────────────────┤[39m
+[90m│[39m [1mTotal:[22m [90m│[39m 7              [90m│[39m 738         [90m│[39m 5461         [90m│[39m 0            [90m│[39m 0 (0.00%)        [90m│[39m 0 (0.00%)         [90m│[39m
+[90m└────────┴────────────────┴─────────────┴──────────────┴──────────────┴──────────────────┴───────────────────┘[39m
+[90mFound 0 clones.[39m
+[90mtime: 14.507ms[39m
+Gate: security:audit
+5:22PM INF scanned ~1031245 bytes (1.03 MB) in 92.7ms
+5:22PM INF no leaks found
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 10 files tracked by git with 3 Code rules:
+                                                                                                                        
+  Language   Rules   Files          Origin   Rules                                                                      
+ ──────────────────────────        ────────────────                                                                     
+  cpp            3       9          Custom       3                                                                      
+  c              2       1                                                                                              
+                                                                                                                        
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+✅ Scan completed successfully.
+ • Findings: 0 (0 blocking)
+ • Rules run: 3
+ • Targets scanned: 10
+ • Parsed lines: ~100.0%
+ • Scan was limited to files tracked by git
+ • For a detailed list of skipped files and lines, run semgrep with the --verbose flag
+Ran 3 rules on 10 files: 0 findings.
+found 0 vulnerabilities
+Scanning dir .
+Starting filesystem walk for root: C:\
+Scanned C:\Users\Randy\Coding\meta_g_link_direct\package-lock.json file and found 9 packages
+End status: 207 dirs visited, 641 inodes visited, 1 Extract calls, 17.5878ms elapsed, 17.5878ms wall time
+
+No issues found
+5:22PM INF 4 commits scanned.
+5:22PM INF scanned ~1128356 bytes (1.13 MB) in 262ms
+5:22PM INF no leaks found
+Gate: test
+ninja: no work to do.
+Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
+    Start 1: protocol-prefix
+1/2 Test #1: protocol-prefix ..................   Passed    0.01 sec
+    Start 2: module-abi
+2/2 Test #2: module-abi .......................   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.03 sec
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 3 tests in 129ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
+Describing Project task runner
+  [+] does not modify files with WhatIf 407ms (385ms|22ms)
+  [+] formats a disposable source when effects are requested 425ms (424ms|1ms)
+  [+] propagates native formatter errors 476ms (475ms|1ms)
+Tests completed in 1.75s
+Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 10 tests in 44ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1'
+Describing Native read-only probe contract
+  [+] reports association separately and performs no implicit discovery 78ms (78ms|1ms)
+  [+] explains discovery limits without accessing glasses 22ms (21ms|0ms)
+  [+] reports actual scan completion or native failure with a matching exit code 45ms (45ms|0ms)
+  [+] performs explicit Classic inquiry without claiming an RFCOMM connection 8.74s (8.74s|0ms)
+  [+] rejects invalid argument sequence --invalid before scanning 96ms (95ms|2ms)
+  [+] rejects invalid argument sequence --discover extra before scanning 19ms (19ms|0ms)
+  [+] rejects invalid argument sequence --help extra before scanning 28ms (27ms|0ms)
+  [+] rejects invalid argument sequence extra --discover before scanning 23ms (23ms|0ms)
+  [+] rejects invalid argument sequence --connect-classic extra before scanning 32ms (31ms|0ms)
+  [+] rejects invalid argument sequence --discover-classic --connect-classic before scanning 31ms (31ms|0ms)
+Tests completed in 9.19s
+Tests Passed: 10, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+Gate: test:red
+PASS drill parser-length (green 0, intended red 1, restored 0)
+PASS drill module-metadata (green 0, intended red 1, restored 0)
+PASS drill probe-arguments (green 0, intended red 1, restored 0)
+PASS drill classic-connection-claim (green 0, intended red 1, restored 0)
+PASS drill format (green 0, intended red 1, restored 0)
+PASS drill owned-header (green 0, intended red 1, restored 0)
+PASS drill compiler-types (green 0, intended red 1, restored 0)
+PASS drill unused-code (green 0, intended red 1, restored 0)
+PASS drill script-analysis (green 0, intended red 1, restored 0)
+PASS drill workflow-security (green 0, intended red 1, restored 0)
+PASS drill secret-scanner (green 0, intended red 1, restored 0)
+PASS drill unsafe-copy (green 0, intended red 1, restored 0)
+PASS drill duplicated-code (green 0, intended red 1, restored 0)
+PASS drill address-sanitizer (green 0, intended red 1, restored 0)
+PASS drill dependency-npm (green 0, intended red 1, restored 0)
+PASS drill dependency-osv (green 0, intended red 1, restored 0)
+PASS drill whatif-guard (green 0, intended red 1, restored 0)
+PASS drill native-exit-propagation (green 0, intended red 1, restored 0)
