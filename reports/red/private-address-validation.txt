@@ -6,16 +6,18 @@ Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
 
 100% tests passed, 0 tests failed out of 1
 
-Total Test time (real) =   0.02 sec
+Total Test time (real) =   0.01 sec
 
 MUTATED EXIT 1
-[1/8] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\address.cpp for CXX dependencies
-[2/8] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
-[3/7] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\address.cpp.obj
-[4/7] Linking CXX static library mgl_protocol.lib
-[5/7] Linking CXX executable mgl-sdu-tests.exe
-[6/7] Linking CXX executable meta-g-link-probe.exe
-[7/7] Linking CXX executable mgl-address-tests.exe
+[1/16] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\address.cpp for CXX dependencies
+[2/16] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
+[3/9] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\address.cpp.obj
+[4/9] Linking CXX static library mgl_protocol.lib
+[5/9] Linking CXX shared module meta-g-link-direct.dll
+[6/9] Linking CXX executable meta-g-link-probe.exe
+[7/9] Linking CXX executable mgl-sdu-tests.exe
+[8/9] Linking CXX executable mgl-address-tests.exe
+[9/9] Linking CXX executable mgl-protocol-tests.exe
 Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
     Start 2: private-address
 1/1 Test #2: private-address ..................***Failed    0.01 sec
@@ -32,13 +34,15 @@ Errors while running CTest
 Write-Error: Native command failed (8): ctest
 
 RESTORED EXIT 0
-[1/8] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\address.cpp for CXX dependencies
-[2/8] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
-[3/7] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\address.cpp.obj
-[4/7] Linking CXX static library mgl_protocol.lib
-[5/7] Linking CXX executable mgl-sdu-tests.exe
-[6/7] Linking CXX executable meta-g-link-probe.exe
-[7/7] Linking CXX executable mgl-address-tests.exe
+[1/16] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\address.cpp for CXX dependencies
+[2/16] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
+[3/9] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\address.cpp.obj
+[4/9] Linking CXX static library mgl_protocol.lib
+[5/9] Linking CXX shared module meta-g-link-direct.dll
+[6/9] Linking CXX executable meta-g-link-probe.exe
+[7/9] Linking CXX executable mgl-sdu-tests.exe
+[8/9] Linking CXX executable mgl-address-tests.exe
+[9/9] Linking CXX executable mgl-protocol-tests.exe
 Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
     Start 2: private-address
 1/1 Test #2: private-address ..................   Passed    0.01 sec

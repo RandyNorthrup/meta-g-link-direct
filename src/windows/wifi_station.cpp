@@ -8,6 +8,7 @@
 #include <winsock2.h> // IWYU pragma: keep
 #include <ws2ipdef.h> // IWYU pragma: keep
 
+#include <combaseapi.h>
 #include <guiddef.h>
 #include <ifdef.h>
 #include <iphlpapi.h> // IWYU pragma: keep — the documented entry header for netioapi.h.
@@ -23,14 +24,17 @@
 #include <ws2def.h>
 
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <cstddef>
 #include <iterator>
 #include <memory>
 #include <span>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <utility>
+#include <vector>
 
 namespace mgl {
 namespace {
@@ -52,6 +56,28 @@ std::wstring widen(const std::string& text) {
     MultiByteToWideChar(CP_UTF8, 0, text.c_str(), static_cast<int>(text.size()), wide.data(),
                         needed);
     return wide;
+}
+
+std::string narrow(std::wstring_view text) {
+    if (text.empty()) {
+        return {};
+    }
+    const int needed = WideCharToMultiByte(CP_UTF8, 0, text.data(), static_cast<int>(text.size()),
+                                           nullptr, 0, nullptr, nullptr);
+    std::string utf8(static_cast<std::size_t>(needed), '\0');
+    WideCharToMultiByte(CP_UTF8, 0, text.data(), static_cast<int>(text.size()), utf8.data(), needed,
+                        nullptr, nullptr);
+    return utf8;
+}
+
+// The interface GUID as "{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}", the form WifiAdapter::id uses.
+std::string guidText(const GUID& guid) {
+    constexpr int GuidTextLength = 39; // braces, 32 digits, 4 dashes and the terminator
+    std::array<wchar_t, GuidTextLength> text{};
+    const int written = StringFromGUID2(guid, text.data(), GuidTextLength);
+    return written > 0
+               ? narrow(std::wstring_view(text.data(), static_cast<std::size_t>(written - 1)))
+               : std::string{};
 }
 
 // A manual-connect WPA2-PSK profile for one network. The SSID and passphrase are our own random
@@ -111,6 +137,21 @@ struct MibFree {
     void operator()(void* table) const noexcept { FreeMibTable(table); }
 };
 
+using InterfaceList = std::unique_ptr<WLAN_INTERFACE_INFO_LIST, WlanFree>;
+
+// The WLAN interfaces Windows lists; null when the WLAN service cannot enumerate them.
+InterfaceList enumerateInterfaces(HANDLE client) {
+    WLAN_INTERFACE_INFO_LIST* raw = nullptr;
+    if (WlanEnumInterfaces(client, nullptr, &raw) != ERROR_SUCCESS || raw == nullptr) {
+        return nullptr;
+    }
+    return InterfaceList(raw);
+}
+
+std::span<const WLAN_INTERFACE_INFO> interfacesOf(const WLAN_INTERFACE_INFO_LIST& list) {
+    return {&list.InterfaceInfo[0], list.dwNumberOfItems};
+}
+
 bool interfaceConnected(HANDLE client, const GUID& guid) {
     DWORD size = 0;
     void* data = nullptr;
@@ -166,8 +207,32 @@ class StationImpl final : public WifiStationConnection {
 };
 } // namespace
 
-std::unique_ptr<WifiStationConnection>
-connectWifiStation(const std::string& ssid, const std::string& passphrase, WifiStation& out) {
+std::vector<WifiAdapter> listWifiAdapters() {
+    HANDLE handle = nullptr;
+    DWORD negotiated = 0;
+    if (WlanOpenHandle(WlanClientVersion, nullptr, &negotiated, &handle) != ERROR_SUCCESS) {
+        return {};
+    }
+    const WlanClient client(handle);
+    const auto list = enumerateInterfaces(client.get());
+    if (!list) {
+        return {};
+    }
+    std::vector<WifiAdapter> adapters;
+    for (const auto& info : interfacesOf(*list)) {
+        // The description is a fixed-size, NUL-terminated array.
+        const auto& raw = info.strInterfaceDescription;
+        const auto* const end = std::ranges::find(raw, L'\0');
+        adapters.push_back({.id = guidText(info.InterfaceGuid),
+                            .description = narrow(std::wstring_view(std::begin(raw), end))});
+    }
+    return adapters;
+}
+
+std::unique_ptr<WifiStationConnection> connectWifiStation(const std::string& ssid,
+                                                          const std::string& passphrase,
+                                                          const std::string& adapter_id,
+                                                          WifiStation& out) {
     if (ssid.empty() || ssid.size() > DOT11_SSID_MAX_LENGTH) {
         out.status = WifiStationStatus::ProfileFailed;
         return nullptr;
@@ -182,18 +247,22 @@ connectWifiStation(const std::string& ssid, const std::string& passphrase, WifiS
     }
     WlanClient client(handle);
 
-    WLAN_INTERFACE_INFO_LIST* raw_list = nullptr;
-    if (WlanEnumInterfaces(client.get(), nullptr, &raw_list) != ERROR_SUCCESS ||
-        raw_list == nullptr) {
+    const auto list = enumerateInterfaces(client.get());
+    const auto interfaces = list ? interfacesOf(*list) : std::span<const WLAN_INTERFACE_INFO>{};
+    if (interfaces.empty()) {
         out.status = WifiStationStatus::NoAdapter;
         return nullptr;
     }
-    const std::unique_ptr<WLAN_INTERFACE_INFO_LIST, WlanFree> list(raw_list);
-    if (list->dwNumberOfItems == 0) {
-        out.status = WifiStationStatus::NoAdapter;
+    const auto chosen =
+        adapter_id.empty() ? interfaces.begin()
+                           : std::ranges::find_if(interfaces, [&](const WLAN_INTERFACE_INFO& info) {
+                                 return guidText(info.InterfaceGuid) == adapter_id;
+                             });
+    if (chosen == interfaces.end()) {
+        out.status = WifiStationStatus::AdapterMissing;
         return nullptr;
     }
-    const GUID guid = list->InterfaceInfo[0].InterfaceGuid;
+    const GUID guid = chosen->InterfaceGuid;
 
     const std::wstring xml = profileXml(ssid, passphrase);
     DWORD reason = 0;

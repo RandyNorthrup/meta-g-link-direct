@@ -44,7 +44,11 @@ The Meta AI Android app's protocol classes (`com.oculus.atc`, decompiled locally
 | 6 | Network lifetime after a stream | Still visible on a fresh scan 8 s after the session ended, gone at 14 s |
 | 7 | Close over Bluetooth before any client joined | Acknowledged (`0x1003`); gone on an immediate fresh scan |
 | 8 | Production `MediaSession` after the DHCP-detection rewrite (2026-10-19) | 1,104 frames in a 60 s session, no stall; the PC joined the glasses' network in 4.1 s; no Wi-Fi profile left behind |
-| 9 | OBS 32.2.2, the installed plugin from this commit's build, scene switched live over the local OBS WebSocket (2026-10-19) | 720×1280 video about 18 s after the scene went live (about 2 s after the media session was ready); 2 minutes at 30.0 fps with OBS render skips at 1 of 9,794 frames through start, stream and stop; OBS CPU about 1.3%; memory flat (570–700 MB); source screenshots at 0 s and 2 min showed live first-person frames (deleted after the check); "Camera stopped" on scene switch, no Wi-Fi profile left behind |
+| 9 | OBS 32.2.2, the installed plugin from this commit's build, scene switched live over the local OBS WebSocket (2026-10-19) | 720×1280 video about 18 s after the scene went live (about 2 s after the media session was ready); 2 minutes at 30.0 fps with OBS render skips at 1 of 9,794 frames through start, stream and stop (the one skip was already counted before the scene was switched live: 1 of 4,147 at the switch); OBS CPU about 1.3%; memory flat (570–700 MB); source screenshots at 0 s and 2 min showed live first-person frames (deleted after the check); "Camera stopped" on scene switch, no Wi-Fi profile left behind |
+
+| 10 | Production `MediaSession` with the owner-key acceptance check (2026-10-19) | Trust accepted; 430 frames in a 30 s session; first video at 15.7 s |
+| 11 | OBS, Wi-Fi adapter set explicitly to the PC's USB adapter (2026-10-19) | The properties listed "Automatic (first adapter)" and the adapter by name; video 16 s after the scene went live |
+| 12 | OBS, Wi-Fi adapter set to an id that matches no adapter (2026-10-19) | Failed in 6 s with "the Wi-Fi adapter chosen in the source properties is not available", used no other adapter, closed the glasses' network over Bluetooth (acknowledged; a fresh scan showed no `mgl-` network) and retried with backoff |
 
 The installer ran end to end from a bundle of this build: it found OBS 32.2.2, copied the plugin (hash identical to the build output) and the setup tool, and skipped the glasses setup when answered "N".
 
@@ -60,5 +64,5 @@ Consequence: while the camera runs, the PC's Wi-Fi adapter is on the glasses' ne
 
 ## Not yet verified
 
-- Reconnection after a real drop, longer runs, the 120-minute acceptance run (which may need the glasses on power if the battery reading above is right), latency, thermal behaviour and battery cost.
+- Reconnection after a real drop, longer runs, the full-charge endurance run (the acceptance target since 2026-10-19), latency, thermal behaviour and confirmation of the battery reading.
 - Other adapters and drivers, 5 GHz or wider channels on the glasses' network, and the current firmware build.

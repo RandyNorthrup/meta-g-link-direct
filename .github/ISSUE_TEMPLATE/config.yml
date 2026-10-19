@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Setup guide
+    url: https://github.com/RandyNorthrup/meta-g-link-direct#readme
+    about: Pairing, install, setup and troubleshooting steps.

@@ -12,7 +12,9 @@
 #include "mgl/bytes.hpp"
 #include "mgl/media_session.hpp"
 #include "mgl/stream.hpp"
+#include "mgl/wifi_station.hpp"
 
+#include <algorithm>
 #include <array>
 #include <atomic>
 #include <chrono>
@@ -23,6 +25,7 @@
 #include <memory>
 #include <mutex>
 #include <new>
+#include <span>
 #include <string>
 #include <string_view>
 #include <system_error>
@@ -171,6 +174,9 @@ struct MglCamera {
     LogFn on_log = nullptr;
     void* context = nullptr;
     std::atomic<std::size_t> quality{0}; // index into QualityPresets
+    // Set from OBS's settings thread, read on start; empty means the first adapter.
+    std::mutex wifi_adapter_mutex;
+    std::string wifi_adapter;
     std::shared_ptr<StatusCell> status = std::make_shared<StatusCell>();
     // Owned by OBS's video thread (activate, deactivate) and destroy.
     std::shared_ptr<Pipeline> pipeline;
@@ -266,8 +272,14 @@ void startCapture(MglCamera& camera) {
     callbacks.on_state = [pipeline](mgl::MediaState state) {
         pipeline->status->report(pipeline->run, state);
     };
+    std::string wifi_adapter;
+    {
+        const std::scoped_lock lock(camera.wifi_adapter_mutex);
+        wifi_adapter = camera.wifi_adapter;
+    }
     auto session = std::make_unique<mgl::MediaSession>(
-        std::move(callbacks), QualityPresets.at(camera.quality.load()).config);
+        std::move(callbacks), QualityPresets.at(camera.quality.load()).config,
+        std::move(wifi_adapter));
     session->start();
     camera.pipeline = std::move(pipeline);
     camera.session = std::move(session);
@@ -356,4 +368,64 @@ void mglCameraSetQuality(MglCamera* camera, const char* key) {
 
 const char* mglCameraStatusKey(const MglCamera* camera) {
     return stateKey(camera != nullptr ? camera->status->current() : mgl::MediaState::Idle);
+}
+
+namespace {
+// UTF-8 continuation bytes look like 10xxxxxx.
+constexpr unsigned char Utf8ContinuationMask = 0xC0;
+constexpr unsigned char Utf8ContinuationBits = 0x80;
+
+// Copies text into a fixed C field, NUL-terminated, cutting at a UTF-8 character boundary.
+void copyField(std::span<char> field, std::string_view text) {
+    std::size_t length = std::min(text.size(), field.size() - 1);
+    if (length < text.size()) {
+        // The byte at length starts the part that does not fit; back off while it would split a
+        // multi-byte character.
+        while (length > 0 && (static_cast<unsigned char>(text.at(length)) & Utf8ContinuationMask) ==
+                                 Utf8ContinuationBits) {
+            --length;
+        }
+    }
+    *std::ranges::copy(text.substr(0, length), field.begin()).out = '\0';
+}
+} // namespace
+
+bool mglWifiAdapterList(MglWifiAdapter* adapters, std::size_t capacity, std::size_t* count) {
+    if (count == nullptr) {
+        return false;
+    }
+    *count = 0;
+    if (adapters == nullptr) {
+        return false;
+    }
+    try {
+        const auto found = mgl::listWifiAdapters();
+        const std::span<MglWifiAdapter> out(adapters, capacity);
+        auto slot = out.begin();
+        for (const auto& adapter : found) {
+            if (slot == out.end()) {
+                break;
+            }
+            copyField(slot->id, adapter.id);
+            copyField(slot->name, adapter.description);
+            ++slot;
+        }
+        *count = static_cast<std::size_t>(slot - out.begin());
+        return true;
+    } catch (const std::exception&) {
+        return false; // the caller logs the failure
+    }
+}
+
+void mglCameraSetWifiAdapter(MglCamera* camera, const char* id) {
+    if (camera == nullptr) {
+        return;
+    }
+    try {
+        const std::scoped_lock lock(camera->wifi_adapter_mutex);
+        camera->wifi_adapter = id != nullptr ? id : "";
+    } catch (const std::exception& error) {
+        logLine(camera->on_log,
+                std::string("Could not store the Wi-Fi adapter choice: ") + error.what());
+    }
 }

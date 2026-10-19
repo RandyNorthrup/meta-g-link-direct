@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 420" width="1280" height="420" role="img" aria-labelledby="title desc">
+  <title id="title">Meta G Link Direct</title>
+  <desc id="desc">Ray-Ban Meta glasses camera, live in OBS Studio over a direct Wi-Fi link. No phone, no router changes.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1020"/>
+      <stop offset="0.55" stop-color="#17123d"/>
+      <stop offset="1" stop-color="#0a2a3a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.78" cy="0.45" r="0.55">
+      <stop offset="0" stop-color="#22d3ee" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#22d3ee" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="frame" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#22d3ee"/>
+      <stop offset="1" stop-color="#a78bfa"/>
+    </linearGradient>
+    <linearGradient id="lens" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1e293b" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#0f172a" stop-opacity="0.95"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#312e81"/>
+      <stop offset="1" stop-color="#0e7490"/>
+    </linearGradient>
+    <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.2" fill="#ffffff" fill-opacity="0.06"/>
+    </pattern>
+    <clipPath id="card"><rect width="1280" height="420" rx="28"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#card)">
+    <rect width="1280" height="420" fill="url(#bg)"/>
+    <rect width="1280" height="420" fill="url(#dots)"/>
+    <rect width="1280" height="420" fill="url(#glow)"/>
+  </g>
+
+  <!-- Wordmark -->
+  <g font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
+    <text x="64" y="176" font-size="58" font-weight="700" fill="#ffffff" letter-spacing="-0.5">Meta G Link Direct</text>
+    <text x="66" y="226" font-size="26" fill="#c7d2fe">Ray-Ban Meta camera, live in OBS</text>
+
+    <g font-size="17" font-weight="600" text-anchor="middle">
+      <rect x="64" y="262" width="112" height="36" rx="18" fill="#22d3ee" fill-opacity="0.14" stroke="#22d3ee" stroke-opacity="0.55"/>
+      <text x="120" y="286" fill="#a5f3fc">No phone</text>
+      <rect x="188" y="262" width="190" height="36" rx="18" fill="#a78bfa" fill-opacity="0.14" stroke="#a78bfa" stroke-opacity="0.55"/>
+      <text x="283" y="286" fill="#ddd6fe">No router changes</text>
+      <rect x="390" y="262" width="150" height="36" rx="18" fill="#34d399" fill-opacity="0.14" stroke="#34d399" stroke-opacity="0.55"/>
+      <text x="465" y="286" fill="#a7f3d0">Direct Wi-Fi</text>
+    </g>
+
+    <text x="66" y="358" font-size="15" fill="#94a3b8">Windows 11 · OBS Studio 32 · Open source (AGPL-3.0) · Not affiliated with Meta, Ray-Ban or OBS</text>
+  </g>
+
+  <!-- Glasses -->
+  <g stroke="url(#frame)" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M718 160 h100 q18 0 18 18 v28 q0 54 -58 54 h-20 q-58 0 -58 -54 v-28 q0 -18 18 -18 z" fill="url(#lens)"/>
+    <path d="M880 160 h100 q18 0 18 18 v28 q0 54 -58 54 h-20 q-58 0 -58 -54 v-28 q0 -18 18 -18 z" fill="url(#lens)"/>
+    <path d="M836 182 Q849 166 862 182" fill="none"/>
+    <path d="M700 176 L682 168" fill="none"/>
+    <path d="M998 176 L1016 168" fill="none"/>
+  </g>
+  <path d="M732 190 q20 -14 48 -12" stroke="#ffffff" stroke-opacity="0.18" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M894 190 q20 -14 48 -12" stroke="#ffffff" stroke-opacity="0.18" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <circle cx="713" cy="171" r="9" fill="#22d3ee" fill-opacity="0.25"/>
+  <circle cx="713" cy="171" r="4.5" fill="#e0f2fe"/>
+
+  <!-- Wi-Fi link -->
+  <g fill="none" stroke="#22d3ee" stroke-width="6" stroke-linecap="round">
+    <path d="M1030 192 A26 26 0 0 1 1030 232" stroke-opacity="0.95"/>
+    <path d="M1043 179 A44 44 0 0 1 1043 245" stroke-opacity="0.65"/>
+    <path d="M1056 166 A62 62 0 0 1 1056 258" stroke-opacity="0.35"/>
+  </g>
+
+  <!-- Screen showing a portrait feed -->
+  <g>
+    <rect x="1086" y="146" width="152" height="108" rx="12" fill="#0f172a" stroke="#cbd5e1" stroke-opacity="0.75" stroke-width="4"/>
+    <rect x="1098" y="158" width="128" height="84" rx="5" fill="url(#screen)"/>
+    <rect x="1146" y="163" width="40" height="74" rx="4" fill="#0b1020" fill-opacity="0.55" stroke="#a5f3fc" stroke-opacity="0.6" stroke-width="2"/>
+    <rect x="1104" y="164" width="38" height="16" rx="8" fill="#ef4444"/>
+    <text x="1123" y="176" font-family="'Segoe UI', Arial, sans-serif" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">LIVE</text>
+    <path d="M1162 254 v20 M1136 276 h52" stroke="#cbd5e1" stroke-opacity="0.75" stroke-width="5" stroke-linecap="round"/>
+  </g>
+</svg>

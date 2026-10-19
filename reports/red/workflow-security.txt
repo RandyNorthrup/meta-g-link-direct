@@ -1,7 +1,11 @@
 BASELINE EXIT 0
+ INFO zizmor: 🌈 zizmor v1.25.2
+ INFO audit: zizmor: 🌈 completed C:\Users\Randy\Coding\meta_g_link_direct\.github\workflows\quality.yml
 No findings to report. Good job!
 
 MUTATED EXIT 1
+ INFO zizmor: 🌈 zizmor v1.25.2
+ INFO audit: zizmor: 🌈 completed C:\Users\Randy\Coding\meta_g_link_direct\.github\workflows\quality.yml
 error[unpinned-uses]: unpinned action reference
   --> C:\Users\Randy\Coding\meta_g_link_direct\.github\workflows\quality.yml:17:15
    |
@@ -15,6 +19,8 @@ error[unpinned-uses]: unpinned action reference
 Write-Error: Native command failed (14): zizmor
 
 RESTORED EXIT 0
+ INFO zizmor: 🌈 zizmor v1.25.2
 No findings to report. Good job!
+ INFO audit: zizmor: 🌈 completed C:\Users\Randy\Coding\meta_g_link_direct\.github\workflows\quality.yml
 
 RESTORATION SHA256 ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca

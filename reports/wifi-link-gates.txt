@@ -1,15 +1,7 @@
-Gate run for the glasses-hosted Wi-Fi link, 2026-10-18, Windows 11 x64 build 26200.
-Each line: task, native exit, duration. Full logs stayed local.
-format:check       exit=0      1s
-lint:cpp           exit=0    189s
-lint:powershell    exit=0      4s
-lint:workflow      exit=0      1s
-deadcode:cpp       exit=0      6s
-deadcode:copies    exit=0      2s
-security:secrets   exit=0      1s
-security:sast      exit=0      6s
-security:npm       exit=0      1s
-security:osv       exit=0      1s
-test               exit=0
+Release gate run for 0.1.0, 2026-10-19, Windows 11 x64 build 26200 (scripts/Invoke-Project.ps1 package).
+quality stages, each exited 0: configure, build, format:check, lint, deadcode, security:audit, test, test:live, test:red.
 CTest: 4/4 passed (protocol-prefix, private-address, protocol-datax with 68 cases, module-abi).
-Pester: runner 3 passed; CLI 20 passed; 0 failed, 0 skipped.
+Pester: runner 3, CLI 20 and live SDP 1 passed; 0 failed, 0 skipped.
+Red drills: 20 passed (green, intended red, exact restoration, green), 0 failed.
+Release zip: dist/meta-g-link-direct-0.1.0-windows-x64.zip, SHA-256 27d7fbae13cddf582d1ee76b3e2fcc3764b18b5971101f3e5899190278f173fe.
+Full logs stayed local.

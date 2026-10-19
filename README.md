@@ -1,160 +1,172 @@
-# Meta G Link Direct
+<p align="center">
+  <img src="assets/banner.svg" alt="Meta G Link Direct: Ray-Ban Meta glasses camera, live in OBS over a direct Wi-Fi link" width="100%">
+</p>
 
-Native Windows OBS plugin that shows the Ray-Ban Meta Gen 2 glasses camera in OBS over a direct local wireless link, with no phone in the loop.
+<p align="center">
+  <a href="https://github.com/RandyNorthrup/meta-g-link-direct/releases"><img alt="Release" src="https://img.shields.io/github/v/release/RandyNorthrup/meta-g-link-direct?include_prereleases&label=release&color=22d3ee"></a>
+  <a href="https://github.com/RandyNorthrup/meta-g-link-direct/actions/workflows/quality.yml"><img alt="Checks" src="https://img.shields.io/github/actions/workflow/status/RandyNorthrup/meta-g-link-direct/quality.yml?branch=main&label=checks"></a>
+  <img alt="Windows 11 x64" src="https://img.shields.io/badge/Windows%2011-x64-0078D4">
+  <img alt="OBS Studio 32" src="https://img.shields.io/badge/OBS%20Studio-32.x-302E31">
+  <a href="LICENSE"><img alt="License: AGPL-3.0" src="https://img.shields.io/badge/license-AGPL--3.0-a78bfa"></a>
+</p>
 
-**Current status: working on real hardware.** The "Ray-Ban Meta Glasses (Direct)" source shows the live 720×1280 HEVC camera at about 30 fps in OBS 32.2.2, after a one-time Meta setup that makes the PC the glasses' owner. The glasses host their own 2.4 GHz Wi-Fi network for the PC, which streamed without a drop in every run so far (longest 180 s; stop and restart verified), including two minutes in OBS at 30 fps with no skipped render frames from the source. This is proven on one PC, one Bluetooth adapter, one Wi-Fi adapter and one pair of glasses. Still open: reconnection after a real link drop (implemented, not yet exercised on hardware), the other quality presets (only 720×1280 is proven), a Narrator and keyboard pass over the source properties, latency measurement, latest-firmware certification, and the 120-minute run.
+Use your **Ray-Ban Meta (Gen 2)** glasses as a first-person camera in **OBS Studio** on Windows. Video comes straight from the glasses over a short-range Wi-Fi network that the glasses create for your PC. No phone, no companion app, and no router or hotspot setup.
 
-Setup moves the glasses' owner key from the Meta AI phone app to this PC. The phone app stops working with the glasses until you remove and re-add them in Meta AI.
+> [!WARNING]
+> **Beta.** Tested on one Windows 11 PC with one pair of glasses. The one-time setup makes this PC the glasses' owner, which disconnects them from the Meta AI phone app. Read [Before you start](#before-you-start).
 
-The confirmed product contract is in [PROJECT_BRIEF.md](PROJECT_BRIEF.md). [PLAN.md](PLAN.md) owns implementation milestones, proof, and deferred gates. The intended product receives local video directly into OBS, with adjustable quality and optional glasses audio disabled by default. Meta authentication is permitted for setup if required; the phone must be off during the eventual local-streaming acceptance tests.
+## Features
 
-## Install and set up
+- 🎥 **Live portrait video**: 720 × 1280 at 30 fps as a native OBS source.
+- 📡 **Direct link**: Bluetooth for control and the glasses' own 2.4 GHz Wi-Fi network for video. Your home network isn't involved.
+- ⚡ **Hands-off**: the camera starts when its scene goes live and stops when the scene leaves the program output. Starting and stopping never stall OBS.
+- 🔒 **Private**: Meta is contacted only during setup. The owner key is sealed to your Windows account. No telemetry, no update checks, no recordings.
 
-Needs Windows 11 x64, OBS Studio 32.x, a Bluetooth adapter with Classic and BLE, a Wi-Fi adapter that can join a 2.4 GHz WPA2 network, and the Visual C++ x64 runtime (the OBS installer provides it). No router, hotspot or network setting changes.
+## What you need
 
-While the camera runs, the PC's Wi-Fi adapter is connected to the glasses' own network, which has no internet. A PC that reaches the internet over Ethernet (or a second Wi-Fi adapter) stays online; a PC whose only connection is that Wi-Fi adapter is offline until the camera stops. Windows returns the adapter to its usual networks afterwards.
+| | |
+|---|---|
+| **PC** | Windows 11 x64 |
+| **OBS** | OBS Studio 32.x (64-bit) |
+| **Glasses** | Ray-Ban Meta Gen 2, charged |
+| **Bluetooth** | An adapter that supports both Bluetooth LE and Classic |
+| **Wi-Fi** | Any adapter that can join a 2.4 GHz network |
+| **Account** | Your Meta account, for the one-time setup |
 
-`scripts/Install-MetaGLinkDirect.ps1` installs from a setup bundle folder containing `plugin/meta-g-link-direct.dll`, `plugin/locale/en-US.ini` and `tools/meta-g-link-probe.exe`. It runs under Windows PowerShell 5.1. In order, it:
+> [!NOTE]
+> While the camera runs, the Wi-Fi adapter it uses is connected to the glasses, and that link has no internet. If you stream online, connect the PC by Ethernet. With two Wi-Fi adapters you can give the camera one of them in the source's **Wi-Fi adapter** setting and keep the other online; that setup hasn't been tested yet. Windows reconnects the adapter to your usual network when the camera stops.
 
-1. finds OBS and checks its FFmpeg (`avcodec-62`, `avutil-60`) and the runtime;
-2. waits for OBS to be closed (it never closes OBS);
-3. copies the plugin, elevating only that copy when OBS is under Program Files;
-4. copies the setup tool to `%LOCALAPPDATA%\MetaGLinkDirect\bin`;
-5. imports an optional `meta-tokens.txt`;
-6. offers the one-time glasses setup.
+## Before you start
 
-`-WhatIf` lists every action without changing anything. `-Uninstall` removes the plugin and tool but keeps the sealed identity. It has been verified by a real install on the development PC (OBS 32.2.2 per-user install, setup declined); an install on a fresh PC has not been run yet. The `package` task does not yet produce this bundle layout.
+- **Ownership moves to this PC.** The glasses accept one owner. After setup, the Meta AI phone app can't use them until you remove and add them again in Meta AI. That return trip hasn't been tested by this project yet.
+- **One PC at a time.** Setting the glasses up on another PC takes them away from this one.
+- **Turn off your phone's Bluetooth** during setup and use, so the glasses don't connect to it.
 
-The setup tool has the Meta AI app's two client tokens built in. They identify the app, not a person, and are already public. An imported `meta-tokens.txt` (one `HW|<app id>|<secret>` line and one `AR|<app id>|<secret>` line) overrides them if Meta rotates them. `.gitignore` excludes that file.
+## 1 · Pair the glasses with your PC
 
-The setup steps the installer runs, if you want them by hand:
+Do this once, before installing. The glasses must be paired with Windows itself, not only with your phone.
 
-```powershell
-meta-g-link-probe.exe --auth-url     # prints the Meta login address; log in, then copy the final address
-'<code from that address>' | meta-g-link-probe.exe --provision   # ownership change; seals the owner key
-meta-g-link-probe.exe --link         # the authenticated Bluetooth session reaches ready
-meta-g-link-probe.exe --stream       # the full camera path for 60 s; reports frame counts
-```
+1. **Turn off Bluetooth on your phone**, so the glasses don't reconnect to it.
+2. **Take the glasses out of the case** and make sure they're charged and on.
+3. On the PC, open **Settings → Bluetooth & devices**, make sure Bluetooth is **On**, then choose **Add device → Bluetooth**.
+4. **Put the glasses in pairing mode**: fold both arms, then press and hold the **capture button** (the button you press to take a photo) for about **12 seconds**, until the light inside the frame blinks **blue**. Let go as soon as it blinks.
+5. In the Windows list, choose the glasses. They appear as **RB Meta** followed by four characters (for example "RB Meta 12AB"). Accept any prompt to connect or pair.
+6. Check that **RB Meta …** now appears under *Bluetooth & devices*. "Paired" is enough; it doesn't need to say "Connected".
 
-Pair the glasses in Windows Bluetooth settings first: fold the arms, then hold the capture button about 12 seconds until the light blinks blue. Turn off Bluetooth on the phone. In OBS, add the "Ray-Ban Meta Glasses (Direct)" source to a scene. It connects when its scene goes live and disconnects when the scene leaves the program output. The source properties offer a quality list and a live status line.
+If the glasses don't show up:
 
-## What exists
+- Make sure your Bluetooth adapter supports **Bluetooth LE**. Older Classic-only adapters don't list the glasses at all.
+- Put the glasses back in the case, close the lid for a few seconds, take them out and try pairing mode again.
+- If they were paired with this PC before and setup now fails, remove **RB Meta …** in *Bluetooth & devices* and pair again.
 
-- C++20 frame-prefix library ported from the pinned AGPL-3.0 Visor implementation. It distinguishes incomplete headers, valid frame lengths, and invalid types without allocating or receiving camera data.
-- The direct camera path, proven on hardware: AirShield handshake and owner trust over Bluetooth RFCOMM, the Meta change-owner setup, a 2.4 GHz / 20 MHz Wi-Fi network the glasses host (svc10 `CreateSoftApNetwork`) that the PC joins as an ordinary client, a second AirShield session over TCP, the stream configuration, HEVC access-unit reassembly and FFmpeg decode to I420. The session and stream protocol is ported from the pinned AGPL-3.0 Visor implementation; the glasses-hosted network follows the Meta AI app's protocol classes.
-- Why the glasses host the network: with the glasses as a Wi-Fi client, video stopped 8–54 s into every run on every access point tried (Windows Mobile Hotspot pinned to 2.4 GHz, a dual-band home router), whatever the bitrate, adapter channel-width setting or audio setting. On their own 2.4 GHz / 20 MHz network, the same stream ran about 180 s (5,370 frames) without a stall. Details: [the Wi-Fi link report](reports/WIFI_LINK_VERIFICATION.md).
-- The OBS source. OBS's video thread starts and stops it, and neither call waits on the radio: a stopped capture is cut off from OBS at once and tears the link down on a background thread. Module unload waits for that teardown. One source drives the glasses at a time; another waits its turn and shows "Waiting". The worker reconnects after a drop with a 2–15 s backoff that resets after video flows. It catches every exception at the thread boundary so a failure cannot take OBS down, and reports "Streaming" only once frames arrive.
-- Each session gives the glasses' network a fresh `mgl-` name and a 20-symbol passphrase from the system CSPRNG, and uses the Windows region as the network's country code. The PC joins with a temporary Windows Wi-Fi profile that is deleted when the camera stops. If the PC cannot join the glasses' network or open the media connection, the plugin closes the network over Bluetooth before retrying. Once the PC has joined, the glasses leave Bluetooth, and after a stream they close the network themselves within about 15 seconds (measured).
-- Native Windows WLAN/Bluetooth probe. Default reports radio presence, Wi-Fi association and controller feature support separately. Explicit `--discover` performs a bounded active BLE scan using Visor's Meta company/service markers. `--discover-classic` performs Classic inquiry and looks up Windows-registered paired Meta RFCOMM services by UUID. Counts/errors contain no names, addresses or payloads. Candidates and Windows bonds do not establish glasses authentication.
-- Explicit `--connect-classic` selects only one Windows-registered Meta service with a paired peer, attempts an encrypted/authenticated Bluetooth socket connection with deadlines, closes it and sends no application frames. Multiple services are refused. It never pairs or silently falls back from BLE. Successful connection behavior still needs actual glasses proof.
-- Explicit uncached per-peer Meta SDP lookup (`--discover-classic-live`), a separate paired socket check (`--connect-classic-live`), and an opt-in native Windows pairing picker (`--pair-classic`). Pairing never runs implicitly.
-- Direct Winsock probes accept a trustworthy glasses Bluetooth address privately on stdin, without a Windows bond prerequisite: `--direct-classic-uuid` resolves the Meta service; `--direct-classic-channel7` explicitly uses the publicly observed Gen 2 control channel. Each waits for one bounded frame, sends no application messages and never switches routes silently. A matching hello prefix is a candidate, not authentication.
-- C17 OBS glue (`module.c`, `source.c`) compiled against the real OBS 32.2.2 SDK, with the C++20 camera core behind the small C interface in `src/plugin/camera.h`. An isolated loader test checks the DLL against the installed OBS runtime, its exports and its metadata. It is not a test of an OBS scene or of streaming.
-- Four CTest suites cover 83 framing/truncation/type cases, 20 private-address format/order/boundary cases, 68 protocol cases (SDU phases, protobuf, DataX, encoding, the glasses-hosted network messages) and the OBS module ABI. Three Pester runner tests, 20 CLI contract cases and one separate live SDP test cover diagnostics, private input, report failures and actual query execution. These software checks do not establish a glasses connection.
-- Native build, formatting, static analysis, dead-code/duplication checks, secret/SAST/dependency scanning, and maintained defect/restoration drills.
+## 2 · Install
 
-## Tested development environment
+1. Download `meta-g-link-direct-<version>-windows-x64.zip` from [**Releases**](https://github.com/RandyNorthrup/meta-g-link-direct/releases).
+2. **Close OBS**, extract the zip, and double-click **`Install.cmd`**.
+   The files aren't code-signed. If Windows SmartScreen says "Windows protected your PC", choose **More info → Run anyway**.
+3. The installer checks that you have OBS 32.x with its FFmpeg libraries, copies the plugin into OBS (asking for administrator permission only if OBS is in Program Files) and the setup tool to `%LOCALAPPDATA%\MetaGLinkDirect\bin`, then offers the one-time setup below.
 
-Windows 11 Pro x64 build 26200; OBS 32.2.2; Visual Studio 2022/MSVC 19.44.35222.0; Windows SDK 10.0.26100.0; CMake 3.31.3; Visual Studio's Ninja; LLVM 22.1.1; PowerShell 7.6.6; Python 3.14.0; Node 24.20.0/npm 11.19.0; Pester 5.7.1; PSScriptAnalyzer 1.25.0; Gitleaks 8.30.1; Semgrep 1.177.0; actionlint 1.7.12; zizmor 1.25.2; OSV-Scanner 2.6.0; and pre-commit.
-
-`dependencies.lock.json` pins native source/tool archives and records observed tools. `package-lock.json` locks the copy-detection development tool. No JavaScript runtime is part of the plugin.
-
-Bootstrap downloads verified OBS source/dependencies, builds the development SDK, extracts Cppcheck 2.22.0 into `.tools/`, and restores the locked development package. It does not globally install those tools or install a plugin into OBS. Other listed development tools/modules must already be available; missing checks fail explicitly.
-
-## Development commands
-
-Run from the repository root with PowerShell 7:
-
-```powershell
-pwsh -NoProfile -File scripts/Invoke-Project.ps1 bootstrap
-pwsh -NoProfile -File scripts/Invoke-Project.ps1 configure
-pwsh -NoProfile -File scripts/Invoke-Project.ps1 build
-pwsh -NoProfile -File scripts/Invoke-Project.ps1 test
-pwsh -NoProfile -File scripts/Invoke-Project.ps1 probe
-pwsh -NoProfile -File scripts/Invoke-Project.ps1 discover
-pwsh -NoProfile -File scripts/Invoke-Project.ps1 discover:classic
-pwsh -NoProfile -File scripts/Invoke-Project.ps1 discover:classic:live
-# Explicit socket check, after glasses are paired with Windows:
-pwsh -NoProfile -File scripts/Invoke-Project.ps1 connect:classic
-```
-
-The runner configures the Visual Studio environment only when required and reuses an existing matching environment. Owned builds use two parallel jobs. Generated dependencies, build files and local tools remain under ignored project directories.
-
-After building, run `out/windows/meta-g-link-probe.exe --help` for native exit codes. No arguments performs no BLE scan. `--discover` listens for up to ten seconds plus a two-second stop deadline; early native failure returns immediately. Counts are advertisement packets, not unique devices. Exit 6 means a completed scan found no Meta marker; exit 3 means native discovery failed. The PowerShell runner converts any nonzero native result to a task failure; use the executable directly when the exact native exit code matters. Tests include a real local scan, so physical driver failure is checked for honest reporting, not treated as a successful scan.
-
-`--discover-classic` requests four Windows inquiry units (5.12 seconds, not a hard whole-command deadline) and a registered-service lookup. Each async service lookup/open/socket connect has a five-second deadline and explicit cancellation. `--connect-classic` skips inquiry so it does not compete with socket connection. Exit 6 also means no registered Meta RFCOMM service; exit 7 means multiple such services were refused. Native Windows inquiry can include cached peers, so a device count is not proof of current reachability. Registered-service lookup is not a complete uncached SDP scan of all nearby devices. Automated tests exercise discovery only; socket connection is an explicit hardware check.
-
-Live lookup requests a 20.48-second Classic inquiry, then a twenty-second query budget over at most eight unique inquiry peers using `GetRfcommServicesForIdAsync(..., Uncached)`. Errors, limits and incomplete discovery remain visible; zero services after a failed query is not a completed negative result. Native inquiry itself is synchronous, so its requested duration is not a hard whole-process deadline. `test:live` is separate from the ordinary test loop; full `quality` runs it and the skipped-query red drill. It contacts inquiry peers for service discovery without pairing or opening an application socket.
-
-`pair:classic` opens the Windows native picker and waits for selection or Cancel. Choose only your glasses; cancel if absent. It may create a Windows Bluetooth bond and interrupt the phone link, but performs no Meta login or ownership transfer. Do not reset glasses or remove the existing Meta account. Return through iPhone Bluetooth/Meta AI using the same account afterward; recovery is not yet proved by this project.
-
-For a known glasses address, run the executable directly in a local console:
+Optional: check the download against the `.sha256` file from the same release:
 
 ```powershell
-out/windows/meta-g-link-probe.exe --direct-classic-uuid
-# A separate explicit test of the documented control channel:
-out/windows/meta-g-link-probe.exe --direct-classic-channel7
+Get-FileHash .\meta-g-link-direct-<version>-windows-x64.zip -Algorithm SHA256
 ```
 
-Enter the address only at the hidden local prompt. Supported forms: twelve hexadecimal digits, or six octets separated consistently by colons or dashes. Zero, broadcast, malformed and oversized inputs fail before connecting. Do not paste the address into chat, arguments, scripts or Git. Each direct probe uses nonblocking connect/receive waits of five seconds each, closes its socket, retains no raw frame, and reports counts/status only. Native service resolution can add platform-controlled delay. Exit 5 rejects input; exit 3 reports transport/probe failure. Exit 0 means a complete transport frame was received, not authenticated glasses or camera success. An optional process-local `MGL_PROBE_REPORT` path explicitly requests the same redacted JSON in a file; write failure returns exit 4. The console prompt is plain text and keyboard usable; Narrator/manual hidden-input behavior remains unverified.
+## 3 · Make this PC the owner (one time)
 
-Controller capability fields are valid only when `bluetooth_features_valid` is true; otherwise inspect `bluetooth_features_error`. A failed optional feature query does not imply LE is unsupported or invalidate successful radio enumeration.
+When the installer asks *"Set up the glasses for this PC now?"*, answer **y** and type **YES** to confirm. A browser opens the Meta login. Log in with your Meta account. When it finishes, copy the full address from the browser's address bar and paste it into the installer window. Keep the glasses on and nearby while this runs.
 
-OBS is discovered at its verified per-user installation. For another installation location, set the optional process environment variable `MGL_OBS_RUNTIME` to that installation's `bin/64bit` directory before configuring. The directory must contain `obs.dll`; it is a runtime path, not a credential. There is no `.env` loader. Configure from the runner (or with `MGL_OBS_RUNTIME` set): a plain `cmake` re-configure without it registers the module-ABI test with an empty runtime path, and that test then fails.
+To run the setup later, close OBS, open a terminal in the extracted folder and run `.\Install.cmd -Setup`. It reinstalls the same files, then goes straight to the setup.
 
-Opt-in diagnostics: `MGL_HTTP_DEBUG` traces the Meta setup requests by URL, field names, reply status and reply keys, never values. `--stream` runs the same media session as the OBS source and writes its status lines to stderr.
+## 4 · Use it in OBS
 
-Focused checks:
+1. In **Sources**, click **+** and add **Ray-Ban Meta Glasses (Direct)**.
+2. Make its scene live. The first frame takes about 20 seconds, because the glasses start their Wi-Fi network and the PC joins it. In Studio Mode, the camera starts when the scene goes to **Program**, not Preview.
+3. Switch away from the scene to stop the camera and free your Wi-Fi adapter.
 
-```powershell
-pwsh -NoProfile -File scripts/Invoke-Project.ps1 format:check
-pwsh -NoProfile -File scripts/Invoke-Project.ps1 lint
-pwsh -NoProfile -File scripts/Invoke-Project.ps1 deadcode
-pwsh -NoProfile -File scripts/Invoke-Project.ps1 test:asan
+The source's **Properties** show:
+
+- **Video quality**: 720 × 1280 (recommended), 1080 × 1920 (experimental), 504 × 896 or 360 × 640. Only 720 × 1280 has been tested so far.
+- **Wi-Fi adapter**: *Automatic (first adapter)*, or a specific adapter by name. Pick the one you don't need online. If the chosen adapter is unplugged, the source reports it in the log instead of using another adapter.
+- Changes to either setting apply the next time the camera starts.
+- **Status**: the connection state when you open the properties (Idle, Connecting, Streaming, Reconnecting, Waiting, Failed or Stopped).
+
+Only one glasses source streams at a time. Another one shows *Waiting* and takes over when the first leaves the program output.
+
+## Known limits
+
+- **Battery**: streaming drains the glasses quickly. One reading suggests about 35–40 minutes from a full charge (not yet confirmed).
+- **Quality**: only 720 × 1280 at 30 fps has been verified. Glasses audio isn't implemented; use your usual OBS audio device.
+- **Reconnecting** after a dropped link is implemented but hasn't been exercised on real hardware yet.
+- **Security**: the PC doesn't yet verify the glasses' identity signature during the handshake.
+- **Coverage**: one PC, one Bluetooth adapter, one Wi-Fi adapter and one pair of glasses. The glasses' firmware build hasn't been recorded yet.
+
+## How it works
+
+```mermaid
+flowchart LR
+    G["👓 Glasses"] -- "1 · Bluetooth: encrypted, owner-key session" --> P["🖥️ Plugin"]
+    P -- "2 · Start your Wi-Fi network" --> G
+    G -. "3 · 2.4 GHz network<br/>(the PC joins it)" .-> P
+    G -- "4 · HEVC video over TCP<br/>(second encrypted session)" --> P
+    P -- "5 · decode (OBS's FFmpeg)" --> O["🎬 OBS source"]
 ```
 
-`format` applies formatting. `typecheck` uses the same compiler gate as `build`. Separate `security:secrets`, `security:sast`, `security:npm`, and `security:osv` tasks expose the individual scanners; `security:audit` also scans reachable Git history. A full-history scan requires an actual commit; no history is not proof of a clean history.
+1. The plugin opens an encrypted Bluetooth session and proves it holds the glasses' owner key. If the glasses refuse the key, the source stops and asks for the setup again.
+2. It asks the glasses to start their own 2.4 GHz / 20 MHz Wi-Fi network, with a fresh random name and password each time.
+3. The PC joins that network with the chosen Wi-Fi adapter and a temporary Windows Wi-Fi profile.
+4. A second encrypted session runs over TCP on that network. The camera starts and sends HEVC video.
+5. The plugin decodes the video with the FFmpeg libraries that ship with OBS and hands each frame to OBS.
 
-Windows AddressSanitizer runs in a separate build. Portable ASan/UBSan commands are configured in the GitHub workflow but hosted/Linux execution is not established by a local Windows pass. The detailed verification report lists scope and remaining gaps, including native dependency auditing, coverage, and hardware acceptance.
+When the camera stops, the PC leaves the network and deletes the profile, and the glasses close the network within about 15 seconds.
 
-## Structure and ownership
-
-- `include/mgl/`, `src/protocol/`: portable protocol contract and implementation (SDU, protobuf, DataX, AirShield framing, stream messages, HEVC, JSON, encodings).
-- `src/windows/`: CNG crypto, DPAPI identity and token storage, Meta setup, WinHTTP, RFCOMM and TCP transports, the Wi-Fi client connection to the glasses' network, the media session, and the radio diagnostics.
-- `src/probe/`: setup and diagnostic CLI.
-- `src/plugin/`: OBS glue in C17 (`module.c`, `source.c`), the C++20 camera core (`camera.cpp`) and the FFmpeg HEVC decoder.
-- `tests/`: independent native examples and disposable-resource runner checks.
-- `scripts/Invoke-Project.ps1`: canonical task and defect-drill runner. `scripts/Install-MetaGLinkDirect.ps1`: end-user installer.
-- `reports/`: actual observations and source-bound proof linked by the plan.
-
-MSVC compiles native C/C++ and analyzes the C files with `/analyze`. LLVM performs C++ analysis with the real compilation database. Only the C files include OBS headers, because those headers use an MSVC intrinsic that clang cannot parse; nothing replaces OBS declarations with a private ABI.
-
-Cppcheck uses the same database with MSVC external-include spelling normalized, explicit compiler builtins, standard/Windows models and six real dynamic OBS entry points. Missing-system-header notices from that model-based analysis and third-party dependency headers are excluded explicitly; quoted owned headers remain checked, and the real compiler/LLVM gates validate system includes. See the plan for these scoped analysis decisions and their required drills.
-
-## Privacy and credentials
-
-The owner key and any imported Meta tokens are sealed with Windows DPAPI for the current Windows account, in `%LOCALAPPDATA%\MetaGLinkDirect` (`identity.bin`, `tokens.bin`). Nothing prints or logs them. Delete that folder to forget the glasses identity.
-
-Meta is contacted only during setup: the OIDC login, the AR login and the two pairing calls. Streaming makes no Meta or cloud call; video travels over the glasses' own Wi-Fi network to this PC and into OBS. The plugin has no telemetry and no update checks, and it records nothing; recording stays under OBS's control. Logs carry status lines only, never payloads, addresses or credentials.
-
-The only credentials in this repository are the Meta AI app's two public client tokens (see `AGENTS.md` revision 3). Never add passwords, owner keys, user tokens, Wi-Fi passphrases, raw captures or private diagnostic bundles.
+Why do the glasses host the network? When the glasses instead joined a network (a Windows hotspot, or a home router), the video stopped within a minute every time. On their own network the stream holds. The details are in [the Wi-Fi link report](reports/WIFI_LINK_VERIFICATION.md).
 
 ## Troubleshooting
 
-The source's properties show its live status. The OBS log (Help > Log Files) has each connection step under `[meta-g-link-direct]`.
+The OBS log (*Help → Log Files*) lists each connection step under `[meta-g-link-direct]`.
 
-- **Stuck on Connecting or Reconnecting:** check that the glasses are on, charged and in range, and that phone Bluetooth is off. The source retries on its own with a 2–15 s backoff.
-- **"No stored glasses identity" or "Could not connect … set up for this PC":** run the setup. It also fails this way if another PC or the phone took ownership since.
-- **"This PC could not join the glasses' Wi-Fi network":** check that Wi-Fi is on and airplane mode is off. "No Wi-Fi adapter is available" means Windows sees no Wi-Fi adapter at all.
-- **"The glasses did not start their Wi-Fi network":** the glasses' Wi-Fi may still be busy with an earlier session. The source retries; if it keeps failing, power-cycle the glasses.
-- **The internet drops while the camera runs:** the PC's Wi-Fi adapter is on the glasses' network, which has no internet. Use Ethernet or a second Wi-Fi adapter for an online stream.
-- **Waiting:** another Ray-Ban Meta source is using the glasses. It takes over when the other source leaves the program output.
-- **After OBS crashed mid-stream:** the glasses close their network on their own within about 15 seconds. Delete any leftover `mgl-` network in Windows Wi-Fi settings if one remains.
+| Symptom | What to do |
+|---|---|
+| The glasses don't appear when pairing | See [step 1](#1--pair-the-glasses-with-your-pc): the adapter must support Bluetooth LE, the phone's Bluetooth must be off, and the light must blink blue. |
+| Stuck on *Connecting* or *Reconnecting* | Check that the glasses are on, charged and in range, and that your phone's Bluetooth is off. The source keeps retrying. |
+| Status *Failed*, and the log says *No stored glasses identity* or *The glasses did not accept this PC as their owner* | Run the setup again (`.\Install.cmd -Setup`, see [step 3](#3--make-this-pc-the-owner-one-time)). The second message means another PC or the phone took ownership since. |
+| *This PC could not join the glasses' Wi-Fi network* | Make sure Wi-Fi is on and airplane mode is off. "No Wi-Fi adapter is available" means Windows sees no Wi-Fi adapter; "the Wi-Fi adapter chosen in the source properties is not available" means the selected adapter is unplugged, so plug it back in or pick another in **Wi-Fi adapter**. |
+| *The glasses did not start their Wi-Fi network* | Their Wi-Fi may still be busy with an earlier session. The source retries; if it keeps failing, power-cycle the glasses. |
+| Internet drops while the camera runs | The camera's Wi-Fi adapter is on the glasses' network (see [What you need](#what-you-need)). Use Ethernet, or try a second Wi-Fi adapter chosen in **Wi-Fi adapter** (untested). |
+| *Waiting* | Another glasses source is live. It takes over when that one leaves the program output. |
+| After OBS crashed mid-stream | The glasses close their network on their own within about 15 seconds. Delete any leftover `mgl-…` network in Windows Wi-Fi settings if one remains. |
 
-Hardware history from before the BLE adapter is in [earlier Classic verification](reports/CLASSIC_VERIFICATION.md) and `PLAN.md`.
+To test the camera outside OBS, run the setup tool's 60-second stream check. It prints status lines and a frame count:
 
-Do not infer latest-firmware compatibility, latency, accessibility or two-hour stability from these tests. Those remain explicit hardware and OBS gates.
+```powershell
+& "$env:LOCALAPPDATA\MetaGLinkDirect\bin\meta-g-link-probe.exe" --stream
+```
 
-## License
+## Privacy and security
 
-AGPL-3.0. Preserve [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). This is an independent personal prototype; no public release, signing identity, hosted service or endorsement is claimed.
+- The owner key and any imported Meta app tokens are sealed with Windows DPAPI for your account, in `%LOCALAPPDATA%\MetaGLinkDirect`. Nothing prints or logs them.
+- Meta is contacted only during setup: the login and the ownership exchange. Streaming makes no Meta or internet call.
+- The glasses' Wi-Fi network gets a new random name and 20-character password for every session.
+- No telemetry, update checks or recordings. OBS's own recording stays under your control. Logs contain status lines only: no payloads, addresses or credentials.
+- The setup tool has the Meta AI app's two public client tokens built in. They identify the app, not a person, and were already public.
+
+## Uninstall and forget
+
+- **Uninstall**: close OBS and double-click `Uninstall.cmd`. This removes the plugin and the setup tool and keeps the stored identity. It still removes the setup tool if OBS is already gone.
+- **Forget the glasses**: before uninstalling, run `& "$env:LOCALAPPDATA\MetaGLinkDirect\bin\meta-g-link-probe.exe" --forget`; afterwards, delete `%LOCALAPPDATA%\MetaGLinkDirect`.
+- **Give the glasses back to the phone**: in Meta AI, remove the glasses and add them again (not yet tested by this project).
+
+## Build from source
+
+See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for the toolchain, build commands, quality gates and project layout.
+
+## Credits and license
+
+- [**Visor**](https://github.com/macedonga/visor) by macedonga (AGPL-3.0): the AirShield/DataX session, Meta setup and stream protocol are ported from it.
+- The glasses-hosted network messages (`CreateSoftApNetwork`) follow the Meta AI app's protocol definitions. No Meta code or binaries are included.
+- OBS Studio's module API and the FFmpeg libraries that ship with OBS.
+
+Licensed under the [GNU AGPL-3.0](LICENSE). Third-party details: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+This is an independent open-source project. It is not affiliated with, endorsed by or sponsored by Meta, Ray-Ban/EssilorLuxottica or OBS. Product names identify compatibility only.

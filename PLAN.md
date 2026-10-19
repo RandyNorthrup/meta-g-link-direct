@@ -2,61 +2,53 @@
 
 ## Contract and scope
 
-The confirmed [project brief](PROJECT_BRIEF.md) is authoritative. This plan covers the personal Windows 11 x64 / OBS 32.2.2 prototype and later direct-hardware milestones. Only the structured ledger below owns task and verification states. Setup is not a claim of functioning camera capture.
+The [project brief](PROJECT_BRIEF.md) is authoritative for the product. This plan covers the Windows 11 x64 OBS plugin, built for Randy first and published for other users as pre-release builds (brief D17). The structured ledger at the end owns task and verification states; each state cites evidence under `reports/`.
+
+## Milestones
+
+| Milestone | State | Proven | Open |
+|---|---|---|---|
+| M0 · TASK-SETUP | Verified | Native build and quality foundation, portable frame-prefix parser, OBS module ABI test, gate drills | — |
+| M1 · TASK-AUTH | In progress | AirShield session over Bluetooth with trust success; Meta owner change; DPAPI-sealed identity; Forget | Trust-signature verification; return-to-phone behaviour |
+| M2 · TASK-MEDIA | In progress | Glasses-hosted 2.4 GHz / 20 MHz link; live 720 × 1280 HEVC at 30 fps; runs of about 179 s and 120 s with no stall; stop/start cycles | Lower profiles; latency, CPU, memory and thermal measurement; audio; firmware build |
+| M3 · TASK-OBS | In progress | Installed source live in OBS 32.2.2 for two minutes at 30 fps with no render frames skipped by the source; non-blocking start and stop; installer; Wi-Fi adapter choice, including the explicit failure and Bluetooth close for a missing adapter | Reconnection after a real drop; the owner-key refusal path; quality changes in OBS; two Wi-Fi adapters at once; keyboard, Narrator, theme and scaling; the full-charge endurance run |
+
+Endurance (brief D16): stream from a full glasses battery to the low-battery shutdown with no drop or reconnect and record the measured minutes. This replaced the 120-minute minimum on 2026-10-19 because a glasses health reading that looks like battery fell about 4 points in 90 s (unconfirmed), which suggests about 35–40 minutes per charge.
 
 ## Scan and reuse decisions
 
-The initial workspace was empty. PROJECT_BRIEF.md now owns product decisions and AGENTS.md owns rules. Reuse Visor's documented framing and later protocol/session behavior at commit e7077b4051b1e3e605c667aa2a010fbe41f346a0 with AGPL-3.0 attribution. Reuse OBS's published module API and actual 32.2.2 development inputs; do not create private OBS ABI declarations or a fake camera source. New protocol, platform and module paths separate different responsibilities and have actual test/diagnostic consumers. Rescan these canonical paths before every change.
+Reuse Visor's protocol and session behaviour at commit `e7077b4051b1e3e605c667aa2a010fbe41f346a0` with AGPL-3.0 attribution, and OBS's published module API with the pinned 32.2.2 development inputs. Do not create private OBS ABI declarations or a fake camera source. Rescan the canonical paths before every change.
 
-Wi-Fi link (2026-10-18): the glasses-hosted network extends the canonical paths instead of adding parallel ones. `src/protocol/stream.cpp` gains the svc10 `CreateSoftApNetwork`/`SoftApNetworkInfo` messages beside the existing stream messages; `MediaSession` keeps its worker, lease, reconnect loop, stream setup and keepalive and swaps only the network step; `randomWifiCredentials` (`src/windows/wifi_credentials.hpp`) remains the single CSPRNG credential generator. One new responsibility is added, `src/windows/wifi_station.cpp`, because joining a network as a Native Wi-Fi client has no existing owner. The Mobile Hotspot and Wi-Fi Direct owners, the `JoinAccessPoint` messages and the probe's `--wifi`/`--wifi-join` were deleted rather than kept as a fallback: no remaining consumer, none carried a stream past a minute, and the hotspot path rewrote the user's Mobile Hotspot settings. `apartment.hpp` and `winrt_wait.hpp` stay for their Bluetooth consumers.
+- Wi-Fi link (2026-10-18): the glasses-hosted network extends the canonical paths. `src/protocol/stream.cpp` gains `CreateSoftApNetwork`/`SoftApNetworkInfo` beside the stream messages; `MediaSession` keeps its worker, lease, reconnect loop, stream setup and keepalive and swaps only the network step; `randomWifiCredentials` remains the single CSPRNG credential generator. One new responsibility, `src/windows/wifi_station.cpp`, joins a network as a Native Wi-Fi client. The Mobile Hotspot and Wi-Fi Direct owners, the `JoinAccessPoint` messages and the probe's `--wifi`/`--wifi-join` were deleted rather than kept as a fallback: no remaining consumer, none carried a stream past a minute, and the hotspot path rewrote the user's Mobile Hotspot settings.
+- Wi-Fi adapter choice (2026-10-19): `wifi_station.cpp` gains `listWifiAdapters` and an adapter id on `connectWifiStation` instead of a second Wi-Fi component; `MediaSession` takes the id; the plugin exposes it through the existing C boundary (`mglWifiAdapterList`, `mglCameraSetWifiAdapter`) and the existing properties pattern used for quality. An id that matches no adapter fails explicitly (no silent fallback). The owner-key check lives in `MediaSession`, not `GlassesSession`, because the ownership setup needs sessions that reach Ready with the key refused.
+- Release packaging (2026-10-19): `package` stages exactly the bundle layout that `Install-MetaGLinkDirect.ps1` already installs from (`Build-ReleaseBundle`), instead of the CMake install layout that no installer consumed. The installer's copy and remove steps share one elevation path (`Invoke-PluginFileStep`), which also fixes uninstall for OBS under Program Files.
 
-## Architecture and verified compatibility inputs
+## Architecture and inputs
 
-Use C++20 for owned code, CMake 3.31.3, installed LLVM 22.1.1 and Visual Studio 2022/MSVC compiler 19.44.35222.0 (toolset 14.44.35207) with Windows SDK 10.0.26100.0. OBS 32.2.2 is installed and its official release/source tag was queried successfully. The official plugin template documents Windows Visual Studio 2022 and CMake >=3.28; owned CMake targets will use the published libobs package/module contract. The frame-prefix library stays portable, while device probing, transport and protected identity live under Windows-specific paths. OBS is a thin consumer of the proved connection/media library. No Qt/custom web UI is required for the planned native properties controls.
-
-Official references: [OBS template](https://github.com/obsproject/obs-plugintemplate/tree/3e7d7ac3b5342cd7d9b88890b9c70b472d1520fc), [OBS 32.2.2](https://github.com/obsproject/obs-studio/tree/ba2f32bdf791005443988a4955e963663e16b1ed), [source API](https://docs.obsproject.com/reference-sources), and the pinned research links in the brief. Source tar SHA-256: ec81fb66b03e75ddb3076b576f62679c39262e0e9960cef3e17a40dc5d68e6b4. OBS upstream dependency hashes must be retained and verified; dependencies.lock.json owns exact downloadable inputs.
-
-## Milestone contracts and certification
-
-M0 (TASK-SETUP) creates the native build and quality foundation, a bounded no-allocation prefix parser, read-only local radio diagnostics, and a C17/MSVC OBS module with metadata only. Its independent vectors and mutation protect framing; isolated loader checks protect ABI/metadata; gate drills protect command wiring. Required security checks include staged/history secret scans, SAST, dependency inventory, and workflow lint. Package only the development foundation with explicit status; it must not appear as a functional camera source. Documentation, upstream notices and exact command evidence are part of this milestone. Parser inputs are bounded; performance profiling begins when real receive/decode workloads exist, not with invented benchmark claims.
-
-M1 (TASK-AUTH) ports actual connection/identity behavior and validates it on glasses. A local iPhone export remains optional research; it is not a prerequisite now that Meta authentication is permitted. A reproducible application-token/ownership path, protected local key storage, explicit timeouts/cancellation and return-to-phone behavior must be proved. Review credential exposure and session teardown; tests/drills must reject bad trust signatures and swallowed timeouts. The current discovery increment extends the existing radio/CLI paths and adds a Windows SDK C++/WinRT passive watcher with bounded wait/stop, shared callback lifetime, aggregate packet counts and explicit errors. Company 0x01AB or service FD5F marks a candidate, not a verified model. No names, addresses or payloads are retained. Classic diagnostics now use explicit inquiry and Windows-registered Meta UUID lookup, with a separate single-paired-service encrypted/authenticated socket check, per-operation deadlines/cancellation and explicit close. This sends no application frames and is not a complete uncached SDP scan. Shared Apartment lifetime is extracted for actual BLE and Classic consumers. Uncached per-peer SDP, an explicit Windows pairing picker, and separate private-address Winsock probes now extend this responsibility. The direct probes use either the Meta UUID or explicitly selected documented channel 7, require a trustworthy target, and do not require an existing Windows bond or send application frames. The portable address parser, bounded hidden console input and requested redacted report output have actual consumers. Shared probe test support prevents duplicate process harnesses; a separate slow live-SDP suite checks actual query execution. New address-validation and skipped-query drills protect these changes. Successful transport and authentication still require actual glasses evidence. No ownership change occurs merely because a build/probe command runs. Update the brief if product constraints change, and README/CHANGELOG when behavior exists.
-
-M2 (TASK-MEDIA) ports the actual Wi-Fi group-owner/access-point role, frame reassembly, HEVC/AAC decode, timing and supported quality selection. Test malformed/truncated/oversized input, codec configuration changes, bounded queues, timestamps and decoder errors with intended red drills. Measure real resolution/fps, independent end-to-end latency, CPU/memory and thermal behavior. Audio remains optional. Record exact current stable firmware; do not demand a downgrade or treat an Android upstream result as Windows proof. Update use/troubleshooting and privacy documentation with actual behavior.
-
-Current state (2026-10-18): M1 authentication and the Meta owner change are proven on hardware (`--link` reaches ready with trust success; this PC holds the owner key). Trust-signature verification is not built, so AC-AUTH stays open. M2 live 720×1280 HEVC at ~30 fps is proven. With the glasses joining an access point, video stopped within 8–54 s on every path tried; with the glasses hosting their own 2.4 GHz / 20 MHz network, the production media session streamed without a stall (about 179 s, 120 s, and two stop/start cycles). See [the Wi-Fi link report](reports/WIFI_LINK_VERIFICATION.md). Other quality profiles, latency, CPU/memory, thermal behaviour, audio and the firmware build remain open. M3: the installed OBS source ran live at 720×1280 / 30 fps for two minutes on the glasses-hosted link (2026-10-19), with one OBS render skip in 9,794 frames, none attributable to the source, through start, stream and stop. Reconnection after a real drop, quality changes in OBS, the accessibility pass and the 120-minute run remain open.
-
-M3 (TASK-OBS) adds the real source only after the direct path is demonstrated. Test source start/stop/destroy, reconnect, optional audio synchronization, quality changes and failures; verify native UI with keyboard, Narrator, themes and scaling. The final certification requires the complete >=120-minute run, phone off, no cloud media path, no unbounded memory/queue growth and all numeric/visual gates in AC-OBS. Hardware limits may make acceptance fail; report this without lowering the target. Native source tests/red drills and current artifact/source binding accompany manual hardware and visual records. README, CHANGELOG, supported-version evidence, installation/uninstall/rollback and diagnostics instructions must match the final artifact.
+C++20 owned code; C17 for the two files that include OBS headers; CMake 3.31.3; MSVC 19.44.35222.0 (toolset 14.44.35207) with Windows SDK 10.0.26100.0; LLVM 22.1.1 for formatting and C++ analysis. The protocol core stays portable; transports, identity, Wi-Fi and the media session live under `src/windows/`; OBS is a thin consumer behind `src/plugin/camera.h`. `dependencies.lock.json` pins the downloadable inputs; the OBS 32.2.2 source tar SHA-256 is `ec81fb66b03e75ddb3076b576f62679c39262e0e9960cef3e17a40dc5d68e6b4`. References: [OBS template](https://github.com/obsproject/obs-plugintemplate/tree/3e7d7ac3b5342cd7d9b88890b9c70b472d1520fc), [OBS 32.2.2](https://github.com/obsproject/obs-studio/tree/ba2f32bdf791005443988a4955e963663e16b1ed), [source API](https://docs.obsproject.com/reference-sources).
 
 ## Gate policy and evidence
 
-Expose conventional format, format:check, lint, typecheck, deadcode, security:audit, test, test:red, build, quality and package tasks through scripts/Invoke-Project.ps1. A missing or unsupported tool is an explicit deferred gate, never a silent success. Independent gate/test commands must propagate native exit codes. Test and gate drills use exact restoration in finally and record baseline, intended diagnostic/nonzero exit and restored green. The maintained set runs at setup and affected changes, then milestone/release review.
+`scripts/Invoke-Project.ps1` exposes format, format:check, lint, typecheck, deadcode, security:audit, test, test:red, build, quality and package. A missing or unsupported tool is a failed gate, never a silent success. Native exit codes propagate. Drills record baseline, intended failure and exact restoration. The maintained set runs on affected changes and before each release; `package` runs `quality` first.
 
-ASan/UBSan and TSan are separate supported builds. Use portable protocol code on Linux for sanitizer coverage that Windows cannot provide; Windows/OBS/radio testing remains distinct. Coverage floors must follow measured owned-code baselines. cppcheck, gcovr, jscpd and platform-specific sanitizer availability require actual provisioning/verification or a concrete deferred entry with owner and next action. OSV support for pinned OBS native archives must be assessed honestly; a scanner finding no supported lockfile does not constitute a native dependency audit.
+Detailed logs belong under `reports/` (indexed in `reports/README.md`). Requirements, software checks, glasses proof, OBS behaviour, accessibility, firmware compatibility and endurance stay separate statuses.
 
-Detailed logs and context belong under reports/. Do not copy full command output into this narrative. Readiness review is separate from implementation/test proof. Technical unknowns and future manual gates remain open in the ledger even when M0 software checks pass.
+## Open verification
 
-## Open technical verification and deferred public scope
+Reconnection after a real drop; trust-signature verification; lower quality profiles and quality changes in OBS; latency, CPU, memory and thermal measurement; glasses audio; the keyboard, Narrator, theme and scaling pass; the firmware build; confirming the battery reading; and the full-charge endurance run. While streaming, the PC's Wi-Fi adapter has no internet (brief D15).
 
-Open on the current link (2026-10-19): reconnection after a real drop; trust-signature verification; quality presets, latency and resource measurement; the accessibility pass; the firmware build; the 120-minute run, where a health reading that looks like battery (about 4 points per 90 s, unconfirmed) suggests the glasses may need power; and a `package` task that builds the installer's bundle layout (it currently produces the CMake install layout). Randy's direction for the link: no router, hotspot or network changes, no phone, full resolution. While streaming, the PC's Wi-Fi adapter has no internet. The paragraph below is the historical Classic-discovery state; Bluetooth pairing and authentication have since been proven.
+Deferred: code signing and provenance, a published SBOM and native advisory assessment, Windows jobs in hosted CI, and other platforms or glasses generations.
 
-Randy requires continued work with the existing adapter; replacement hardware is not a prerequisite of this plan. The current controller reports Classic supported and LE unsupported; the documented LE path is unavailable. This does not establish that Classic-only access is impossible. Initial and controlled uncached queries found no Meta service and one peer timed out. The explicit Windows picker was canceled because glasses were absent; no new bond or socket was created. Randy confirmed the paired headphones are separate from the glasses. Public Gen 2 research reports an unpaired channel-7 server hello, so targeted Winsock probes are implemented separately from the bonded WinRT route. The glasses' trustworthy Classic address remains unidentified; a question about a Bluetooth-address field in Meta AI is pending. Addresses are entered privately on local stdin, never chat/argv/logs. No current-firmware, authentication, camera or ownership success is claimed. Same LAN does not supply the authenticated Wi-Fi endpoint; group-owner capability and all real media/OBS acceptance remain unproved. No driver/network changes, purchase, reset or firmware downgrade are authorized by this investigation.
+## Analysis decisions
 
-Public repository, hosted CI execution, public distribution support, signing/provenance services, procurement, public incident response and broader platforms are deferred by the personal-prototype contract. Randy owns reopening these decisions if distribution is requested. No remote/publishing/signing identity is created during M0.
+- Both languages build with MSVC because CMake rejects a mixed clang-cl/MSVC project and OBS's `util_uint64.h` needs `_udiv128`, which clang-cl does not implement ([LLVM issue 59168](https://github.com/llvm/llvm-project/issues/59168)). No compiler macro is spoofed and no private OBS declaration is introduced.
+- clang-tidy disables only `llvm-prefer-static-over-anonymous-namespace`, which contradicts the retained `misc-use-anonymous-namespace`. Line-scoped `misc-include-cleaner` annotations cover C++/WinRT projection headers that LLVM 22 cannot map back to the public SDK (in `src/windows/discovery.cpp` and `src/windows/classic.cpp`). Line-scoped cast annotations cover exact-signature `GetProcAddress` conversions in `tests/module_tests.cpp` and each unavoidable C ABI cast at a Windows API boundary. Revisit when the SDK or LLVM changes.
+- Cppcheck runs on an analysis copy of the compilation database with MSVC `-external:I` paths normalized and the compiler builtins added. `.cppcheck-obs.cfg` models the six OBS entry points OBS loads dynamically. Only `missingIncludeSystem` notices and findings under `.deps/` are suppressed; owned header and unused-function findings fail.
+- The first synthetic secret canary used the wrong alphabet; its miss is preserved in `reports/red-secret-canary-initial.txt` and the generator was corrected without changing scanner rules.
+- The GitHub workflow builds the portable protocol core on Linux with clang under ASan and UBSan; Windows ASan runs locally (`test:asan`). TSan, fuzzing and a coverage floor are not established.
+- OSV and npm audit cover the locked npm development packages only. The pinned native OBS archives have integrity and version evidence, not an advisory assessment.
 
-## Analysis decisions and remaining verification boundaries
-
-The actual native build uses MSVC for both languages because CMake rejects a mixed clang-cl/MSVC project and OBS's util_uint64.h needs `_udiv128`, which clang-cl does not implement ([LLVM issue 59168](https://github.com/llvm/llvm-project/issues/59168)). Owned libraries remain C++20; the small OBS ABI file is C17 with `/W4 /WX /analyze`. C++ clang-tidy consumes the actual MSVC compilation database. No compiler-version macro is spoofed in production and no private OBS declaration is introduced.
-
-The copied strict clang-tidy preset contained contradictory static/anonymous-namespace rules. Disable only llvm-prefer-static-over-anonymous-namespace while retaining misc-use-anonymous-namespace; this is a style conflict, not a correctness suppression. Three declarations in src/windows/discovery.cpp and thirteen declarations in src/windows/classic.cpp carry line-scoped misc-include-cleaner annotations because LLVM 22 cannot map generated C++/WinRT impl headers back to the included public SDK projection; IWYU keep comments retain required public projection headers. No generated/private SDK declarations are copied or substituted, and the compiler still parses the actual SDK. Revisit when the SDK or LLVM changes. Two exact-signature GetProcAddress conversions in tests/module_tests.cpp carry scoped cppcoreguidelines-pro-type-reinterpret-cast annotations after independent non-null/export checks; this is the documented dynamic Windows ABI boundary. The native Bluetooth address union access and Winsock SOCKADDR_BTH-to-sockaddr conversion each have one precise boundary annotation required by the public SDK C ABI. Existing Windows umbrella headers are kept with IWYU comments because SDK leaf headers require their prerequisites.
-
-Cppcheck initially lost MSVC `-external:I` include paths. Generate only an analysis copy of compile_commands.json with those paths normalized and the observed compiler builtins added. The .cppcheck-obs.cfg models six real externally loaded OBS entry points; it does not mark arbitrary functions as used. Suppress only missingIncludeSystem informational notices from the deliberately model-based std/windows analysis and findings under the external .deps header tree. The real compiler/LLVM gates still parse owned and system headers; missing quoted owned headers and owned unusedFunction findings remain failures. Native dependency headers are not certified by this scope. Revisit these analysis decisions on toolchain/OBS upgrades; the header and unused-function drills must continue to fail as intended.
-
-The first synthetic AWS canary used hexadecimal rather than the scanner's documented A-Z2-7 base32 suffix. Its miss was preserved in reports/red-secret-canary-initial.txt. The generator was corrected without changing scanner rules. A native-exit mutation was rejected by Pester but the harness expected different assertion wording; the original receipt is retained in reports/red-native-exit-initial.txt. Final proof requires a complete restored run against the corrected harness.
-
-Windows ASan is configured and exercised separately. Linux/hosted ASan+UBSan remains unexecuted because no remote is authorized and this session verifies the Windows host. TSan/Valgrind require a supported Linux environment; the current parser/probe has no owned concurrent streaming code. The new BLE watcher does have concurrent callbacks protected by a mutex and shared lifetime; a successful packet path and supported race instrumentation are not proved by the current unsupported-transport result. Coverage baseline/floor and fuzzing remain work before accepting the upcoming session/media parser expansion; gcovr cannot establish coverage for the current MSVC build. Owner: technical implementation; next action: establish portable-core coverage/fuzz and supported sanitizer execution before M1/M2 certification. No coverage percentage, Linux sanitizer pass or hosted CI pass is claimed.
-
-OSV and npm audit currently cover the nine locked npm development packages. The pinned native OBS/dependency archives have integrity and version evidence, not a complete SBOM/advisory assessment. Owner: technical/security work; next action: inventory native components and assess advisories before authentication/media dependencies are accepted. Current SDK input should not be presented as a full native supply-chain audit. Hardware, actual OBS source UI and the 120-minute target remain separate later acceptance, not setup-test conclusions.
+## Ledger
 
 ```quality-ledger
 {
@@ -64,7 +56,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
   "work": {
     "id": "MGL-DIRECT",
     "title": "Direct Gen 2 glasses source for personal Windows OBS use",
-    "scope_revision": 2,
+    "scope_revision": 3,
     "brief": "PROJECT_BRIEF.md",
     "brief_reason": null,
     "rules": [
@@ -133,7 +125,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
     },
     {
       "id": "REQ-OBS",
-      "statement": "Deliver an accessible responsive native OBS source and prove at least 120 minutes continuous streaming.",
+      "statement": "Deliver an accessible responsive native OBS source and prove streaming for one full glasses battery charge with no drop or reconnect, recorded in measured minutes.",
       "priority": "critical",
       "acceptance": [
         "AC-OBS"
@@ -206,14 +198,14 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       "id": "AC-OBS",
       "requirement": "REQ-OBS",
       "given": "A proved direct media path, OBS 32.2.2 on this PC and external audio normally selected",
-      "when": "User pairs/connects, starts/stops, adjusts quality, toggles glasses audio, reconnects and streams for at least 120 minutes",
+      "when": "User pairs/connects, starts/stops, adjusts quality, toggles glasses audio, reconnects and streams from a full glasses battery until the low-battery shutdown",
       "then": "Native OBS source remains stable on latest stable firmware; startup \u226415s after ready connection, reconnect \u226430s after availability; no growing queue; keyboard/Narrator/theme checks pass at 480px+ and 100\u2013200% scaling; phone stays off during streaming.",
       "checks": [
         "behavior",
         "red",
         "manual"
       ],
-      "manual_reason": "Requires a real OBS scene, actual glasses, assistive technology, visual inspection and a timed 120-minute run."
+      "manual_reason": "Requires a real OBS scene, actual glasses, assistive technology, visual inspection and a timed full-charge run."
     }
   ],
   "tasks": [
@@ -19188,7 +19180,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       "exit_code": null,
       "artifact": {
         "path": "reports/WIFI_LINK_VERIFICATION.md",
-        "sha256": "6c93fe6e1e26e5f748210b692807795ae09817594389b78101baff3edec818b4"
+        "sha256": "d0d6a035809793e86fbace8c9827f5252b62256ec0d434d77ea140c470f7b464"
       },
       "inputs": [
         {
@@ -19261,9 +19253,9 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "-NoProfile",
         "-File",
         "scripts/Invoke-Project.ps1",
-        "test"
+        "package"
       ],
-      "method": "Native build; format:check, lint:cpp, lint:powershell, lint:workflow, deadcode:cpp, deadcode:copies, security:secrets, security:sast, security:npm and security:osv each exited 0; the test task passed, including 68 protocol cases with 26 for the glasses-hosted network messages.",
+      "method": "The release gate (package): configure, build, format:check, lint, deadcode, security:audit, test, test:live, test:red each exited 0; 4 CTest suites (68 protocol cases), 24 Pester cases and 20 red drills passed; then the release zip was built (SHA-256 27d7fbae13cddf582d1ee76b3e2fcc3764b18b5971101f3e5899190278f173fe). The zip was extracted and its installer dry-run under Windows PowerShell 5.1 for install, uninstall and uninstall without OBS.",
       "environment": {
         "platform": "windows",
         "tools": {
@@ -19289,7 +19281,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       "exit_code": 0,
       "artifact": {
         "path": "reports/wifi-link-gates.txt",
-        "sha256": "5fe3c9b44c5315477afdce1a39b856dd025ba2e205e182972ae54d97034f9b46"
+        "sha256": "4750d752fae3fbe9d7753ce0ef4bd03ffa0291d6daee1609b6f9774e9e46f384"
       },
       "inputs": [
         {
@@ -19306,11 +19298,11 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         },
         {
           "path": "include/mgl/wifi_station.hpp",
-          "sha256": "ccc16d781a97b2cad0c0491543e25ea7a3137b795fadf2d37b72c556e2be9151"
+          "sha256": "ac6c3df9b17f8a7bc2fbbf92f918008bd7b2929d76dd2f71dfe28ec29d344636"
         },
         {
           "path": "src/windows/wifi_station.cpp",
-          "sha256": "4c9ebc5d0e62a91ffe0613a3a9eb616f78161609a6f0854bc1bea03c1f3b01e1"
+          "sha256": "a3b0c56d87d04f9ab4afc33ad7986d1d861621b3250db7a36fc563e10f71dcb2"
         },
         {
           "path": "src/windows/wifi_credentials.hpp",
@@ -19318,11 +19310,27 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         },
         {
           "path": "include/mgl/media_session.hpp",
-          "sha256": "f72e0e09aa11a591a69d54c4d91447d81fae13906cb812db26a2c670e105a10c"
+          "sha256": "26697ce17c19d0ba0888eca7a11c5e7ce09a7c8d2ea27fe8b1116d059093a5c0"
         },
         {
           "path": "src/windows/media_session.cpp",
-          "sha256": "d1c912e636038eb4c96db2b105ad07855ac46d35f56dd530c0ef74e467c6fcc3"
+          "sha256": "c4490464219de062d591774239a45d506410b4a9ccc3ce712ef9d4f0a07624bb"
+        },
+        {
+          "path": "src/plugin/camera.h",
+          "sha256": "c14b40b631f48974f6d0ae066d4420d53295c1187e5253d9bb8334488cceeb8b"
+        },
+        {
+          "path": "src/plugin/camera.cpp",
+          "sha256": "f057f97c16dad8e1679189f52f300f68049c6efd6cf974f5aaa2e353775ad3ed"
+        },
+        {
+          "path": "src/plugin/source.c",
+          "sha256": "f47d8c734cec4a1f82d8a4417f9cd016e41e58a424e00dad303115ab995d8ea7"
+        },
+        {
+          "path": "data/locale/en-US.ini",
+          "sha256": "70580c88b13e2c3e8ee858397e613985a4c429113fbbdb338c9caf82305edd2a"
         },
         {
           "path": "src/probe/main.cpp",
@@ -19333,16 +19341,24 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
           "sha256": "f56c414cc9b814861aaffcbb40d35983e4cd6e6cbc1858716eec986816ecb7f9"
         },
         {
-          "path": "include/mgl/wifi_group.hpp",
-          "sha256": null
+          "path": "scripts/Install-MetaGLinkDirect.ps1",
+          "sha256": "ecc3c16028d3a1ae7f4de453f6b30eb6ac4636c9e0c752c82527b000835c9ef9"
         },
         {
-          "path": "src/windows/wifi_group.cpp",
-          "sha256": null
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "de78c654f25a0ad94f656ad78b5bd6e1aee0f8dba3423574089510fbfb5b0d1c"
         },
         {
-          "path": "src/windows/wifi_hotspot.cpp",
-          "sha256": null
+          "path": "packaging/Install.cmd",
+          "sha256": "1bad1b9185b1328e783d01bc881e9a9060263f8cbc7c3973291ee40ec4227039"
+        },
+        {
+          "path": "packaging/Uninstall.cmd",
+          "sha256": "041c25669c21aa56cac8ef3af8d138abaddb0d85bcc2b3eeefbd81b7868bed3b"
+        },
+        {
+          "path": "packaging/README.txt",
+          "sha256": "a1828052143a56a979e082de1b79952e36508369d74eabaabe8bbad27acef0b4"
         }
       ],
       "scope_sha256": null,
@@ -19435,7 +19451,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       "kind": "manual",
       "status": "deferred",
       "command": [],
-      "method": "Not yet run: reconnection after a real drop, quality changes in OBS, the keyboard/Narrator/theme/scaling pass, latency measurement and the 120-minute run.",
+      "method": "Not yet run: reconnection after a real drop, quality changes in OBS, the keyboard/Narrator/theme/scaling pass, latency measurement and the full-charge endurance run.",
       "environment": {
         "platform": "windows",
         "tools": {
@@ -19463,7 +19479,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       "inputs": [],
       "scope_sha256": null,
       "red": null,
-      "reason": "Next hardware sessions; a health reading that looks like battery suggests the 120-minute run may need the glasses on power."
+      "reason": "Next hardware sessions; a health reading that looks like battery suggests a session lasts roughly 35-40 minutes per charge."
     },
     {
       "id": "EV-WIFI-LINK-OBS",
@@ -19473,7 +19489,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       "kind": "manual",
       "status": "pass",
       "command": [],
-      "method": "Installed this build with scripts/Install-MetaGLinkDirect.ps1 (setup declined), started OBS 32.2.2 and switched the test scene live over the local OBS WebSocket. 720x1280 video about 18 s after the scene went live; two minutes at 30.0 fps; OBS render skips 1 of 9,794 frames (present before the scene went live) through start, stream and stop; CPU about 1.3%; memory flat; source screenshots at 0 s and 2 min showed live first-person frames and were deleted; Camera stopped on scene switch with no Wi-Fi profile left. Not covered: reconnection after a real drop, quality changes, accessibility, the 120-minute run.",
+      "method": "Installed this build with scripts/Install-MetaGLinkDirect.ps1 (setup declined), started OBS 32.2.2 and switched the test scene live over the local OBS WebSocket. 720x1280 video about 18 s after the scene went live; two minutes at 30.0 fps; OBS render skips 1 of 9,794 frames (present before the scene went live) through start, stream and stop; CPU about 1.3%; memory flat; source screenshots at 0 s and 2 min showed live first-person frames and were deleted; Camera stopped on scene switch with no Wi-Fi profile left. Not covered: reconnection after a real drop, quality changes, accessibility, the full-charge endurance run. On 2026-10-19 the Wi-Fi adapter property listed Automatic and the USB adapter by name; video came up with that adapter chosen explicitly; an id matching no adapter failed explicitly, used no other adapter and closed the glasses network over Bluetooth (acknowledged).",
       "environment": {
         "platform": "windows",
         "tools": {
@@ -19499,32 +19515,84 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       "exit_code": null,
       "artifact": {
         "path": "reports/WIFI_LINK_VERIFICATION.md",
-        "sha256": "6c93fe6e1e26e5f748210b692807795ae09817594389b78101baff3edec818b4"
+        "sha256": "d0d6a035809793e86fbace8c9827f5252b62256ec0d434d77ea140c470f7b464"
       },
       "inputs": [
         {
-          "path": "src/plugin/camera.cpp",
-          "sha256": "525045179a3ccf0161ae3dcfb537b3c23c79ef75865c3d9fe24cbaa9121ba9b6"
+          "path": "CMakeLists.txt",
+          "sha256": "edf508bd8b91c85951f555ede63c42436b9cf8935c8d7dde09ea70b81b681108"
         },
         {
-          "path": "src/plugin/source.c",
-          "sha256": "5b09da2c95ffc93aa4991aeb2eec64669e407838358aa65f20ca898f207a29b1"
+          "path": "include/mgl/stream.hpp",
+          "sha256": "0588814c1b39e08aec407542a2d973c71cfb442f72e941081c00be45d686508a"
         },
         {
-          "path": "src/plugin/module.c",
-          "sha256": "acd95e46fadada63c946e253675b40a73d82f7b9f830d4ae92ca76bc3e8a4749"
+          "path": "src/protocol/stream.cpp",
+          "sha256": "4f58f94c3ecfd5c06ed85a78d0ef8b7e9e163641bf9d727f43d7f93e511345a5"
         },
         {
-          "path": "src/windows/media_session.cpp",
-          "sha256": "d1c912e636038eb4c96db2b105ad07855ac46d35f56dd530c0ef74e467c6fcc3"
+          "path": "include/mgl/wifi_station.hpp",
+          "sha256": "ac6c3df9b17f8a7bc2fbbf92f918008bd7b2929d76dd2f71dfe28ec29d344636"
         },
         {
           "path": "src/windows/wifi_station.cpp",
-          "sha256": "4c9ebc5d0e62a91ffe0613a3a9eb616f78161609a6f0854bc1bea03c1f3b01e1"
+          "sha256": "a3b0c56d87d04f9ab4afc33ad7986d1d861621b3250db7a36fc563e10f71dcb2"
+        },
+        {
+          "path": "src/windows/wifi_credentials.hpp",
+          "sha256": "fdaaedd93bc48b18f0b5833f1ae7abde37d4035ad42ba610b9dc72f9e4fd9fe6"
+        },
+        {
+          "path": "include/mgl/media_session.hpp",
+          "sha256": "26697ce17c19d0ba0888eca7a11c5e7ce09a7c8d2ea27fe8b1116d059093a5c0"
+        },
+        {
+          "path": "src/windows/media_session.cpp",
+          "sha256": "c4490464219de062d591774239a45d506410b4a9ccc3ce712ef9d4f0a07624bb"
+        },
+        {
+          "path": "src/plugin/camera.h",
+          "sha256": "c14b40b631f48974f6d0ae066d4420d53295c1187e5253d9bb8334488cceeb8b"
+        },
+        {
+          "path": "src/plugin/camera.cpp",
+          "sha256": "f057f97c16dad8e1679189f52f300f68049c6efd6cf974f5aaa2e353775ad3ed"
+        },
+        {
+          "path": "src/plugin/source.c",
+          "sha256": "f47d8c734cec4a1f82d8a4417f9cd016e41e58a424e00dad303115ab995d8ea7"
+        },
+        {
+          "path": "data/locale/en-US.ini",
+          "sha256": "70580c88b13e2c3e8ee858397e613985a4c429113fbbdb338c9caf82305edd2a"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "6fb691e1b34541ba2cb19cacae66942682047ef9f60fe3536d5d2c8f38cf778b"
+        },
+        {
+          "path": "tests/protocol_tests.cpp",
+          "sha256": "f56c414cc9b814861aaffcbb40d35983e4cd6e6cbc1858716eec986816ecb7f9"
         },
         {
           "path": "scripts/Install-MetaGLinkDirect.ps1",
-          "sha256": "6bc5f328a2910d0b8f69db5e5a04a6e7f5b5205b3f9fd3e3ccc72d1e592b1ddf"
+          "sha256": "ecc3c16028d3a1ae7f4de453f6b30eb6ac4636c9e0c752c82527b000835c9ef9"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "de78c654f25a0ad94f656ad78b5bd6e1aee0f8dba3423574089510fbfb5b0d1c"
+        },
+        {
+          "path": "packaging/Install.cmd",
+          "sha256": "1bad1b9185b1328e783d01bc881e9a9060263f8cbc7c3973291ee40ec4227039"
+        },
+        {
+          "path": "packaging/Uninstall.cmd",
+          "sha256": "041c25669c21aa56cac8ef3af8d138abaddb0d85bcc2b3eeefbd81b7868bed3b"
+        },
+        {
+          "path": "packaging/README.txt",
+          "sha256": "a1828052143a56a979e082de1b79952e36508369d74eabaabe8bbad27acef0b4"
         }
       ],
       "scope_sha256": null,
@@ -19798,8 +19866,8 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       "TASK-SETUP"
     ],
     "pending_operations": [],
-    "next_action": "Exercise reconnection after a real drop in OBS, then quality changes, the accessibility pass, trust-signature verification, a package task for the installer bundle, and the 120-minute run with the glasses on power if the battery reading is confirmed.",
-    "source_revision": "4d1cab2a5350c76f56efcdc6b883fde4fa4d0918"
+    "next_action": "After the 0.1.0 pre-release: reconnection after a real drop in OBS, the owner-key refusal path, quality changes, two Wi-Fi adapters at once, the accessibility pass, trust-signature verification, confirming the battery reading and the full-charge endurance run.",
+    "source_revision": "b9753ac4fe2a50da02b166d698541604b4785ae8"
   }
 }
 ```

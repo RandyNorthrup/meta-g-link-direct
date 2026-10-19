@@ -4,12 +4,12 @@ BASELINE EXIT 0
 ┌─────────────┐
 │ Scan Status │
 └─────────────┘
-  Scanning 16 files tracked by git with 3 Code rules:
+  Scanning 61 files tracked by git with 3 Code rules:
                                                                                                                         
   Language   Rules   Files          Origin   Rules                                                                      
  ──────────────────────────        ────────────────                                                                     
-  cpp            3      15          Custom       3                                                                      
-  c              2       1                                                                                              
+  cpp            3      59          Custom       3                                                                      
+  c              2       3                                                                                              
                                                                                                                         
                 
                 
@@ -19,11 +19,11 @@ BASELINE EXIT 0
 ✅ Scan completed successfully.
  • Findings: 0 (0 blocking)
  • Rules run: 3
- • Targets scanned: 16
+ • Targets scanned: 61
  • Parsed lines: ~100.0%
  • Scan was limited to files tracked by git
  • For a detailed list of skipped files and lines, run semgrep with the --verbose flag
-Ran 3 rules on 16 files: 0 findings.
+Ran 3 rules on 61 files: 0 findings.
 
 MUTATED EXIT 1
                
@@ -31,12 +31,12 @@ MUTATED EXIT 1
 ┌─────────────┐
 │ Scan Status │
 └─────────────┘
-  Scanning 16 files tracked by git with 3 Code rules:
+  Scanning 61 files tracked by git with 3 Code rules:
                                                                                                                         
   Language   Rules   Files          Origin   Rules                                                                      
  ──────────────────────────        ────────────────                                                                     
-  cpp            3      15          Custom       3                                                                      
-  c              2       1                                                                                              
+  cpp            3      59          Custom       3                                                                      
+  c              2       3                                                                                              
                                                                                                                         
                 
                 
@@ -46,11 +46,11 @@ MUTATED EXIT 1
 ✅ Scan completed successfully.
  • Findings: 1 (1 blocking)
  • Rules run: 3
- • Targets scanned: 16
+ • Targets scanned: 61
  • Parsed lines: ~100.0%
  • Scan was limited to files tracked by git
  • For a detailed list of skipped files and lines, run semgrep with the --verbose flag
-Ran 3 rules on 16 files: 1 finding.
+Ran 3 rules on 61 files: 1 finding.
                   
                   
 ┌────────────────┐
@@ -62,7 +62,7 @@ Ran 3 rules on 16 files: 1 finding.
           ❰❰ Blocking ❱❱
           Use bounded typed buffers; unbounded string copies are forbidden.
                                                                            
-           47┆ void red_drill_copy(char* d, const char* s) { strcpy(d, s); }
+           80┆ void red_drill_copy(char* d, const char* s) { strcpy(d, s); }
 
 Write-Error: Native command failed (1): semgrep
 
@@ -72,12 +72,12 @@ RESTORED EXIT 0
 ┌─────────────┐
 │ Scan Status │
 └─────────────┘
-  Scanning 16 files tracked by git with 3 Code rules:
+  Scanning 61 files tracked by git with 3 Code rules:
                                                                                                                         
   Language   Rules   Files          Origin   Rules                                                                      
  ──────────────────────────        ────────────────                                                                     
-  cpp            3      15          Custom       3                                                                      
-  c              2       1                                                                                              
+  cpp            3      59          Custom       3                                                                      
+  c              2       3                                                                                              
                                                                                                                         
                 
                 
@@ -87,10 +87,10 @@ RESTORED EXIT 0
 ✅ Scan completed successfully.
  • Findings: 0 (0 blocking)
  • Rules run: 3
- • Targets scanned: 16
+ • Targets scanned: 61
  • Parsed lines: ~100.0%
  • Scan was limited to files tracked by git
  • For a detailed list of skipped files and lines, run semgrep with the --verbose flag
-Ran 3 rules on 16 files: 0 findings.
+Ran 3 rules on 61 files: 0 findings.
 
-RESTORATION SHA256 9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084
+RESTORATION SHA256 23f81a1e6ccdf6122fdb9414b839a7e2ca96f3564b1608f35ffa807579178ca0

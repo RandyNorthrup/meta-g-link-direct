@@ -1,0 +1,53 @@
+name: Bug report
+description: Something doesn't work as the README describes.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. **Never paste** Bluetooth or network addresses, Wi-Fi passwords, Meta login links or codes, tokens, or the contents of `%LOCALAPPDATA%\MetaGLinkDirect`. Plugin log lines (`[meta-g-link-direct] ...`) contain status only and are safe to share.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Plugin version
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Windows and OBS versions
+      placeholder: "Windows 11 24H2 (build 26100), OBS 32.2.2"
+    validations:
+      required: true
+  - type: input
+    id: adapters
+    attributes:
+      label: Bluetooth and Wi-Fi adapters
+      description: Model names from Device Manager, if you know them.
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Where it fails
+      options:
+        - Pairing the glasses with Windows
+        - Installer
+        - Meta setup (ownership)
+        - Connecting in OBS
+        - Video stops or freezes
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Plugin log lines
+      description: From OBS Help > Log Files, the lines starting with `[meta-g-link-direct]`.
+      render: text

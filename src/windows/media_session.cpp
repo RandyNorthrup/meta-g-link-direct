@@ -227,6 +227,9 @@ std::string describeStationFailure(const WifiStation& station) {
     case WifiStationStatus::NoAdapter:
         text += "no Wi-Fi adapter is available";
         break;
+    case WifiStationStatus::AdapterMissing:
+        text += "the Wi-Fi adapter chosen in the source properties is not available";
+        break;
     case WifiStationStatus::ProfileFailed:
         text += "Windows refused the network profile";
         break;
@@ -495,8 +498,9 @@ struct MediaSession::ControlLink {
     stream::SoftApInfo access_point;
 };
 
-MediaSession::MediaSession(MediaCallbacks callbacks, const stream::VideoConfig& config)
-    : callbacks_(std::move(callbacks)), config_(config) {}
+MediaSession::MediaSession(MediaCallbacks callbacks, const stream::VideoConfig& config,
+                           std::string wifi_adapter)
+    : callbacks_(std::move(callbacks)), config_(config), wifi_adapter_(std::move(wifi_adapter)) {}
 
 MediaSession::~MediaSession() { stop(); }
 
@@ -609,14 +613,15 @@ MediaSession::SessionEnd MediaSession::runSession() {
     // The control link outlives the rest of the attempt so it can close the glasses' access point
     // if the attempt fails before the media link opens. Locals unwind in reverse order: the media
     // link closes, then this PC leaves the glasses' network, then the control link goes.
-    const auto control = openControlLink(*owner);
+    auto failure = SessionEnd::Failed;
+    const auto control = openControlLink(*owner, failure);
     if (!control) {
-        return SessionEnd::Failed;
+        return failure;
     }
     log("Joining the glasses' Wi-Fi network from this PC.");
     WifiStation station;
-    const auto station_link =
-        connectWifiStation(control->access_point.ssid, control->access_point.passphrase, station);
+    const auto station_link = connectWifiStation(
+        control->access_point.ssid, control->access_point.passphrase, wifi_adapter_, station);
     if (!station_link) {
         log(describeStationFailure(station));
         abandonAccessPoint(*control);
@@ -638,7 +643,7 @@ MediaSession::SessionEnd MediaSession::runSession() {
 }
 
 std::unique_ptr<MediaSession::ControlLink>
-MediaSession::openControlLink(const crypto::OwnerKey& owner) {
+MediaSession::openControlLink(const crypto::OwnerKey& owner, SessionEnd& failure) {
     // The glasses allow one RFCOMM session at a time and need a moment between them, so a connect
     // right after a previous session can fail transiently.
     constexpr int RfcommAttempts = 6;
@@ -656,8 +661,19 @@ MediaSession::openControlLink(const crypto::OwnerKey& owner) {
     auto control = std::make_unique<ControlLink>();
     control->transport = std::move(bt.transport);
     control->session = std::make_unique<GlassesSession>(*control->transport, &owner);
-    if (control->session->open().stage != LinkStage::Ready) {
+    const auto outcome = control->session->open();
+    if (outcome.stage != LinkStage::Ready) {
         log("The authenticated Bluetooth session did not reach ready.");
+        return nullptr;
+    }
+    // The session reaches Ready even when the glasses refuse the owner key (the ownership setup
+    // relies on that), but nothing else works then. Retrying cannot help: the owner changed.
+    if (!outcome.trust_tx_ok) {
+        log(std::format("The glasses did not accept this PC as their owner (status 0x{:04X}). "
+                        "Another PC or the phone may have taken ownership; run the setup again.",
+                        outcome.trust_status));
+        setState(MediaState::Failed);
+        failure = SessionEnd::Fatal;
         return nullptr;
     }
     log("Authenticated; asking the glasses to start their Wi-Fi network.");

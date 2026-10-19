@@ -9,15 +9,27 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace mgl {
 enum class WifiStationStatus : std::uint8_t {
     Ok,
-    NoAdapter,     // no Wi-Fi adapter is present
-    ProfileFailed, // the temporary WPA2 profile could not be set
-    ConnectFailed, // the adapter did not associate in time
-    NoAddress      // associated but DHCP gave no usable address in time
+    NoAdapter,      // no Wi-Fi adapter is present
+    AdapterMissing, // the adapter chosen by id is not present
+    ProfileFailed,  // the temporary WPA2 profile could not be set
+    ConnectFailed,  // the adapter did not associate in time
+    NoAddress       // associated but DHCP gave no usable address in time
 };
+
+// A Wi-Fi adapter that can join the glasses' network.
+struct WifiAdapter {
+    std::string id;          // the Windows interface GUID, "{...}"; stable across restarts
+    std::string description; // the adapter's name, as Device Manager shows it
+};
+
+// The Wi-Fi adapters Windows lists, in its order. Empty when there are none or the WLAN service
+// is unavailable.
+[[nodiscard]] std::vector<WifiAdapter> listWifiAdapters();
 
 struct WifiStation {
     WifiStationStatus status = WifiStationStatus::ConnectFailed;
@@ -37,9 +49,12 @@ class WifiStationConnection {
     WifiStationConnection& operator=(WifiStationConnection&&) = delete;
 };
 
-// Connects the first Wi-Fi adapter to the given WPA2-PSK network and waits for an address. Returns
-// null and fills out on failure; otherwise out.status is Ok and the connection handle is returned.
+// Connects a Wi-Fi adapter to the given WPA2-PSK network and waits for an address. adapter_id is a
+// WifiAdapter::id; empty uses the first adapter Windows lists. An id that matches no adapter fails
+// with AdapterMissing rather than falling back to another adapter. Returns null and fills out on
+// failure; otherwise out.status is Ok and the connection handle is returned.
 [[nodiscard]] std::unique_ptr<WifiStationConnection>
-connectWifiStation(const std::string& ssid, const std::string& passphrase, WifiStation& out);
+connectWifiStation(const std::string& ssid, const std::string& passphrase,
+                   const std::string& adapter_id, WifiStation& out);
 } // namespace mgl
 #endif

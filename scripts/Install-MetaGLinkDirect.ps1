@@ -35,6 +35,9 @@ kept; delete %LOCALAPPDATA%\MetaGLinkDirect to forget them.
 
 .PARAMETER CopyOnly
 Internal: used by the elevated child process to copy only the plugin files.
+
+.PARAMETER RemoveOnly
+Internal: used by the elevated child process to remove only the plugin files.
 #>
 [CmdletBinding(SupportsShouldProcess)]
 param(
@@ -42,7 +45,8 @@ param(
     [string]$TokenFile,
     [switch]$Setup,
     [switch]$Uninstall,
-    [switch]$CopyOnly
+    [switch]$CopyOnly,
+    [switch]$RemoveOnly
 )
 
 Set-StrictMode -Version Latest
@@ -52,6 +56,7 @@ $moduleName = 'meta-g-link-direct'
 $bundleRoot = $PSScriptRoot
 $toolRoot = [IO.Path]::Combine($env:LOCALAPPDATA, 'MetaGLinkDirect', 'bin')
 $toolPath = [IO.Path]::Combine($toolRoot, 'meta-g-link-probe.exe')
+$requiredObsMajor = 32
 $requiredFfmpeg = @('avcodec-62.dll', 'avutil-60.dll')
 $requiredRuntime = @('msvcp140.dll', 'vcruntime140.dll', 'vcruntime140_1.dll')
 $runtimeUrl = 'https://aka.ms/vs/17/release/vc_redist.x64.exe'
@@ -103,9 +108,14 @@ function Test-ObsCompatibility {
     param([Parameter(Mandatory)][string]$Obs)
     $binary = [IO.Path]::Combine($Obs, 'bin', '64bit')
     $version = (Get-Item -LiteralPath ([IO.Path]::Combine($binary, 'obs64.exe'))).VersionInfo.ProductVersion
+    $major = 0
+    if (-not ("$version" -match '^(\d+)\.' -and [int]::TryParse($Matches[1], [ref]$major)) -or
+        $major -ne $requiredObsMajor) {
+        throw "Found OBS $version. This build needs OBS $requiredObsMajor.x."
+    }
     $missing = @($requiredFfmpeg | Where-Object { -not (Test-Path -LiteralPath ([IO.Path]::Combine($binary, $_))) })
     if ($missing.Count -gt 0) {
-        throw "OBS $version lacks $($missing -join ', '). This build needs OBS 32.x."
+        throw "OBS $version lacks $($missing -join ', '), which this build decodes video with."
     }
     return $version
 }
@@ -171,28 +181,46 @@ function Install-PluginFile {
     }
 }
 
-function Invoke-PluginInstall {
+function Remove-PluginFile {
     [CmdletBinding(SupportsShouldProcess)]
     param([Parameter(Mandatory)][string]$Obs)
+    $target = Get-PluginTarget -Obs $Obs
+    foreach ($path in @([IO.Path]::Combine($target.Binary, "$moduleName.dll"), $target.Data)) {
+        if ((Test-Path -LiteralPath $path) -and $PSCmdlet.ShouldProcess($path, 'Remove')) {
+            Remove-Item -LiteralPath $path -Recurse -Force
+        }
+    }
+}
+
+# Copies or removes the plugin files, elevating only that step when OBS lives in a protected
+# folder such as Program Files (the default OBS installer location).
+function Invoke-PluginFileStep {
+    [CmdletBinding(SupportsShouldProcess)]
+    param(
+        [Parameter(Mandatory)][string]$Obs,
+        [Parameter(Mandatory)][ValidateSet('Copy', 'Remove')][string]$Mode
+    )
     $binary = (Get-PluginTarget -Obs $Obs).Binary
     $elevated = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
         [Security.Principal.WindowsBuiltInRole]::Administrator)
     if ($WhatIfPreference -or $elevated -or (Test-DirectoryWritable -Path $binary)) {
-        Install-PluginFile -Obs $Obs
+        if ($Mode -eq 'Copy') { Install-PluginFile -Obs $Obs } else { Remove-PluginFile -Obs $Obs }
         return
     }
-    if (-not $PSCmdlet.ShouldProcess($Obs, 'Copy the plugin with administrator rights')) {
+    $verb = $Mode.ToLowerInvariant()
+    if (-not $PSCmdlet.ShouldProcess($Obs, "$Mode the plugin with administrator rights")) {
         return
     }
-    # Only the file copy runs elevated; the token import below stays in this user's
+    # Only the plugin file step runs elevated; the token import and setup stay in this user's
     # context because DPAPI seals the store to the account that runs it.
-    Write-Step 'OBS is in a protected folder; Windows will ask for permission to copy the plugin.'
+    Write-Step "OBS is in a protected folder; Windows will ask for permission to $verb the plugin."
     $hostPath = (Get-Process -Id $PID).Path
+    $childSwitch = if ($Mode -eq 'Copy') { '-CopyOnly' } else { '-RemoveOnly' }
     $arguments = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', "`"$PSCommandPath`"",
-        '-CopyOnly', '-ObsPath', "`"$Obs`"")
+        $childSwitch, '-ObsPath', "`"$Obs`"")
     $child = Start-Process -FilePath $hostPath -ArgumentList $arguments -Verb RunAs -Wait -PassThru
     if ($child.ExitCode -ne 0) {
-        throw "The elevated plugin copy failed (exit $($child.ExitCode))."
+        throw "The elevated plugin $verb step failed (exit $($child.ExitCode))."
     }
 }
 
@@ -265,34 +293,49 @@ function Invoke-GlassesSetup {
     Write-Step 'This PC now owns the glasses.'
 }
 
+# Removes the plugin from OBS (when OBS is still installed) and the setup tool. The sealed
+# identity is kept.
 function Uninstall-Plugin {
     [CmdletBinding(SupportsShouldProcess)]
-    param([Parameter(Mandatory)][string]$Obs)
-    $target = Get-PluginTarget -Obs $Obs
-    foreach ($path in @([IO.Path]::Combine($target.Binary, "$moduleName.dll"), $target.Data, $toolRoot)) {
-        if ((Test-Path -LiteralPath $path) -and $PSCmdlet.ShouldProcess($path, 'Remove')) {
-            Remove-Item -LiteralPath $path -Recurse -Force
-        }
+    param([string]$Requested)
+    $obs = $null
+    try {
+        $obs = Find-ObsInstallation -Requested $Requested
+    } catch {
+        Write-Step "$($_.Exception.Message) Only the setup tool will be removed."
     }
-    Write-Step 'Removed the plugin and setup tool. The sealed identity in %LOCALAPPDATA%\MetaGLinkDirect was kept.'
+    if ($obs) {
+        Write-Step "OBS: $obs"
+        Wait-ObsClosed
+        Invoke-PluginFileStep -Obs $obs -Mode Remove
+    }
+    if ((Test-Path -LiteralPath $toolRoot) -and $PSCmdlet.ShouldProcess($toolRoot, 'Remove')) {
+        Remove-Item -LiteralPath $toolRoot -Recurse -Force
+    }
+    $removed = if ($obs) { 'the plugin and setup tool' } else { 'the setup tool' }
+    Write-Step "Removed $removed. The sealed identity in %LOCALAPPDATA%\MetaGLinkDirect was kept."
 }
 
 try {
+    if ($Uninstall -and -not $RemoveOnly) {
+        Uninstall-Plugin -Requested $ObsPath
+        exit 0
+    }
     $obs = Find-ObsInstallation -Requested $ObsPath
     if ($CopyOnly) {
         Install-PluginFile -Obs $obs
         exit 0
     }
-    Write-Step "OBS: $obs"
-    Wait-ObsClosed
-    if ($Uninstall) {
-        Uninstall-Plugin -Obs $obs
+    if ($RemoveOnly) {
+        Remove-PluginFile -Obs $obs
         exit 0
     }
+    Write-Step "OBS: $obs"
+    Wait-ObsClosed
     $version = Test-ObsCompatibility -Obs $obs
     Write-Step "OBS version $version is compatible."
     Test-VcRuntime
-    Invoke-PluginInstall -Obs $obs
+    Invoke-PluginFileStep -Obs $obs -Mode Copy
     Install-SetupTool
     if ([string]::IsNullOrWhiteSpace($TokenFile)) {
         $TokenFile = [IO.Path]::Combine($bundleRoot, 'meta-tokens.txt')

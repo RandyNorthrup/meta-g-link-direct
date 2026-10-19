@@ -2,33 +2,33 @@ BASELINE EXIT 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 3 tests in 138ms.
+Discovery found 3 tests in 221ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 440ms (417ms|22ms)
-  [+] formats a disposable source when effects are requested 413ms (411ms|2ms)
-  [+] propagates native formatter errors 510ms (510ms|1ms)
-Tests completed in 1.84s
+  [+] does not modify files with WhatIf 616ms (579ms|37ms)
+  [+] formats a disposable source when effects are requested 662ms (659ms|3ms)
+  [+] propagates native formatter errors 815ms (812ms|2ms)
+Tests completed in 2.94s
 Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
 MUTATED EXIT 1
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 3 tests in 133ms.
+Discovery found 3 tests in 244ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 470ms (439ms|31ms)
-  [+] formats a disposable source when effects are requested 435ms (433ms|2ms)
-  [-] propagates native formatter errors 424ms (423ms|1ms)
+  [+] does not modify files with WhatIf 564ms (527ms|37ms)
+  [+] formats a disposable source when effects are requested 665ms (663ms|2ms)
+  [-] propagates native formatter errors 589ms (587ms|2ms)
    Expected 0 to be different from the actual value, but got the same value.
    at $LASTEXITCODE | Should -Not -Be 0, C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1:41
    at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1:41
-Tests completed in 1.88s
+Tests completed in 2.67s
 Tests Passed: 2, Failed: 1, Skipped: 0, Inconclusive: 0, NotRun: 0
 Write-Error: Pester runner tests failed or discovery count changed
 
@@ -36,15 +36,15 @@ RESTORED EXIT 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 3 tests in 132ms.
+Discovery found 3 tests in 195ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 446ms (421ms|25ms)
-  [+] formats a disposable source when effects are requested 422ms (418ms|4ms)
-  [+] propagates native formatter errors 506ms (506ms|1ms)
-Tests completed in 1.85s
+  [+] does not modify files with WhatIf 606ms (572ms|34ms)
+  [+] formats a disposable source when effects are requested 622ms (620ms|2ms)
+  [+] propagates native formatter errors 685ms (683ms|2ms)
+Tests completed in 2.59s
 Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
-RESTORATION SHA256 3c46440439ddc920db9b4913f5224daa011345f46206c4ed3da72586b671e7b8
+RESTORATION SHA256 de78c654f25a0ad94f656ad78b5bd6e1aee0f8dba3423574089510fbfb5b0d1c

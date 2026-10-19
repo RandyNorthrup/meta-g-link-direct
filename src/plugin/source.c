@@ -42,6 +42,7 @@ static void* source_create(obs_data_t* settings, obs_source_t* source) {
         return NULL;
     }
     mglCameraSetQuality(camera, obs_data_get_string(settings, "quality"));
+    mglCameraSetWifiAdapter(camera, obs_data_get_string(settings, "wifi_adapter"));
     // Present frames as they arrive: the glasses' presentation clock is unrelated to OBS's, so the
     // default timestamp-buffered path would schedule them far in the future and show nothing.
     obs_source_set_async_unbuffered(source, true);
@@ -58,6 +59,26 @@ static void source_deactivate(void* data) { mglCameraStop(data); }
 
 static void source_get_defaults(obs_data_t* settings) {
     obs_data_set_default_string(settings, "quality", mglCameraQualityKey(0));
+    obs_data_set_default_string(settings, "wifi_adapter", "");
+}
+
+// The adapters shown in the Wi-Fi adapter list; PCs rarely have more than one or two.
+#define MGL_MAX_WIFI_ADAPTERS 8
+
+static void add_wifi_adapter_list(obs_properties_t* props) {
+    obs_property_t* list =
+        obs_properties_add_list(props, "wifi_adapter", obs_module_text("WifiAdapter"),
+                                OBS_COMBO_TYPE_LIST, OBS_COMBO_FORMAT_STRING);
+    obs_property_list_add_string(list, obs_module_text("WifiAdapter.Auto"), "");
+    struct MglWifiAdapter adapters[MGL_MAX_WIFI_ADAPTERS];
+    size_t count = 0;
+    if (!mglWifiAdapterList(adapters, MGL_MAX_WIFI_ADAPTERS, &count)) {
+        blog(LOG_WARNING, "[meta-g-link-direct] Could not list the Wi-Fi adapters.");
+    }
+    for (size_t index = 0; index < count; ++index) {
+        obs_property_list_add_string(list, adapters[index].name, adapters[index].id);
+    }
+    obs_property_set_long_description(list, obs_module_text("WifiAdapter.Desc"));
 }
 
 // cppcheck-suppress constParameterCallback ; obs_source_info fixes this signature as (void *data).
@@ -70,6 +91,7 @@ static obs_properties_t* source_get_properties(void* data) {
         obs_property_list_add_string(quality, obs_module_text(key), key);
     }
     obs_property_set_long_description(quality, obs_module_text("Quality.Desc"));
+    add_wifi_adapter_list(props);
     // A Narrator-readable status line showing the current connection state.
     obs_properties_add_text(props, "status", obs_module_text(mglCameraStatusKey(data)),
                             OBS_TEXT_INFO);
@@ -78,8 +100,9 @@ static obs_properties_t* source_get_properties(void* data) {
 }
 
 static void source_update(void* data, obs_data_t* settings) {
-    // A running capture picks up the new quality on its next start.
+    // A running capture picks up the new quality and Wi-Fi adapter on its next start.
     mglCameraSetQuality(data, obs_data_get_string(settings, "quality"));
+    mglCameraSetWifiAdapter(data, obs_data_get_string(settings, "wifi_adapter"));
 }
 
 // Called once from obs_module_load in module.c.

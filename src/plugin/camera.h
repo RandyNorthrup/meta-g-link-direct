@@ -56,6 +56,21 @@ void mglCameraSetQuality(struct MglCamera* camera, const char* key);
 // Locale key describing the current connection state. NULL reports the idle state.
 const char* mglCameraStatusKey(const struct MglCamera* camera);
 
+// One Wi-Fi adapter that can join the glasses' network. Both strings are NUL-terminated UTF-8;
+// a description too long for name is cut at a character boundary.
+struct MglWifiAdapter {
+    char id[64];    // NOLINT(modernize-avoid-c-arrays) — C ABI; the Windows interface GUID
+    char name[256]; // NOLINT(modernize-avoid-c-arrays) — C ABI; the adapter's description
+};
+// Copies up to capacity of the Wi-Fi adapters Windows lists into adapters, in Windows' order, and
+// stores how many were copied in count. False (count 0) if the list could not be built; an
+// unavailable WLAN service is not a failure and simply lists none.
+bool mglWifiAdapterList(struct MglWifiAdapter* adapters, size_t capacity, size_t* count);
+// Selects the Wi-Fi adapter (an MglWifiAdapter id) that joins the glasses' network on the next
+// start. NULL or "" selects the first adapter Windows lists. An id that is no longer present makes
+// the next start fail with a log line instead of using another adapter.
+void mglCameraSetWifiAdapter(struct MglCamera* camera, const char* id);
+
 #ifdef __cplusplus
 }
 #endif

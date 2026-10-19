@@ -51,7 +51,10 @@ struct MediaCallbacks {
 
 class MediaSession {
   public:
-    explicit MediaSession(MediaCallbacks callbacks, const stream::VideoConfig& config = {});
+    // wifi_adapter is the WifiAdapter::id that joins the glasses' network; empty uses the first
+    // adapter Windows lists.
+    explicit MediaSession(MediaCallbacks callbacks, const stream::VideoConfig& config = {},
+                          std::string wifi_adapter = {});
     ~MediaSession();
     MediaSession(const MediaSession&) = delete;
     MediaSession& operator=(const MediaSession&) = delete;
@@ -80,6 +83,7 @@ class MediaSession {
 
     MediaCallbacks callbacks_;
     stream::VideoConfig config_;
+    std::string wifi_adapter_;
     std::atomic<MediaState> state_{MediaState::Idle};
     std::atomic<bool> stop_{false};
     std::thread worker_;
@@ -92,7 +96,10 @@ class MediaSession {
     // One connection attempt through to a stream drop.
     [[nodiscard]] SessionEnd runSession();
     // Authenticates over Bluetooth and asks the glasses to host their own 2.4 GHz access point.
-    [[nodiscard]] std::unique_ptr<ControlLink> openControlLink(const crypto::OwnerKey& owner);
+    // On failure returns null and sets failure: Fatal when the glasses refuse this PC's owner key,
+    // Failed otherwise.
+    [[nodiscard]] std::unique_ptr<ControlLink> openControlLink(const crypto::OwnerKey& owner,
+                                                               SessionEnd& failure);
     // After a failure before the media link opens, closes the glasses' access point over
     // Bluetooth so the retry finds the glasses' Wi-Fi free.
     void abandonAccessPoint(ControlLink& control);

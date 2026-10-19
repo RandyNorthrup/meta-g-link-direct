@@ -181,6 +181,51 @@ function Invoke-SecurityAnalysis {
     Invoke-Native -Command gitleaks -ArgumentList @('git', '--redact', '--no-banner', '.')
 }
 
+# Stages the end-user bundle that scripts/Install-MetaGLinkDirect.ps1 installs from, then zips it
+# with a SHA-256 file: dist/meta-g-link-direct-<version>-windows-x64.zip(.sha256).
+function Build-ReleaseBundle {
+    $cmake = Get-Content -LiteralPath (Join-Path $projectRoot 'CMakeLists.txt') -Raw
+    $match = [regex]::Match($cmake, 'project\(meta_g_link_direct VERSION (\d+\.\d+\.\d+)')
+    if (-not $match.Success) {
+        throw 'Project version not found in CMakeLists.txt'
+    }
+    $name = "meta-g-link-direct-$($match.Groups[1].Value)-windows-x64"
+    $distRoot = Join-Path $projectRoot 'dist'
+    $stage = Join-Path $distRoot $name
+    if (Test-Path -LiteralPath $stage) {
+        Remove-Item -LiteralPath $stage -Recurse -Force
+    }
+    $layout = [ordered]@{
+        'plugin/meta-g-link-direct.dll' = Join-Path $buildRoot 'meta-g-link-direct.dll'
+        'plugin/locale/en-US.ini' = Join-Path $projectRoot 'data/locale/en-US.ini'
+        'tools/meta-g-link-probe.exe' = Join-Path $buildRoot 'meta-g-link-probe.exe'
+        'Install-MetaGLinkDirect.ps1' = Join-Path $PSScriptRoot 'Install-MetaGLinkDirect.ps1'
+        'README.txt' = Join-Path $projectRoot 'packaging/README.txt'
+        'LICENSE' = Join-Path $projectRoot 'LICENSE'
+        'THIRD_PARTY_NOTICES.md' = Join-Path $projectRoot 'THIRD_PARTY_NOTICES.md'
+    }
+    foreach ($entry in $layout.GetEnumerator()) {
+        if (-not (Test-Path -LiteralPath $entry.Value)) {
+            throw "Release input missing: $($entry.Value)"
+        }
+        $target = Join-Path $stage $entry.Key
+        New-Item -ItemType Directory -Path (Split-Path -Parent $target) -Force | Out-Null
+        Copy-Item -LiteralPath $entry.Value -Destination $target
+    }
+    # Batch files must reach users with CRLF line endings whatever the checkout settings are.
+    foreach ($batch in @('Install.cmd', 'Uninstall.cmd')) {
+        $lines = Get-Content -LiteralPath (Join-Path $projectRoot "packaging/$batch")
+        [IO.File]::WriteAllText((Join-Path $stage $batch), (($lines -join "`r`n") + "`r`n"),
+            [Text.UTF8Encoding]::new($false))
+    }
+    $zip = Join-Path $distRoot "$name.zip"
+    Compress-Archive -Path (Join-Path $stage '*') -DestinationPath $zip -Force
+    $hash = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+    [IO.File]::WriteAllText("$zip.sha256", "$hash  $name.zip`n", [Text.UTF8Encoding]::new($false))
+    Write-Output "Release bundle: $zip"
+    Write-Output "SHA-256: $hash"
+}
+
 function Invoke-DrillCheck {
     [CmdletBinding()]
     param([Parameter(Mandatory)][string]$Name)
@@ -472,12 +517,7 @@ function Invoke-Task {
         }
         package {
             Invoke-Task -Name quality
-            $destination = Join-Path $projectRoot 'dist/foundation-0.1.0'
-            Invoke-Native -Command cmake -ArgumentList @('--install', $buildRoot, '--prefix',
-                $destination)
-            $zip = "$destination.zip"
-            Compress-Archive -Path (Join-Path $destination '*') -DestinationPath $zip -Force
-            Get-FileHash -LiteralPath $zip -Algorithm SHA256 | Format-List
+            Build-ReleaseBundle
         }
         probe { Invoke-Native -Command (Join-Path $buildRoot 'meta-g-link-probe.exe') }
         discover {

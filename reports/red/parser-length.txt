@@ -2,147 +2,160 @@ BASELINE EXIT 0
 ninja: no work to do.
 Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
     Start 1: protocol-prefix
-1/3 Test #1: protocol-prefix ..................   Passed    0.00 sec
+1/4 Test #1: protocol-prefix ..................   Passed    0.02 sec
     Start 2: private-address
-2/3 Test #2: private-address ..................   Passed    0.00 sec
-    Start 3: module-abi
-3/3 Test #3: module-abi .......................   Passed    0.01 sec
+2/4 Test #2: private-address ..................   Passed    0.01 sec
+    Start 3: protocol-datax
+3/4 Test #3: protocol-datax ...................   Passed    0.01 sec
+    Start 4: module-abi
+4/4 Test #4: module-abi .......................   Passed    0.04 sec
 
-100% tests passed, 0 tests failed out of 3
+100% tests passed, 0 tests failed out of 4
 
-Total Test time (real) =   0.03 sec
+Total Test time (real) =   0.09 sec
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 3 tests in 155ms.
+Discovery found 3 tests in 238ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 532ms (502ms|30ms)
-  [+] formats a disposable source when effects are requested 540ms (538ms|2ms)
-  [+] propagates native formatter errors 585ms (584ms|1ms)
-Tests completed in 2.15s
+  [+] does not modify files with WhatIf 751ms (686ms|65ms)
+  [+] formats a disposable source when effects are requested 651ms (649ms|2ms)
+  [+] propagates native formatter errors 792ms (791ms|1ms)
+Tests completed in 3.02s
 Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 20 tests in 29ms.
+Discovery found 20 tests in 47ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1'
 Describing Native diagnostic probe contract
-  [+] rejects private input without echo or connection: --direct-classic-uuid 100ms (94ms|6ms)
-  [+] rejects private input without echo or connection: --direct-classic-channel7 27ms (26ms|1ms)
-  [+] rejects private input without echo or connection: --direct-classic-channel7 28ms (28ms|1ms)
-  [+] rejects private input without echo or connection: --direct-classic-uuid 43ms (42ms|1ms)
-  [+] rejects private input without echo or connection: --direct-classic-uuid 42ms (41ms|1ms)
-  [+] exports only requested redacted direct-probe diagnostics 39ms (38ms|1ms)
-  [+] propagates requested diagnostic write failure 43ms (41ms|2ms)
-  [+] reports association separately and performs no implicit discovery 57ms (55ms|2ms)
-  [+] explains discovery limits without accessing glasses 39ms (37ms|2ms)
-  [+] reports actual scan completion or native failure with a matching exit code 61ms (60ms|1ms)
-  [+] performs explicit Classic inquiry without claiming an RFCOMM connection 5.19s (5.19s|2ms)
-  [+] rejects invalid argument sequence --pair-classic extra before scanning 30ms (29ms|1ms)
-  [+] rejects invalid argument sequence --direct-classic-uuid extra before scanning 23ms (22ms|1ms)
-  [+] rejects invalid argument sequence --discover-classic-live extra before scanning 24ms (23ms|1ms)
-  [+] rejects invalid argument sequence --invalid before scanning 26ms (25ms|1ms)
-  [+] rejects invalid argument sequence --discover extra before scanning 24ms (23ms|1ms)
-  [+] rejects invalid argument sequence --help extra before scanning 31ms (31ms|1ms)
-  [+] rejects invalid argument sequence extra --discover before scanning 29ms (28ms|1ms)
-  [+] rejects invalid argument sequence --connect-classic extra before scanning 23ms (22ms|1ms)
-  [+] rejects invalid argument sequence --discover-classic --connect-classic before scanning 24ms (23ms|1ms)
-Tests completed in 6.01s
+  [+] rejects private input without echo or connection: --direct-classic-uuid 183ms (179ms|3ms)
+  [+] rejects private input without echo or connection: --direct-classic-channel7 62ms (61ms|2ms)
+  [+] rejects private input without echo or connection: --direct-classic-channel7 64ms (63ms|1ms)
+  [+] rejects private input without echo or connection: --direct-classic-uuid 62ms (59ms|3ms)
+  [+] rejects private input without echo or connection: --direct-classic-uuid 87ms (85ms|2ms)
+  [+] exports only requested redacted direct-probe diagnostics 59ms (56ms|3ms)
+  [+] propagates requested diagnostic write failure 49ms (48ms|1ms)
+  [+] reports association separately and performs no implicit discovery 113ms (112ms|1ms)
+  [+] explains discovery limits without accessing glasses 60ms (58ms|2ms)
+  [+] reports actual scan completion or native failure with a matching exit code 10.11s (10.1s|3ms)
+  [+] performs explicit Classic inquiry without claiming an RFCOMM connection 5.25s (5.25s|2ms)
+  [+] rejects invalid argument sequence --pair-classic extra before scanning 52ms (48ms|4ms)
+  [+] rejects invalid argument sequence --direct-classic-uuid extra before scanning 39ms (38ms|1ms)
+  [+] rejects invalid argument sequence --discover-classic-live extra before scanning 41ms (40ms|2ms)
+  [+] rejects invalid argument sequence --invalid before scanning 43ms (41ms|1ms)
+  [+] rejects invalid argument sequence --discover extra before scanning 99ms (97ms|2ms)
+  [+] rejects invalid argument sequence --help extra before scanning 48ms (47ms|1ms)
+  [+] rejects invalid argument sequence extra --discover before scanning 44ms (43ms|1ms)
+  [+] rejects invalid argument sequence --connect-classic extra before scanning 38ms (38ms|0ms)
+  [+] rejects invalid argument sequence --discover-classic --connect-classic before scanning 39ms (39ms|0ms)
+Tests completed in 16.7s
 Tests Passed: 20, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
 MUTATED EXIT 1
-[1/8] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp for CXX dependencies
-[2/8] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
-[3/7] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\sdu.cpp.obj
-[4/7] Linking CXX static library mgl_protocol.lib
-[5/7] Linking CXX executable mgl-sdu-tests.exe
-[6/7] Linking CXX executable meta-g-link-probe.exe
-[7/7] Linking CXX executable mgl-address-tests.exe
+[1/16] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp for CXX dependencies
+[2/16] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
+[3/9] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\sdu.cpp.obj
+[4/9] Linking CXX static library mgl_protocol.lib
+[5/9] Linking CXX shared module meta-g-link-direct.dll
+[6/9] Linking CXX executable meta-g-link-probe.exe
+[7/9] Linking CXX executable mgl-sdu-tests.exe
+[8/9] Linking CXX executable mgl-address-tests.exe
+[9/9] Linking CXX executable mgl-protocol-tests.exe
 Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
     Start 1: protocol-prefix
-1/3 Test #1: protocol-prefix ..................***Failed    0.01 sec
+1/4 Test #1: protocol-prefix ..................***Failed    0.02 sec
 DataX empty has 4 bytes: unexpected prefix status or frame length
 
     Start 2: private-address
-2/3 Test #2: private-address ..................   Passed    0.01 sec
-    Start 3: module-abi
-3/3 Test #3: module-abi .......................   Passed    0.02 sec
+2/4 Test #2: private-address ..................   Passed    0.01 sec
+    Start 3: protocol-datax
+3/4 Test #3: protocol-datax ...................***Failed    0.01 sec
+plaintext 0x80 is DataX length: failed
 
-67% tests passed, 1 tests failed out of 3
+    Start 4: module-abi
+4/4 Test #4: module-abi .......................   Passed    0.03 sec
 
-Total Test time (real) =   0.04 sec
+50% tests passed, 2 tests failed out of 4
+
+Total Test time (real) =   0.08 sec
 
 The following tests FAILED:
 	  1 - protocol-prefix (Failed)
+	  3 - protocol-datax (Failed)
 Errors while running CTest
 Write-Error: Native command failed (8): ctest
 
 RESTORED EXIT 0
-[1/8] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp for CXX dependencies
-[2/8] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
-[3/7] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\sdu.cpp.obj
-[4/7] Linking CXX static library mgl_protocol.lib
-[5/7] Linking CXX executable mgl-sdu-tests.exe
-[6/7] Linking CXX executable meta-g-link-probe.exe
-[7/7] Linking CXX executable mgl-address-tests.exe
+[1/16] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp for CXX dependencies
+[2/16] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
+[3/9] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\sdu.cpp.obj
+[4/9] Linking CXX static library mgl_protocol.lib
+[5/9] Linking CXX shared module meta-g-link-direct.dll
+[6/9] Linking CXX executable meta-g-link-probe.exe
+[7/9] Linking CXX executable mgl-sdu-tests.exe
+[8/9] Linking CXX executable mgl-address-tests.exe
+[9/9] Linking CXX executable mgl-protocol-tests.exe
 Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
     Start 1: protocol-prefix
-1/3 Test #1: protocol-prefix ..................   Passed    0.01 sec
+1/4 Test #1: protocol-prefix ..................   Passed    0.01 sec
     Start 2: private-address
-2/3 Test #2: private-address ..................   Passed    0.01 sec
-    Start 3: module-abi
-3/3 Test #3: module-abi .......................   Passed    0.02 sec
+2/4 Test #2: private-address ..................   Passed    0.01 sec
+    Start 3: protocol-datax
+3/4 Test #3: protocol-datax ...................   Passed    0.01 sec
+    Start 4: module-abi
+4/4 Test #4: module-abi .......................   Passed    0.03 sec
 
-100% tests passed, 0 tests failed out of 3
+100% tests passed, 0 tests failed out of 4
 
-Total Test time (real) =   0.04 sec
+Total Test time (real) =   0.07 sec
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 3 tests in 206ms.
+Discovery found 3 tests in 258ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 541ms (506ms|34ms)
-  [+] formats a disposable source when effects are requested 482ms (480ms|2ms)
-  [+] propagates native formatter errors 586ms (585ms|1ms)
-Tests completed in 2.27s
+  [+] does not modify files with WhatIf 774ms (683ms|91ms)
+  [+] formats a disposable source when effects are requested 684ms (682ms|2ms)
+  [+] propagates native formatter errors 816ms (815ms|1ms)
+Tests completed in 3.2s
 Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 20 tests in 41ms.
+Discovery found 20 tests in 72ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1'
 Describing Native diagnostic probe contract
-  [+] rejects private input without echo or connection: --direct-classic-uuid 126ms (123ms|4ms)
-  [+] rejects private input without echo or connection: --direct-classic-channel7 46ms (45ms|1ms)
-  [+] rejects private input without echo or connection: --direct-classic-channel7 48ms (47ms|1ms)
-  [+] rejects private input without echo or connection: --direct-classic-uuid 60ms (58ms|1ms)
-  [+] rejects private input without echo or connection: --direct-classic-uuid 39ms (36ms|3ms)
-  [+] exports only requested redacted direct-probe diagnostics 37ms (37ms|1ms)
-  [+] propagates requested diagnostic write failure 34ms (33ms|1ms)
-  [+] reports association separately and performs no implicit discovery 95ms (95ms|1ms)
-  [+] explains discovery limits without accessing glasses 53ms (51ms|2ms)
-  [+] reports actual scan completion or native failure with a matching exit code 66ms (64ms|2ms)
-  [+] performs explicit Classic inquiry without claiming an RFCOMM connection 5.27s (5.27s|2ms)
-  [+] rejects invalid argument sequence --pair-classic extra before scanning 36ms (34ms|1ms)
-  [+] rejects invalid argument sequence --direct-classic-uuid extra before scanning 28ms (27ms|1ms)
-  [+] rejects invalid argument sequence --discover-classic-live extra before scanning 20ms (19ms|1ms)
-  [+] rejects invalid argument sequence --invalid before scanning 24ms (19ms|5ms)
-  [+] rejects invalid argument sequence --discover extra before scanning 22ms (21ms|1ms)
-  [+] rejects invalid argument sequence --help extra before scanning 18ms (18ms|0ms)
-  [+] rejects invalid argument sequence extra --discover before scanning 18ms (17ms|0ms)
-  [+] rejects invalid argument sequence --connect-classic extra before scanning 18ms (17ms|0ms)
-  [+] rejects invalid argument sequence --discover-classic --connect-classic before scanning 24ms (24ms|0ms)
-Tests completed in 6.22s
+  [+] rejects private input without echo or connection: --direct-classic-uuid 243ms (234ms|9ms)
+  [+] rejects private input without echo or connection: --direct-classic-channel7 106ms (105ms|1ms)
+  [+] rejects private input without echo or connection: --direct-classic-channel7 54ms (51ms|3ms)
+  [+] rejects private input without echo or connection: --direct-classic-uuid 57ms (55ms|1ms)
+  [+] rejects private input without echo or connection: --direct-classic-uuid 70ms (68ms|3ms)
+  [+] exports only requested redacted direct-probe diagnostics 50ms (50ms|1ms)
+  [+] propagates requested diagnostic write failure 46ms (45ms|2ms)
+  [+] reports association separately and performs no implicit discovery 103ms (103ms|1ms)
+  [+] explains discovery limits without accessing glasses 51ms (48ms|3ms)
+  [+] reports actual scan completion or native failure with a matching exit code 10.14s (10.13s|2ms)
+  [+] performs explicit Classic inquiry without claiming an RFCOMM connection 5.31s (5.31s|2ms)
+  [+] rejects invalid argument sequence --pair-classic extra before scanning 54ms (51ms|3ms)
+  [+] rejects invalid argument sequence --direct-classic-uuid extra before scanning 49ms (48ms|1ms)
+  [+] rejects invalid argument sequence --discover-classic-live extra before scanning 82ms (81ms|1ms)
+  [+] rejects invalid argument sequence --invalid before scanning 49ms (48ms|0ms)
+  [+] rejects invalid argument sequence --discover extra before scanning 47ms (46ms|1ms)
+  [+] rejects invalid argument sequence --help extra before scanning 104ms (103ms|1ms)
+  [+] rejects invalid argument sequence extra --discover before scanning 47ms (45ms|2ms)
+  [+] rejects invalid argument sequence --connect-classic extra before scanning 54ms (52ms|2ms)
+  [+] rejects invalid argument sequence --discover-classic --connect-classic before scanning 100ms (99ms|1ms)
+Tests completed in 17.03s
 Tests Passed: 20, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
-RESTORATION SHA256 9e92d77135826f7460b3e74bf05dd24cbfbe67efd2f551eebb6f433d2bf29084
+RESTORATION SHA256 23f81a1e6ccdf6122fdb9414b839a7e2ca96f3564b1608f35ffa807579178ca0
