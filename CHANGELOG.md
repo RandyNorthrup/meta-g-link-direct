@@ -6,6 +6,13 @@ All notable changes are recorded here. The project follows [semantic versioning]
 
 ### Changed
 
+- The camera starts sooner. The media connection now opens as soon as this PC has its address on the glasses' network, instead of after a fixed 1.5 s pause, and retries on a short, growing delay. The Wi-Fi join is checked every 100 ms instead of every 500 ms. Measured with the stream check: the media connection took 1.0 s after the join, down from 2.7 s.
+- The OBS log shows how long each connection step took, for example "Joined the glasses' Wi-Fi network after 8.7 s (associated in 3273 ms, address in 737 ms)".
+
+### Fixed
+
+- The Wi-Fi join could count an address the adapter still held from its previous network as the glasses' address. The media connection then aimed at the wrong network and waited about 21 s for each attempt. The join now waits for a DHCP address on the glasses' subnet, and each TCP connection attempt gives up after 3 s.
+
 - `quality` reruns only the red drills whose inputs (the file the drill mutates, the task runner and the gate's configuration) changed since their recorded pass, and lists the others as unchanged; `package` and `test:red` still run all of them. `reports/red-drills.json` records each drill's inputs and their SHA-256. A new drill (22 in total) proves that a changed input forces a rerun.
 
 ## [0.2.0] - 2026-10-19 (beta)

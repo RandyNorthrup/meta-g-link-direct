@@ -98,6 +98,8 @@ class MediaSession {
     std::atomic<MediaState> state_{MediaState::Idle};
     std::atomic<bool> stop_{false};
     std::thread worker_;
+    // When the current connection attempt began; the step log lines report time since then.
+    std::chrono::steady_clock::time_point attempt_started_;
 
     void run();
     // The reconnect loop, once this session holds the glasses.
@@ -132,6 +134,8 @@ class MediaSession {
     [[nodiscard]] SessionEnd streamVideo(GlassesSession& media, std::uint32_t nonce);
     void setState(MediaState next);
     void log(const std::string& message);
+    // The time since the current connection attempt began, such as "2.3 s".
+    [[nodiscard]] std::string elapsed() const;
     // Sleeps in short steps; false if stop was requested before the time passed.
     bool interruptibleSleep(std::chrono::milliseconds total);
 };

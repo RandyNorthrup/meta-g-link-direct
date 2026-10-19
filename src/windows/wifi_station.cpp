@@ -11,6 +11,7 @@
 #include <combaseapi.h>
 #include <guiddef.h>
 #include <ifdef.h>
+#include <inaddr.h>
 #include <iphlpapi.h> // IWYU pragma: keep — the documented entry header for netioapi.h.
 #include <minwindef.h>
 #include <netioapi.h>
@@ -22,13 +23,17 @@
 #include <wlanapi.h>
 #include <wlantypes.h>
 #include <ws2def.h>
+#include <ws2tcpip.h>
 
 #include <algorithm>
 #include <array>
+#include <bit>
 #include <chrono>
 #include <cstddef>
+#include <cstdint>
 #include <iterator>
 #include <memory>
+#include <optional>
 #include <span>
 #include <string>
 #include <string_view>
@@ -42,7 +47,9 @@ using namespace std::chrono_literals;
 
 // How long association plus DHCP may take before the connect counts as failed.
 constexpr auto ConnectBudget = 25s;
-constexpr auto ConnectPollInterval = 500ms;
+// Both checks are cheap local queries, so a short interval costs nothing and starts the media
+// connection sooner.
+constexpr auto ConnectPollInterval = 100ms;
 // The Native Wi-Fi client API version for Windows Vista and later.
 constexpr DWORD WlanClientVersion = 2;
 
@@ -169,9 +176,40 @@ bool interfaceConnected(HANDLE client, const GUID& guid) {
     return state == wlan_interface_state_connected;
 }
 
-// True once the interface holds an IPv4 address assigned by DHCP and ready for use. The glasses
-// run the DHCP server on their network; a self-assigned link-local address does not count.
-bool hasDhcpAddress(const GUID& guid) {
+// An IPv4 address in host byte order. IN_ADDR and SOCKADDR_INET are C unions, so their bytes are
+// copied out instead of being read through a union member.
+std::uint32_t hostOrder(const IN_ADDR& address) {
+    return ntohl(std::bit_cast<std::uint32_t>(address));
+}
+
+std::uint32_t rowAddress(const MIB_UNICASTIPADDRESS_ROW& row) {
+    const auto raw = std::bit_cast<std::array<std::byte, sizeof(SOCKADDR_INET)>>(row.Address);
+    std::array<std::byte, sizeof(sockaddr_in)> ipv4{};
+    std::copy_n(raw.begin(), ipv4.size(), ipv4.begin());
+    return hostOrder(std::bit_cast<sockaddr_in>(ipv4).sin_addr);
+}
+
+std::optional<std::uint32_t> parseIpv4(const std::string& text) {
+    IN_ADDR address{};
+    if (inet_pton(AF_INET, text.c_str(), &address) != 1) {
+        return std::nullopt;
+    }
+    return hostOrder(address);
+}
+
+bool sameSubnet(std::uint32_t left, std::uint32_t right, std::uint8_t prefix_length) {
+    constexpr unsigned AddressBits = 32;
+    if (prefix_length == 0 || prefix_length > AddressBits) {
+        return false;
+    }
+    const std::uint32_t mask = prefix_length == AddressBits ? ~0U : ~(~0U >> prefix_length);
+    return (left & mask) == (right & mask);
+}
+
+// True once the interface holds an IPv4 address assigned by DHCP, ready for use and on the same
+// subnet as peer (the glasses). The glasses run the DHCP server on their network; a self-assigned
+// link-local address, or one still left from the adapter's previous network, does not count.
+bool hasDhcpAddress(const GUID& guid, std::uint32_t peer) {
     NET_LUID luid{};
     if (ConvertInterfaceGuidToLuid(&guid, &luid) != NO_ERROR) {
         return false;
@@ -184,7 +222,8 @@ bool hasDhcpAddress(const GUID& guid) {
     const std::span rows(&table->Table[0], table->NumEntries);
     return std::ranges::any_of(rows, [&](const MIB_UNICASTIPADDRESS_ROW& row) {
         return row.InterfaceLuid.Value == luid.Value && row.PrefixOrigin == IpPrefixOriginDhcp &&
-               row.DadState == IpDadStatePreferred;
+               row.DadState == IpDadStatePreferred &&
+               sameSubnet(rowAddress(row), peer, row.OnLinkPrefixLength);
     });
 }
 
@@ -232,9 +271,15 @@ std::vector<WifiAdapter> listWifiAdapters() {
 std::unique_ptr<WifiStationConnection> connectWifiStation(const std::string& ssid,
                                                           const std::string& passphrase,
                                                           const std::string& adapter_id,
+                                                          const std::string& peer_address,
                                                           WifiStation& out) {
     if (ssid.empty() || ssid.size() > DOT11_SSID_MAX_LENGTH) {
         out.status = WifiStationStatus::ProfileFailed;
+        return nullptr;
+    }
+    const auto peer = parseIpv4(peer_address);
+    if (!peer) {
+        out.status = WifiStationStatus::BadPeer;
         return nullptr;
     }
     HANDLE handle = nullptr;
@@ -293,14 +338,23 @@ std::unique_ptr<WifiStationConnection> connectWifiStation(const std::string& ssi
     }
 
     // Wait for association, then for DHCP from the glasses.
-    const auto deadline = std::chrono::steady_clock::now() + ConnectBudget;
+    const auto requested = std::chrono::steady_clock::now();
+    const auto deadline = requested + ConnectBudget;
+    const auto since_request = [&] {
+        return std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::steady_clock::now() - requested);
+    };
     bool associated = false;
     bool addressed = false;
     while (!addressed && std::chrono::steady_clock::now() < deadline) {
         std::this_thread::sleep_for(ConnectPollInterval);
-        associated = associated || interfaceConnected(client.get(), guid);
-        addressed = associated && hasDhcpAddress(guid);
+        if (!associated && interfaceConnected(client.get(), guid)) {
+            associated = true;
+            out.associated_after = since_request();
+        }
+        addressed = associated && hasDhcpAddress(guid, *peer);
     }
+    out.addressed_after = since_request();
     if (!addressed) {
         WlanDeleteProfile(client.get(), &guid, profile_name.c_str(), nullptr);
         out.status = associated ? WifiStationStatus::NoAddress : WifiStationStatus::ConnectFailed;

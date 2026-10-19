@@ -239,6 +239,9 @@ std::string describeStationFailure(const WifiStation& station) {
     case WifiStationStatus::NoAddress:
         text += "no network address was assigned";
         break;
+    case WifiStationStatus::BadPeer:
+        text += "the glasses reported an address that is not IPv4";
+        break;
     case WifiStationStatus::Ok:
         text += "unexpected success";
         break;
@@ -564,6 +567,12 @@ bool MediaSession::interruptibleSleep(std::chrono::milliseconds total) {
     return sleepUnlessStopped(total, stop_);
 }
 
+std::string MediaSession::elapsed() const {
+    const auto taken = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now() - attempt_started_);
+    return std::format("{:.1f} s", static_cast<double>(taken.count()) / 1000.0);
+}
+
 void MediaSession::run() {
     if (!radioLease().tryAcquire(this)) {
         setState(MediaState::Waiting);
@@ -618,6 +627,7 @@ MediaSession::SessionEnd MediaSession::attemptSession() {
 }
 
 MediaSession::SessionEnd MediaSession::runSession() {
+    attempt_started_ = std::chrono::steady_clock::now();
     setState(MediaState::Connecting);
     const auto identity = identity::loadOwnerIdentity();
     if (!identity) {
@@ -641,16 +651,22 @@ MediaSession::SessionEnd MediaSession::runSession() {
     if (!control) {
         return failure;
     }
-    log("Joining the glasses' Wi-Fi network from this PC.");
+    log(std::format("The glasses' Wi-Fi network is up after {}; joining it from this PC.",
+                    elapsed()));
     WifiStation station;
     const auto station_link =
         connectWifiStation(control->access_point.ssid, control->access_point.passphrase,
-                           options_.wifi_adapter, station);
+                           options_.wifi_adapter, control->access_point.address, station);
     if (!station_link) {
         log(describeStationFailure(station));
         abandonAccessPoint(*control);
         return SessionEnd::Failed;
     }
+    log(std::format(
+        "Joined the glasses' Wi-Fi network after {} (associated in {} ms, address in {} "
+        "ms); opening the media connection.",
+        elapsed(), station.associated_after.count(),
+        (station.addressed_after - station.associated_after).count()));
     const auto link = openMediaLink(*owner, control->access_point);
     if (!link) {
         abandonAccessPoint(*control);
@@ -706,7 +722,8 @@ MediaSession::openControlLink(const crypto::OwnerKey& owner, SessionEnd& failure
         failure = SessionEnd::Fatal;
         return nullptr;
     }
-    log("Authenticated; asking the glasses to start their Wi-Fi network.");
+    log(std::format("Authenticated after {}; asking the glasses to start their Wi-Fi network.",
+                    elapsed()));
     auto access_point = hostAccessPoint(*control->session, stop_, callbacks_);
     if (!access_point) {
         log(stop_.load() ? "Stopped before the glasses started their Wi-Fi network."
@@ -726,13 +743,13 @@ void MediaSession::abandonAccessPoint(ControlLink& control) {
 
 std::unique_ptr<MediaSession::MediaLink>
 MediaSession::openMediaLink(const crypto::OwnerKey& owner, const stream::SoftApInfo& access_point) {
-    log("Joined the glasses' Wi-Fi network; opening the media connection.");
-    // The glasses' TCP server may not accept the instant this PC gets an address, so settle and
-    // retry the whole TCP AirShield session a few times rather than racing it once.
-    constexpr int TcpAttempts = 5;
+    // The glasses host the network, so their TCP server is normally up before this PC has an
+    // address. Connect at once and retry the whole TCP AirShield session on a short, growing delay
+    // in case it is not.
+    const std::array<std::chrono::milliseconds, 7> delays{0ms, 250ms, 500ms, 1s, 2s, 3s, 4s};
     LinkOutcome outcome;
-    for (int attempt = 0; attempt < TcpAttempts; ++attempt) {
-        if (!interruptibleSleep(attempt == 0 ? 1500ms : 2500ms)) {
+    for (const auto delay : delays) {
+        if (!interruptibleSleep(delay)) {
             return nullptr;
         }
         auto tcp = openTcp(access_point.address, static_cast<std::uint16_t>(access_point.port));
@@ -744,7 +761,7 @@ MediaSession::openMediaLink(const crypto::OwnerKey& owner, const stream::SoftApI
         link->session = std::make_unique<GlassesSession>(*link->transport, &owner);
         outcome = link->session->open();
         if (outcome.stage == LinkStage::Ready) {
-            log("Media session ready; starting the camera.");
+            log(std::format("Media session ready after {}; starting the camera.", elapsed()));
             return link;
         }
         // The failed link drops here, session first, closing its connection.
@@ -826,7 +843,7 @@ MediaSession::SessionEnd MediaSession::streamVideo(GlassesSession& media, std::u
     const StreamEnd end = receiveVideo(media, callbacks_, stop_, [&] {
         streamed = true;
         setState(MediaState::Streaming);
-        log("Video is flowing.");
+        log(std::format("Video is flowing after {}.", elapsed()));
     });
     if (end == StreamEnd::Stalled) {
         log(streamed ? "Video stalled; the link may have dropped."
