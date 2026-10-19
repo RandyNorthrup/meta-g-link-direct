@@ -319,7 +319,7 @@ struct Reassembly {
     Bytes audio;
 };
 
-enum class MediaEvent : std::uint8_t { Nothing, Frame, StreamStopped };
+enum class MediaEvent : std::uint8_t { Nothing, Frame, AudioUnit, StreamStopped };
 
 // The glasses' own reports on the stream: why they stopped it, and battery or heat changes. Other
 // types are noted once each, by type and size only.
@@ -372,7 +372,7 @@ MediaEvent handleMediaMessage(const RawMessage& message, Reassembly& units,
         append(units.audio, payload);
         deliverAudio(viewOf(units.audio), callbacks);
         units.audio.clear();
-        return MediaEvent::Nothing;
+        return MediaEvent::AudioUnit;
     default:
         return handleStreamReport(message, callbacks, noted);
     }
@@ -389,8 +389,6 @@ void noteOtherService(const RawMessage& message, const MediaCallbacks& callbacks
                                        message.service, message.type, message.payload.size()));
     }
 }
-
-enum class StreamEnd : std::uint8_t { Stopped, Stalled, Silent, GlassesStopped, LinkLost };
 
 // The Wi-Fi session keepalive, as Visor's LiveStream.kt keepAlive: the phone is otherwise silent
 // once the stream runs, and the glasses drop a silent session after about half a minute. Every
@@ -430,56 +428,108 @@ class Keepalive {
     std::optional<std::chrono::steady_clock::time_point> answered_at_;
 };
 
-// Delivers video until stop is requested, the link drops or goes silent, or no access unit
-// arrives within the stall window, keeping the session alive meanwhile. on_first_frame runs
-// once, when the first access unit is delivered.
-template <typename OnFirstFrame>
-StreamEnd receiveVideo(GlassesSession& media, const MediaCallbacks& callbacks,
-                       const std::atomic<bool>& stop, OnFirstFrame on_first_frame) {
-    constexpr auto StallTimeout = 8s;
-    constexpr auto ReceiveSlice = 500ms;
-    Keepalive keepalive;
-    Reassembly units;
-    std::set<std::uint16_t> noted_media;
-    std::set<std::uint32_t> noted_other;
-    bool any_frame = false;
-    auto last_frame_at = std::chrono::steady_clock::now();
-    while (!stop.load()) {
-        if (!keepalive.tick(media)) {
-            return StreamEnd::LinkLost;
+// The receive side of one media session: reassembly, the keepalive, and whether the wanted medium
+// is arriving. Video paces a stream that carries it; an audio-only stream is paced by its audio.
+class StreamWatch {
+  public:
+    // After the stream changed: nothing has arrived for the new setup yet.
+    void restart() {
+        flowing_ = false;
+        last_media_at_ = std::chrono::steady_clock::now();
+    }
+    [[nodiscard]] bool flowing() const noexcept { return flowing_; }
+    [[nodiscard]] bool streamed() const noexcept { return streamed_; }
+
+    enum class Pump : std::uint8_t { Continue, FirstMedia, LinkLost, Silent, Stalled, StreamEnded };
+
+    // Sends the keepalive when due, then reads and handles one message, waiting a short slice so a
+    // changed demand is applied quickly. video and audio say what the running stream carries.
+    Pump pump(GlassesSession& media, bool video, bool audio, const MediaCallbacks& callbacks) {
+        constexpr auto ReceiveSlice = 200ms;
+        if (!keepalive_.tick(media)) {
+            return Pump::LinkLost;
         }
         auto message = media.receiveRaw(ReceiveSlice);
         if (media.linkLost()) {
-            return StreamEnd::LinkLost;
+            return Pump::LinkLost;
         }
-        if (keepalive.silent()) {
-            return StreamEnd::Silent;
+        if (keepalive_.silent()) {
+            return Pump::Silent;
         }
-        if (std::chrono::steady_clock::now() - last_frame_at > StallTimeout) {
-            return StreamEnd::Stalled;
+        if (stalled(video || audio)) {
+            return Pump::Stalled;
         }
-        if (!message || keepalive.observe(*message)) {
-            continue; // a quiet gap or a keepalive answer; keep reading
+        if (!message || keepalive_.observe(*message)) {
+            return Pump::Continue; // a quiet gap or a keepalive answer
+        }
+        if (message->service == stream::ServiceStatus && reportBattery(*message, callbacks)) {
+            return Pump::Continue;
         }
         if (message->service != stream::ServiceMedia) {
-            noteOtherService(*message, callbacks, noted_other);
-            continue;
+            noteOtherService(*message, callbacks, noted_other_);
+            return Pump::Continue;
         }
-        const auto event = handleMediaMessage(*message, units, callbacks, noted_media);
-        if (event == MediaEvent::StreamStopped) {
-            return StreamEnd::GlassesStopped;
+        const auto event = handleMediaMessage(*message, units_, callbacks, noted_media_);
+        if (event == MediaEvent::StreamStopped && (video || audio)) {
+            return Pump::StreamEnded;
         }
-        if (event == MediaEvent::Frame) {
-            last_frame_at = std::chrono::steady_clock::now();
-            if (!any_frame) {
-                any_frame = true;
-                on_first_frame();
+        return record(event, video, audio) ? Pump::FirstMedia : Pump::Continue;
+    }
+
+  private:
+    // A device-status push that carries the battery: logged and reported when the percentage or
+    // the charging state changes. False for any other message.
+    bool reportBattery(const RawMessage& message, const MediaCallbacks& callbacks) {
+        if (message.type < stream::MtDeviceStateFirst || message.type > stream::MtDeviceStateLast) {
+            return false;
+        }
+        const auto battery = stream::parseBatteryState(viewOf(message.payload));
+        if (!battery) {
+            return false;
+        }
+        if (!battery_ || battery_->percent != battery->percent ||
+            battery_->charging() != battery->charging()) {
+            constexpr double PerUnit = 1000.0;
+            logLine(callbacks,
+                    std::format("Glasses battery: {}%, {} ({:.2f} V, {:.1f} C).", battery->percent,
+                                battery->charging() ? "charging" : "not charging",
+                                static_cast<double>(battery->millivolts) / PerUnit,
+                                static_cast<double>(battery->millicelsius) / PerUnit));
+            if (callbacks.on_battery) {
+                callbacks.on_battery(*battery);
             }
         }
+        battery_ = battery;
+        return true;
     }
-    return StreamEnd::Stopped;
-}
 
+    [[nodiscard]] bool stalled(bool streaming) const {
+        constexpr auto StallTimeout = 8s;
+        return streaming && std::chrono::steady_clock::now() - last_media_at_ > StallTimeout;
+    }
+    // Records a delivered unit; true the first time the wanted medium arrives after a start.
+    bool record(MediaEvent event, bool video, bool audio) {
+        const bool paced = (event == MediaEvent::Frame && video) ||
+                           (event == MediaEvent::AudioUnit && !video && audio);
+        if (!paced) {
+            return false;
+        }
+        last_media_at_ = std::chrono::steady_clock::now();
+        const bool first = !flowing_;
+        flowing_ = true;
+        streamed_ = true;
+        return first;
+    }
+
+    Keepalive keepalive_;
+    Reassembly units_;
+    std::set<std::uint16_t> noted_media_;
+    std::set<std::uint32_t> noted_other_;
+    std::optional<stream::BatteryState> battery_; // the last battery report
+    bool flowing_ = false;                        // the wanted medium arrived since the last start
+    bool streamed_ = false;                       // media arrived at some point in this session
+    std::chrono::steady_clock::time_point last_media_at_ = std::chrono::steady_clock::now();
+};
 // Waits briefly for the glasses to confirm their access point is gone. True once they answer.
 bool awaitAccessPointClosed(GlassesSession& session) {
     const auto deadline = std::chrono::steady_clock::now() + 3s;
@@ -525,8 +575,7 @@ struct MediaSession::ControlLink {
     stream::SoftApInfo access_point;
 };
 
-MediaSession::MediaSession(MediaCallbacks callbacks, MediaOptions options)
-    : callbacks_(std::move(callbacks)), options_(std::move(options)) {}
+MediaSession::MediaSession(MediaCallbacks callbacks) : callbacks_(std::move(callbacks)) {}
 
 MediaSession::~MediaSession() { stop(); }
 
@@ -551,7 +600,35 @@ void MediaSession::start() {
     worker_ = std::thread([this] { run(); });
 }
 
-void MediaSession::requestStop() noexcept { stop_.store(true); }
+void MediaSession::requestStop() noexcept {
+    stop_.store(true);
+    demand_changed_.notify_all();
+}
+
+void MediaSession::setDemand(const MediaDemand& demand) {
+    {
+        const std::scoped_lock lock(demand_mutex_);
+        demand_ = demand;
+    }
+    demand_changed_.notify_all();
+}
+
+MediaDemand MediaSession::currentDemand() const {
+    const std::scoped_lock lock(demand_mutex_);
+    return demand_;
+}
+
+bool MediaSession::awaitDemand() {
+    if (!currentDemand().wantsLink() && !stop_.load()) {
+        setState(MediaState::Idle);
+    }
+    std::unique_lock lock(demand_mutex_);
+    // A bounded wait, so a stop request that lands between the check and the wait is still seen.
+    while (!stop_.load() && !demand_.wantsLink()) {
+        (void)demand_changed_.wait_for(lock, StopPollInterval);
+    }
+    return !stop_.load();
+}
 
 void MediaSession::stop() {
     requestStop();
@@ -576,7 +653,7 @@ std::string MediaSession::elapsed() const {
 void MediaSession::run() {
     if (!radioLease().tryAcquire(this)) {
         setState(MediaState::Waiting);
-        log("Another camera source is using the glasses; waiting for it to finish.");
+        log("Another glasses link in this program is using the glasses; waiting for it to finish.");
         if (!radioLease().acquire(this, stop_)) {
             return;
         }
@@ -586,16 +663,25 @@ void MediaSession::run() {
 }
 
 void MediaSession::runConnected() {
-    // Keep the camera up across drops: each attempt runs until the stream ends, then reconnects
-    // with a short backoff, until the source is stopped or a fatal error occurs.
+    // Keep the link up across drops while the demand wants it: each attempt runs until the link
+    // ends, then reconnects with a short backoff. With nothing wanted the worker waits, connected
+    // to nothing, until the demand changes, the session is stopped or a fatal error occurs.
     const std::array<std::chrono::milliseconds, 4> backoff{2s, 4s, 8s, 15s};
     std::size_t failures = 0;
-    while (!stop_.load()) {
+    while (awaitDemand()) {
         const SessionEnd end = attemptSession();
-        if (end == SessionEnd::Fatal || stop_.load()) {
+        if (end == SessionEnd::Fatal) {
+            ended_.store(true);
             return;
         }
-        // Video that flowed and then dropped reconnects quickly; repeated failures back off.
+        if (stop_.load()) {
+            return;
+        }
+        if (end == SessionEnd::Released) {
+            failures = 0;
+            continue;
+        }
+        // Media that flowed and then dropped reconnects quickly; repeated failures back off.
         failures = end == SessionEnd::Dropped ? 0 : failures + 1;
         const auto wait = backoff.at(std::min(failures, backoff.size() - 1));
         setState(MediaState::Reconnecting);
@@ -643,6 +729,8 @@ MediaSession::SessionEnd MediaSession::runSession() {
         return SessionEnd::Fatal;
     }
 
+    // The adapter is fixed for the attempt; choosing another one releases the link and reconnects.
+    const std::string wifi_adapter = currentDemand().wifi_adapter;
     // The control link outlives the rest of the attempt so it can close the glasses' access point
     // if the attempt fails before the media link opens. Locals unwind in reverse order: the media
     // link closes, then this PC leaves the glasses' network, then the control link goes.
@@ -656,7 +744,7 @@ MediaSession::SessionEnd MediaSession::runSession() {
     WifiStation station;
     const auto station_link =
         connectWifiStation(control->access_point.ssid, control->access_point.passphrase,
-                           options_.wifi_adapter, control->access_point.address, station);
+                           wifi_adapter, control->access_point.address, station);
     if (!station_link) {
         log(describeStationFailure(station));
         abandonAccessPoint(*control);
@@ -675,17 +763,11 @@ MediaSession::SessionEnd MediaSession::runSession() {
     // From here the glasses have left Bluetooth. They close their network on their own within
     // about 15 s of this PC leaving (measured); a close sent over the Wi-Fi link was never
     // acknowledged, so none is sent.
-    if (options_.audio && callbacks_.on_audio_config) {
-        // The glasses send raw AAC with no AudioSpecificConfig, so describe the format asked of
-        // them. A configuration the glasses do send later replaces it.
-        const Bytes config = stream::requestedAudioSpecificConfig();
-        callbacks_.on_audio_config(viewOf(config));
-    }
-    std::uint32_t nonce = 1;
-    if (!startCamera(*link->session, nonce)) {
+    nonce_ = 1;
+    if (!prepareMedia(*link->session)) {
         return SessionEnd::Failed;
     }
-    return streamVideo(*link->session, nonce);
+    return serve(*link->session, wifi_adapter);
 }
 
 std::unique_ptr<MediaSession::ControlLink>
@@ -781,86 +863,253 @@ bool MediaSession::sendStep(GlassesSession& media, std::string_view name, std::u
     return false;
 }
 
-bool MediaSession::awaitStep(GlassesSession& media, std::string_view name, std::uint16_t service,
-                             std::uint16_t type, const Bytes& payload, std::uint16_t response,
-                             std::chrono::seconds wait) {
+MediaSession::Step MediaSession::awaitStep(GlassesSession& media, std::string_view name,
+                                           std::uint16_t service, std::uint16_t type,
+                                           const Bytes& payload, std::uint16_t response,
+                                           std::chrono::seconds wait) {
     if (!sendStep(media, name, service, type, payload)) {
-        return false;
+        return Step::Failed;
     }
     const auto result = awaitMedia(media, service, response, wait, stop_);
     if (result.ack == Ack::LinkLost) {
         log(std::format("The link dropped while waiting for {}.", name));
-        return false;
+        return Step::Failed;
     }
     if (result.ack == Ack::Missing) {
-        if (!stop_.load()) {
-            log(std::format("No acknowledgement for {}; continuing.", name));
+        if (stop_.load()) {
+            return Step::Failed;
         }
-        return !stop_.load();
+        log(std::format("No acknowledgement for {}; continuing.", name));
+        return Step::Done;
     }
     // The configure and stream-control answers carry an error code; the glasses refuse, for
-    // example, a video profile they cannot encode. Refused audio is not fatal: the camera goes on
-    // without it.
+    // example, a video profile they cannot encode.
     if (response == stream::MtConfigureVideoResponse ||
         response == stream::MtConfigureAudioResponse ||
         response == stream::MtControlStreamResponse) {
         if (const auto answer = stream::parseStreamAnswer(viewOf(result.payload));
             answer && answer->error != 0) {
-            if (response == stream::MtConfigureAudioResponse) {
-                log(std::format("The glasses refused the audio stream (error {}); continuing "
-                                "with video only.",
-                                answer->error));
-                return !stop_.load();
-            }
-            log(std::format("The glasses rejected {} (error {}).", name, answer->error));
-            return false;
+            log(std::format("The glasses refused {} (error {}).", name, answer->error));
+            return Step::Refused;
         }
     }
-    return !stop_.load();
+    return stop_.load() ? Step::Failed : Step::Done;
 }
 
-bool MediaSession::startCamera(GlassesSession& media, std::uint32_t& nonce) {
-    const auto video = stream::buildConfigureVideo(nonce++, options_.video);
-    const auto audio = stream::buildConfigureAudio(nonce++, options_.audio);
-    const auto start_stream = stream::buildControlStream(nonce++, stream::ActionStart);
+bool MediaSession::prepareMedia(GlassesSession& media) {
     return sendStep(media, "Subscribe", stream::ServiceStatus, stream::MtInit,
                     stream::buildSubscribe()) &&
            awaitStep(media, "StartApp", stream::ServiceStatus, stream::MtStartApp,
                      stream::buildStartApp(stream::AppLivestream), stream::MtStartAppResponse,
-                     7s) &&
+                     7s) == Step::Done &&
            sendStep(media, "SessionSettings", stream::ServiceMedia, stream::MtSessionSettings,
-                    stream::buildSessionSettings(3, /*bypass_don=*/true)) &&
-           awaitStep(media, "ConfigureVideo", stream::ServiceMedia, stream::MtConfigureVideo, video,
-                     stream::MtConfigureVideoResponse, 5s) &&
-           awaitStep(media, "ConfigureAudio", stream::ServiceMedia, stream::MtConfigureAudio, audio,
-                     stream::MtConfigureAudioResponse, 5s) &&
-           awaitStep(media, "ControlStream START", stream::ServiceMedia, stream::MtControlStream,
-                     start_stream, stream::MtControlStreamResponse, 5s);
+                    stream::buildSessionSettings(3, /*bypass_don=*/true));
 }
 
-MediaSession::SessionEnd MediaSession::streamVideo(GlassesSession& media, std::uint32_t nonce) {
-    bool streamed = false;
-    const StreamEnd end = receiveVideo(media, callbacks_, stop_, [&] {
-        streamed = true;
-        setState(MediaState::Streaming);
-        log(std::format("Video is flowing after {}.", elapsed()));
-    });
-    if (end == StreamEnd::Stalled) {
-        log(streamed ? "Video stalled; the link may have dropped."
-                     : "The glasses accepted the stream but sent no video.");
-    } else if (end == StreamEnd::Silent) {
-        log("The glasses stopped answering over Wi-Fi.");
-    } else if (end == StreamEnd::LinkLost) {
-        log("The media link to the glasses dropped.");
+MediaSession::StreamSetup MediaSession::setupFor(const MediaDemand& demand,
+                                                 const Configured& configured) {
+    StreamSetup setup;
+    if (demand.video) {
+        setup.video = demand.video_config;
     }
-    if (end != StreamEnd::LinkLost) {
-        // Stop the camera before the network goes so the glasses end the stream cleanly. Best
-        // effort: the link may already be failing. The control link closes the access point.
-        (void)media.sendOnService(stream::ServiceMedia, stream::MtControlStream,
-                                  viewOf(stream::buildControlStream(nonce, stream::ActionStop)));
-        std::this_thread::sleep_for(300ms);
+    setup.audio = demand.audio && !configured.audio_refused;
+    return setup;
+}
+
+std::optional<MediaSession::StreamSetup> MediaSession::applySetup(GlassesSession& media,
+                                                                  const StreamSetup& running,
+                                                                  const StreamSetup& wanted,
+                                                                  Configured& configured) {
+    constexpr auto AnswerWait = 5s;
+    if (running.streams() &&
+        awaitStep(media, "ControlStream STOP", stream::ServiceMedia, stream::MtControlStream,
+                  stream::buildControlStream(nonce_++, stream::ActionStop),
+                  stream::MtControlStreamResponse, AnswerWait) == Step::Failed) {
+        return std::nullopt;
     }
-    log(stop_.load() ? "Camera stopped." : "Stream ended; will reconnect.");
-    return streamed ? SessionEnd::Dropped : SessionEnd::Failed;
+    if (!wanted.streams()) {
+        return StreamSetup{};
+    }
+    // Video goes out only when the profile or its on/off state differs from what the glasses
+    // hold; a video stream switched off keeps its last profile.
+    if (wanted.video) {
+        if (!configured.video_enabled || configured.video != wanted.video) {
+            if (awaitStep(media, "ConfigureVideo", stream::ServiceMedia, stream::MtConfigureVideo,
+                          stream::buildConfigureVideo(nonce_++, *wanted.video, true),
+                          stream::MtConfigureVideoResponse, AnswerWait) != Step::Done) {
+                return std::nullopt;
+            }
+            configured.video = wanted.video;
+            configured.video_enabled = true;
+        }
+    } else if (configured.video_enabled && configured.video) {
+        if (awaitStep(media, "ConfigureVideo off", stream::ServiceMedia, stream::MtConfigureVideo,
+                      stream::buildConfigureVideo(nonce_++, *configured.video, false),
+                      stream::MtConfigureVideoResponse, AnswerWait) != Step::Done) {
+            return std::nullopt;
+        }
+        configured.video_enabled = false;
+    }
+    StreamSetup effective = wanted;
+    if (configured.audio != wanted.audio) {
+        const Step step =
+            awaitStep(media, "ConfigureAudio", stream::ServiceMedia, stream::MtConfigureAudio,
+                      stream::buildConfigureAudio(nonce_++, wanted.audio),
+                      stream::MtConfigureAudioResponse, AnswerWait);
+        if (step == Step::Failed) {
+            return std::nullopt;
+        }
+        if (step == Step::Refused) {
+            // Not fatal: video goes on without it, and this session stops asking for audio.
+            log("The glasses refused the audio stream; continuing without glasses audio.");
+            configured.audio_refused = true;
+            configured.audio = false;
+            effective.audio = false;
+        } else {
+            configured.audio = wanted.audio;
+        }
+    }
+    if (!effective.streams()) {
+        return StreamSetup{};
+    }
+    if (effective.audio && callbacks_.on_audio_config) {
+        // The glasses send raw AAC with no AudioSpecificConfig, so describe the format asked of
+        // them. A configuration the glasses do send later replaces it.
+        const Bytes config = stream::requestedAudioSpecificConfig();
+        callbacks_.on_audio_config(viewOf(config));
+    }
+    if (awaitStep(media, "ControlStream START", stream::ServiceMedia, stream::MtControlStream,
+                  stream::buildControlStream(nonce_++, stream::ActionStart),
+                  stream::MtControlStreamResponse, AnswerWait) != Step::Done) {
+        return std::nullopt;
+    }
+    return effective;
+}
+
+void MediaSession::stopBeforeLeaving(GlassesSession& media, const StreamSetup& running) {
+    if (!running.streams() || media.linkLost()) {
+        return;
+    }
+    // The link may already be failing, so no answer is awaited; the pause lets the request out.
+    constexpr auto SendPause = 300ms;
+    (void)media.sendOnService(stream::ServiceMedia, stream::MtControlStream,
+                              viewOf(stream::buildControlStream(nonce_++, stream::ActionStop)));
+    std::this_thread::sleep_for(SendPause);
+}
+
+const char* MediaSession::releaseReason(const MediaDemand& demand,
+                                        const std::string& wifi_adapter) const {
+    if (stop_.load()) {
+        return "Glasses link stopped.";
+    }
+    if (!demand.wantsLink()) {
+        return "No glasses source needs the glasses now; disconnecting.";
+    }
+    if (demand.wifi_adapter != wifi_adapter) {
+        return "The Wi-Fi adapter choice changed; reconnecting with the new adapter.";
+    }
+    return nullptr;
+}
+
+namespace {
+// How a pump result ends the attempt: the log line, and whether the running stream should be
+// stopped first. nullopt keeps serving.
+struct Ending {
+    const char* why = nullptr;
+    bool stop_stream = false;
+};
+
+std::optional<Ending> endingFor(StreamWatch::Pump pump, bool flowing) {
+    switch (pump) {
+    case StreamWatch::Pump::Continue:
+    case StreamWatch::Pump::FirstMedia:
+        return std::nullopt;
+    case StreamWatch::Pump::LinkLost:
+        return Ending{.why = "The media link to the glasses dropped.", .stop_stream = false};
+    case StreamWatch::Pump::Silent:
+        return Ending{.why = "The glasses stopped answering over Wi-Fi.", .stop_stream = true};
+    case StreamWatch::Pump::Stalled:
+        return Ending{.why = flowing ? "The stream stalled; the link may have dropped."
+                                     : "The glasses accepted the stream but sent nothing.",
+                      .stop_stream = true};
+    case StreamWatch::Pump::StreamEnded:
+        return Ending{.why = "The stream ended; reconnecting.", .stop_stream = false};
+    }
+    return std::nullopt;
+}
+} // namespace
+
+void MediaSession::announceReady(bool restarted) {
+    setState(MediaState::Ready);
+    log(restarted ? std::string("Camera off; the glasses stay connected, so a glasses source "
+                                "going live starts it in about a second.")
+                  : std::format("Connected to the glasses after {}, camera off; a glasses source "
+                                "going live starts it in about a second.",
+                                elapsed()));
+}
+
+void MediaSession::announceFlow(bool video, bool restarted,
+                                std::chrono::steady_clock::time_point change_began) {
+    setState(MediaState::Streaming);
+    const char* medium = video ? "Video" : "Audio";
+    if (!restarted) {
+        log(std::format("{} is flowing after {}.", medium, elapsed()));
+        return;
+    }
+    const auto taken = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now() - change_began);
+    log(std::format("{} is flowing {:.1f} s after the change.", medium,
+                    static_cast<double>(taken.count()) / 1000.0));
+}
+
+MediaSession::SessionEnd MediaSession::serve(GlassesSession& media,
+                                             const std::string& wifi_adapter) {
+    StreamWatch watch;
+    Configured configured;
+    StreamSetup running;
+    bool announced_ready = false;
+    // When the latest change of stream began, and whether media had flowed before it: a restart
+    // reports its own duration rather than the time since the connection began.
+    auto change_began = std::chrono::steady_clock::now();
+    bool restarted = false;
+    const auto finish = [&](std::string_view why) {
+        log(std::string(why));
+        return watch.streamed() ? SessionEnd::Dropped : SessionEnd::Failed;
+    };
+    while (true) {
+        const MediaDemand demand = currentDemand();
+        if (const char* reason = releaseReason(demand, wifi_adapter); reason != nullptr) {
+            stopBeforeLeaving(media, running);
+            log(reason);
+            return SessionEnd::Released;
+        }
+        if (const StreamSetup wanted = setupFor(demand, configured); wanted != running) {
+            change_began = std::chrono::steady_clock::now();
+            // A start from the connected, camera-off state reports its own time too.
+            restarted = watch.streamed() || announced_ready;
+            const auto applied = applySetup(media, running, wanted, configured);
+            if (!applied) {
+                return finish("The glasses did not accept the stream change; reconnecting.");
+            }
+            running = *applied;
+            watch.restart();
+            announced_ready = false;
+            setState(running.streams() ? MediaState::Connecting : MediaState::Ready);
+        }
+        if (!running.streams() && !announced_ready) {
+            announced_ready = true;
+            announceReady(restarted);
+        }
+        const auto pumped = watch.pump(media, running.video.has_value(), running.audio, callbacks_);
+        if (pumped == StreamWatch::Pump::FirstMedia) {
+            announceFlow(running.video.has_value(), restarted, change_began);
+        }
+        if (const auto ending = endingFor(pumped, watch.flowing())) {
+            if (ending->stop_stream) {
+                stopBeforeLeaving(media, running);
+            }
+            return finish(ending->why);
+        }
+    }
 }
 } // namespace mgl

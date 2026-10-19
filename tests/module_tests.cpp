@@ -34,6 +34,16 @@ int runModuleTests(int argument_count, char** arguments) {
         std::cerr << "Real OBS runtime could not load; Windows error " << GetLastError() << '\n';
         return EXIT_FAILURE;
     }
+    // OBS has its frontend API loaded before it loads plugins; the plugin links it for its Tools
+    // menu entry.
+    const auto frontend = std::filesystem::path(arguments[2]) / "obs-frontend-api.dll";
+    const std::unique_ptr<HINSTANCE__, LibraryCloser> frontend_api(
+        LoadLibraryExW(frontend.c_str(), nullptr, SearchFlags));
+    if (!frontend_api) {
+        std::cerr << "Real OBS frontend API could not load; Windows error " << GetLastError()
+                  << '\n';
+        return EXIT_FAILURE;
+    }
     const auto path = std::filesystem::absolute(arguments[1]);
     const std::unique_ptr<HINSTANCE__, LibraryCloser> plugin(
         LoadLibraryExW(path.c_str(), nullptr, SearchFlags));

@@ -103,7 +103,7 @@ Bytes buildSessionSettings(std::uint16_t app_type, bool bypass_don) {
     return out;
 }
 
-Bytes buildConfigureVideo(std::uint32_t nonce, const VideoConfig& config) {
+Bytes buildConfigureVideo(std::uint32_t nonce, const VideoConfig& config, bool enabled) {
     Bytes video;
     proto::appendStringField(video, 1, "video/hevc");
     proto::appendVarintField(video, 2, config.width);
@@ -116,7 +116,7 @@ Bytes buildConfigureVideo(std::uint32_t nonce, const VideoConfig& config) {
     Bytes out;
     proto::appendVarintField(out, 1, nonce);
     proto::appendBytesField(out, 2, video);
-    proto::appendVarintField(out, 3, 1); // enabled
+    proto::appendVarintField(out, 3, enabled ? 1 : 0);
     return out;
 }
 
@@ -239,6 +239,30 @@ std::string_view stopReasonText(std::uint64_t reason) {
                                                        "weak signal",
                                                        "service destroyed"};
     return reason < Reasons.size() ? Reasons.at(reason) : Reasons.front();
+}
+
+std::optional<BatteryState> parseBatteryState(ByteView device_state) {
+    constexpr std::uint64_t MaxPercent = 100;
+    const auto top = proto::Message::parse(device_state);
+    if (!top) {
+        return std::nullopt;
+    }
+    const auto field = top->bytes(1);
+    if (!field) {
+        return std::nullopt;
+    }
+    const auto battery = proto::Message::parse(*field);
+    const auto percent = battery ? battery->varint(3) : std::nullopt;
+    if (!percent || *percent > MaxPercent) {
+        return std::nullopt;
+    }
+    // Protobuf int32 travels as a varint of its two's-complement value, so the low 32 bits carry
+    // a negative temperature intact.
+    return BatteryState{.percent = static_cast<std::uint32_t>(*percent),
+                        .charge_state = static_cast<std::uint32_t>(battery->varintOr(2, 0)),
+                        .millivolts = static_cast<std::uint32_t>(battery->varintOr(5, 0)),
+                        .millicelsius = static_cast<std::int32_t>(
+                            static_cast<std::uint32_t>(battery->varintOr(4, 0)))};
 }
 
 std::optional<HealthEvent> parseHealthEvent(ByteView payload) {

@@ -9,9 +9,9 @@ The [project brief](PROJECT_BRIEF.md) is authoritative for the product. This pla
 | Milestone | State | Proven | Open |
 |---|---|---|---|
 | M0 · TASK-SETUP | Verified | Native build and quality foundation, portable frame-prefix parser, OBS module ABI test, gate drills | — |
-| M1 · TASK-AUTH | In progress | AirShield session over Bluetooth with trust success; Meta owner change; DPAPI-sealed identity; Forget | Trust-signature verification; return-to-phone behaviour |
-| M2 · TASK-MEDIA | In progress | Glasses-hosted 2.4 GHz / 20 MHz link; live 720 × 1280 HEVC at 30 fps; runs of about 179 s and 120 s with no stall; stop/start cycles; optional glasses audio (raw AAC-LC 48 kHz stereo, decoded) | Lower profiles; latency, CPU, memory and thermal measurement; audio/video sync; firmware build |
-| M3 · TASK-OBS | In progress | Installed source live in OBS 32.2.2 for two minutes at 30 fps with no render frames skipped by the source; non-blocking start and stop; installer; Wi-Fi adapter choice, including the explicit failure and Bluetooth close for a missing adapter; glasses audio in the OBS mixer (peak −15 dBFS); installed from the ProgramData plugin folder in both layouts; OBS 33.0.0-rc2 installed, loading the new layout, streaming video and audio; installer finds and installs into an OBS on another drive letter | Reconnection after a real drop; the final OBS 33.0 release; the owner-key refusal path; quality changes in OBS; two Wi-Fi adapters at once; keyboard, Narrator, theme and scaling; the full-charge endurance run |
+| M1 · TASK-AUTH | In progress | AirShield session over Bluetooth with trust success; Meta owner change, also from the setup window with the login inside it; DPAPI-sealed identity; Forget | Trust-signature verification (the glasses sign with RSA-4096; the Meta app's check is native code); return-to-phone behaviour |
+| M2 · TASK-MEDIA | In progress | Glasses-hosted 2.4 GHz / 20 MHz link; live 720 × 1280 HEVC at 30 fps; runs of about 179 s and 120 s with no stall; stop/start cycles; optional glasses audio (raw AAC-LC 48 kHz stereo, decoded); stream changes inside one session (720p → 504p → 504p with audio → audio only → 720p, first frame about 0.3 s after each restart); audio only with the camera off; battery report decoded | 1080p and 360p profiles; latency, CPU, memory and thermal measurement; audio/video sync; battery drain per mode; firmware build |
+| M3 · TASK-OBS | In progress | Installed source live in OBS 32.2.2 for two minutes at 30 fps with no render frames skipped by the source; non-blocking start and stop; installer; Wi-Fi adapter choice, including the explicit failure and Bluetooth close for a missing adapter; glasses audio in the OBS mixer (peak −15 dBFS); installed from the ProgramData plugin folder in both layouts; OBS 33.0.0-rc2 installed, loading the new layout, streaming video and audio; installer finds and installs into an OBS on another drive letter; in OBS 33.0.0-rc2: the shared link, the microphone source with the camera off, keep-connected starts, shared settings mirrored to every glasses source, grouped properties, Set up glasses opening and cancelling the window, battery line; quality changes in OBS (720p ↔ 504p in 1.4 s) | Reconnection after a real drop; the final OBS 33.0 release; the owner-key refusal path; two Wi-Fi adapters at once; keyboard, Narrator, theme and scaling (properties and setup window); the full-charge endurance run |
 
 Endurance (brief D16): stream from a full glasses battery to the low-battery shutdown with no drop or reconnect and record the measured minutes. This replaced the 120-minute minimum on 2026-10-19 because a glasses health reading that looks like battery fell about 4 points in 90 s (unconfirmed), which suggests about 35–40 minutes per charge.
 
@@ -26,11 +26,16 @@ Reuse Visor's protocol and session behaviour at commit `e7077b4051b1e3e605c667aa
 - Drive independence (2026-10-19): every system folder in the installer comes from one helper over the Windows known-folder call (`Get-KnownFolder`), the call OBS itself uses for ProgramData, instead of environment variables or drive letters. `Find-ObsInstallation` stays the single OBS lookup and gains a running OBS (`Get-RunningObsRoot`) and Steam's library list (`Get-SteamLibraryFolder`); registry reads share `Get-RegistryText`. `tests/installer.Tests.ps1` loads the installer's functions from its syntax tree, so the tests exercise the shipped code without a test switch in it.
 - Drill scope (2026-10-19): `Invoke-RestoredDrill` stays the single drill path and decides reuse itself (`Get-InputFingerprint`, `Get-ReusableDrillResult`), so no drill needed its own change list; the existing `reports/red-drills.json` record gains each drill's inputs and fingerprint instead of a second state file. The gate inputs are one table (`$drillGateInputs`) in the runner, and a drill whose gate is missing from it fails.
 - Community files (2026-10-19): the funding links come from the account's `.github` repository (`FUNDING.yml`), so this repository adds no copy; it adds `CONTRIBUTING.md`, `SECURITY.md` and `SUPPORT.md`, which that repository does not provide.
+- Shared glasses link (2026-10-19): `MediaSession` stays the single session owner and becomes demand-driven (`MediaDemand`, `setDemand`) instead of taking fixed `MediaOptions`; its worker, lease, reconnect loop, Wi-Fi step and keepalive are unchanged, and stream changes reuse the existing configure/control messages (`buildConfigureVideo` gains the `enabled` field the glasses already define) rather than a second session. `src/plugin/camera.cpp`/`camera.h` became `glasses_link.cpp`/`glasses_link.h`, one process-wide link that every source registers with, because the glasses accept one session (brief D18). The microphone source shares the camera source's create, live, update and setup code in `source.c` and differs only in its output flags and its Video and Audio groups, not a second implementation. Shared settings live in one place (`link_settings.c`, the plugin's `link.json`) and are mirrored into each source's settings so OBS's own properties UI shows them (D22).
+- Battery report (2026-10-19): `stream::parseBatteryState` sits beside the existing health-event parser and reads the DeviceState the glasses already push on svc28; no new channel or poll.
+- Setup window (2026-10-19): `src/windows/setup.cpp` (`setup::changeOwner`) is the one ownership-change path, extracted from the probe's `--provision`, which now calls it; the window is a new program only because a GUI needs its own subsystem and the WebView2 loader. The login redirect address moved from `provision.cpp` into `provision.hpp` (`LoginRedirectUri`) so the window and the provisioning request share it; the code extraction reuses `encoding.cpp` (`queryParameter`). The installer and the OBS button open the same window (D21).
+- Text conversion (2026-10-19): the three UTF-8 → UTF-16 and two UTF-16 → UTF-8 copies in `http.cpp`, `identity.cpp` and `wifi_station.cpp` were replaced by `win_text` (`widenUtf8`, `narrowUtf8`), which the setup window also uses; jscpd found the copies.
+- Trust signature (2026-10-19): an attempt to verify the glasses' svc36 trust signature as P-256 r||s was removed before release. On this firmware the glasses send a 32-byte value (SHA-256-sized) with a 512-byte (RSA-4096-sized) signature and their device certificate carries an RSA key, so the expected key and signed bytes are unknown; the Meta app's check is in native code. The gap stays open rather than shipping a check that cannot pass.
 - Release packaging (2026-10-19): `package` stages exactly the bundle layout that `Install-MetaGLinkDirect.ps1` already installs from (`Build-ReleaseBundle`), instead of the CMake install layout that no installer consumed. The installer's copy and remove steps share one elevation path (`Invoke-PluginFileStep`), which also fixes uninstall for OBS under Program Files.
 
 ## Architecture and inputs
 
-C++20 owned code; C17 for the two files that include OBS headers; CMake 3.31.3; MSVC 19.44.35222.0 (toolset 14.44.35207) with Windows SDK 10.0.26100.0; LLVM 22.1.1 for formatting and C++ analysis. The protocol core stays portable; transports, identity, Wi-Fi and the media session live under `src/windows/`; OBS is a thin consumer behind `src/plugin/camera.h`. `dependencies.lock.json` pins the downloadable inputs; the OBS 32.2.2 source tar SHA-256 is `ec81fb66b03e75ddb3076b576f62679c39262e0e9960cef3e17a40dc5d68e6b4`. References: [OBS template](https://github.com/obsproject/obs-plugintemplate/tree/3e7d7ac3b5342cd7d9b88890b9c70b472d1520fc), [OBS 32.2.2](https://github.com/obsproject/obs-studio/tree/ba2f32bdf791005443988a4955e963663e16b1ed), [source API](https://docs.obsproject.com/reference-sources).
+C++20 owned code; C17 for the three files that include OBS headers (`module.c`, `source.c`, `link_settings.c`); CMake 3.31.3; MSVC 19.44.35222.0 (toolset 14.44.35207) with Windows SDK 10.0.26100.0; LLVM 22.1.1 for formatting and C++ analysis. The protocol core stays portable; transports, identity, Wi-Fi, the ownership change and the media session live under `src/windows/`; OBS is a thin consumer behind `src/plugin/glasses_link.h`; the setup window (`src/setup/`) links the pinned WebView2 SDK's static loader. `dependencies.lock.json` pins the downloadable inputs; the OBS 32.2.2 source tar SHA-256 is `ec81fb66b03e75ddb3076b576f62679c39262e0e9960cef3e17a40dc5d68e6b4`. References: [OBS template](https://github.com/obsproject/obs-plugintemplate/tree/3e7d7ac3b5342cd7d9b88890b9c70b472d1520fc), [OBS 32.2.2](https://github.com/obsproject/obs-studio/tree/ba2f32bdf791005443988a4955e963663e16b1ed), [source API](https://docs.obsproject.com/reference-sources).
 
 ## Gate policy and evidence
 
@@ -40,7 +45,7 @@ Detailed logs belong under `reports/` (indexed in `reports/README.md`). Requirem
 
 ## Open verification
 
-Reconnection after a real drop; the final OBS 33.0 release once it is out; trust-signature verification; lower quality profiles and quality changes in OBS; latency, CPU, memory and thermal measurement; audio/video sync and long-run audio; the keyboard, Narrator, theme and scaling pass; the firmware build; confirming the battery reading; and the full-charge endurance run. While streaming, the PC's Wi-Fi adapter has no internet (brief D15).
+Reconnection after a real drop; the final OBS 33.0 release once it is out; trust-signature verification; the 1080p and 360p profiles; latency, CPU, memory and thermal measurement; audio/video sync and long-run audio; battery drain with video and with audio only; the keyboard, Narrator, theme and scaling pass, including the setup window; the setup window without WebView2 (browser fallback); the firmware build; and the full-charge endurance run. While streaming, the PC's Wi-Fi adapter has no internet (brief D15).
 
 Deferred: code signing and provenance, a published SBOM and native advisory assessment, Windows jobs in hosted CI, and other platforms or glasses generations.
 
@@ -48,7 +53,7 @@ Deferred: code signing and provenance, a published SBOM and native advisory asse
 
 - Both languages build with MSVC because CMake rejects a mixed clang-cl/MSVC project and OBS's `util_uint64.h` needs `_udiv128`, which clang-cl does not implement ([LLVM issue 59168](https://github.com/llvm/llvm-project/issues/59168)). No compiler macro is spoofed and no private OBS declaration is introduced.
 - clang-tidy disables only `llvm-prefer-static-over-anonymous-namespace`, which contradicts the retained `misc-use-anonymous-namespace`. Line-scoped `misc-include-cleaner` annotations cover C++/WinRT projection headers that LLVM 22 cannot map back to the public SDK (in `src/windows/discovery.cpp` and `src/windows/classic.cpp`). Line-scoped cast annotations cover exact-signature `GetProcAddress` conversions in `tests/module_tests.cpp` and each unavoidable C ABI cast at a Windows API boundary. Revisit when the SDK or LLVM changes.
-- Cppcheck runs on an analysis copy of the compilation database with MSVC `-external:I` paths normalized and the compiler builtins added. `.cppcheck-obs.cfg` models the six OBS entry points OBS loads dynamically. Only `missingIncludeSystem` notices and findings under `.deps/` are suppressed; owned header and unused-function findings fail.
+- Cppcheck runs on an analysis copy of the compilation database with MSVC `-external:I` paths normalized and the compiler builtins added. `.cppcheck-obs.cfg` models the ten entry points OBS loads dynamically (seven module functions and three locale functions). Only `missingIncludeSystem` notices, findings under `.deps/` and three inline `constParameterCallback` findings in `src/plugin/source.c` are suppressed; those three are OBS callbacks (`obs_source_info` and `obs_property_clicked_t`) whose `void *data` parameter type OBS fixes. Owned header and unused-function findings fail.
 - The first synthetic secret canary used the wrong alphabet; its miss is preserved in `reports/red-secret-canary-initial.txt` and the generator was corrected without changing scanner rules.
 - The GitHub workflow builds the portable protocol core on Linux with clang under ASan and UBSan; Windows ASan runs locally (`test:asan`). TSan, fuzzing and a coverage floor are not established.
 - OSV and npm audit cover the locked npm development packages only. The pinned native OBS archives have integrity and version evidence, not an advisory assessment.
@@ -576,7 +581,8 @@ Deferred: code signing and provenance, a published SBOM and native advisory asse
         "EV-EXISTING-ADAPTER-RED-CLASSIC-CONNECTION-CLAIM",
         "EV-EXISTING-ADAPTER-RED-PRIVATE-ADDRESS-VALIDATION",
         "EV-EXISTING-ADAPTER-RED-UNCACHED-QUERY-LOOP",
-        "EV-EXISTING-ADAPTER-HARDWARE-DEFERRED"
+        "EV-EXISTING-ADAPTER-HARDWARE-DEFERRED",
+        "EV-SETUP-WINDOW"
       ],
       "blocker": "Owner change and authenticated session are proven on hardware; glasses trust-signature verification is not built, so AC-AUTH stays open.",
       "superseded_by": null
@@ -633,7 +639,8 @@ Deferred: code signing and provenance, a published SBOM and native advisory asse
         "EV-WIFI-LINK-HARDWARE",
         "EV-WIFI-LINK-SOFTWARE",
         "EV-WIFI-LINK-RED-SOFTAP-PORT",
-        "EV-AUDIO-HARDWARE"
+        "EV-AUDIO-HARDWARE",
+        "EV-SHARED-LINK-OBS"
       ],
       "blocker": null,
       "superseded_by": null
@@ -671,7 +678,8 @@ Deferred: code signing and provenance, a published SBOM and native advisory asse
         "EV-WIFI-LINK-OBS-DEFERRED",
         "EV-AUDIO-HARDWARE",
         "EV-OBS33-LOAD",
-        "EV-INSTALLER-DRIVES"
+        "EV-INSTALLER-DRIVES",
+        "EV-SHARED-LINK-OBS"
       ],
       "blocker": null,
       "superseded_by": null
@@ -19264,7 +19272,7 @@ Deferred: code signing and provenance, a published SBOM and native advisory asse
         "scripts/Invoke-Project.ps1",
         "package"
       ],
-      "method": "The 0.2.0 release gate (package): configure, build, format:check, lint, deadcode, security:audit, test, test:live, test:red each exited 0; 4 CTest suites (90 protocol cases), 28 Pester cases and 21 red drills passed; release zip SHA-256 debb454b0990d21902acbf30ebb077c244873a78089d3b3ff5d144b8a9c7b693.",
+      "method": "The 0.3.0 release gate (package): configure, build, format:check, lint, deadcode, security:audit, test, test:live, test:red each exited 0; 4 CTest suites (126 protocol cases), 31 Pester cases and 22 red drills passed; release zip SHA-256 78b76e593ec9a2c85ddf747293a405e4a412e87b5b5162340ce6369019463729.",
       "environment": {
         "platform": "windows",
         "tools": {
@@ -19290,80 +19298,144 @@ Deferred: code signing and provenance, a published SBOM and native advisory asse
       "exit_code": 0,
       "artifact": {
         "path": "reports/wifi-link-gates.txt",
-        "sha256": "bd3b3cc2b66bfab56affe8fd1d7614c2d298f94852615ce7616374ed8db5c537"
+        "sha256": "ababe135f0f17ffe4c7b24218d0f67b42cd46338e7bb4bf20e842cac3c1e61b6"
       },
       "inputs": [
         {
           "path": "CMakeLists.txt",
-          "sha256": "b903d25825336f84b5a2f596ce6f3a9c86fd1e93a15e7139a313ec35dda77d11"
+          "sha256": "d32bea00a090453f2b66bc328cba8a351e5a1fbbff10b26f89a3b98ce5811572"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "549199ce7d74d7aa8caebca912b686b368f68d470fa1e97d433dba9a2c28f1f0"
         },
         {
           "path": "include/mgl/stream.hpp",
-          "sha256": "5cf40f97cac5c92a4197173585e6d421c63b709cf9b5c3468883f6ec38d99f65"
+          "sha256": "0d00cab5defc69902b37573abf259c0ba4b31da46a39e88245d0de6e41d2fd99"
         },
         {
           "path": "src/protocol/stream.cpp",
-          "sha256": "6514fd1d35dd9c344a3abeac53ea44590f00a725ca2e2aae721e08478655e576"
+          "sha256": "4c70f8045b9518e4c50a196fe90fbc036730727447c33be9325ace1e302678c0"
+        },
+        {
+          "path": "include/mgl/encoding.hpp",
+          "sha256": "cf81f03c11c776512395e96ced31b3c7798ca4af0906d72491c95e9364c3908a"
+        },
+        {
+          "path": "src/protocol/encoding.cpp",
+          "sha256": "4802dd71890f57735ba8f3775461885fe1c2dcd7d7e63717b68106fb3854d3b9"
         },
         {
           "path": "include/mgl/media_session.hpp",
-          "sha256": "c6a01be1339133961b2b20f6c5a2a0f21d574cad8d66466ec627b50e8b2f4397"
+          "sha256": "8cbe78933fcb03d65ac42cc4a874fde550d9d745ae3433ce1fb36799f12e5067"
         },
         {
           "path": "src/windows/media_session.cpp",
-          "sha256": "f09f551bf388fba131cd5db7c4c9c2efba455c2a5b14889a1e981117f1bb1207"
+          "sha256": "ae989edbb09ac87a55c84ce946252540b839f6a35dbbc9172e52f12861aafb35"
         },
         {
           "path": "include/mgl/wifi_station.hpp",
-          "sha256": "ac6c3df9b17f8a7bc2fbbf92f918008bd7b2929d76dd2f71dfe28ec29d344636"
+          "sha256": "892fb00c1a1417d828d4e81d273d36072d45575cfb101fa4fd9c12f83f4dfae5"
         },
         {
           "path": "src/windows/wifi_station.cpp",
-          "sha256": "a3b0c56d87d04f9ab4afc33ad7986d1d861621b3250db7a36fc563e10f71dcb2"
+          "sha256": "bba5c4a2f7783899ee680f0c48f621c31ba045f2abfd67d09b3d8f79ec4e8ebf"
+        },
+        {
+          "path": "include/mgl/provision.hpp",
+          "sha256": "113867d8e76f514fc9fb2f843228ab42e887fd33aea6445be3f7b7fac94cac9d"
+        },
+        {
+          "path": "src/windows/provision.cpp",
+          "sha256": "f371d045772bc954573eacd0098a0db8db0e5a614b16b8824620ad060fb34641"
+        },
+        {
+          "path": "include/mgl/setup.hpp",
+          "sha256": "336dd0250c8ac7e8e0acfa7a8a3788bdfb423266d0c85cdc056df03dce491fbc"
+        },
+        {
+          "path": "src/windows/setup.cpp",
+          "sha256": "74f581c6318728af5e834bec77625c350e4ee7f3af726a266086c686bf2767d0"
+        },
+        {
+          "path": "include/mgl/win_text.hpp",
+          "sha256": "d633257f62c7280d2edf536e2dd41d5ea42c9206bec36741494e5f3e712fb6d7"
+        },
+        {
+          "path": "src/windows/win_text.cpp",
+          "sha256": "c3065a5453492a5577d0fbc1316d204749d60527a8ffbc4a9fb5186a85282361"
         },
         {
           "path": "src/plugin/camera.h",
-          "sha256": "354cca54429f5bf9acc282c3b4b3f78d51f26ef5d093b09ad76a1b2929bf6d9d"
+          "sha256": null
         },
         {
           "path": "src/plugin/camera.cpp",
-          "sha256": "aeb22cca3d7b2e9ab366360e3109ab9217240e9c92dd931cc4eba40ff2b2b786"
+          "sha256": null
+        },
+        {
+          "path": "src/plugin/glasses_link.h",
+          "sha256": "4979a11ca91baa9f63c13fe1a829e44dd42d4961248d36c1f2ba1978162df78c"
+        },
+        {
+          "path": "src/plugin/glasses_link.cpp",
+          "sha256": "9c51760ad1eb0fa71015bc7a95f00c692a27a702facbd7195db64a20f791908f"
+        },
+        {
+          "path": "src/plugin/link_settings.h",
+          "sha256": "31a54bf4e129d9eba7ac1e68fba3309f7891e9a17e12d4c900bc3c617fe5a7e7"
+        },
+        {
+          "path": "src/plugin/link_settings.c",
+          "sha256": "f633cbaf8f744db317f8133f5003d4103cf525cae270319398ab11790cb907e1"
+        },
+        {
+          "path": "src/plugin/source_ids.h",
+          "sha256": "06d6fb8ea780c04903975d94d39eac6fc3f781db928fcf2dd0aa652977fcd7a6"
         },
         {
           "path": "src/plugin/source.c",
-          "sha256": "de457fc283bbb1924b36cd530e6a04b8954501e4e0e9f8c7b74e393bbcaa8448"
+          "sha256": "95e0ac9e1ec5601c7d15e0c0e195bc44bddd46de6a7e03e795a2bfb087f0539d"
         },
         {
-          "path": "src/plugin/aac_decoder.hpp",
-          "sha256": "fd2e73957c3b38db215cc996640cd89f20365092104ce6a790f321e357dc975b"
+          "path": "src/plugin/module.c",
+          "sha256": "720ca32179c5f5597435f34fb887f4e86a9d8d2b4551f2fc69e99332e0e3d71f"
         },
         {
-          "path": "src/plugin/aac_decoder.cpp",
-          "sha256": "ae0c98f51187ec61df74f6575f666abd43479425f3ee6743b39cf3fa97ef9946"
+          "path": "src/setup/main.cpp",
+          "sha256": "5ad210427a43ae3b0d9edd6ee4417562a62c47206be1b89531ccc82d0b53b526"
         },
         {
-          "path": "src/plugin/hevc_decoder.cpp",
-          "sha256": "f99c0a6ce28a9e0bd196dca0c9fcb30293eb3a349bad48876a7780d4f86f54dd"
+          "path": "src/setup/meta-g-link-setup.manifest",
+          "sha256": "d0dbfb23b78628ba91f77c5bd5f425041e8869d99406239d085a6381d650c6c6"
         },
         {
-          "path": "src/plugin/ffmpeg_handles.hpp",
-          "sha256": "c2e5c0ffd2dc1ac7ae0a6fe91093233afe845cc76e2039d5849c689879bb2d9d"
+          "path": "src/probe/main.cpp",
+          "sha256": "020894fd4653b3f4ca01bece4e5d8e1f37c9852689b82fb3c79363321e610482"
         },
         {
           "path": "data/locale/en-US.ini",
-          "sha256": "47e4deecb8f18e755e1ac994f14c7b66792457207ba5a7db025995f140d5edf5"
+          "sha256": "354ff3b856659d42c754fafaf53490f0ca87e40e7786a9c61d623e7444794e16"
         },
         {
           "path": "tests/protocol_tests.cpp",
-          "sha256": "7a8ef0e13ccfe887d37bce17ec30663aff5467af4d5e3fee679bca04bea979b8"
+          "sha256": "902176f7f493e501b9d124bcd20ba6d0f69befb55ecbf4d5ba6058086e27c662"
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "7df122ba4d8575cd32b607753bf7b9e53c1be77321aaf40ed636b950e13fac87"
+        },
+        {
+          "path": "tests/probe.Tests.ps1",
+          "sha256": "252c47377a872c399f0cd029570a52dd6ebca943c6df859300d6bc9fb46d8135"
         },
         {
           "path": "scripts/Install-MetaGLinkDirect.ps1",
-          "sha256": "3b45b7023416a047163d7edabeba7413cfb2b9d7e073983f02eb0910284a7865"
+          "sha256": "cf4be3d407cbfc15aa006f10444f7b97047021877354abc51a320db9521e8357"
         },
         {
           "path": "scripts/Invoke-Project.ps1",
-          "sha256": "840ad4ffbe235c6458119df5bc59dc96012396525257d02cf0fc356866cb0eb6"
+          "sha256": "9161e49c6eca3655a50c77dc4a1cfbb946b74e18d59dafe353453b884f9f49b0"
         },
         {
           "path": "tests/installer.Tests.ps1",
@@ -19371,7 +19443,11 @@ Deferred: code signing and provenance, a published SBOM and native advisory asse
         },
         {
           "path": "packaging/README.txt",
-          "sha256": "c409052cefc9859ae65d41f8d617cca1f87cb576edc84dd744eb4fa2fe35e1e4"
+          "sha256": "5d883703162a1dbff58fb42667fb5c4d6886c7d4276b440b06654502c81311ca"
+        },
+        {
+          "path": "packaging/Install.cmd",
+          "sha256": "25eb945272606b42c342817dce6f49692b7bb5053d987d98633a8076bd01d72e"
         }
       ],
       "scope_sha256": null,
@@ -19986,6 +20062,389 @@ Deferred: code signing and provenance, a published SBOM and native advisory asse
       "scope_sha256": null,
       "red": null,
       "reason": "The scope fingerprint tool behind earlier entries is not available in this session; inputs carry their own hashes (null = deleted file)."
+    },
+    {
+      "id": "EV-SHARED-LINK-OBS",
+      "acceptance": [
+        "AC-MEDIA",
+        "AC-OBS"
+      ],
+      "kind": "behavior",
+      "status": "pass",
+      "command": [],
+      "method": "Real glasses: five stream changes inside one media session (720p, 504p, 504p with audio, audio only with video disabled, 720p), each answered, first frame about 0.3 s after each restart, no reconnect; camera privacy light off in audio only (observed by Randy); svc28 DeviceState battery report decoded and matched to the type 2 health level. OBS 33.0.0-rc2 over its WebSocket: cold start 12.9-19.1 s to video; keep-connected start 0.94 s (video) and 0.5 s (microphone source, mixer -26.7 dBFS, camera off); quality 720p to 504p and back in 1.4 s, audio on in 1.0 s; microphone-only scene audio alone in 1.5 s (peak -12.9 dBFS); keep_ready mirrored to five sources and link.json; grouped properties rendered; Set up glasses opened the window and paused the link, cancel exited 8 and the link resumed; Tools menu opened the properties. Battery drain per mode, 1080p/360p, sync and accessibility not measured.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/SHARED_LINK_AND_SETUP_VERIFICATION.md",
+        "sha256": "19d830c5f90002b392b465561ea6d981af3a168975190dd73edf2e05713311ed"
+      },
+      "inputs": [
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "d32bea00a090453f2b66bc328cba8a351e5a1fbbff10b26f89a3b98ce5811572"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "549199ce7d74d7aa8caebca912b686b368f68d470fa1e97d433dba9a2c28f1f0"
+        },
+        {
+          "path": "include/mgl/stream.hpp",
+          "sha256": "0d00cab5defc69902b37573abf259c0ba4b31da46a39e88245d0de6e41d2fd99"
+        },
+        {
+          "path": "src/protocol/stream.cpp",
+          "sha256": "4c70f8045b9518e4c50a196fe90fbc036730727447c33be9325ace1e302678c0"
+        },
+        {
+          "path": "include/mgl/encoding.hpp",
+          "sha256": "cf81f03c11c776512395e96ced31b3c7798ca4af0906d72491c95e9364c3908a"
+        },
+        {
+          "path": "src/protocol/encoding.cpp",
+          "sha256": "4802dd71890f57735ba8f3775461885fe1c2dcd7d7e63717b68106fb3854d3b9"
+        },
+        {
+          "path": "include/mgl/media_session.hpp",
+          "sha256": "8cbe78933fcb03d65ac42cc4a874fde550d9d745ae3433ce1fb36799f12e5067"
+        },
+        {
+          "path": "src/windows/media_session.cpp",
+          "sha256": "ae989edbb09ac87a55c84ce946252540b839f6a35dbbc9172e52f12861aafb35"
+        },
+        {
+          "path": "include/mgl/wifi_station.hpp",
+          "sha256": "892fb00c1a1417d828d4e81d273d36072d45575cfb101fa4fd9c12f83f4dfae5"
+        },
+        {
+          "path": "src/windows/wifi_station.cpp",
+          "sha256": "bba5c4a2f7783899ee680f0c48f621c31ba045f2abfd67d09b3d8f79ec4e8ebf"
+        },
+        {
+          "path": "include/mgl/provision.hpp",
+          "sha256": "113867d8e76f514fc9fb2f843228ab42e887fd33aea6445be3f7b7fac94cac9d"
+        },
+        {
+          "path": "src/windows/provision.cpp",
+          "sha256": "f371d045772bc954573eacd0098a0db8db0e5a614b16b8824620ad060fb34641"
+        },
+        {
+          "path": "include/mgl/setup.hpp",
+          "sha256": "336dd0250c8ac7e8e0acfa7a8a3788bdfb423266d0c85cdc056df03dce491fbc"
+        },
+        {
+          "path": "src/windows/setup.cpp",
+          "sha256": "74f581c6318728af5e834bec77625c350e4ee7f3af726a266086c686bf2767d0"
+        },
+        {
+          "path": "include/mgl/win_text.hpp",
+          "sha256": "d633257f62c7280d2edf536e2dd41d5ea42c9206bec36741494e5f3e712fb6d7"
+        },
+        {
+          "path": "src/windows/win_text.cpp",
+          "sha256": "c3065a5453492a5577d0fbc1316d204749d60527a8ffbc4a9fb5186a85282361"
+        },
+        {
+          "path": "src/plugin/camera.h",
+          "sha256": null
+        },
+        {
+          "path": "src/plugin/camera.cpp",
+          "sha256": null
+        },
+        {
+          "path": "src/plugin/glasses_link.h",
+          "sha256": "4979a11ca91baa9f63c13fe1a829e44dd42d4961248d36c1f2ba1978162df78c"
+        },
+        {
+          "path": "src/plugin/glasses_link.cpp",
+          "sha256": "9c51760ad1eb0fa71015bc7a95f00c692a27a702facbd7195db64a20f791908f"
+        },
+        {
+          "path": "src/plugin/link_settings.h",
+          "sha256": "31a54bf4e129d9eba7ac1e68fba3309f7891e9a17e12d4c900bc3c617fe5a7e7"
+        },
+        {
+          "path": "src/plugin/link_settings.c",
+          "sha256": "f633cbaf8f744db317f8133f5003d4103cf525cae270319398ab11790cb907e1"
+        },
+        {
+          "path": "src/plugin/source_ids.h",
+          "sha256": "06d6fb8ea780c04903975d94d39eac6fc3f781db928fcf2dd0aa652977fcd7a6"
+        },
+        {
+          "path": "src/plugin/source.c",
+          "sha256": "95e0ac9e1ec5601c7d15e0c0e195bc44bddd46de6a7e03e795a2bfb087f0539d"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "720ca32179c5f5597435f34fb887f4e86a9d8d2b4551f2fc69e99332e0e3d71f"
+        },
+        {
+          "path": "src/setup/main.cpp",
+          "sha256": "5ad210427a43ae3b0d9edd6ee4417562a62c47206be1b89531ccc82d0b53b526"
+        },
+        {
+          "path": "src/setup/meta-g-link-setup.manifest",
+          "sha256": "d0dbfb23b78628ba91f77c5bd5f425041e8869d99406239d085a6381d650c6c6"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "020894fd4653b3f4ca01bece4e5d8e1f37c9852689b82fb3c79363321e610482"
+        },
+        {
+          "path": "data/locale/en-US.ini",
+          "sha256": "354ff3b856659d42c754fafaf53490f0ca87e40e7786a9c61d623e7444794e16"
+        },
+        {
+          "path": "tests/protocol_tests.cpp",
+          "sha256": "902176f7f493e501b9d124bcd20ba6d0f69befb55ecbf4d5ba6058086e27c662"
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "7df122ba4d8575cd32b607753bf7b9e53c1be77321aaf40ed636b950e13fac87"
+        },
+        {
+          "path": "tests/probe.Tests.ps1",
+          "sha256": "252c47377a872c399f0cd029570a52dd6ebca943c6df859300d6bc9fb46d8135"
+        },
+        {
+          "path": "scripts/Install-MetaGLinkDirect.ps1",
+          "sha256": "cf4be3d407cbfc15aa006f10444f7b97047021877354abc51a320db9521e8357"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "9161e49c6eca3655a50c77dc4a1cfbb946b74e18d59dafe353453b884f9f49b0"
+        },
+        {
+          "path": "tests/installer.Tests.ps1",
+          "sha256": "99300ab966bda583e33c60bf464dbcdd876aec131606f25ce53d93313409b238"
+        },
+        {
+          "path": "packaging/README.txt",
+          "sha256": "5d883703162a1dbff58fb42667fb5c4d6886c7d4276b440b06654502c81311ca"
+        },
+        {
+          "path": "packaging/Install.cmd",
+          "sha256": "25eb945272606b42c342817dce6f49692b7bb5053d987d98633a8076bd01d72e"
+        }
+      ],
+      "scope_sha256": null,
+      "red": null,
+      "reason": "The scope fingerprint tool behind earlier entries is not available in this session; inputs carry their own hashes (null = deleted file)."
+    },
+    {
+      "id": "EV-SETUP-WINDOW",
+      "acceptance": [
+        "AC-AUTH"
+      ],
+      "kind": "manual",
+      "status": "pass",
+      "command": [
+        "meta-g-link-setup.exe"
+      ],
+      "method": "Real glasses and Meta account: the WebView2 setup window (SDK 1.0.2903.40, static loader, private mode) showed Meta login inside the window; after Randy logged in it recognised the final redirect, took the code, changed the owner and showed Done; meta-g-link-probe --link then reached ready with trust_tx_ok and trust_rx_ok true using the new owner key. The browser fallback without WebView2 and the keyboard/Narrator checks were not tested. Trust-signature verification remains open: the glasses send a 32-byte value and a 512-byte RSA-sized signature, so the P-256 check was removed.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/SHARED_LINK_AND_SETUP_VERIFICATION.md",
+        "sha256": "19d830c5f90002b392b465561ea6d981af3a168975190dd73edf2e05713311ed"
+      },
+      "inputs": [
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "d32bea00a090453f2b66bc328cba8a351e5a1fbbff10b26f89a3b98ce5811572"
+        },
+        {
+          "path": "dependencies.lock.json",
+          "sha256": "549199ce7d74d7aa8caebca912b686b368f68d470fa1e97d433dba9a2c28f1f0"
+        },
+        {
+          "path": "include/mgl/stream.hpp",
+          "sha256": "0d00cab5defc69902b37573abf259c0ba4b31da46a39e88245d0de6e41d2fd99"
+        },
+        {
+          "path": "src/protocol/stream.cpp",
+          "sha256": "4c70f8045b9518e4c50a196fe90fbc036730727447c33be9325ace1e302678c0"
+        },
+        {
+          "path": "include/mgl/encoding.hpp",
+          "sha256": "cf81f03c11c776512395e96ced31b3c7798ca4af0906d72491c95e9364c3908a"
+        },
+        {
+          "path": "src/protocol/encoding.cpp",
+          "sha256": "4802dd71890f57735ba8f3775461885fe1c2dcd7d7e63717b68106fb3854d3b9"
+        },
+        {
+          "path": "include/mgl/media_session.hpp",
+          "sha256": "8cbe78933fcb03d65ac42cc4a874fde550d9d745ae3433ce1fb36799f12e5067"
+        },
+        {
+          "path": "src/windows/media_session.cpp",
+          "sha256": "ae989edbb09ac87a55c84ce946252540b839f6a35dbbc9172e52f12861aafb35"
+        },
+        {
+          "path": "include/mgl/wifi_station.hpp",
+          "sha256": "892fb00c1a1417d828d4e81d273d36072d45575cfb101fa4fd9c12f83f4dfae5"
+        },
+        {
+          "path": "src/windows/wifi_station.cpp",
+          "sha256": "bba5c4a2f7783899ee680f0c48f621c31ba045f2abfd67d09b3d8f79ec4e8ebf"
+        },
+        {
+          "path": "include/mgl/provision.hpp",
+          "sha256": "113867d8e76f514fc9fb2f843228ab42e887fd33aea6445be3f7b7fac94cac9d"
+        },
+        {
+          "path": "src/windows/provision.cpp",
+          "sha256": "f371d045772bc954573eacd0098a0db8db0e5a614b16b8824620ad060fb34641"
+        },
+        {
+          "path": "include/mgl/setup.hpp",
+          "sha256": "336dd0250c8ac7e8e0acfa7a8a3788bdfb423266d0c85cdc056df03dce491fbc"
+        },
+        {
+          "path": "src/windows/setup.cpp",
+          "sha256": "74f581c6318728af5e834bec77625c350e4ee7f3af726a266086c686bf2767d0"
+        },
+        {
+          "path": "include/mgl/win_text.hpp",
+          "sha256": "d633257f62c7280d2edf536e2dd41d5ea42c9206bec36741494e5f3e712fb6d7"
+        },
+        {
+          "path": "src/windows/win_text.cpp",
+          "sha256": "c3065a5453492a5577d0fbc1316d204749d60527a8ffbc4a9fb5186a85282361"
+        },
+        {
+          "path": "src/plugin/camera.h",
+          "sha256": null
+        },
+        {
+          "path": "src/plugin/camera.cpp",
+          "sha256": null
+        },
+        {
+          "path": "src/plugin/glasses_link.h",
+          "sha256": "4979a11ca91baa9f63c13fe1a829e44dd42d4961248d36c1f2ba1978162df78c"
+        },
+        {
+          "path": "src/plugin/glasses_link.cpp",
+          "sha256": "9c51760ad1eb0fa71015bc7a95f00c692a27a702facbd7195db64a20f791908f"
+        },
+        {
+          "path": "src/plugin/link_settings.h",
+          "sha256": "31a54bf4e129d9eba7ac1e68fba3309f7891e9a17e12d4c900bc3c617fe5a7e7"
+        },
+        {
+          "path": "src/plugin/link_settings.c",
+          "sha256": "f633cbaf8f744db317f8133f5003d4103cf525cae270319398ab11790cb907e1"
+        },
+        {
+          "path": "src/plugin/source_ids.h",
+          "sha256": "06d6fb8ea780c04903975d94d39eac6fc3f781db928fcf2dd0aa652977fcd7a6"
+        },
+        {
+          "path": "src/plugin/source.c",
+          "sha256": "95e0ac9e1ec5601c7d15e0c0e195bc44bddd46de6a7e03e795a2bfb087f0539d"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "720ca32179c5f5597435f34fb887f4e86a9d8d2b4551f2fc69e99332e0e3d71f"
+        },
+        {
+          "path": "src/setup/main.cpp",
+          "sha256": "5ad210427a43ae3b0d9edd6ee4417562a62c47206be1b89531ccc82d0b53b526"
+        },
+        {
+          "path": "src/setup/meta-g-link-setup.manifest",
+          "sha256": "d0dbfb23b78628ba91f77c5bd5f425041e8869d99406239d085a6381d650c6c6"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "020894fd4653b3f4ca01bece4e5d8e1f37c9852689b82fb3c79363321e610482"
+        },
+        {
+          "path": "data/locale/en-US.ini",
+          "sha256": "354ff3b856659d42c754fafaf53490f0ca87e40e7786a9c61d623e7444794e16"
+        },
+        {
+          "path": "tests/protocol_tests.cpp",
+          "sha256": "902176f7f493e501b9d124bcd20ba6d0f69befb55ecbf4d5ba6058086e27c662"
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "7df122ba4d8575cd32b607753bf7b9e53c1be77321aaf40ed636b950e13fac87"
+        },
+        {
+          "path": "tests/probe.Tests.ps1",
+          "sha256": "252c47377a872c399f0cd029570a52dd6ebca943c6df859300d6bc9fb46d8135"
+        },
+        {
+          "path": "scripts/Install-MetaGLinkDirect.ps1",
+          "sha256": "cf4be3d407cbfc15aa006f10444f7b97047021877354abc51a320db9521e8357"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "9161e49c6eca3655a50c77dc4a1cfbb946b74e18d59dafe353453b884f9f49b0"
+        },
+        {
+          "path": "tests/installer.Tests.ps1",
+          "sha256": "99300ab966bda583e33c60bf464dbcdd876aec131606f25ce53d93313409b238"
+        },
+        {
+          "path": "packaging/README.txt",
+          "sha256": "5d883703162a1dbff58fb42667fb5c4d6886c7d4276b440b06654502c81311ca"
+        },
+        {
+          "path": "packaging/Install.cmd",
+          "sha256": "25eb945272606b42c342817dce6f49692b7bb5053d987d98633a8076bd01d72e"
+        }
+      ],
+      "scope_sha256": null,
+      "red": null,
+      "reason": "The scope fingerprint tool behind earlier entries is not available in this session; inputs carry their own hashes (null = deleted file)."
     }
   ],
   "checkpoint": {
@@ -20254,8 +20713,8 @@ Deferred: code signing and provenance, a published SBOM and native advisory asse
       "TASK-SETUP"
     ],
     "pending_operations": [],
-    "next_action": "After 0.2.0: the final OBS 33.0 release once out, measure audio/video sync, reconnection after a real drop, quality changes, two Wi-Fi adapters, the accessibility pass, trust-signature verification, the battery reading and the full-charge endurance run.",
-    "source_revision": "da0d500482158171550a452dda6b478304abf7c7"
+    "next_action": "After 0.3.0: battery drain with video and with audio only, the full-charge endurance run, the final OBS 33.0 release once out, audio/video sync, reconnection after a real drop, the 1080p and 360p profiles, two Wi-Fi adapters, the accessibility pass (properties and setup window), the setup window without WebView2, and trust-signature verification (RSA-sized signature; the Meta app check is native).",
+    "source_revision": "b7776ececebc1a93c46fe4e6e71517a4d84c1282"
   }
 }
 ```

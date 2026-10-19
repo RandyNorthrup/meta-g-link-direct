@@ -77,6 +77,13 @@ Describe 'Native diagnostic probe contract' {
         $result.Code | Should -Be $expectedExit
     }
 
+    It 'rejects an empty auth code before contacting Meta' {
+        $result = Invoke-ProbeProcess -ProbeArguments '--provision' -PrivateInput ''
+        $result.Code | Should -Be 5
+        $result.Error | Should -Match 'No auth code on stdin'
+        $result.Out | Should -BeNullOrEmpty
+    }
+
     It 'explains discovery limits without accessing glasses' {
         $result = Invoke-ProbeProcess -ProbeArguments '--help'
         $result.Code | Should -Be 0

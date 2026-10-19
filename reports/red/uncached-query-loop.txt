@@ -3,55 +3,57 @@ ninja: no work to do.
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 1 tests in 240ms.
+Discovery found 1 tests in 343ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\live.Tests.ps1'
 Describing Explicit live Classic service lookup
-  [+] queries available Classic peers without pairing or connecting 32.72s (32.69s|29ms)
-Tests completed in 33.44s
+  [+] queries available Classic peers without pairing or connecting 34.73s (34.68s|52ms)
+Tests completed in 35.57s
 Tests Passed: 1, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
 MUTATED EXIT 1
-[1/20] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp for CXX dependencies
-[2/20] Generating CXX dyndep file CMakeFiles\mgl_windows.dir\CXX.dd
-[3/6] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\classic.cpp.obj
-[4/6] Linking CXX static library mgl_windows.lib
-[5/6] Linking CXX shared module meta-g-link-direct.dll
-[6/6] Linking CXX executable meta-g-link-probe.exe
+[1/23] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp for CXX dependencies
+[2/23] Generating CXX dyndep file CMakeFiles\mgl_windows.dir\CXX.dd
+[3/7] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\classic.cpp.obj
+[4/7] Linking CXX static library mgl_windows.lib
+[5/7] Linking CXX executable meta-g-link-setup.exe
+[6/7] Linking CXX executable meta-g-link-probe.exe
+[7/7] Linking CXX shared module meta-g-link-direct.dll
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 1 tests in 221ms.
+Discovery found 1 tests in 205ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\live.Tests.ps1'
 Describing Explicit live Classic service lookup
-  [-] queries available Classic peers without pairing or connecting 20.74s (20.7s|31ms)
+  [-] queries available Classic peers without pairing or connecting 20.79s (20.76s|31ms)
    Expected the actual value to be greater than 0, because Live discovery must query available Classic peers, but got 0.
    at $report.uncached_peer_queries | Should -BeGreaterThan 0 -Because 'Live discovery must query available Classic peers', C:\Users\Randy\Coding\meta_g_link_direct\tests\live.Tests.ps1:21
    at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\live.Tests.ps1:21
-Tests completed in 21.41s
+Tests completed in 21.71s
 Tests Passed: 0, Failed: 1, Skipped: 0, Inconclusive: 0, NotRun: 0
 Write-Error: Pester live SDP tests failed or discovery count changed
 
 RESTORED EXIT 0
-[1/20] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp for CXX dependencies
-[2/20] Generating CXX dyndep file CMakeFiles\mgl_windows.dir\CXX.dd
-[3/6] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\classic.cpp.obj
-[4/6] Linking CXX static library mgl_windows.lib
-[5/6] Linking CXX shared module meta-g-link-direct.dll
-[6/6] Linking CXX executable meta-g-link-probe.exe
+[1/23] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp for CXX dependencies
+[2/23] Generating CXX dyndep file CMakeFiles\mgl_windows.dir\CXX.dd
+[3/7] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\classic.cpp.obj
+[4/7] Linking CXX static library mgl_windows.lib
+[5/7] Linking CXX executable meta-g-link-setup.exe
+[6/7] Linking CXX executable meta-g-link-probe.exe
+[7/7] Linking CXX shared module meta-g-link-direct.dll
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 1 tests in 181ms.
+Discovery found 1 tests in 202ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\live.Tests.ps1'
 Describing Explicit live Classic service lookup
-  [+] queries available Classic peers without pairing or connecting 30.95s (30.92s|30ms)
-Tests completed in 31.59s
+  [+] queries available Classic peers without pairing or connecting 36.51s (36.47s|41ms)
+Tests completed in 37.53s
 Tests Passed: 1, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
 RESTORATION SHA256 7696e4215bb4eae7049f5513449c9d22414050f1448831c7eb7ce84d2033ade1

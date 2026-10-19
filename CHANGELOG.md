@@ -2,18 +2,36 @@
 
 All notable changes are recorded here. The project follows [semantic versioning](https://semver.org/); versions below 1.0 are beta releases.
 
-## [Unreleased]
+## [0.3.0] - 2026-10-19 (beta)
+
+### Added
+
+- **Microphone source "Ray-Ban Meta Glasses Microphone (Direct)"**: the glasses' microphones (48 kHz stereo) as an OBS audio source of their own, usable without the camera. While only microphone sources are live, the glasses stream audio alone and the camera and its light stay off (seen on the glasses). Verified in OBS 33.0.0-rc2: with the glasses connected and the camera off, audio flowed 0.5 s after the scene switch (mixer peak −26.7 dBFS); switching from a camera scene to a microphone-only scene, the stream changed to audio alone in 1.5 s (peak −12.9 dBFS), with no video requested.
+- **Keep the glasses connected while OBS is open** (off by default): the glasses connect when OBS loads and stay connected with the camera off, so a glasses source going live starts in about a second instead of about 13 (measured in OBS 33.0.0-rc2: video 0.9 s and microphone audio 0.5 s after the scene switch). It uses the glasses' battery and keeps the chosen Wi-Fi adapter on the glasses' network, with no internet, until OBS closes.
+- **Setup window** `meta-g-link-setup.exe`: explains the change of owner, shows Meta's login inside the window (Microsoft Edge WebView2, private mode, its browser data deleted afterwards), notices the end of the login by itself and makes this PC the owner. Nothing is copied or pasted. Without WebView2 it opens the login in the browser and offers a box for the final address. The installer and the new **Set up glasses…** button in OBS open it.
+- **Glasses settings in OBS**: every glasses source's properties group the settings into *Video*, *Audio*, *Glasses connection* (shared by all glasses sources: Wi-Fi adapter, keep connected, status) and *Glasses setup* (Set up glasses…, and Forget these glasses behind a confirmation tick). Shared settings are saved in the plugin's own configuration and copied to every glasses source. **Tools → Ray-Ban Meta Glasses (Direct)** opens them, adding a camera source to the current scene first if there is none.
+- **Battery level**: the status shows the glasses' battery percentage and whether they are charging, from the glasses' device-status reports, and the OBS log records each change (for example "Glasses battery: 57%, not charging (3.73 V, 30.2 C)").
 
 ### Changed
 
-- The camera starts sooner. The media connection now opens as soon as this PC has its address on the glasses' network, instead of after a fixed 1.5 s pause, and retries on a short, growing delay. The Wi-Fi join is checked every 100 ms instead of every 500 ms. Measured with the stream check: the media connection took 1.0 s after the join, down from 2.7 s.
-- The OBS log shows how long each connection step took, for example "Joined the glasses' Wi-Fi network after 8.7 s (associated in 3273 ms, address in 737 ms)".
+- **One connection for all glasses sources.** The plugin keeps one link to the glasses for the whole OBS process and asks it for what the live sources need. Several glasses sources can be live at once; they show the same video, and the camera source that went live first sets the quality. Quality and audio changes now apply inside the running session (stream stop, new configuration, start) instead of at the next start; changing the Wi-Fi adapter reconnects. Measured in OBS 33.0.0-rc2: 720 × 1280 → 504 × 896 in 1.4 s, audio on in 1.0 s, back to 720 × 1280 in 1.4 s, with no reconnect. 504 × 896 is now verified in OBS too.
+- The camera starts sooner. The media connection now opens as soon as this PC has its address on the glasses' network, instead of after a fixed 1.5 s pause, and retries on a short, growing delay. The Wi-Fi join is checked every 100 ms instead of every 500 ms. Measured with the stream check: the media connection took 1.0 s after the join, down from 2.7 s. In OBS the first frame now comes about 13 s after the scene goes live.
+- The OBS log shows how long each connection step took, for example "Joined the glasses' Wi-Fi network after 8.7 s (associated in 3273 ms, address in 737 ms)". A start from the connected, camera-off state reports its own time.
+- The installer opens the setup window instead of asking for the login address in its console, and no longer asks for a typed confirmation: the window's first page explains the change and offers Continue or Cancel. `meta-g-link-probe.exe --provision` and the window share one implementation of the ownership change.
+- `quality` reruns only the red drills whose inputs (the file the drill mutates, the task runner and the gate's configuration) changed since their recorded pass, and lists the others as unchanged; `package` and `test:red` still run all of them. `reports/red-drills.json` records each drill's inputs and their SHA-256. A new drill (22 in total) proves that a changed input forces a rerun.
+- UTF-8 and UTF-16 conversion for Windows calls lives in one place (`win_text`) instead of five copies.
+- The README shows a short clip from the glasses and screenshots of the setup window and the OBS properties.
 
 ### Fixed
 
 - The Wi-Fi join could count an address the adapter still held from its previous network as the glasses' address. The media connection then aimed at the wrong network and waited about 21 s for each attempt. The join now waits for a DHCP address on the glasses' subnet, and each TCP connection attempt gives up after 3 s.
 
-- `quality` reruns only the red drills whose inputs (the file the drill mutates, the task runner and the gate's configuration) changed since their recorded pass, and lists the others as unchanged; `package` and `test:red` still run all of them. `reports/red-drills.json` records each drill's inputs and their SHA-256. A new drill (22 in total) proves that a changed input forces a rerun.
+### Known issues
+
+- Battery use with only the microphone source live has not been measured.
+- The PC still does not verify the glasses' trust signature. The glasses sign with RSA-4096, and the exact verification the Meta app performs is not known yet.
+- Audio and video sync has not been measured; OBS's *Sync Offset* can adjust it.
+- OBS 33 is verified with release candidate 33.0.0-rc2; the final 33.0 release has not been tested yet.
 
 ## [0.2.0] - 2026-10-19 (beta)
 

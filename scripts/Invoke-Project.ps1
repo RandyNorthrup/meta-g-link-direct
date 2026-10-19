@@ -150,6 +150,14 @@ function Initialize-Dependency {
             throw "Cppcheck extraction failed with exit $($process.ExitCode)"
         }
     }
+    # The WebView2 SDK (headers and the static loader) for the setup window. The NuGet package is
+    # a zip; PowerShell 7's Expand-Archive refuses entries that would land outside the destination.
+    $webview = Join-Path $dependencyRoot $dependencyLock.webview2.directory
+    if (-not (Test-Path -LiteralPath (Join-Path $webview 'build/native/include/WebView2.h'))) {
+        $package = Join-Path $dependencyRoot "$($dependencyLock.webview2.directory).nupkg"
+        Get-VerifiedArchive -Specification $dependencyLock.webview2 -Destination $package
+        Expand-Archive -LiteralPath $package -DestinationPath $webview -Force
+    }
     Invoke-Native -Command npm -ArgumentList @('ci', '--ignore-scripts', '--no-fund', '--no-audit')
 }
 
@@ -227,6 +235,7 @@ function Build-ReleaseBundle {
         'plugin/meta-g-link-direct.dll' = Join-Path $buildRoot 'meta-g-link-direct.dll'
         'plugin/locale/en-US.ini' = Join-Path $projectRoot 'data/locale/en-US.ini'
         'tools/meta-g-link-probe.exe' = Join-Path $buildRoot 'meta-g-link-probe.exe'
+        'tools/meta-g-link-setup.exe' = Join-Path $buildRoot 'meta-g-link-setup.exe'
         'Install-MetaGLinkDirect.ps1' = Join-Path $PSScriptRoot 'Install-MetaGLinkDirect.ps1'
         'README.txt' = Join-Path $projectRoot 'packaging/README.txt'
         'LICENSE' = Join-Path $projectRoot 'LICENSE'
@@ -560,7 +569,7 @@ function Invoke-Task {
         'test:probe' {
             $result = Invoke-Pester -Path (Join-Path $projectRoot 'tests/probe.Tests.ps1') `
                 -PassThru -Output Detailed
-            if ($result.TotalCount -ne 20 -or $result.FailedCount -ne 0 -or $result.PassedCount -ne 20) {
+            if ($result.TotalCount -ne 21 -or $result.FailedCount -ne 0 -or $result.PassedCount -ne 21) {
                 throw 'Pester probe tests failed or discovery count changed'
             }
         }

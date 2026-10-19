@@ -31,7 +31,6 @@ namespace {
 using namespace std::chrono_literals;
 
 constexpr std::string_view AppId = "934401142814369";
-constexpr std::string_view RedirectUri = "https://accounts.meta.com/native/oidc/redirect/metaai";
 constexpr std::string_view AuthorizeUrl = "https://accounts.meta.com/oidc/";
 constexpr std::string_view ExchangeUrl =
     "https://api.accounts.meta.com/native/oidc/token-exchange/";
@@ -260,7 +259,7 @@ Authorize authorizeRequest() {
         {"app_id", std::string(AppId)},
         {"scope", "openid"},
         {"response_type", "code"},
-        {"redirect_uri", std::string(RedirectUri)},
+        {"redirect_uri", std::string(LoginRedirectUri)},
         {"state", state}};
     return {.url = std::string(AuthorizeUrl) + "?" + encoding::formUrlEncode(query),
             .state = state};
@@ -271,7 +270,7 @@ std::optional<std::string> exchangeCode(const std::string& code, std::string& er
     const std::vector<std::pair<std::string, std::string>> fields{
         {"mt_app_id", std::string(AppId)},
         {"oidc_auth_code", code},
-        {"redirect_uri", std::string(RedirectUri)}};
+        {"redirect_uri", std::string(LoginRedirectUri)}};
     const auto parsed = postForm(ExchangeUrl, fields, false, error);
     if (!parsed) {
         return std::nullopt;

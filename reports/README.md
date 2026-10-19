@@ -8,7 +8,8 @@ Evidence referenced by the ledger in [`PLAN.md`](../PLAN.md). Ledger entries bin
 |---|---|
 | [`WIFI_LINK_VERIFICATION.md`](WIFI_LINK_VERIFICATION.md) | Why the glasses host the Wi-Fi network, every hardware run on that link, and the OBS run |
 | [`AUDIO_AND_OBS33_VERIFICATION.md`](AUDIO_AND_OBS33_VERIFICATION.md) | Glasses audio (raw AAC, no AudioSpecificConfig), OBS 33 installed and streaming, the ProgramData plugin location and installing on other drives |
-| [`wifi-link-gates.txt`](wifi-link-gates.txt) | Gate results for the glasses-hosted link |
+| [`SHARED_LINK_AND_SETUP_VERIFICATION.md`](SHARED_LINK_AND_SETUP_VERIFICATION.md) | Stream changes inside one session, audio only with the camera off, the battery report, the shared link and keep-connected in OBS 33, the setup window, and the trust-signature finding |
+| [`wifi-link-gates.txt`](wifi-link-gates.txt) | Gate results for the release gate (`package`) |
 | [`red/softap-port.txt`](red/softap-port.txt) | Recorded red drill for the `SoftApNetworkInfo` port field |
 
 ## Historical milestones

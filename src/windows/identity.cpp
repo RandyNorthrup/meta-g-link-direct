@@ -2,6 +2,7 @@
 #include "mgl/identity.hpp"
 
 #include "mgl/bytes.hpp"
+#include "mgl/win_text.hpp"
 
 #include <windows.h> // IWYU pragma: keep — SDK umbrella prerequisites.
 
@@ -12,10 +13,8 @@
 #include <knownfolders.h>
 #include <minwindef.h>
 #include <shlobj_core.h>
-#include <stringapiset.h>
 #include <winbase.h>
 #include <winerror.h>
-#include <winnls.h>
 #include <winnt.h>
 
 #include <cstddef>
@@ -25,6 +24,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <utility>
 
 namespace mgl::identity {
@@ -45,13 +45,8 @@ std::optional<std::string> localAppData() {
         CoTaskMemFree(raw);
         return std::nullopt;
     }
-    const int needed = WideCharToMultiByte(CP_UTF8, 0, raw, -1, nullptr, 0, nullptr, nullptr);
-    std::string path(static_cast<std::size_t>(needed), '\0');
-    WideCharToMultiByte(CP_UTF8, 0, raw, -1, path.data(), needed, nullptr, nullptr);
+    std::string path = narrowUtf8(std::wstring_view(raw));
     CoTaskMemFree(raw);
-    if (!path.empty() && path.back() == '\0') {
-        path.pop_back();
-    }
     return path;
 }
 

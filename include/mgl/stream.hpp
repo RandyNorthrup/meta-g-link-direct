@@ -95,12 +95,15 @@ struct VideoConfig {
     std::uint32_t bitrate = 4'000'000;
     std::uint32_t frame_rate = 30;
     std::uint32_t iframe_interval = 1;
+    bool operator==(const VideoConfig&) const = default;
 };
 
 // SessionSettings (type 27): timers, application type, override settings.
 [[nodiscard]] Bytes buildSessionSettings(std::uint16_t app_type, bool bypass_don);
-// ConfigureVideoStreamRequest (type 5): nonce, VideoConfig, enabled.
-[[nodiscard]] Bytes buildConfigureVideo(std::uint32_t nonce, const VideoConfig& config);
+// ConfigureVideoStreamRequest (type 5): nonce, VideoConfig, enabled. With enabled false the next
+// stream start carries no video, so the glasses stream their microphones alone (observed on Gen 2).
+[[nodiscard]] Bytes buildConfigureVideo(std::uint32_t nonce, const VideoConfig& config,
+                                        bool enabled);
 // The audio format asked of the glasses' microphones, as the Meta app asks for it.
 inline constexpr std::uint32_t AudioSampleRate = 48'000;
 inline constexpr std::uint32_t AudioChannels = 2;
@@ -125,6 +128,23 @@ struct StreamAnswer {
 // The firmware's name for a stop reason, as Visor StreamProto.kt lists them ("thermal threshold",
 // "doff", "weak signal", ...), or "unknown" past the end of the list.
 [[nodiscard]] std::string_view stopReasonText(std::uint64_t reason);
+
+// svc28 device-status pushes, types 2005 (the full snapshot) to 2044, each carry a DeviceState;
+// 2007 is the battery report (Visor Status.kt).
+inline constexpr std::uint16_t MtDeviceStateFirst = 2005;
+inline constexpr std::uint16_t MtDeviceStateLast = 2044;
+// DeviceState field 1, the glasses' own battery: field 2 charge state (1 charging, 2 charging and
+// full, 3 charging and low, 4 not charging), 3 percent, 4 temperature in thousandths of a degree
+// Celsius, 5 voltage in millivolts.
+struct BatteryState {
+    std::uint32_t percent = 0;
+    std::uint32_t charge_state = 0;
+    std::uint32_t millivolts = 0;
+    std::int32_t millicelsius = 0;
+    [[nodiscard]] bool charging() const noexcept { return charge_state >= 1 && charge_state <= 3; }
+};
+// The battery in a DeviceState, or nullopt when it carries none or an impossible percentage.
+[[nodiscard]] std::optional<BatteryState> parseBatteryState(ByteView device_state);
 
 // SystemHealthEvent (type 21): status, type (2 battery, 3 thermal) and a zigzag-coded level.
 struct HealthEvent {

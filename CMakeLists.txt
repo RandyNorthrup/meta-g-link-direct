@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28...3.31)
-project(meta_g_link_direct VERSION 0.2.0 LANGUAGES C CXX)
+project(meta_g_link_direct VERSION 0.3.0 LANGUAGES C CXX)
 
 include(CTest)
 set(CMAKE_CXX_STANDARD 20)
@@ -58,6 +58,8 @@ if(WIN32)
     src/windows/provision.cpp
     src/windows/wifi_station.cpp
     src/windows/media_session.cpp
+    src/windows/setup.cpp
+    src/windows/win_text.cpp
     src/protocol/airshield.cpp)
   target_include_directories(mgl_windows PUBLIC include)
   target_compile_definitions(mgl_windows PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
@@ -67,6 +69,19 @@ if(WIN32)
   add_executable(meta-g-link-probe src/probe/main.cpp src/probe/private_input.cpp)
   target_link_libraries(meta-g-link-probe PRIVATE mgl_windows)
   mgl_owned_target(meta-g-link-probe)
+
+  # The setup window. The WebView2 SDK (pinned in dependencies.lock.json, fetched by bootstrap)
+  # provides its headers and the static loader, so no WebView2 DLL ships.
+  file(READ "${CMAKE_CURRENT_SOURCE_DIR}/dependencies.lock.json" setup_dependency_lock)
+  string(JSON webview2_directory GET "${setup_dependency_lock}" webview2 directory)
+  set(webview2_root "${CMAKE_CURRENT_SOURCE_DIR}/.deps/${webview2_directory}/build/native")
+  add_executable(meta-g-link-setup WIN32 src/setup/main.cpp src/setup/meta-g-link-setup.manifest)
+  target_include_directories(meta-g-link-setup SYSTEM PRIVATE "${webview2_root}/include")
+  # Without WIN32_LEAN_AND_MEAN: WebView2.h needs the COM declarations windows.h then brings in.
+  target_compile_definitions(meta-g-link-setup PRIVATE NOMINMAX UNICODE _UNICODE)
+  target_link_libraries(meta-g-link-setup PRIVATE mgl_windows
+    "${webview2_root}/x64/WebView2LoaderStatic.lib" comctl32 shell32 ole32 user32 gdi32 advapi32)
+  mgl_owned_target(meta-g-link-setup)
 endif()
 
 if(MGL_BUILD_OBS_PLUGIN)
@@ -80,23 +95,26 @@ if(MGL_BUILD_OBS_PLUGIN)
     "${CMAKE_CURRENT_SOURCE_DIR}/.deps/${obs_source_directory}/.deps/obs-deps-${obs_dependency_version}-x64")
   list(APPEND CMAKE_PREFIX_PATH "${obs_deps_root}")
   find_package(libobs 32.2.2 EXACT REQUIRED CONFIG)
+  # The Tools menu entry; obs-frontend-api.dll ships with every OBS that has a user interface.
+  find_package(obs-frontend-api REQUIRED CONFIG)
   # FFmpeg for HEVC decode; the matching runtime DLLs ship with OBS.
   find_library(MGL_AVCODEC NAMES avcodec PATHS "${obs_deps_root}/lib" REQUIRED)
   find_library(MGL_AVUTIL NAMES avutil PATHS "${obs_deps_root}/lib" REQUIRED)
   # libobs's _udiv128 header requires the MSVC C compiler; LLVM issue #59168. Every file that
-  # includes OBS headers (module.c, source.c) is C17 with /analyze. The camera core and HEVC
-  # decoder are C++20 behind src/plugin/camera.h, include no OBS headers, and are checked by
-  # clang-tidy instead.
+  # includes OBS headers (module.c, source.c, link_settings.c) is C17 with /analyze. The glasses
+  # link core and the decoders are C++20 behind src/plugin/glasses_link.h, include no OBS headers,
+  # and are checked by clang-tidy instead.
   add_library(meta-g-link-direct MODULE
     src/plugin/module.c
     src/plugin/source.c
-    src/plugin/camera.cpp
+    src/plugin/link_settings.c
+    src/plugin/glasses_link.cpp
     src/plugin/hevc_decoder.cpp
     src/plugin/aac_decoder.cpp)
   target_include_directories(meta-g-link-direct PRIVATE "${obs_deps_root}/include")
-  target_link_libraries(meta-g-link-direct PRIVATE OBS::libobs mgl_windows
+  target_link_libraries(meta-g-link-direct PRIVATE OBS::libobs OBS::obs-frontend-api mgl_windows
     "${MGL_AVCODEC}" "${MGL_AVUTIL}")
-  set_source_files_properties(src/plugin/module.c src/plugin/source.c
+  set_source_files_properties(src/plugin/module.c src/plugin/source.c src/plugin/link_settings.c
     PROPERTIES COMPILE_OPTIONS "/analyze")
   target_compile_definitions(meta-g-link-direct PRIVATE MGL_VERSION="${PROJECT_VERSION}"
     WIN32_LEAN_AND_MEAN NOMINMAX)

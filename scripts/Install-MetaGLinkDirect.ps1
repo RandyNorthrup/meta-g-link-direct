@@ -5,17 +5,19 @@ Installs the Meta G Link Direct OBS plugin and its setup tool from an unpacked b
 
 .DESCRIPTION
 Run from a bundle folder that contains plugin\meta-g-link-direct.dll,
-plugin\locale\en-US.ini and tools\meta-g-link-probe.exe. The script:
+plugin\locale\en-US.ini, tools\meta-g-link-setup.exe (the setup window) and
+tools\meta-g-link-probe.exe (the setup tool's command line). The script:
   1. finds OBS Studio 32 or newer and checks its FFmpeg and the Visual C++ runtime,
   2. waits for OBS to be closed (it never closes OBS itself),
   3. copies the plugin into the folder OBS loads plugins from
      (%ProgramData%\obs-studio\plugins\meta-g-link-direct, or the OBS folder for a
      portable OBS), removes copies an earlier install left in other layouts, and
      elevates only that step when a folder is protected,
-  4. copies the setup tool to %LOCALAPPDATA%\MetaGLinkDirect\bin,
+  4. copies the setup window and the setup tool to %LOCALAPPDATA%\MetaGLinkDirect\bin,
   5. imports meta-tokens.txt, if present, into the DPAPI-sealed token store; it overrides the
      Meta AI app tokens built into the setup tool, for when Meta rotates them,
-  6. optionally runs the one-time glasses setup (Meta login + ownership change).
+  6. optionally opens the setup window for the one-time glasses setup (Meta login + ownership
+     change).
 
 The ownership change makes this PC the owner of the glasses; the Meta AI phone
 app, or another PC, loses access until the glasses are set up there again.
@@ -71,6 +73,8 @@ $moduleName = 'meta-g-link-direct'
 $bundleRoot = $PSScriptRoot
 $toolRoot = [IO.Path]::Combine((Get-KnownFolder -Folder LocalApplicationData), 'MetaGLinkDirect', 'bin')
 $toolPath = [IO.Path]::Combine($toolRoot, 'meta-g-link-probe.exe')
+$setupWindowPath = [IO.Path]::Combine($toolRoot, 'meta-g-link-setup.exe')
+$setupTools = @('meta-g-link-setup.exe', 'meta-g-link-probe.exe')
 $minimumObsMajor = 32
 $testedObsMajors = @(32, 33)
 # OBS 33 introduced the flat plugin layout (plugins\<name>\<name>.dll); OBS 32 reads
@@ -408,14 +412,18 @@ function Invoke-PluginFileStep {
 function Install-SetupTool {
     [CmdletBinding(SupportsShouldProcess)]
     param()
-    $source = [IO.Path]::Combine($bundleRoot, 'tools', 'meta-g-link-probe.exe')
-    if (-not (Test-Path -LiteralPath $source)) {
-        throw "Bundle file missing: $source"
+    foreach ($name in $setupTools) {
+        $source = [IO.Path]::Combine($bundleRoot, 'tools', $name)
+        if (-not (Test-Path -LiteralPath $source)) {
+            throw "Bundle file missing: $source"
+        }
     }
-    if ($PSCmdlet.ShouldProcess($toolRoot, 'Copy meta-g-link-probe.exe')) {
-        New-Item -ItemType Directory -Path $toolRoot -Force | Out-Null
-        Copy-Item -LiteralPath $source -Destination $toolRoot -Force
-        Unblock-File -LiteralPath $toolPath
+    foreach ($name in $setupTools) {
+        if ($PSCmdlet.ShouldProcess($toolRoot, "Copy $name")) {
+            New-Item -ItemType Directory -Path $toolRoot -Force | Out-Null
+            Copy-Item -LiteralPath ([IO.Path]::Combine($bundleRoot, 'tools', $name)) -Destination $toolRoot -Force
+            Unblock-File -LiteralPath ([IO.Path]::Combine($toolRoot, $name))
+        }
     }
 }
 
@@ -436,40 +444,24 @@ function Import-TokenFile {
     }
 }
 
-function Get-AuthCode {
-    param([Parameter(Mandatory)][string]$Address)
-    if ($Address -match '[?&]code=([^&#\s]+)') {
-        return [Uri]::UnescapeDataString($Matches[1])
-    }
-    return $null
-}
-
 function Invoke-GlassesSetup {
     [CmdletBinding(SupportsShouldProcess)]
     param()
-    Write-Warning ('Setup makes THIS PC the owner of the glasses. The Meta AI phone app (or another PC) ' +
-        'loses access until the glasses are set up there again.')
-    Write-Step 'Before continuing: pair the glasses in Windows Settings > Bluetooth (fold the arms, hold the capture button about 12 seconds until the light blinks blue), and turn off Bluetooth on your phone.'
     if (-not $PSCmdlet.ShouldProcess('the glasses', 'Change the owner to this PC')) {
         return
     }
-    if ((Read-Host -Prompt 'Type YES to continue') -cne 'YES') {
-        Write-Step 'Setup skipped.'
+    # The setup window explains the change of owner and shows the Meta login itself, so nothing is
+    # copied; the OBS Set up glasses button opens the same window.
+    $setupCancelled = 8
+    Write-Step 'The setup window is open; follow it there.'
+    $window = Start-Process -FilePath $setupWindowPath -Wait -PassThru
+    $exitCode = $window.ExitCode
+    if ($exitCode -eq $setupCancelled) {
+        Write-Step 'Setup skipped. Run it later from the glasses source properties in OBS (Set up glasses), or with .\Install.cmd -Setup.'
         return
     }
-    $url = @(& $toolPath --auth-url) | Select-Object -First 1
-    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($url)) {
-        throw 'Could not create the Meta login address.'
-    }
-    Start-Process -FilePath $url.Trim()
-    Write-Step 'Log in to Meta in the browser window that opened. When it finishes, copy the full address from the address bar.'
-    $code = Get-AuthCode -Address (Read-Host -Prompt 'Paste the address here')
-    if (-not $code) {
-        throw 'That address has no login code. Run the installer again with -Setup and paste the final address after logging in.'
-    }
-    $code | & $toolPath --provision
-    if ($LASTEXITCODE -ne 0) {
-        throw "Glasses setup failed (exit $LASTEXITCODE). The output above says which step stopped."
+    if ($exitCode -ne 0) {
+        throw "The glasses setup did not finish (exit $exitCode). The setup window said which step stopped; run .\Install.cmd -Setup to try again."
     }
     Write-Step 'This PC now owns the glasses.'
 }
@@ -535,7 +527,7 @@ try {
     if ($runSetup -or $WhatIfPreference) {
         Invoke-GlassesSetup
     }
-    Write-Step 'Done. In OBS, add the "Ray-Ban Meta Glasses (Direct)" source to a scene; it starts when the scene is live.'
+    Write-Step 'Done. In OBS, add the "Ray-Ban Meta Glasses (Direct)" source, or "Ray-Ban Meta Glasses Microphone (Direct)" for the microphones alone, to a scene; it starts when the scene is live.'
 } catch {
     Write-Error -Message $_.Exception.Message -ErrorAction Continue
     exit 1

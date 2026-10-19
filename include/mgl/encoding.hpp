@@ -7,6 +7,7 @@
 
 #include "mgl/bytes.hpp"
 
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -20,6 +21,13 @@ namespace mgl::encoding {
 [[nodiscard]] std::string
 formUrlEncode(const std::vector<std::pair<std::string, std::string>>& fields);
 [[nodiscard]] std::string quotePlus(std::string_view value);
+
+// The percent-decoded value of query parameter name in an address as a browser's address bar
+// shows it after a redirect: "https://host/path?state=x&code=AbC%2D1#_=_" gives "AbC-1" for
+// "code". Surrounding whitespace is ignored. nullopt when the parameter is absent or empty, or its
+// percent-encoding is malformed.
+[[nodiscard]] std::optional<std::string> queryParameter(std::string_view address,
+                                                        std::string_view name);
 
 // A valid gzip stream wrapping data in stored DEFLATE blocks (no size growth concern here).
 [[nodiscard]] Bytes gzip(ByteView data);

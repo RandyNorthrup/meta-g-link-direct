@@ -33,7 +33,7 @@ The setup tool contains the Meta AI app's two client tokens (see `AGENTS.md` rev
 ## OBS Studio
 
 - Upstream: https://github.com/obsproject/obs-studio, version `32.2.2`, revision `ba2f32bdf791005443988a4955e963663e16b1ed`.
-- The plugin builds against OBS's public module headers and import library (GPL-2.0-or-later in OBS's source notices) and follows the documented module API. No private ABI declaration is copied.
+- The plugin builds against OBS's public module and frontend API headers and import libraries (`libobs` and `obs-frontend-api`, GPL-2.0-or-later in OBS's source notices) and follows the documented module API. No private ABI declaration is copied.
 - Source and dependency archives are downloaded to the ignored `.deps/` and verified against pinned hashes. Their licenses stay with the original packages. Release zips do not redistribute them.
 
 OBS Studio 33.0.0-rc2 (the official Windows zip, SHA-256 `33d5fab2e23ffbcd0e32a4a33ee11c26ebe7b99276a2e550445b27feb75a4127`) was used only as a test runtime for loading the plugin. Nothing from it is copied into this repository or the release zip.
@@ -44,8 +44,44 @@ The plugin decodes video and audio with the FFmpeg libraries `avcodec` and `avut
 
 ## Microsoft Windows SDK and C++/WinRT
 
-Windows APIs (WinRT Bluetooth, Native Wi-Fi, IP Helper, CNG, DPAPI, WinHTTP, Winsock) are used through the Windows SDK headers and system libraries. Nothing from the SDK is redistributed.
+Windows APIs (WinRT Bluetooth, Native Wi-Fi, IP Helper, CNG, DPAPI, WinHTTP, Winsock, Common Controls) are used through the Windows SDK headers and system libraries. Nothing from the SDK is redistributed.
+
+## Microsoft Edge WebView2 SDK
+
+- Package: `Microsoft.Web.WebView2` version `1.0.2903.40` from NuGet, pinned with its SHA-256 in `dependencies.lock.json` and downloaded by `bootstrap` into the ignored `.deps/`.
+- The setup window (`meta-g-link-setup.exe`) is built with the SDK's headers and links its static loader (`WebView2LoaderStatic.lib`), so the release contains the loader inside that program and no separate WebView2 file. The WebView2 Runtime itself is part of Windows and is not redistributed. The package's other tools, which its `NOTICE.txt` covers, are not used in the release.
+- License of the SDK:
+
+```text
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * The name of Microsoft Corporation, or the names of its contributors
+may not be used to endorse or promote products derived from this
+software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
 
 ## Trademarks
 
-No Meta, Ray-Ban, EssilorLuxottica, Apple or OBS logos are included. Product names identify compatibility only and imply no affiliation or endorsement.
+No Meta, Ray-Ban, EssilorLuxottica, Apple or OBS logos are included. The README's screenshots and clip are this project's own (see `AGENTS.md` revision 7) and were cropped to leave out application logos. Product names identify compatibility only and imply no affiliation or endorsement.

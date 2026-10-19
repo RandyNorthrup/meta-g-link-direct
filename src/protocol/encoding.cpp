@@ -7,6 +7,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -130,6 +131,81 @@ std::string quotePlus(std::string_view value) {
         }
     }
     return out;
+}
+
+namespace {
+std::optional<unsigned> hexValue(char digit) {
+    constexpr unsigned DecimalDigits = 10;
+    if (digit >= '0' && digit <= '9') {
+        return static_cast<unsigned>(digit - '0');
+    }
+    if (digit >= 'a' && digit <= 'f') {
+        return static_cast<unsigned>(digit - 'a') + DecimalDigits;
+    }
+    if (digit >= 'A' && digit <= 'F') {
+        return static_cast<unsigned>(digit - 'A') + DecimalDigits;
+    }
+    return std::nullopt;
+}
+
+// Percent-decodes a query value; '+' stays '+', as the browser's address bar shows it.
+std::optional<std::string> percentDecode(std::string_view text) {
+    std::string out;
+    out.reserve(text.size());
+    for (std::size_t index = 0; index < text.size(); ++index) {
+        if (text.at(index) != '%') {
+            out.push_back(text.at(index));
+            continue;
+        }
+        if (text.size() - index < 3) {
+            return std::nullopt;
+        }
+        const auto high = hexValue(text.at(index + 1));
+        const auto low = hexValue(text.at(index + 2));
+        if (!high || !low) {
+            return std::nullopt;
+        }
+        out.push_back(static_cast<char>((*high << NibbleBits) | *low));
+        index += 2;
+    }
+    return out;
+}
+
+std::string_view trimmed(std::string_view text) {
+    constexpr std::string_view Space = " \t\r\n";
+    const auto first = text.find_first_not_of(Space);
+    if (first == std::string_view::npos) {
+        return {};
+    }
+    return text.substr(first, text.find_last_not_of(Space) - first + 1);
+}
+} // namespace
+
+std::optional<std::string> queryParameter(std::string_view address, std::string_view name) {
+    std::string_view query = trimmed(address);
+    if (const auto fragment = query.find('#'); fragment != std::string_view::npos) {
+        query = query.substr(0, fragment);
+    }
+    if (const auto start = query.find('?'); start != std::string_view::npos) {
+        query = query.substr(start + 1);
+    }
+    while (!query.empty()) {
+        const auto end = query.find('&');
+        const auto pair = query.substr(0, end);
+        const auto equals = pair.find('=');
+        if (equals != std::string_view::npos && pair.substr(0, equals) == name) {
+            auto value = percentDecode(pair.substr(equals + 1));
+            if (!value || value->empty()) {
+                return std::nullopt;
+            }
+            return value;
+        }
+        if (end == std::string_view::npos) {
+            break;
+        }
+        query.remove_prefix(end + 1);
+    }
+    return std::nullopt;
 }
 
 std::string formUrlEncode(const std::vector<std::pair<std::string, std::string>>& fields) {

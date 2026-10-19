@@ -2,6 +2,8 @@
 // Native Wi-Fi station connect to the glasses' hosted access point. See mgl/wifi_station.hpp.
 #include "mgl/wifi_station.hpp"
 
+#include "mgl/win_text.hpp"
+
 #include <windows.h> // IWYU pragma: keep — SDK umbrella prerequisites.
 
 // The IP Helper address-table declarations exist only once Winsock's IP definitions are in.
@@ -16,9 +18,7 @@
 #include <minwindef.h>
 #include <netioapi.h>
 #include <nldef.h>
-#include <stringapiset.h>
 #include <winerror.h>
-#include <winnls.h>
 #include <winnt.h>
 #include <wlanapi.h>
 #include <wlantypes.h>
@@ -53,44 +53,20 @@ constexpr auto ConnectPollInterval = 100ms;
 // The Native Wi-Fi client API version for Windows Vista and later.
 constexpr DWORD WlanClientVersion = 2;
 
-std::wstring widen(const std::string& text) {
-    if (text.empty()) {
-        return {};
-    }
-    const int needed =
-        MultiByteToWideChar(CP_UTF8, 0, text.c_str(), static_cast<int>(text.size()), nullptr, 0);
-    std::wstring wide(static_cast<std::size_t>(needed), L'\0');
-    MultiByteToWideChar(CP_UTF8, 0, text.c_str(), static_cast<int>(text.size()), wide.data(),
-                        needed);
-    return wide;
-}
-
-std::string narrow(std::wstring_view text) {
-    if (text.empty()) {
-        return {};
-    }
-    const int needed = WideCharToMultiByte(CP_UTF8, 0, text.data(), static_cast<int>(text.size()),
-                                           nullptr, 0, nullptr, nullptr);
-    std::string utf8(static_cast<std::size_t>(needed), '\0');
-    WideCharToMultiByte(CP_UTF8, 0, text.data(), static_cast<int>(text.size()), utf8.data(), needed,
-                        nullptr, nullptr);
-    return utf8;
-}
-
 // The interface GUID as "{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}", the form WifiAdapter::id uses.
 std::string guidText(const GUID& guid) {
     constexpr int GuidTextLength = 39; // braces, 32 digits, 4 dashes and the terminator
     std::array<wchar_t, GuidTextLength> text{};
     const int written = StringFromGUID2(guid, text.data(), GuidTextLength);
     return written > 0
-               ? narrow(std::wstring_view(text.data(), static_cast<std::size_t>(written - 1)))
+               ? narrowUtf8(std::wstring_view(text.data(), static_cast<std::size_t>(written - 1)))
                : std::string{};
 }
 
 // A manual-connect WPA2-PSK profile for one network. The SSID and passphrase are our own random
 // credentials drawn from an alphanumeric alphabet, so they need no XML escaping.
 std::wstring profileXml(const std::string& ssid, const std::string& passphrase) {
-    const std::wstring name = widen(ssid);
+    const std::wstring name = widenUtf8(ssid);
     return L"<?xml version=\"1.0\"?>\n"
            L"<WLANProfile xmlns=\"http://www.microsoft.com/networking/WLAN/profile/v1\">\n"
            L"  <name>" +
@@ -106,7 +82,7 @@ std::wstring profileXml(const std::string& ssid, const std::string& passphrase) 
            L"<encryption>AES</encryption><useOneX>false</useOneX></authEncryption>\n"
            L"    <sharedKey><keyType>passPhrase</keyType><protected>false</protected>"
            L"<keyMaterial>" +
-           widen(passphrase) +
+           widenUtf8(passphrase) +
            L"</keyMaterial></sharedKey>\n"
            L"  </security></MSM>\n"
            L"</WLANProfile>\n";
@@ -263,7 +239,7 @@ std::vector<WifiAdapter> listWifiAdapters() {
         const auto& raw = info.strInterfaceDescription;
         const auto* const end = std::ranges::find(raw, L'\0');
         adapters.push_back({.id = guidText(info.InterfaceGuid),
-                            .description = narrow(std::wstring_view(std::begin(raw), end))});
+                            .description = narrowUtf8(std::wstring_view(std::begin(raw), end))});
     }
     return adapters;
 }
@@ -319,7 +295,7 @@ std::unique_ptr<WifiStationConnection> connectWifiStation(const std::string& ssi
         return nullptr;
     }
 
-    const std::wstring profile_name = widen(ssid);
+    const std::wstring profile_name = widenUtf8(ssid);
     DOT11_SSID dot11{};
     dot11.uSSIDLength = static_cast<ULONG>(ssid.size());
     std::copy_n(ssid.begin(), ssid.size(), std::begin(dot11.ucSSID));

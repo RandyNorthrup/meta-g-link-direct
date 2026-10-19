@@ -25,6 +25,11 @@ inline constexpr std::string_view DefaultHwAppToken =
 inline constexpr std::string_view DefaultArAppToken =
     "AR|306760944872162|a919421a55a8ea18080ab2f10f57f1be"; // gitleaks:allow
 
+// Where the Meta login sends the browser when it finishes, with the auth code and the state in the
+// query. A window hosting the login recognises the end of it by this address.
+inline constexpr std::string_view LoginRedirectUri =
+    "https://accounts.meta.com/native/oidc/redirect/metaai";
+
 // The browser login half.
 struct Authorize {
     std::string url;   // the accounts.meta.com page to open

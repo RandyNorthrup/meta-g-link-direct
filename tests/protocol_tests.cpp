@@ -18,6 +18,7 @@
 #include <span>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace {
@@ -189,6 +190,19 @@ void testEncoding(Checks& check) {
           "base64 decode roundtrips");
     check(mgl::encoding::quotePlus("a b+c/d") == "a+b%2Bc%2Fd",
           "quote_plus encodes reserved bytes");
+    using mgl::encoding::queryParameter;
+    check(queryParameter("https://h/p?state=x&code=AbC%2D1#_=_\r\n", "code") == "AbC-1",
+          "the code is percent-decoded after another parameter, before a fragment");
+    check(queryParameter("code=plain", "code") == "plain", "a bare query works");
+    check(queryParameter("https://h/p?code=a+b", "code") == "a+b", "plus stays a plus");
+    check(!queryParameter("https://h/p?state=x", "code").has_value(), "an absent code is none");
+    check(!queryParameter("https://h/p?code=", "code").has_value(), "an empty code is none");
+    check(!queryParameter("https://h/p?code=%ZZ", "code").has_value(),
+          "malformed percent-encoding is none");
+    check(!queryParameter("https://h/p?xcode=1", "code").has_value(),
+          "a longer parameter name does not match");
+    check(!queryParameter("https://h/p#code=1", "code").has_value(),
+          "a code only in the fragment does not count");
     // A valid gzip stream begins with the magic and the DEFLATE method byte.
     const std::array<std::uint8_t, 5> hello{'h', 'e', 'l', 'l', 'o'};
     const auto gz = mgl::encoding::gzip({hello.data(), hello.size()});
@@ -308,6 +322,67 @@ void testConfigureAudio(Checks& check) {
     check(asc.size() == 2 && asc.at(0) == 0x11 && asc.at(1) == 0x90,
           "AudioSpecificConfig describes the requested AAC-LC 48 kHz stereo");
 }
+
+void testConfigureVideo(Checks& check) {
+    const mgl::stream::VideoConfig low{
+        .width = 504, .height = 896, .bitrate = 1'500'000, .frame_rate = 30, .iframe_interval = 1};
+    for (const bool enabled : {false, true}) {
+        const auto request = mgl::stream::buildConfigureVideo(9, low, enabled);
+        const auto parsed =
+            check.present(mgl::proto::Message::parse(view(request)), "ConfigureVideo parses");
+        check(parsed.varint(1) == 9U, "video nonce is field 1");
+        check(parsed.varint(3) == (enabled ? 1U : 0U), "video enabled flag is field 3");
+        const auto config = check.present(
+            mgl::proto::Message::parse(check.present(parsed.bytes(2), "VideoConfig present")),
+            "VideoConfig parses");
+        check(text(check.present(config.bytes(1), "video mime present")) == "video/hevc",
+              "HEVC mime");
+        check(config.varint(2) == 504U && config.varint(3) == 896U,
+              "profile size is fields 2 and 3");
+        check(config.varint(4) == 1'500'000U && config.varint(5) == 30U,
+              "bitrate and frame rate are fields 4 and 5");
+    }
+    check(low == mgl::stream::VideoConfig{.width = 504,
+                                          .height = 896,
+                                          .bitrate = 1'500'000,
+                                          .frame_rate = 30,
+                                          .iframe_interval = 1},
+          "equal profiles compare equal");
+    check(!(low == mgl::stream::VideoConfig{}), "a different profile compares unequal");
+}
+
+mgl::Bytes deviceStateWithBattery(std::uint64_t charge_state, std::uint64_t percent) {
+    mgl::Bytes battery;
+    mgl::proto::appendVarintField(battery, 2, charge_state);
+    mgl::proto::appendVarintField(battery, 3, percent);
+    mgl::proto::appendVarintField(battery, 4, 31'200);
+    mgl::proto::appendVarintField(battery, 5, 3'850);
+    mgl::Bytes state;
+    mgl::proto::appendBytesField(state, 1, battery);
+    mgl::proto::appendVarintField(state, 9, 1); // an unrelated DeviceState field
+    return state;
+}
+
+void testBatteryState(Checks& check) {
+    const auto state = deviceStateWithBattery(4, 64);
+    const auto battery = check.present(mgl::stream::parseBatteryState(view(state)),
+                                       "a DeviceState with a battery parses");
+    check(battery.percent == 64U, "battery percent is field 1.3");
+    check(!battery.charging(), "charge state 4 is not charging");
+    check(battery.millivolts == 3'850U && battery.millicelsius == 31'200,
+          "voltage and temperature are fields 1.5 and 1.4");
+    const auto charging = deviceStateWithBattery(1, 80);
+    check(
+        check.present(mgl::stream::parseBatteryState(view(charging)), "charging parses").charging(),
+        "charge state 1 is charging");
+    const auto impossible = deviceStateWithBattery(4, 101);
+    check(!mgl::stream::parseBatteryState(view(impossible)).has_value(),
+          "a percentage above 100 is rejected");
+    mgl::Bytes without;
+    mgl::proto::appendVarintField(without, 9, 1);
+    check(!mgl::stream::parseBatteryState(view(without)).has_value(),
+          "a DeviceState without a battery gives none");
+}
 } // namespace
 
 int main() {
@@ -323,6 +398,8 @@ int main() {
         testSoftApInfo(check);
         testTimedUnits(check);
         testConfigureAudio(check);
+        testConfigureVideo(check);
+        testBatteryState(check);
         std::cout << check.count() << " protocol/datax/protobuf/encoding/stream cases passed\n";
         return EXIT_SUCCESS;
     } catch (const std::exception& error) {

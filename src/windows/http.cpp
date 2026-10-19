@@ -3,16 +3,14 @@
 #include "mgl/http.hpp"
 
 #include "mgl/bytes.hpp"
+#include "mgl/win_text.hpp"
 
 #include <windows.h> // IWYU pragma: keep — SDK umbrella prerequisites for winhttp.h.
 
 #include <minwindef.h>
-#include <stringapiset.h>
 #include <winhttp.h>
-#include <winnls.h>
 
 #include <array>
-#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -31,22 +29,12 @@ struct HandleCloser {
 };
 using Handle = std::unique_ptr<void, HandleCloser>;
 
-std::wstring widen(std::string_view text) {
-    if (text.empty()) {
-        return {};
-    }
-    const auto needed =
-        MultiByteToWideChar(CP_UTF8, 0, text.data(), static_cast<int>(text.size()), nullptr, 0);
-    std::wstring out(static_cast<std::size_t>(needed), L'\0');
-    MultiByteToWideChar(CP_UTF8, 0, text.data(), static_cast<int>(text.size()), out.data(), needed);
-    return out;
-}
 } // namespace
 
 Reply post(std::string_view url, const std::vector<std::pair<std::string, std::string>>& headers,
            ByteView body, std::string_view user_agent) {
     Reply reply;
-    const auto wide_url = widen(url);
+    const auto wide_url = widenUtf8(url);
     URL_COMPONENTS components{};
     components.dwStructSize = sizeof(components);
     std::array<wchar_t, 256> host{};
@@ -64,8 +52,9 @@ Reply post(std::string_view url, const std::vector<std::pair<std::string, std::s
         return reply;
     }
 
-    const Handle session(WinHttpOpen(widen(user_agent).c_str(), WINHTTP_ACCESS_TYPE_AUTOMATIC_PROXY,
-                                     WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0));
+    const Handle session(WinHttpOpen(widenUtf8(user_agent).c_str(),
+                                     WINHTTP_ACCESS_TYPE_AUTOMATIC_PROXY, WINHTTP_NO_PROXY_NAME,
+                                     WINHTTP_NO_PROXY_BYPASS, 0));
     if (!session) {
         reply.transport_error = L"WinHttpOpen failed";
         return reply;
@@ -86,9 +75,9 @@ Reply post(std::string_view url, const std::vector<std::pair<std::string, std::s
 
     std::wstring header_block;
     for (const auto& [name, value] : headers) {
-        header_block += widen(name);
+        header_block += widenUtf8(name);
         header_block += L": ";
-        header_block += widen(value);
+        header_block += widenUtf8(value);
         header_block += L"\r\n";
     }
     if (!header_block.empty()) {

@@ -10,9 +10,10 @@
 #include "mgl/rfcomm.hpp"
 #include "mgl/rfcomm_transport.hpp"
 #include "mgl/session.hpp"
+#include "mgl/setup.hpp"
+#include "mgl/stream.hpp"
 #include "private_input.hpp"
 
-#include <algorithm>
 #include <chrono>
 #include <condition_variable>
 #include <cstdint>
@@ -28,7 +29,6 @@
 #include <string_view>
 #include <thread>
 #include <utility>
-#include <vector>
 
 namespace {
 int runDirectProbe(mgl::DirectRfcommRoute route) {
@@ -225,45 +225,6 @@ int runImportTokens() {
     return std::cout ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-// Splits the sealed token blob into the HW token and the AR app tokens to try. An explicit
-// "AR|<id>|<secret>" line is used as-is; a bare "<id>|<secret>" line is an AR candidate tried with
-// the "AR|" prefix. Imported tokens override the built-in Meta AI app defaults.
-void parseTokenBlob(const std::string& blob, std::string& hw_token,
-                    std::vector<std::string>& ar_tokens) {
-    std::istringstream lines(blob);
-    std::string line;
-    while (std::getline(lines, line)) {
-        while (!line.empty() && (line.back() == '\r' || line.back() == ' ')) {
-            line.pop_back();
-        }
-        if (line.empty()) {
-            continue;
-        }
-        if (line.starts_with("HW|")) {
-            hw_token = line;
-        } else if (line.starts_with("AR|")) {
-            ar_tokens.push_back(line);
-        } else {
-            ar_tokens.push_back("AR|" + line);
-        }
-    }
-}
-
-// The glasses allow one RFCOMM session at a time and need a moment between them, so a connect
-// right after a previous attempt can fail transiently; retry a few times.
-mgl::RfcommOpen openBondedMetaRfcommWithRetry() {
-    constexpr int Attempts = 6;
-    mgl::RfcommOpen opened;
-    for (int attempt = 0; attempt < Attempts; ++attempt) {
-        opened = mgl::openBondedMetaRfcomm();
-        if (opened.transport) {
-            break;
-        }
-        std::this_thread::sleep_for(std::chrono::seconds(3));
-    }
-    return opened;
-}
-
 // The owner key sealed by --provision, or nullopt after reporting why it is unavailable.
 std::optional<mgl::crypto::OwnerKey> loadStoredOwner() {
     const auto identity = mgl::identity::loadOwnerIdentity();
@@ -279,73 +240,50 @@ std::optional<mgl::crypto::OwnerKey> loadStoredOwner() {
     return owner;
 }
 
-// The one-time Meta-authenticated change of owner. Reads the login auth code on stdin.
+std::string trimmedLine(std::string line) {
+    while (!line.empty() && (line.back() == '\r' || line.back() == '\n' || line.back() == ' ')) {
+        line.pop_back();
+    }
+    const auto first = line.find_first_not_of(' ');
+    return first == std::string::npos ? std::string() : line.substr(first);
+}
+
+// Reads the login auth code on stdin and runs the change of owner, reporting each phase as a JSON
+// line. For scripts; people use the setup window (meta-g-link-setup.exe).
 int runProvision() {
     constexpr int ProbeFailed = 3;
     constexpr int InvalidInput = 5;
-    // Imported tokens come first; the built-in Meta AI app tokens fill whatever the store lacks,
-    // so setup works without --import-tokens.
-    std::string hw_token;
-    std::vector<std::string> ar_tokens;
-    if (const auto blob = mgl::identity::loadTokenBlob()) {
-        parseTokenBlob(*blob, hw_token, ar_tokens);
-    }
-    if (hw_token.empty()) {
-        hw_token = mgl::provision::DefaultHwAppToken;
-    }
-    if (std::ranges::find(ar_tokens, mgl::provision::DefaultArAppToken) == ar_tokens.end()) {
-        ar_tokens.emplace_back(mgl::provision::DefaultArAppToken);
-    }
-    std::string code;
-    std::getline(std::cin, code);
-    while (!code.empty() && (code.back() == '\r' || code.back() == '\n' || code.back() == ' ')) {
-        code.pop_back();
-    }
+    std::string line;
+    std::getline(std::cin, line);
+    const std::string code = trimmedLine(line);
     if (code.empty()) {
         std::cerr << "No auth code on stdin.\n";
         return InvalidInput;
     }
-
-    const auto auth = mgl::provision::authenticate(code, ar_tokens);
-    if (!auth.error.empty()) {
-        std::cout << R"({"phase":"auth","ok":false,"error":")" << jsonEscape(auth.error) << "\"}\n";
-        return ProbeFailed;
-    }
-
-    const auto opened = openBondedMetaRfcommWithRetry();
-    if (!opened.transport) {
-        std::cout << R"({"phase":"connect","ok":false,"rfcomm_connect":")"
-                  << connectWord(opened.status) << "\"}\n";
-        return ProbeFailed;
-    }
-    mgl::GlassesSession session(*opened.transport, nullptr);
-    const auto handshake = session.openHandshake();
-    if (handshake.stage != mgl::LinkStage::KeysDerived) {
-        std::cout << R"({"phase":"handshake","ok":false,"stage":")" << stageWord(handshake.stage)
+    const auto outcome = mgl::setup::changeOwner(code);
+    using mgl::setup::Phase;
+    if (outcome.phase == Phase::Auth) {
+        std::cout << R"({"phase":"auth","ok":false,"error":")" << jsonEscape(outcome.auth_error)
                   << "\"}\n";
-        return ProbeFailed;
+    } else if (outcome.phase == Phase::Connect) {
+        std::cout << R"({"phase":"connect","ok":false,"rfcomm_connect":")"
+                  << connectWord(outcome.rfcomm) << "\"}\n";
+    } else if (outcome.phase == Phase::Handshake) {
+        std::cout << R"({"phase":"handshake","ok":false,"stage":")" << stageWord(outcome.handshake)
+                  << "\"}\n";
+    } else {
+        const auto& result = outcome.change_owner;
+        std::cout << R"({"phase":"change_owner","ok":)" << (result.ok ? "true" : "false")
+                  << R"(,"stage":")" << provisionStageWord(result.stage) << R"(","glasses_status":)"
+                  << result.glasses_status << R"(,"serial":")" << jsonEscape(result.serial)
+                  << R"(","error":")" << jsonEscape(result.error) << "\"}\n";
     }
-
-    const auto owner = mgl::crypto::OwnerKey::generate();
-    const auto result = mgl::provision::runChangeOwner(session, owner, hw_token, auth.token);
-    std::cout << R"({"phase":"change_owner","ok":)" << (result.ok ? "true" : "false")
-              << R"(,"stage":")" << provisionStageWord(result.stage) << R"(","glasses_status":)"
-              << result.glasses_status << R"(,"serial":")" << jsonEscape(result.serial)
-              << R"(","error":")" << jsonEscape(result.error) << "\"}\n";
-    if (!result.ok) {
-        return ProbeFailed;
-    }
-    mgl::identity::OwnerIdentity identity;
-    identity.owner_private = owner.exportPrivate();
-    identity.serial = result.serial;
-    identity.user_id = result.user_id;
-    if (!mgl::identity::saveOwnerIdentity(identity)) {
-        std::cerr << "Owner changed but the identity could not be sealed locally.\n";
+    if (!outcome.ok) {
+        std::cerr << outcome.problem << '\n';
         return ProbeFailed;
     }
     return std::cout ? EXIT_SUCCESS : ProbeFailed;
 }
-
 // Opens a full authenticated link using the stored owner identity: handshake, trust with the
 // owner key, EndLinkSetup. Reaching trust_accepted/ready proves the PC owns the glasses.
 int runLink() {
@@ -354,7 +292,7 @@ int runLink() {
     if (!owner) {
         return ProbeFailed;
     }
-    const auto opened = openBondedMetaRfcommWithRetry();
+    const auto opened = mgl::setup::openGlassesRfcomm();
     if (!opened.transport) {
         std::cout << R"({"rfcomm_connect":")" << connectWord(opened.status) << R"(","ok":false})"
                   << '\n';
@@ -433,6 +371,11 @@ int runStream() {
     };
 
     mgl::MediaSession session(std::move(callbacks));
+    session.setDemand({.video = true,
+                       .audio = false,
+                       .keep_link = false,
+                       .video_config = mgl::stream::VideoConfig{},
+                       .wifi_adapter = {}});
     session.start();
     {
         std::unique_lock lock(mutex);
@@ -588,6 +531,7 @@ int main(int argc, char* argv[]) {
                    "--direct-classic-uuid|--direct-classic-channel7|--help]\n"
                    "Default: local radio/association counts only.\n"
                    "Setup and camera:\n"
+                   "People set up the glasses with the setup window, meta-g-link-setup.exe.\n"
                    "--auth-url: print the Meta login address used by --provision.\n"
                    "--provision: read the login code on stdin and make this PC the glasses' "
                    "owner. The Meta AI phone app loses the glasses until they are added there "
@@ -599,7 +543,8 @@ int main(int argc, char* argv[]) {
                    "--stream: the OBS source's camera path, for sixty seconds of video; status "
                    "on stderr, summary on stdout.\n"
                    "--forget: delete this PC's stored glasses identity and imported tokens.\n"
-                   "Only --auth-url and --provision contact Meta. --stream asks the glasses to "
+                   "Only --auth-url and --provision contact Meta. --stream asks the "
+                   "glasses to "
                    "host their own Wi-Fi network and joins this PC's Wi-Fi adapter to it while it "
                    "runs; the adapter is free for its usual networks afterwards.\n"
                    "Diagnostics:\n"

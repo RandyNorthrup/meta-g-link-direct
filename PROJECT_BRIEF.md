@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Confirmed contract; public beta releases (0.2.0 adds glasses audio and OBS 33 support) |
+| Status | Confirmed contract; public beta releases (0.3.0 adds the microphone source, the shared link, keep-connected and the setup window) |
 | Product owner | Randy |
 | Technical work | Coding agent under Randy's direction |
 | Created / last updated | 2026-10-15 / 2026-10-19 |
@@ -12,7 +12,7 @@ This brief owns the product contract. [`PLAN.md`](PLAN.md) owns delivery tasks, 
 
 ## Product
 
-A native OBS Studio source plugin for Windows that shows the camera of Ray-Ban Meta Gen 2 glasses live in OBS, directly over local wireless links: no phone, no relay, no screen mirroring and no virtual webcam. Video quality must be good and adjustable. Glasses audio is optional and off by default; users normally record audio from their own OBS audio device.
+A native OBS Studio source plugin for Windows that shows the camera of Ray-Ban Meta Gen 2 glasses live in OBS, directly over local wireless links: no phone, no relay, no screen mirroring and no virtual webcam. Video quality must be good and adjustable. Glasses audio is optional and off by default; users normally record audio from their own OBS audio device, and those who want the glasses' microphones can use them with or without the camera (D18).
 
 Meta is contacted only during the one-time setup that makes the PC the glasses' owner. Streaming afterwards is local: Bluetooth for control, and a Wi-Fi network that the glasses host for the PC (see D15). The setup moves ownership away from the Meta AI phone app; users must be told this before it happens.
 
@@ -27,13 +27,13 @@ Meta is contacted only during the one-time setup that makes the PC the glasses' 
 
 | Area | Target | Status (see PLAN.md) |
 |---|---|---|
-| Video | 720 × 1280 portrait at a nominal 30 fps, plus at least one lower profile | 720 × 1280 at 30 fps proven; lower profiles untested |
+| Video | 720 × 1280 portrait at a nominal 30 fps, plus at least one lower profile | 720 × 1280 and 504 × 896 at 30 fps proven in OBS, switching in 1.4 s; 1080 × 1920 and 360 × 640 untested |
 | Endurance | One full glasses battery charge with no drop or reconnect, recorded in measured minutes (D16) | Open; longest run so far 3 minutes |
 | Latency | 95th percentile glass-to-OBS ≤ 500 ms | Not measured |
-| Startup | First frame ≤ 15 s after a ready connection | About 2 s from a ready media session; about 18 s from the scene going live, including the Wi-Fi setup |
+| Startup | First frame ≤ 15 s after a ready connection | About 13 s from the scene going live, including the Wi-Fi setup; about 1 s with keep-connected on (D20) |
 | Reconnect | ≤ 30 s after the glasses become available again | Implemented, not exercised on hardware |
 | Stability | No growing media queue or memory; no OBS stall | Two-minute OBS run: flat memory, no render frames skipped by the source |
-| Audio | Optional glasses audio, off by default | 48 kHz stereo AAC decoded into the OBS mixer (D18); sync offset not measured |
+| Audio | Optional glasses audio, off by default | 48 kHz stereo AAC decoded into the OBS mixer, from the camera source or the microphone source with the camera off (D18); sync offset not measured |
 
 No 1080p, latency, battery or uptime claim is made without measurement.
 
@@ -42,11 +42,13 @@ No 1080p, latency, battery or uptime claim is made without measurement.
 - Windows 11 x64 and OBS Studio 32 or newer (streamed on Windows 11 Pro build 26200 with OBS 32.2.2 and with OBS 33.0.0-rc2). The plugin goes in the layouts OBS loads (D19).
 - A Bluetooth adapter with both Bluetooth LE and Classic (the glasses pair as a dual-mode device; the session runs over Classic RFCOMM) and a Wi-Fi adapter that can join a 2.4 GHz WPA2 network.
 - Ray-Ban Meta Gen 2 glasses. The firmware build used for verification is not yet recorded. Other generations are untested. Firmware downgrades are not a support strategy.
-- One glasses connection per OBS instance.
+- One glasses connection per OBS instance, shared by every glasses source in it (D18).
+- The setup window needs Microsoft Edge WebView2, which Windows 11 includes; without it the window falls back to the browser and a paste box (D21).
 
 ## Experience and accessibility
 
-- Native OBS source properties: a quality list, a Wi-Fi adapter list (Automatic or a named adapter), a glasses-audio checkbox, a status line and a setup note. English only.
+- Native OBS source properties in four groups: *Video* (quality list), *Audio* (glasses-audio checkbox, or a note on the microphone source), *Glasses connection*, shared by all glasses sources (Wi-Fi adapter list, keep-connected checkbox, status and battery), and *Glasses setup* (Set up glasses, Forget behind a confirmation). A Tools menu entry opens them (D22). English only.
+- The setup window (D21) is a plain Win32 window with standard controls, Windows visual styles and per-monitor DPI scaling. Its keyboard, Narrator, high-contrast and scaling checks are pending with the rest of D08.
 - Keyboard access, Narrator labels, visible focus, light/dark/high-contrast themes, properties usable from 480 logical pixels wide and at 100–200% display scaling (D08). Not yet verified.
 - Errors are actionable and the OBS log names each connection step.
 - No logos or brand assets of Meta, Ray-Ban, Apple or OBS. Product names identify compatibility only and imply no endorsement or affiliation.
@@ -57,7 +59,8 @@ No 1080p, latency, battery or uptime claim is made without measurement.
 - Wi-Fi credentials for the glasses' network are random per session and live only in memory and in a temporary Windows profile that is deleted when the camera stops.
 - The only credentials in the repository are the Meta AI app's two public client tokens (AGENTS.md revision 3). No user tokens, owner keys, passwords, Wi-Fi passphrases, raw captures or raw media may enter the repository, logs or diagnostics.
 - No telemetry, update checks or plugin-managed recordings. OBS recording stays under the user's control. Logs carry status lines only.
-- Known gap: the PC does not yet verify the glasses' trust signature.
+- The setup window shows Meta's login in a private WebView2 session whose browser data is deleted when the window closes. It reads only the login code from Meta's final redirect.
+- Known gap: the PC does not yet verify the glasses' trust signature. The glasses send a 32-byte value with a 512-byte (RSA-4096-sized) signature and their certificate holds an RSA key; the exact check the Meta app performs runs in native code and is not known yet.
 
 ## Decision ledger
 
@@ -79,9 +82,12 @@ No 1080p, latency, battery or uptime claim is made without measurement.
 | D14 | Adapters | Closed | The PC's original Classic-only controller could not pair the glasses. Proven with a TP-Link USB adapter (Bluetooth LE and Classic) and one USB Wi-Fi adapter | Randy | 2026-10-18 |
 | D15 | Wi-Fi link role | Confirmed, proven | No router, hotspot or network changes and no phone. The glasses host a 2.4 GHz / 20 MHz network (`CreateSoftApNetwork`) and the PC joins it as a client. While streaming, the PC's Wi-Fi adapter has no internet | Randy | 2026-10-18 |
 | D16 | Endurance target | Confirmed | One full glasses battery charge with no drop or reconnect, recorded in measured minutes. Replaces the 120-minute minimum because streaming appears to drain the battery in roughly 35–40 minutes (unconfirmed) | Randy | 2026-10-19 |
-| D17 | Public release | Confirmed | Publish the repository and beta releases for other users (0.1.0, then 0.2.0) | Randy | 2026-10-19 |
-| D18 | Glasses audio | Confirmed, proven | An optional setting on the camera source, off by default, rather than a separate audio source: the glasses accept one session, so audio rides the camera's session into the same source's mixer channel | Randy / technical decision | 2026-10-19 |
+| D17 | Public release | Confirmed | Publish the repository and beta releases for other users (0.1.0, 0.2.0, then 0.3.0) | Randy | 2026-10-19 |
+| D18 | Glasses audio | Revised, proven | Off by default. Either a setting on the camera source or a separate microphone source that works with the camera off. The glasses accept one session, so one process-wide link serves every glasses source and the glasses stream what the live sources need; with only microphone sources live the camera is off. Replaces "a setting on the camera source only" (0.2.0) because Randy asked for audio without video and the glasses proved to accept stream changes inside one session | Randy / technical verification | 2026-10-19 |
 | D19 | OBS plugin location | Confirmed, proven | Find OBS on any drive and take system folders from Windows, never from a drive letter. Install to `%ProgramData%\obs-studio\plugins\meta-g-link-direct` in both layouts OBS reads there (flat for OBS 33+, `bin\64bit` for OBS 32, which OBS 33 skips), so OBS upgrades need no reinstall; a portable OBS gets its version's layout in its own folder; remove copies elsewhere. OBS 34 stops loading the old `obs-plugins` folder | Randy / technical verification | 2026-10-19 |
+| D20 | Keep connected | Confirmed, proven | An opt-in setting, off by default, that connects when OBS loads and keeps the link up with the camera off, so a source starts in about a second. The battery and Wi-Fi-adapter cost is stated beside it | Randy | 2026-10-19 |
+| D21 | Setup experience | Confirmed, proven | One setup window (`meta-g-link-setup.exe`, WebView2) that explains the change of owner, hosts Meta's login and finishes by itself, opened by the installer and from OBS; no console copy and paste. Replaces the console flow because Randy found it too complicated | Randy | 2026-10-19 |
+| D22 | Settings access | Confirmed, proven | Every glasses source carries the shared connection and setup settings; a Tools menu entry opens them; Forget is a button behind a confirmation tick | Randy | 2026-10-19 |
 
 ## Research references
 
