@@ -24,7 +24,7 @@ M1 (TASK-AUTH) ports actual connection/identity behavior and validates it on gla
 
 M2 (TASK-MEDIA) ports the actual Wi-Fi group-owner/access-point role, frame reassembly, HEVC/AAC decode, timing and supported quality selection. Test malformed/truncated/oversized input, codec configuration changes, bounded queues, timestamps and decoder errors with intended red drills. Measure real resolution/fps, independent end-to-end latency, CPU/memory and thermal behavior. Audio remains optional. Record exact current stable firmware; do not demand a downgrade or treat an Android upstream result as Windows proof. Update use/troubleshooting and privacy documentation with actual behavior.
 
-Current state (2026-10-18): M1 authentication and the Meta owner change are proven on hardware (`--link` reaches ready with trust success; this PC holds the owner key). Trust-signature verification is not built, so AC-AUTH stays open. M2 live 720×1280 HEVC at ~30 fps is proven. With the glasses joining an access point, video stopped within 8–54 s on every path tried; with the glasses hosting their own 2.4 GHz / 20 MHz network, the production media session streamed without a stall (about 179 s, 120 s, and two stop/start cycles). See [the Wi-Fi link report](reports/WIFI_LINK_VERIFICATION.md). Other quality profiles, latency, CPU/memory, thermal behaviour, audio and the firmware build remain open. M3: the OBS source runs live at 720×1280 on the earlier hotspot link; a run on the glasses-hosted link, reconnection after a real drop, the accessibility pass and the 120-minute run remain open.
+Current state (2026-10-18): M1 authentication and the Meta owner change are proven on hardware (`--link` reaches ready with trust success; this PC holds the owner key). Trust-signature verification is not built, so AC-AUTH stays open. M2 live 720×1280 HEVC at ~30 fps is proven. With the glasses joining an access point, video stopped within 8–54 s on every path tried; with the glasses hosting their own 2.4 GHz / 20 MHz network, the production media session streamed without a stall (about 179 s, 120 s, and two stop/start cycles). See [the Wi-Fi link report](reports/WIFI_LINK_VERIFICATION.md). Other quality profiles, latency, CPU/memory, thermal behaviour, audio and the firmware build remain open. M3: the installed OBS source ran live at 720×1280 / 30 fps for two minutes on the glasses-hosted link (2026-10-19), with one OBS render skip in 9,794 frames, none attributable to the source, through start, stream and stop. Reconnection after a real drop, quality changes in OBS, the accessibility pass and the 120-minute run remain open.
 
 M3 (TASK-OBS) adds the real source only after the direct path is demonstrated. Test source start/stop/destroy, reconnect, optional audio synchronization, quality changes and failures; verify native UI with keyboard, Narrator, themes and scaling. The final certification requires the complete >=120-minute run, phone off, no cloud media path, no unbounded memory/queue growth and all numeric/visual gates in AC-OBS. Hardware limits may make acceptance fail; report this without lowering the target. Native source tests/red drills and current artifact/source binding accompany manual hardware and visual records. README, CHANGELOG, supported-version evidence, installation/uninstall/rollback and diagnostics instructions must match the final artifact.
 
@@ -38,7 +38,7 @@ Detailed logs and context belong under reports/. Do not copy full command output
 
 ## Open technical verification and deferred public scope
 
-Open on the current link (2026-10-18): an OBS run on the glasses-hosted network; hardware proof of the rewritten DHCP detection in `wifi_station.cpp`; reconnection after a real drop; trust-signature verification; quality presets, latency and resource measurement; the accessibility pass; the firmware build; and the 120-minute run. Randy's direction for the link: no router, hotspot or network changes, no phone, full resolution. While streaming, the PC's Wi-Fi adapter has no internet. The paragraph below is the historical Classic-discovery state; Bluetooth pairing and authentication have since been proven.
+Open on the current link (2026-10-19): reconnection after a real drop; trust-signature verification; quality presets, latency and resource measurement; the accessibility pass; the firmware build; the 120-minute run, where a health reading that looks like battery (about 4 points per 90 s, unconfirmed) suggests the glasses may need power; and a `package` task that builds the installer's bundle layout (it currently produces the CMake install layout). Randy's direction for the link: no router, hotspot or network changes, no phone, full resolution. While streaming, the PC's Wi-Fi adapter has no internet. The paragraph below is the historical Classic-discovery state; Bluetooth pairing and authentication have since been proven.
 
 Randy requires continued work with the existing adapter; replacement hardware is not a prerequisite of this plan. The current controller reports Classic supported and LE unsupported; the documented LE path is unavailable. This does not establish that Classic-only access is impossible. Initial and controlled uncached queries found no Meta service and one peer timed out. The explicit Windows picker was canceled because glasses were absent; no new bond or socket was created. Randy confirmed the paired headphones are separate from the glasses. Public Gen 2 research reports an unpaired channel-7 server hello, so targeted Winsock probes are implemented separately from the bonded WinRT route. The glasses' trustworthy Classic address remains unidentified; a question about a Bluetooth-address field in Meta AI is pending. Addresses are entered privately on local stdin, never chat/argv/logs. No current-firmware, authentication, camera or ownership success is claimed. Same LAN does not supply the authenticated Wi-Fi endpoint; group-owner capability and all real media/OBS acceptance remain unproved. No driver/network changes, purchase, reset or firmware downgrade are authorized by this investigation.
 
@@ -669,6 +669,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       ],
       "status": "in_progress",
       "evidence": [
+        "EV-WIFI-LINK-OBS",
         "EV-WIFI-LINK-OBS-DEFERRED"
       ],
       "blocker": null,
@@ -19161,7 +19162,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       "kind": "manual",
       "status": "pass",
       "command": [],
-      "method": "Observed on real glasses, phone Bluetooth off: glasses-hosted 2.4 GHz / 20 MHz network via CreateSoftApNetwork; 5,370 frames in about 179 s (standalone harness), 3,127 frames in a 120 s production MediaSession run, two back-to-back 30 s MediaSession runs, Bluetooth close acknowledged, network gone 8-14 s after a stream on fresh scans. Every earlier join-an-access-point path stopped video within 8-54 s. The rewritten DHCP detection in wifi_station.cpp and an OBS run are not covered.",
+      "method": "Observed on real glasses, phone Bluetooth off: glasses-hosted 2.4 GHz / 20 MHz network via CreateSoftApNetwork; 5,370 frames in about 179 s (standalone harness), 3,127 frames in a 120 s production MediaSession run, two back-to-back 30 s runs, Bluetooth close acknowledged, network gone 8-14 s after a stream on fresh scans; on 2026-10-19 the DHCP-detection rewrite joined in 4.1 s and streamed 1,104 frames in 60 s. Every earlier join-an-access-point path stopped video within 8-54 s.",
       "environment": {
         "platform": "windows",
         "tools": {
@@ -19187,7 +19188,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       "exit_code": null,
       "artifact": {
         "path": "reports/WIFI_LINK_VERIFICATION.md",
-        "sha256": "55528a57ce828864bf3734abab556de8428612303b9db03a856b62e5a2cfb0af"
+        "sha256": "6c93fe6e1e26e5f748210b692807795ae09817594389b78101baff3edec818b4"
       },
       "inputs": [
         {
@@ -19434,7 +19435,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       "kind": "manual",
       "status": "deferred",
       "command": [],
-      "method": "Not yet run: the OBS source on the glasses-hosted network, reconnection after a real drop, the accessibility pass and the 120-minute run.",
+      "method": "Not yet run: reconnection after a real drop, quality changes in OBS, the keyboard/Narrator/theme/scaling pass, latency measurement and the 120-minute run.",
       "environment": {
         "platform": "windows",
         "tools": {
@@ -19462,7 +19463,73 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       "inputs": [],
       "scope_sha256": null,
       "red": null,
-      "reason": "OBS was open during this session and the plugin was not reinstalled; the glasses were charging."
+      "reason": "Next hardware sessions; a health reading that looks like battery suggests the 120-minute run may need the glasses on power."
+    },
+    {
+      "id": "EV-WIFI-LINK-OBS",
+      "acceptance": [
+        "AC-OBS"
+      ],
+      "kind": "manual",
+      "status": "pass",
+      "command": [],
+      "method": "Installed this build with scripts/Install-MetaGLinkDirect.ps1 (setup declined), started OBS 32.2.2 and switched the test scene live over the local OBS WebSocket. 720x1280 video about 18 s after the scene went live; two minutes at 30.0 fps; OBS render skips 1 of 9,794 frames (present before the scene went live) through start, stream and stop; CPU about 1.3%; memory flat; source screenshots at 0 s and 2 min showed live first-person frames and were deleted; Camera stopped on scene switch with no Wi-Fi profile left. Not covered: reconnection after a real drop, quality changes, accessibility, the 120-minute run.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": null,
+      "artifact": {
+        "path": "reports/WIFI_LINK_VERIFICATION.md",
+        "sha256": "6c93fe6e1e26e5f748210b692807795ae09817594389b78101baff3edec818b4"
+      },
+      "inputs": [
+        {
+          "path": "src/plugin/camera.cpp",
+          "sha256": "525045179a3ccf0161ae3dcfb537b3c23c79ef75865c3d9fe24cbaa9121ba9b6"
+        },
+        {
+          "path": "src/plugin/source.c",
+          "sha256": "5b09da2c95ffc93aa4991aeb2eec64669e407838358aa65f20ca898f207a29b1"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "acd95e46fadada63c946e253675b40a73d82f7b9f830d4ae92ca76bc3e8a4749"
+        },
+        {
+          "path": "src/windows/media_session.cpp",
+          "sha256": "d1c912e636038eb4c96db2b105ad07855ac46d35f56dd530c0ef74e467c6fcc3"
+        },
+        {
+          "path": "src/windows/wifi_station.cpp",
+          "sha256": "4c9ebc5d0e62a91ffe0613a3a9eb616f78161609a6f0854bc1bea03c1f3b01e1"
+        },
+        {
+          "path": "scripts/Install-MetaGLinkDirect.ps1",
+          "sha256": "6bc5f328a2910d0b8f69db5e5a04a6e7f5b5205b3f9fd3e3ccc72d1e592b1ddf"
+        }
+      ],
+      "scope_sha256": null,
+      "red": null,
+      "reason": "The scope fingerprint tool behind earlier entries is not available in this session; inputs carry their own hashes (null = deleted file)."
     }
   ],
   "checkpoint": {
@@ -19731,7 +19798,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       "TASK-SETUP"
     ],
     "pending_operations": [],
-    "next_action": "Hardware-check the rewritten DHCP detection with the production MediaSession, then reinstall the plugin with OBS closed and run the source on the glasses-hosted network; then reconnection after a real drop, the accessibility pass, trust-signature verification and the 120-minute run.",
+    "next_action": "Exercise reconnection after a real drop in OBS, then quality changes, the accessibility pass, trust-signature verification, a package task for the installer bundle, and the 120-minute run with the glasses on power if the battery reading is confirmed.",
     "source_revision": "4d1cab2a5350c76f56efcdc6b883fde4fa4d0918"
   }
 }

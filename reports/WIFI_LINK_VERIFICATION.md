@@ -43,6 +43,12 @@ The Meta AI Android app's protocol classes (`com.oculus.atc`, decompiled locally
 | 5 | Close over the Wi-Fi link after a stream | Sent, never acknowledged; the network was still visible on an immediate scan |
 | 6 | Network lifetime after a stream | Still visible on a fresh scan 8 s after the session ended, gone at 14 s |
 | 7 | Close over Bluetooth before any client joined | Acknowledged (`0x1003`); gone on an immediate fresh scan |
+| 8 | Production `MediaSession` after the DHCP-detection rewrite (2026-10-19) | 1,104 frames in a 60 s session, no stall; the PC joined the glasses' network in 4.1 s; no Wi-Fi profile left behind |
+| 9 | OBS 32.2.2, the installed plugin from this commit's build, scene switched live over the local OBS WebSocket (2026-10-19) | 720×1280 video about 18 s after the scene went live (about 2 s after the media session was ready); 2 minutes at 30.0 fps with OBS render skips at 1 of 9,794 frames through start, stream and stop; OBS CPU about 1.3%; memory flat (570–700 MB); source screenshots at 0 s and 2 min showed live first-person frames (deleted after the check); "Camera stopped" on scene switch, no Wi-Fi profile left behind |
+
+The installer ran end to end from a bundle of this build: it found OBS 32.2.2, copied the plugin (hash identical to the build output) and the setup tool, and skipped the glasses setup when answered "N".
+
+During run 9 the glasses sent health events every 10 s (type 1, status 4, level 48–69) and every 30 s (type 2, status 0, level 98, 97, 95, 94). Type 2 falling about 4 points in 90 s looks like the battery level, which would mean roughly 35–40 minutes of streaming per charge; this is not confirmed. Type 1 is unidentified.
 
 The glasses close the Bluetooth session once the PC has joined their network, so after a stream no close can be sent over Bluetooth.
 
@@ -54,7 +60,5 @@ Consequence: while the camera runs, the PC's Wi-Fi adapter is on the glasses' ne
 
 ## Not yet verified
 
-- The new link inside OBS (the OBS source runs the same `MediaSession`).
-- The rewritten DHCP detection in `wifi_station.cpp` (moved from parsing addresses to the IP Helper address table after static analysis) on hardware.
-- Reconnection after a real drop, longer runs, the 120-minute acceptance run, latency, thermal behaviour and battery cost.
+- Reconnection after a real drop, longer runs, the 120-minute acceptance run (which may need the glasses on power if the battery reading above is right), latency, thermal behaviour and battery cost.
 - Other adapters and drivers, 5 GHz or wider channels on the glasses' network, and the current firmware build.

@@ -22,10 +22,10 @@ All notable changes to this project will be documented here. The project uses se
 - A TCP transport and the svc51350 stream control. First verified end to end (`--stream`) with a Windows-hosted network the glasses joined, delivering live 720x1280 HEVC frames at ~30 fps; that network has since been replaced (see Removed).
 - HEVC Annex-B helpers (frame/keyframe detection, SPS picture size) used to confirm real decoded camera frames.
 - The OBS camera source "Ray-Ban Meta Glasses (Direct)": FFmpeg HEVC decode to I420, a quality list and a live status line in its properties. Verified live in OBS 32.2.2 at 720x1280.
-- `scripts/Install-MetaGLinkDirect.ps1`, an end-user installer for a setup bundle (Windows PowerShell 5.1, `-WhatIf`, `-Uninstall`). It never closes OBS and elevates only the plugin copy. Verified by a real install on the development PC.
+- `scripts/Install-MetaGLinkDirect.ps1`, an end-user installer for a setup bundle (Windows PowerShell 5.1, `-WhatIf`, `-Uninstall`). It never closes OBS and elevates only the plugin copy. Verified by real installs on the development PC. The `package` task does not yet build that bundle layout.
 - `--forget` deletes this PC's sealed glasses identity and imported tokens.
 - The Meta AI app's two public client tokens are built in as defaults (AGENTS.md revision 3), so setup needs no token step; `--import-tokens` still overrides them.
-- The glasses host their own Wi-Fi network for the camera stream: svc10 `CreateSoftApNetwork` (0x1000) on 2.4 GHz at 20 MHz, channel 6, with the Windows region as country code, answered by `SoftApNetworkInfo` (0x1001). Message numbers and fields come from the Meta AI app's `com.oculus.atc` protocol classes. A Native Wi-Fi client connection (`connectWifiStation`) joins the PC to that network with a temporary profile. Verified on hardware: 180 s (5,370 frames) and 120 s runs through the production media session with no stall, and two back-to-back stop/start cycles.
+- The glasses host their own Wi-Fi network for the camera stream: svc10 `CreateSoftApNetwork` (0x1000) on 2.4 GHz at 20 MHz, channel 6, with the Windows region as country code, answered by `SoftApNetworkInfo` (0x1001). Message numbers and fields come from the Meta AI app's `com.oculus.atc` protocol classes. A Native Wi-Fi client connection (`connectWifiStation`) joins the PC to that network with a temporary profile. Verified on hardware: 180 s (5,370 frames) and 120 s runs through the production media session with no stall, two back-to-back stop/start cycles, and two minutes live in OBS 32.2.2 at 30 fps with no render frames skipped through start, stream and stop.
 - Protocol tests for the glasses-hosted network messages (26 new cases, 68 in that suite), with a port-field red drill.
 
 ### Changed
@@ -63,7 +63,7 @@ All notable changes to this project will be documented here. The project uses se
 
 - The PC acknowledges the glasses' trust message without verifying its signature. The Bluetooth bond and the private network passphrase limit the exposure, but verification against the glasses' device-certificate key is still to be built and proven with hardware.
 - While the camera runs, the PC's Wi-Fi adapter is on the glasses' network, which has no internet. A PC online only through that adapter is offline until the camera stops.
-- The glasses-hosted network is proven through the production media session from the command line; a run inside OBS is still to be done.
+- A glasses health reading that looks like battery fell about 4 points in 90 s of streaming (unconfirmed), which would limit an unpowered session to roughly 35–40 minutes.
 
 ### Engineering decisions
 
@@ -73,7 +73,6 @@ All notable changes to this project will be documented here. The project uses se
 
 Direct authentication, the owner change, the glasses-hosted Wi-Fi network, live 720x1280 HEVC camera frames and the OBS source are proven on hardware. Remaining work:
 
-- the glasses-hosted network inside OBS;
 - reconnection after a real link drop on hardware;
 - the non-default quality presets;
 - a Narrator and keyboard pass over the source properties;

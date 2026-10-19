@@ -2,7 +2,7 @@
 
 Native Windows OBS plugin that shows the Ray-Ban Meta Gen 2 glasses camera in OBS over a direct local wireless link, with no phone in the loop.
 
-**Current status: working on real hardware.** The "Ray-Ban Meta Glasses (Direct)" source shows the live 720×1280 HEVC camera at about 30 fps in OBS 32.2.2, after a one-time Meta setup that makes the PC the glasses' owner. The glasses host their own 2.4 GHz Wi-Fi network for the PC, which streamed without a drop in every run so far (longest 180 s; stop and restart verified). This is proven on one PC, one Bluetooth adapter, one Wi-Fi adapter and one pair of glasses. Still open: the glasses-hosted network inside OBS itself (proven so far with the same media session from the command line), reconnection after a real link drop (implemented, not yet exercised on hardware), the other quality presets (only 720×1280 is proven), a Narrator and keyboard pass over the source properties, latency measurement, latest-firmware certification, and the 120-minute run.
+**Current status: working on real hardware.** The "Ray-Ban Meta Glasses (Direct)" source shows the live 720×1280 HEVC camera at about 30 fps in OBS 32.2.2, after a one-time Meta setup that makes the PC the glasses' owner. The glasses host their own 2.4 GHz Wi-Fi network for the PC, which streamed without a drop in every run so far (longest 180 s; stop and restart verified), including two minutes in OBS at 30 fps with no skipped render frames from the source. This is proven on one PC, one Bluetooth adapter, one Wi-Fi adapter and one pair of glasses. Still open: reconnection after a real link drop (implemented, not yet exercised on hardware), the other quality presets (only 720×1280 is proven), a Narrator and keyboard pass over the source properties, latency measurement, latest-firmware certification, and the 120-minute run.
 
 Setup moves the glasses' owner key from the Meta AI phone app to this PC. The phone app stops working with the glasses until you remove and re-add them in Meta AI.
 
@@ -23,7 +23,7 @@ While the camera runs, the PC's Wi-Fi adapter is connected to the glasses' own n
 5. imports an optional `meta-tokens.txt`;
 6. offers the one-time glasses setup.
 
-`-WhatIf` lists every action without changing anything. `-Uninstall` removes the plugin and tool but keeps the sealed identity. So far it has been verified with a `-WhatIf` run on the development PC; an install on a fresh PC has not been run yet.
+`-WhatIf` lists every action without changing anything. `-Uninstall` removes the plugin and tool but keeps the sealed identity. It has been verified by a real install on the development PC (OBS 32.2.2 per-user install, setup declined); an install on a fresh PC has not been run yet. The `package` task does not yet produce this bundle layout.
 
 The setup tool has the Meta AI app's two client tokens built in. They identify the app, not a person, and are already public. An imported `meta-tokens.txt` (one `HW|<app id>|<secret>` line and one `AR|<app id>|<secret>` line) overrides them if Meta rotates them. `.gitignore` excludes that file.
 
