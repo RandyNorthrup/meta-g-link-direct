@@ -65,7 +65,9 @@ void scanAdvertisements(const std::shared_ptr<ScanState>& state) {
         state->result.hresult = NullActivationHresult;
         return;
     }
-    watcher.ScanningMode(BluetoothLEScanningMode::Passive);
+    // Active scanning requests scan responses; glasses may carry the Meta service UUID there,
+    // as Android's default scan (used by Visor) does.
+    watcher.ScanningMode(BluetoothLEScanningMode::Active);
     const auto received =
         watcher.Received(winrt::auto_revoke, [state](const auto&, const auto& args) {
             try {

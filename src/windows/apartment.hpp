@@ -5,15 +5,24 @@
 #include <winrt/base.h>
 
 namespace mgl {
-// Each diagnostic uses its own MTA; callers must not invoke it on an existing STA.
+// Each diagnostic uses its own MTA; callers must not invoke it on an existing STA. Movable so a
+// long-lived owner (such as a Wi-Fi group) can keep the apartment alive past the call that opened
+// it; only the owning instance uninitialises.
 class Apartment final {
   public:
     Apartment() { winrt::init_apartment(winrt::apartment_type::multi_threaded); }
-    ~Apartment() { winrt::uninit_apartment(); }
+    ~Apartment() {
+        if (owns_) {
+            winrt::uninit_apartment();
+        }
+    }
     Apartment(const Apartment&) = delete;
     Apartment& operator=(const Apartment&) = delete;
-    Apartment(Apartment&&) = delete;
+    Apartment(Apartment&& other) noexcept : owns_(other.owns_) { other.owns_ = false; }
     Apartment& operator=(Apartment&&) = delete;
+
+  private:
+    bool owns_ = true;
 };
 } // namespace mgl
 #endif

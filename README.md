@@ -2,7 +2,9 @@
 
 Native Windows OBS plugin project for a direct Ray-Ban Meta Gen 2 connection.
 
-**Current status: development foundation only. Camera capture, glasses authentication, live media, source controls, current-firmware compatibility, and the 120-minute streaming requirement are not implemented or verified. The module does not register a camera source.**
+**Current status: the direct connection works and is proven on hardware through a diagnostic CLI — authenticated ownership, an encrypted Bluetooth session, the Wi-Fi Direct handover, and live 720×1280 HEVC camera frames at ~30 fps. The OBS camera source itself (decoding those frames into an OBS source), accessible source controls, reconnection, current-firmware certification, and the 120-minute acceptance run are the remaining work. The OBS module still registers no camera source yet.**
+
+Proving ownership moved the glasses' owner key from the iPhone Meta AI app to this PC. To hand the glasses back to the phone, remove and re-add them in Meta AI on the iPhone.
 
 The confirmed product contract is in [PROJECT_BRIEF.md](PROJECT_BRIEF.md). [PLAN.md](PLAN.md) owns implementation milestones, proof, and deferred gates. The intended product receives local video directly into OBS, with adjustable quality and optional glasses audio disabled by default. Meta authentication is permitted for setup if required; the phone must be off during the eventual local-streaming acceptance tests.
 

@@ -16,6 +16,11 @@ All notable changes to this project will be documented here. The project uses se
 - Bounded hidden address input, a portable validated address parser, requested redacted JSON export and write-error propagation. Shared process-test support covers invalid/private input without contacting guessed devices; separate live SDP testing and address/skipped-query drills extend the maintained checks.
 - Isolated native module loading, parser tests, disposable-resource PowerShell runner tests, separate Windows AddressSanitizer build, local quality tasks and defect/restoration drills.
 - Local pre-commit checks and a hardened portable CI workflow definition. Hosted CI has not run.
+- Ported protocol stack (C++20): strict protobuf, DataX header/channel-registry/frame-splitter, AirShield KDF and per-frame AES-256-CBC + HMAC-SHA-256 cipher, handshake messages, channel binding and svc36 trust, with Windows CNG crypto. Independent protocol/DataX/protobuf/encoding test vectors (42 cases) alongside the existing suites.
+- Synchronous `GlassesSession` over a whole-SDU transport: AirShield handshake, trust with the owner key, EndLinkSetup, and a DataX receive loop. Proven on hardware — `--handshake` reaches key derivation and `--link` reaches READY with trust success in both directions, reproducibly.
+- Meta-authenticated change of owner: OIDC browser login to the FRLA, the AR-universe user-token exchange, and the svc36 change-owner flow (`--provision`). Verified on hardware: this computer now holds the glasses owner key, sealed locally with DPAPI. Tokens and identity never enter the repo, logs or diagnostics.
+- Windows Wi-Fi group owner (Mobile Hotspot, 2.4 GHz; WiFiDirect legacy AP fallback), the svc10 Wi-Fi join, a TCP transport, and the svc51350 stream control. Verified end to end (`--stream`): the glasses join the group and deliver live 720x1280 HEVC frames at ~30 fps over TCP.
+- HEVC Annex-B helpers (frame/keyframe detection, SPS picture size) used to confirm real decoded camera frames.
 
 ### Engineering decisions
 
@@ -23,4 +28,6 @@ All notable changes to this project will be documented here. The project uses se
 - Normalize Cppcheck's MSVC compilation database and model real dynamic OBS entry points. Keep analysis limitations explicit.
 - Preserve original failed canary evidence, correct the AWS canary to the scanner's documented base32 pattern, and retain exact-restoration checks.
 
-Authentication, direct glasses sessions, camera/audio decoding, source UI, latest-firmware proof and long-session acceptance remain future work. The earlier foundation ZIP is historical and does not contain the new discovery CLI.
+Direct authentication, the owner change, the Wi-Fi handover and live 720x1280 HEVC camera frames are now proven on hardware through the diagnostic CLI. Remaining work: the OBS camera source itself (decode into an OBS async source), accessible source properties, reconnection, latest-firmware proof and the 120-minute acceptance run. The earlier foundation ZIP is historical and does not contain the new CLI or protocol stack.
+
+Ownership note: provisioning moved the glasses' owner key to this PC, so the iPhone Meta AI app is no longer the owner until the glasses are re-added there.

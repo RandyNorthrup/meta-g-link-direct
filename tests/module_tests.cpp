@@ -59,9 +59,8 @@ int runModuleTests(int argument_count, char** arguments) {
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
         reinterpret_cast<Metadata>(GetProcAddress(plugin.get(), "obs_module_description"));
     if (std::string_view(name()) != "Meta G Link Direct" ||
-        std::string_view(description()).find("Camera source is not implemented yet.") ==
-            std::string_view::npos) {
-        std::cerr << "OBS module metadata does not match development-foundation contract\n";
+        std::string_view(description()).find("camera source") == std::string_view::npos) {
+        std::cerr << "OBS module metadata does not match the camera-source contract\n";
         return EXIT_FAILURE;
     }
     std::cout << "Real OBS runtime, module DLL and six required exports verified\n";

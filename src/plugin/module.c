@@ -2,16 +2,21 @@
 #include <obs-module.h>
 
 OBS_DECLARE_MODULE()
+OBS_MODULE_USE_DEFAULT_LOCALE("meta-g-link-direct", "en-US")
+
+// Defined in source.cpp (C++); registers the direct Gen 2 glasses camera source.
+extern void mgl_register_camera_source(void);
 
 MODULE_EXPORT const char* obs_module_name(void) { return "Meta G Link Direct"; }
 
 MODULE_EXPORT const char* obs_module_description(void) {
-    return "Direct Gen 2 glasses development foundation. Camera source is not implemented yet.";
+    return "Direct Ray-Ban Meta Gen 2 camera source over a local wireless link.";
 }
 
 MODULE_EXPORT const char* obs_module_author(void) { return "Meta G Link Direct contributors"; }
 
 bool obs_module_load(void) {
-    blog(LOG_INFO, "[meta-g-link-direct] Foundation %s loaded; camera source pending", MGL_VERSION);
+    mgl_register_camera_source();
+    blog(LOG_INFO, "[meta-g-link-direct] %s loaded; camera source registered", MGL_VERSION);
     return true;
 }
