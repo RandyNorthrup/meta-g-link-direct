@@ -5,17 +5,27 @@
 
 #include <windows.h> // IWYU pragma: keep — SDK umbrella prerequisites.
 
+#include <combaseapi.h>
 #include <dpapi.h>
-#include <shlobj.h>
+#include <errhandlingapi.h>
+#include <fileapi.h>
+#include <knownfolders.h>
+#include <minwindef.h>
+#include <shlobj_core.h>
+#include <stringapiset.h>
+#include <winbase.h>
+#include <winerror.h>
+#include <winnls.h>
+#include <winnt.h>
 
-#include <array>
 #include <cstddef>
 #include <cstdint>
-#include <cstring>
 #include <fstream>
 #include <ios>
+#include <memory>
 #include <optional>
 #include <string>
+#include <utility>
 
 namespace mgl::identity {
 namespace {
@@ -54,37 +64,40 @@ std::optional<std::string> filePath(const char* name) {
 }
 
 bool sealToFile(const std::string& path, ByteView plaintext) {
-    DATA_BLOB in{.cbData = static_cast<DWORD>(plaintext.size()),
-                 .pbData = const_cast<BYTE*>(
-                     plaintext.data())}; // NOLINT(cppcoreguidelines-pro-type-const-cast)
+    // DPAPI's input DATA_BLOB is non-const; CryptProtectData only reads it.
+    auto* const input =
+        const_cast<BYTE*>(plaintext.data()); // NOLINT(cppcoreguidelines-pro-type-const-cast)
+    DATA_BLOB in{.cbData = static_cast<DWORD>(plaintext.size()), .pbData = input};
     DATA_BLOB out{};
     if (CryptProtectData(&in, L"MetaGLinkDirect", nullptr, nullptr, nullptr,
                          CRYPTPROTECT_UI_FORBIDDEN, &out) == FALSE) {
         return false;
     }
     const std::unique_ptr<void, LocalFreeGuard> owned(out.pbData);
-    std::ofstream file(path, std::ios::binary | std::ios::trunc);
+    // std::ofstream always adds out; out alone truncates exactly as out | trunc.
+    std::ofstream file(path, std::ios::binary);
     if (!file) {
         return false;
     }
-    file.write(reinterpret_cast<const char*>(out.pbData),
-               out.cbData); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) — std::ofstream writes char.
+    file.write(reinterpret_cast<const char*>(out.pbData), out.cbData);
     return file.good();
 }
 
 std::optional<Bytes> unsealFromFile(const std::string& path) {
-    std::ifstream file(path, std::ios::binary | std::ios::ate);
+    std::ifstream file(path, std::ios::binary);
     if (!file) {
         return std::nullopt;
     }
+    file.seekg(0, std::ios::end);
     const auto size = static_cast<std::streamoff>(file.tellg());
-    if (size <= 0 || static_cast<std::size_t>(size) > MaxBlobSize) {
+    if (size <= 0 || std::cmp_greater(size, MaxBlobSize)) {
         return std::nullopt;
     }
     Bytes sealed(static_cast<std::size_t>(size));
     file.seekg(0);
-    file.read(reinterpret_cast<char*>(sealed.data()),
-              size); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) — std::ifstream reads char.
+    file.read(reinterpret_cast<char*>(sealed.data()), size);
     if (!file) {
         return std::nullopt;
     }
@@ -98,28 +111,35 @@ std::optional<Bytes> unsealFromFile(const std::string& path) {
     return Bytes(out.pbData, out.pbData + out.cbData);
 }
 
-void appendString(Bytes& out, const std::string& text) {
-    const auto size = static_cast<std::uint32_t>(text.size());
-    for (unsigned shift = 0; shift < 32; shift += 8) {
-        out.push_back(static_cast<std::uint8_t>((size >> shift) & 0xFF));
+// Reads a little-endian u32 at offset and advances past it; nullopt if fewer than four bytes
+// remain.
+std::optional<std::uint32_t> readU32(ByteView data, std::size_t& offset) {
+    if (data.size() - offset < sizeof(std::uint32_t)) {
+        return std::nullopt;
     }
+    std::uint32_t value = 0;
+    unsigned shift = 0;
+    for (const std::uint8_t byte : data.subspan(offset, sizeof(std::uint32_t))) {
+        value |= static_cast<std::uint32_t>(byte) << shift;
+        shift += 8U;
+    }
+    offset += sizeof(std::uint32_t);
+    return value;
+}
+
+void appendString(Bytes& out, const std::string& text) {
+    appendLittleEndian(out, static_cast<std::uint32_t>(text.size()));
     out.insert(out.end(), text.begin(), text.end());
 }
 
 bool readString(ByteView data, std::size_t& offset, std::string& out) {
-    if (data.size() - offset < sizeof(std::uint32_t)) {
+    const auto size = readU32(data, offset);
+    if (!size || data.size() - offset < *size) {
         return false;
     }
-    std::uint32_t size = 0;
-    for (unsigned shift = 0; shift < 32; shift += 8) {
-        size |= static_cast<std::uint32_t>(data[offset++]) << shift;
-    }
-    if (data.size() - offset < size) {
-        return false;
-    }
-    out.assign(reinterpret_cast<const char*>(data.data() + offset),
-               size); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-    offset += size;
+    const auto text = data.subspan(offset, *size);
+    out.assign(text.begin(), text.end());
+    offset += *size;
     return true;
 }
 } // namespace
@@ -129,7 +149,7 @@ std::optional<std::string> storageDirectory() {
     if (!base) {
         return std::nullopt;
     }
-    const auto dir = *base + "\\MetaGLinkDirect";
+    auto dir = *base + "\\MetaGLinkDirect";
     if (CreateDirectoryA(dir.c_str(), nullptr) == FALSE && GetLastError() != ERROR_ALREADY_EXISTS) {
         return std::nullopt;
     }
@@ -142,10 +162,7 @@ bool saveOwnerIdentity(const OwnerIdentity& identity) {
         return false;
     }
     Bytes blob;
-    const auto key_size = static_cast<std::uint32_t>(identity.owner_private.size());
-    for (unsigned shift = 0; shift < 32; shift += 8) {
-        blob.push_back(static_cast<std::uint8_t>((key_size >> shift) & 0xFF));
-    }
+    appendLittleEndian(blob, static_cast<std::uint32_t>(identity.owner_private.size()));
     append(blob, identity.owner_private);
     appendString(blob, identity.serial);
     appendString(blob, identity.user_id);
@@ -165,42 +182,45 @@ std::optional<OwnerIdentity> loadOwnerIdentity() {
     }
     std::size_t offset = 0;
     const ByteView view(*blob);
-    if (view.size() < sizeof(std::uint32_t)) {
-        return std::nullopt;
-    }
-    std::uint32_t key_size = 0;
-    for (unsigned shift = 0; shift < 32; shift += 8) {
-        key_size |= static_cast<std::uint32_t>(view[offset++]) << shift;
-    }
-    if (view.size() - offset < key_size) {
+    const auto key_size = readU32(view, offset);
+    if (!key_size || view.size() - offset < *key_size) {
         return std::nullopt;
     }
     OwnerIdentity identity;
-    identity.owner_private.assign(view.begin() + static_cast<std::ptrdiff_t>(offset),
-                                  view.begin() + static_cast<std::ptrdiff_t>(offset + key_size));
-    offset += key_size;
+    const auto key = view.subspan(offset, *key_size);
+    identity.owner_private.assign(key.begin(), key.end());
+    offset += *key_size;
     if (!readString(view, offset, identity.serial) || !readString(view, offset, identity.user_id)) {
         return std::nullopt;
     }
     return identity;
 }
 
-bool forgetOwnerIdentity() {
-    const auto path = filePath("identity.bin");
+namespace {
+bool deleteSealedFile(const char* name) {
+    const auto path = filePath(name);
     if (!path) {
         return false;
     }
     return DeleteFileA(path->c_str()) != FALSE || GetLastError() == ERROR_FILE_NOT_FOUND;
 }
+} // namespace
+
+bool forgetOwnerIdentity() {
+    // Both run even if the first fails, so a partial Forget removes all it can.
+    const bool identity_gone = deleteSealedFile("identity.bin");
+    const bool tokens_gone = deleteSealedFile("tokens.bin");
+    return identity_gone && tokens_gone;
+}
 
 bool saveTokenBlob(const std::string& text) {
     const auto path = filePath("tokens.bin");
-    return path &&
-           sealToFile(
-               *path,
-               ByteView(reinterpret_cast<const std::uint8_t*>(
-                            text.data()), // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-                        text.size()));
+    if (!path) {
+        return false;
+    }
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) — byte view of the token text.
+    const ByteView bytes(reinterpret_cast<const std::uint8_t*>(text.data()), text.size());
+    return sealToFile(*path, bytes);
 }
 
 std::optional<std::string> loadTokenBlob() {
@@ -212,7 +232,6 @@ std::optional<std::string> loadTokenBlob() {
     if (!blob) {
         return std::nullopt;
     }
-    return std::string(reinterpret_cast<const char*>(blob->data()),
-                       blob->size()); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+    return std::string(blob->begin(), blob->end());
 }
 } // namespace mgl::identity

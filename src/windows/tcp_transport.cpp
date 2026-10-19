@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 #include "mgl/tcp_transport.hpp"
 
-#include "mgl/transport.hpp"
 #include "sdu_socket.hpp"
 
+#include <windows.h> // IWYU pragma: keep — SDK umbrella prerequisites.
+
+#include <minwindef.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
-#include <array>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -34,7 +35,7 @@ TcpOpen openTcp(const std::string& address, std::uint16_t port) {
     }
     const auto socket = WSASocketW(resolved->ai_family, resolved->ai_socktype,
                                    resolved->ai_protocol, nullptr, 0, WSA_FLAG_NO_HANDLE_INHERIT);
-    if (socket == INVALID_SOCKET) {
+    if (std::cmp_equal(socket, INVALID_SOCKET)) {
         result.detail = static_cast<std::uint32_t>(WSAGetLastError());
         freeaddrinfo(resolved);
         return result;
@@ -48,8 +49,10 @@ TcpOpen openTcp(const std::string& address, std::uint16_t port) {
     }
     // Low latency for the media stream: disable Nagle.
     const DWORD on = 1;
-    setsockopt(socket, IPPROTO_TCP, TCP_NODELAY, reinterpret_cast<const char*>(&on),
-               sizeof(on)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+    // Winsock's C ABI type-erases the option value as char.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    const auto* const option = reinterpret_cast<const char*>(&on);
+    setsockopt(socket, IPPROTO_TCP, TCP_NODELAY, option, sizeof(on));
     result.ok = true;
     result.transport = std::make_unique<SduSocket>(std::move(library), socket);
     return result;

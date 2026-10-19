@@ -1,29 +1,33 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-#include "mgl/airshield.hpp"
+#include "mgl/bytes.hpp"
 #include "mgl/capabilities.hpp"
 #include "mgl/crypto.hpp"
 #include "mgl/discovery.hpp"
 #include "mgl/hevc.hpp"
 #include "mgl/identity.hpp"
+#include "mgl/media_session.hpp"
 #include "mgl/provision.hpp"
 #include "mgl/rfcomm.hpp"
 #include "mgl/rfcomm_transport.hpp"
 #include "mgl/session.hpp"
-#include "mgl/stream.hpp"
-#include "mgl/tcp_transport.hpp"
-#include "mgl/wifi_group.hpp"
 #include "private_input.hpp"
 
+#include <algorithm>
 #include <chrono>
+#include <condition_variable>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <exception>
 #include <iostream>
+#include <memory>
+#include <mutex>
 #include <optional>
 #include <sstream>
 #include <string>
 #include <string_view>
 #include <thread>
+#include <utility>
 #include <vector>
 
 namespace {
@@ -153,18 +157,6 @@ int runHandshakeProbe() {
     return outcome.stage >= mgl::LinkStage::KeysDerived ? EXIT_SUCCESS : ProbeFailed;
 }
 
-mgl::ByteView viewOf(const mgl::Bytes& bytes) { return {bytes.data(), bytes.size()}; }
-
-bool envFlag(const char* name) {
-    char* value = nullptr;
-    std::size_t size = 0;
-    if (_dupenv_s(&value, &size, name) != 0 || value == nullptr) {
-        return false;
-    }
-    std::free(value);
-    return true;
-}
-
 const char* provisionStageWord(mgl::provision::ProvisionStage stage) {
     switch (stage) {
     case mgl::provision::ProvisionStage::NotStarted:
@@ -207,6 +199,15 @@ int runAuthUrl() {
     return std::cout ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
+// Deletes this PC's sealed glasses identity and imported tokens. The glasses themselves are not
+// contacted: they keep this PC's key as owner until they are set up somewhere else.
+int runForget() {
+    constexpr int ProbeFailed = 3;
+    const bool forgotten = mgl::identity::forgetOwnerIdentity();
+    std::cout << R"({"forgotten":)" << (forgotten ? "true" : "false") << "}\n";
+    return (forgotten && std::cout) ? EXIT_SUCCESS : ProbeFailed;
+}
+
 // Reads the extracted Meta token text from stdin and seals it locally. No token is printed back.
 int runImportTokens() {
     std::ostringstream buffer;
@@ -226,7 +227,7 @@ int runImportTokens() {
 
 // Splits the sealed token blob into the HW token and the AR app tokens to try. An explicit
 // "AR|<id>|<secret>" line is used as-is; a bare "<id>|<secret>" line is an AR candidate tried with
-// the "AR|" prefix. No token is ever embedded in this repo; the store supplies them.
+// the "AR|" prefix. Imported tokens override the built-in Meta AI app defaults.
 void parseTokenBlob(const std::string& blob, std::string& hw_token,
                     std::vector<std::string>& ar_tokens) {
     std::istringstream lines(blob);
@@ -238,9 +239,9 @@ void parseTokenBlob(const std::string& blob, std::string& hw_token,
         if (line.empty()) {
             continue;
         }
-        if (line.rfind("HW|", 0) == 0) {
+        if (line.starts_with("HW|")) {
             hw_token = line;
-        } else if (line.rfind("AR|", 0) == 0) {
+        } else if (line.starts_with("AR|")) {
             ar_tokens.push_back(line);
         } else {
             ar_tokens.push_back("AR|" + line);
@@ -248,25 +249,52 @@ void parseTokenBlob(const std::string& blob, std::string& hw_token,
     }
 }
 
+// The glasses allow one RFCOMM session at a time and need a moment between them, so a connect
+// right after a previous attempt can fail transiently; retry a few times.
+mgl::RfcommOpen openBondedMetaRfcommWithRetry() {
+    constexpr int Attempts = 6;
+    mgl::RfcommOpen opened;
+    for (int attempt = 0; attempt < Attempts; ++attempt) {
+        opened = mgl::openBondedMetaRfcomm();
+        if (opened.transport) {
+            break;
+        }
+        std::this_thread::sleep_for(std::chrono::seconds(3));
+    }
+    return opened;
+}
+
+// The owner key sealed by --provision, or nullopt after reporting why it is unavailable.
+std::optional<mgl::crypto::OwnerKey> loadStoredOwner() {
+    const auto identity = mgl::identity::loadOwnerIdentity();
+    if (!identity) {
+        std::cerr << "No stored owner identity. Run --provision first.\n";
+        return std::nullopt;
+    }
+    auto owner = mgl::crypto::OwnerKey::importPrivate(
+        mgl::ByteView(identity->owner_private.data(), identity->owner_private.size()));
+    if (!owner) {
+        std::cerr << "Stored owner key is unreadable.\n";
+    }
+    return owner;
+}
+
 // The one-time Meta-authenticated change of owner. Reads the login auth code on stdin.
 int runProvision() {
     constexpr int ProbeFailed = 3;
     constexpr int InvalidInput = 5;
-    const auto blob = mgl::identity::loadTokenBlob();
-    if (!blob) {
-        std::cerr << "No token store. Run --import-tokens first.\n";
-        return ProbeFailed;
-    }
+    // Imported tokens come first; the built-in Meta AI app tokens fill whatever the store lacks,
+    // so setup works without --import-tokens.
     std::string hw_token;
     std::vector<std::string> ar_tokens;
-    parseTokenBlob(*blob, hw_token, ar_tokens);
-    if (hw_token.empty()) {
-        std::cerr << "Token store has no HW token.\n";
-        return ProbeFailed;
+    if (const auto blob = mgl::identity::loadTokenBlob()) {
+        parseTokenBlob(*blob, hw_token, ar_tokens);
     }
-    if (ar_tokens.empty()) {
-        std::cerr << "Token store has no AR app token (expected an \"AR|<id>|<secret>\" line).\n";
-        return ProbeFailed;
+    if (hw_token.empty()) {
+        hw_token = mgl::provision::DefaultHwAppToken;
+    }
+    if (std::ranges::find(ar_tokens, mgl::provision::DefaultArAppToken) == ar_tokens.end()) {
+        ar_tokens.emplace_back(mgl::provision::DefaultArAppToken);
     }
     std::string code;
     std::getline(std::cin, code);
@@ -284,16 +312,7 @@ int runProvision() {
         return ProbeFailed;
     }
 
-    // The glasses allow one RFCOMM session at a time and need a moment between them, so a connect
-    // right after a previous attempt can fail transiently; retry a few times.
-    mgl::RfcommOpen opened;
-    for (int attempt = 0; attempt < 6; ++attempt) {
-        opened = mgl::openBondedMetaRfcomm();
-        if (opened.transport) {
-            break;
-        }
-        std::this_thread::sleep_for(std::chrono::seconds(3));
-    }
+    const auto opened = openBondedMetaRfcommWithRetry();
     if (!opened.transport) {
         std::cout << R"({"phase":"connect","ok":false,"rfcomm_connect":")"
                   << connectWord(opened.status) << "\"}\n";
@@ -327,59 +346,15 @@ int runProvision() {
     return std::cout ? EXIT_SUCCESS : ProbeFailed;
 }
 
-const char* wifiWord(mgl::WifiGroupStatus status) {
-    switch (status) {
-    case mgl::WifiGroupStatus::Ok:
-        return "ok";
-    case mgl::WifiGroupStatus::NoAdapterSupport:
-        return "no_adapter_support";
-    case mgl::WifiGroupStatus::StartFailed:
-        return "start_failed";
-    case mgl::WifiGroupStatus::Aborted:
-        return "aborted";
-    }
-    return "unknown";
-}
-
-// Brings up the Windows Wi-Fi Direct group owner the glasses would join, to prove the adapter can
-// host it. Holds the group briefly, then stops. No glasses interaction.
-int runWifi() {
-    mgl::WifiGroup group;
-    const auto owner = mgl::WifiGroupOwner::start(group);
-    std::cout << R"({"wifi_group":")" << wifiWord(group.status) << R"(","detail":)" << group.detail
-              << R"(,"ssid":")" << jsonEscape(group.ssid) << R"(","passphrase_len":)"
-              << group.passphrase.size() << R"(,"up":)" << (owner ? "true" : "false") << "}\n";
-    if (owner) {
-        constexpr int HoldSeconds = 40;
-        std::this_thread::sleep_for(std::chrono::seconds(HoldSeconds));
-    }
-    constexpr int ProbeFailed = 3;
-    return (owner && std::cout) ? EXIT_SUCCESS : ProbeFailed;
-}
-
 // Opens a full authenticated link using the stored owner identity: handshake, trust with the
 // owner key, EndLinkSetup. Reaching trust_accepted/ready proves the PC owns the glasses.
 int runLink() {
     constexpr int ProbeFailed = 3;
-    const auto identity = mgl::identity::loadOwnerIdentity();
-    if (!identity) {
-        std::cerr << "No stored owner identity. Run --provision first.\n";
-        return ProbeFailed;
-    }
-    const auto owner = mgl::crypto::OwnerKey::importPrivate(
-        mgl::ByteView(identity->owner_private.data(), identity->owner_private.size()));
+    const auto owner = loadStoredOwner();
     if (!owner) {
-        std::cerr << "Stored owner key is unreadable.\n";
         return ProbeFailed;
     }
-    mgl::RfcommOpen opened;
-    for (int attempt = 0; attempt < 6; ++attempt) {
-        opened = mgl::openBondedMetaRfcomm();
-        if (opened.transport) {
-            break;
-        }
-        std::this_thread::sleep_for(std::chrono::seconds(3));
-    }
+    const auto opened = openBondedMetaRfcommWithRetry();
     if (!opened.transport) {
         std::cout << R"({"rfcomm_connect":")" << connectWord(opened.status) << R"(","ok":false})"
                   << '\n';
@@ -399,320 +374,87 @@ int runLink() {
     return outcome.stage == mgl::LinkStage::Ready ? EXIT_SUCCESS : ProbeFailed;
 }
 
-// Full path up to the Wi-Fi handover: authenticated BT link, host a Wi-Fi group, tell the glasses
-// to join it, and report the TCP endpoint they return. Proves Windows-as-group-owner interop.
-int runWifiJoin() {
-    constexpr int ProbeFailed = 3;
-    const auto identity = mgl::identity::loadOwnerIdentity();
-    if (!identity) {
-        std::cerr << "No stored owner identity. Run --provision first.\n";
-        return ProbeFailed;
-    }
-    const auto owner = mgl::crypto::OwnerKey::importPrivate(
-        mgl::ByteView(identity->owner_private.data(), identity->owner_private.size()));
-    if (!owner) {
-        std::cerr << "Stored owner key is unreadable.\n";
-        return ProbeFailed;
-    }
-    mgl::WifiGroup group;
-    const auto group_owner = mgl::WifiGroupOwner::start(group);
-    if (!group_owner) {
-        std::cout << R"({"phase":"wifi_group","wifi_group":")" << wifiWord(group.status)
-                  << R"(","detail":)" << group.detail << "}\n";
-        return ProbeFailed;
-    }
-    mgl::RfcommOpen opened;
-    for (int attempt = 0; attempt < 6; ++attempt) {
-        opened = mgl::openBondedMetaRfcomm();
-        if (opened.transport) {
-            break;
-        }
-        std::this_thread::sleep_for(std::chrono::seconds(3));
-    }
-    if (!opened.transport) {
-        std::cout << R"({"phase":"connect","rfcomm_connect":")" << connectWord(opened.status)
-                  << "\"}\n";
-        return ProbeFailed;
-    }
-    mgl::GlassesSession session(*opened.transport, &*owner);
-    const auto link = session.open();
-    if (link.stage != mgl::LinkStage::Ready) {
-        std::cout << R"({"phase":"link","stage":")" << stageWord(link.stage) << "\"}\n";
-        return ProbeFailed;
-    }
-    // The glasses answer INTERNAL_ERROR (status 2) for 15-45 s after a Wi-Fi firmware restart, so
-    // retry the join several times, a fresh v4 UUID each time (Visor uses eight tries).
-    mgl::stream::JoinResult result;
-    bool got = false;
-    for (int attempt = 0; attempt < 8 && !result.ok(); ++attempt) {
-        if (attempt > 0) {
-            std::this_thread::sleep_for(std::chrono::seconds(4));
-        }
-        const auto uuid = mgl::airshield::randomUuid();
-        const auto join = mgl::stream::buildJoinAccessPoint(group.ssid, group.passphrase, uuid,
-                                                            mgl::stream::Bandwidth20MHz);
-        if (!session.sendOnService(mgl::stream::ServiceAtc, mgl::stream::MtJoinAccessPoint,
-                                   {join.data(), join.size()})) {
-            std::cout << R"({"phase":"join_send","ok":false})" << "\n";
-            return ProbeFailed;
-        }
-        const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(12);
-        while (std::chrono::steady_clock::now() < deadline) {
-            const auto remaining = std::chrono::duration_cast<std::chrono::milliseconds>(
-                deadline - std::chrono::steady_clock::now());
-            auto message = session.receiveRaw(remaining);
-            if (!message) {
-                break;
-            }
-            if (message->service == mgl::stream::ServiceAtc &&
-                message->type == mgl::stream::MtJoinAccessPointResult) {
-                if (const auto parsed = mgl::stream::parseJoinResult(
-                        {message->payload.data(), message->payload.size()})) {
-                    result = *parsed;
-                    got = true;
-                    break;
-                }
-            }
-        }
-    }
-    std::cout << R"({"phase":"join","ssid":")" << jsonEscape(group.ssid) << R"(","answered":)"
-              << (got ? "true" : "false") << R"(,"status":)" << result.status
-              << R"(,"has_address":)" << (result.address.empty() ? "false" : "true")
-              << R"(,"port":)" << result.port << R"(,"ok":)" << (result.ok() ? "true" : "false")
-              << "}\n";
-    return (got && result.ok() && std::cout) ? EXIT_SUCCESS : ProbeFailed;
-}
-
-namespace stream_probe {
-// Sends the Wi-Fi join on the Bluetooth session and returns the glasses' TCP endpoint, retrying
-// through the INTERNAL_ERROR window.
-std::optional<mgl::stream::JoinResult> joinWifi(mgl::GlassesSession& session,
-                                                const mgl::WifiGroup& group) {
-    for (int attempt = 0; attempt < 8; ++attempt) {
-        if (attempt > 0) {
-            std::this_thread::sleep_for(std::chrono::seconds(4));
-        }
-        const auto uuid = mgl::airshield::randomUuid();
-        const auto join = mgl::stream::buildJoinAccessPoint(group.ssid, group.passphrase, uuid,
-                                                            mgl::stream::Bandwidth20MHz);
-        if (!session.sendOnService(mgl::stream::ServiceAtc, mgl::stream::MtJoinAccessPoint,
-                                   {join.data(), join.size()})) {
-            return std::nullopt;
-        }
-        const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(12);
-        while (std::chrono::steady_clock::now() < deadline) {
-            const auto remaining = std::chrono::duration_cast<std::chrono::milliseconds>(
-                deadline - std::chrono::steady_clock::now());
-            auto message = session.receiveRaw(remaining);
-            if (!message) {
-                break;
-            }
-            if (message->service == mgl::stream::ServiceAtc &&
-                message->type == mgl::stream::MtJoinAccessPointResult) {
-                if (const auto parsed = mgl::stream::parseJoinResult(
-                        {message->payload.data(), message->payload.size()})) {
-                    if (parsed->ok()) {
-                        return parsed;
-                    }
-                    break; // non-success status; retry
-                }
-            }
-        }
-    }
-    return std::nullopt;
-}
-} // namespace stream_probe
-
-// The full live media path: authenticated BT link, Wi-Fi handover, TCP session, start the camera
-// stream, and receive real HEVC frames. Reports frame/keyframe counts and the decoded picture size.
-int runStream() {
-    constexpr int ProbeFailed = 3;
-    const auto identity = mgl::identity::loadOwnerIdentity();
-    if (!identity) {
-        std::cerr << "No stored owner identity. Run --provision first.\n";
-        return ProbeFailed;
-    }
-    const auto owner = mgl::crypto::OwnerKey::importPrivate(
-        mgl::ByteView(identity->owner_private.data(), identity->owner_private.size()));
-    if (!owner) {
-        std::cerr << "Stored owner key is unreadable.\n";
-        return ProbeFailed;
-    }
-    mgl::WifiGroup group;
-    const auto group_owner = mgl::WifiGroupOwner::start(group);
-    if (!group_owner) {
-        std::cout << R"({"phase":"wifi_group","wifi_group":")" << wifiWord(group.status) << "\"}\n";
-        return ProbeFailed;
-    }
-
-    mgl::stream::JoinResult join;
-    {
-        mgl::RfcommOpen bt;
-        for (int attempt = 0; attempt < 6 && !bt.transport; ++attempt) {
-            bt = mgl::openBondedMetaRfcomm();
-            if (!bt.transport) {
-                std::this_thread::sleep_for(std::chrono::seconds(3));
-            }
-        }
-        if (!bt.transport) {
-            std::cout << R"({"phase":"bt_connect","ok":false})" << "\n";
-            return ProbeFailed;
-        }
-        mgl::GlassesSession bt_session(*bt.transport, &*owner);
-        if (bt_session.open().stage != mgl::LinkStage::Ready) {
-            std::cout << R"({"phase":"bt_link","ok":false})" << "\n";
-            return ProbeFailed;
-        }
-        const auto result = stream_probe::joinWifi(bt_session, group);
-        if (!result) {
-            std::cout << R"({"phase":"wifi_join","ok":false})" << "\n";
-            return ProbeFailed;
-        }
-        join = *result;
-    } // the Bluetooth session is released; the glasses are on Wi-Fi now
-
-    auto tcp = mgl::openTcp(join.address, static_cast<std::uint16_t>(join.port));
-    if (!tcp.transport) {
-        std::cout << R"({"phase":"tcp_connect","ok":false,"detail":)" << tcp.detail << "}\n";
-        return ProbeFailed;
-    }
-    mgl::GlassesSession media(*tcp.transport, &*owner);
-    const auto link = media.open();
-    if (link.stage != mgl::LinkStage::Ready) {
-        std::cout << R"({"phase":"tcp_link","stage":")" << stageWord(link.stage) << "\"}\n";
-        return ProbeFailed;
-    }
-
-    const bool debug = envFlag("MGL_STREAM_DEBUG");
-    // Reads messages until one of the given service/type arrives or the timeout passes, tracing
-    // everything when debugging. Returns the matching payload.
-    const auto awaitMedia = [&](std::uint16_t service, std::uint16_t type,
-                                std::chrono::seconds timeout) -> std::optional<mgl::Bytes> {
-        const auto until = std::chrono::steady_clock::now() + timeout;
-        while (std::chrono::steady_clock::now() < until) {
-            const auto remaining = std::chrono::duration_cast<std::chrono::milliseconds>(
-                until - std::chrono::steady_clock::now());
-            auto message = media.receiveRaw(remaining);
-            if (!message) {
-                return std::nullopt;
-            }
-            if (debug) {
-                std::cerr << "[rx] svc=" << message->service << " type=" << message->type
-                          << " err=" << (message->has_error ? message->error : 0)
-                          << " len=" << message->payload.size() << "\n";
-            }
-            if (message->service == service && message->type == type) {
-                return std::move(message->payload);
-            }
-        }
-        return std::nullopt;
-    };
-
-    std::uint32_t nonce = 1;
-    (void)media.sendOnService(mgl::stream::ServiceStatus, mgl::stream::MtInit,
-                              viewOf(mgl::stream::buildSubscribe()));
-    (void)media.sendOnService(mgl::stream::ServiceStatus, mgl::stream::MtStartApp,
-                              viewOf(mgl::stream::buildStartApp(mgl::stream::AppLivestream)));
-    const auto start_app = awaitMedia(mgl::stream::ServiceStatus, mgl::stream::MtStartAppResponse,
-                                      std::chrono::seconds(7));
-    if (debug) {
-        std::cerr << "[start-app] " << (start_app ? "answered" : "no answer") << "\n";
-    }
-    (void)media.sendOnService(mgl::stream::ServiceMedia, mgl::stream::MtSessionSettings,
-                              viewOf(mgl::stream::buildSessionSettings(3, /*bypass_don=*/true)));
-    const mgl::stream::VideoConfig config{};
-    (void)media.sendOnService(mgl::stream::ServiceMedia, mgl::stream::MtConfigureVideo,
-                              viewOf(mgl::stream::buildConfigureVideo(nonce++, config)));
-    (void)awaitMedia(mgl::stream::ServiceMedia, mgl::stream::MtConfigureVideoResponse,
-                     std::chrono::seconds(5));
-    (void)media.sendOnService(mgl::stream::ServiceMedia, mgl::stream::MtConfigureAudio,
-                              viewOf(mgl::stream::buildConfigureAudio(nonce++, /*enabled=*/false)));
-    (void)awaitMedia(mgl::stream::ServiceMedia, mgl::stream::MtConfigureAudioResponse,
-                     std::chrono::seconds(5));
-    (void)media.sendOnService(
-        mgl::stream::ServiceMedia, mgl::stream::MtControlStream,
-        viewOf(mgl::stream::buildControlStream(nonce++, mgl::stream::ActionStart)));
-    (void)awaitMedia(mgl::stream::ServiceMedia, mgl::stream::MtControlStreamResponse,
-                     std::chrono::seconds(5));
-
-    // Receive and reassemble frames for a bounded window.
-    mgl::Bytes frame;
+// What the bounded receive window saw.
+struct StreamStats {
     std::uint64_t frames = 0;
     std::uint64_t keyframes = 0;
     std::uint64_t video_bytes = 0;
     std::uint32_t width = 0;
     std::uint32_t height = 0;
-    std::uint32_t video_error = 0;
-    const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(20);
-    while (std::chrono::steady_clock::now() < deadline) {
-        const auto remaining = std::chrono::duration_cast<std::chrono::milliseconds>(
-            deadline - std::chrono::steady_clock::now());
-        auto message = media.receiveRaw(remaining);
-        if (!message) {
-            break;
-        }
-        if (message->service != mgl::stream::ServiceMedia) {
-            continue;
-        }
-        const mgl::ByteView payload(message->payload.data(), message->payload.size());
-        switch (message->type) {
-        case mgl::stream::MtVideoChunk:
-            mgl::append(frame, payload);
-            break;
-        case mgl::stream::MtVideoChunkEnd: {
-            mgl::append(frame, payload);
-            if (frame.size() > 8) {
-                const mgl::ByteView annex(frame.data() + 8, frame.size() - 8);
-                ++frames;
-                video_bytes += annex.size();
-                if (mgl::hevc::hasKeyframe(annex)) {
-                    ++keyframes;
-                }
-                if (width == 0) {
-                    if (const auto dims = mgl::hevc::spsDimensions(annex)) {
-                        width = dims->width;
-                        height = dims->height;
-                    }
-                }
-            }
-            frame.clear();
-            break;
-        }
-        case mgl::stream::MtCodecConfig:
-            if (const auto codec = mgl::stream::parseCodecConfig(payload)) {
-                if (width == 0) {
-                    if (const auto dims =
-                            mgl::hevc::spsDimensions({codec->data.data(), codec->data.size()})) {
-                        width = dims->width;
-                        height = dims->height;
-                    }
-                }
-            }
-            break;
-        case mgl::stream::MtConfigureVideoResponse:
-        case mgl::stream::MtControlStreamResponse:
-            if (const auto answer = mgl::stream::parseStreamAnswer(payload)) {
-                if (answer->error != 0 && video_error == 0) {
-                    video_error = answer->error;
-                }
-            }
-            break;
-        default:
-            break;
-        }
-    }
-    (void)media.sendOnService(
-        mgl::stream::ServiceMedia, mgl::stream::MtControlStream,
-        viewOf(mgl::stream::buildControlStream(nonce++, mgl::stream::ActionStop)));
-    // Leave the access point so the glasses drop off cleanly for the next session.
-    (void)media.sendOnService(mgl::stream::ServiceAtc, mgl::stream::MtLeaveAccessPoint, {});
-    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+};
 
-    std::cout << R"({"phase":"stream","frames":)" << frames << R"(,"keyframes":)" << keyframes
-              << R"(,"video_bytes":)" << video_bytes << R"(,"width":)" << width << R"(,"height":)"
-              << height << R"(,"stream_error":)" << video_error << R"(,"ok":)"
-              << (frames > 0 ? "true" : "false") << "}\n";
-    return (frames > 0 && std::cout) ? EXIT_SUCCESS : ProbeFailed;
+// Takes the picture size from an SPS in the buffer until one has been recorded.
+void recordDimensions(StreamStats& stats, mgl::ByteView annex) {
+    if (stats.width != 0) {
+        return;
+    }
+    if (const auto dims = mgl::hevc::spsDimensions(annex)) {
+        stats.width = dims->width;
+        stats.height = dims->height;
+    }
+}
+
+// The full live media path, through the same MediaSession the OBS source runs: authenticated
+// Bluetooth link, Wi-Fi handover, TCP session, camera start, then sixty seconds of real HEVC
+// frames. Connection attempts, retries and teardown are the production ones; their log lines go
+// to stderr and the JSON summary to stdout.
+int runStream() {
+    constexpr int ProbeFailed = 3;
+    constexpr auto FirstFrameBudget = std::chrono::seconds(120);
+    constexpr auto VideoWindow = std::chrono::seconds(60);
+    if (!loadStoredOwner()) {
+        return ProbeFailed;
+    }
+    std::mutex mutex;
+    std::condition_variable changed;
+    StreamStats stats;
+    auto state = mgl::MediaState::Idle;
+
+    mgl::MediaCallbacks callbacks;
+    callbacks.on_frame = [&](std::uint64_t /*pts*/, mgl::ByteView annex, bool keyframe) {
+        const std::scoped_lock lock(mutex);
+        ++stats.frames;
+        stats.video_bytes += annex.size();
+        if (keyframe) {
+            ++stats.keyframes;
+        }
+        recordDimensions(stats, annex);
+        changed.notify_all();
+    };
+    callbacks.on_parameters = [&](mgl::ByteView parameters) {
+        const std::scoped_lock lock(mutex);
+        recordDimensions(stats, parameters);
+    };
+    callbacks.on_log = [](const std::string& message) { std::cerr << message << '\n'; };
+    callbacks.on_state = [&](mgl::MediaState next) {
+        const std::scoped_lock lock(mutex);
+        state = next;
+        changed.notify_all();
+    };
+
+    mgl::MediaSession session(std::move(callbacks));
+    session.start();
+    {
+        std::unique_lock lock(mutex);
+        changed.wait_for(lock, FirstFrameBudget,
+                         [&] { return stats.frames > 0 || state == mgl::MediaState::Failed; });
+    }
+    bool streamed = false;
+    {
+        const std::scoped_lock lock(mutex);
+        streamed = stats.frames > 0;
+    }
+    if (streamed) {
+        std::this_thread::sleep_for(VideoWindow);
+    }
+    session.stop();
+
+    const std::scoped_lock lock(mutex);
+    std::cout << R"({"phase":"stream","frames":)" << stats.frames << R"(,"keyframes":)"
+              << stats.keyframes << R"(,"video_bytes":)" << stats.video_bytes << R"(,"width":)"
+              << stats.width << R"(,"height":)" << stats.height << R"(,"ok":)"
+              << (stats.frames > 0 ? "true" : "false") << "}\n";
+    return (stats.frames > 0 && std::cout) ? EXIT_SUCCESS : ProbeFailed;
 }
 
 void writeClassicReport(const mgl::ClassicDiscovery& classic) {
@@ -840,14 +582,31 @@ int main(int argc, char* argv[]) {
         if (argc == 2 && std::string_view(argv[1]) == "--help") {
             std::cout
                 << "Usage: meta-g-link-probe "
-                   "[--discover|--discover-classic|--connect-classic|--discover-classic-live|--"
-                   "connect-classic-live|--pair-classic|--direct-classic-uuid|--direct-classic-"
-                   "channel7|--handshake|--help]\n"
+                   "[--auth-url|--provision|--import-tokens|--link|--stream|"
+                   "--forget|--handshake|--discover|--discover-classic|--connect-classic|"
+                   "--discover-classic-live|--connect-classic-live|--pair-classic|"
+                   "--direct-classic-uuid|--direct-classic-channel7|--help]\n"
                    "Default: local radio/association counts only.\n"
+                   "Setup and camera:\n"
+                   "--auth-url: print the Meta login address used by --provision.\n"
+                   "--provision: read the login code on stdin and make this PC the glasses' "
+                   "owner. The Meta AI phone app loses the glasses until they are added there "
+                   "again.\n"
+                   "--import-tokens: seal Meta app tokens from stdin; they override the built-in "
+                   "ones.\n"
+                   "--link: authenticated Bluetooth session with the stored owner key; reports "
+                   "the stage reached.\n"
+                   "--stream: the OBS source's camera path, for sixty seconds of video; status "
+                   "on stderr, summary on stdout.\n"
+                   "--forget: delete this PC's stored glasses identity and imported tokens.\n"
+                   "Only --auth-url and --provision contact Meta. --stream asks the glasses to "
+                   "host their own Wi-Fi network and joins this PC's Wi-Fi adapter to it while it "
+                   "runs; the adapter is free for its usual networks afterwards.\n"
+                   "Diagnostics:\n"
                    "--handshake: open the bonded Meta RFCOMM service and run the AirShield "
                    "handshake only (no owner key, no trust, no ownership change); reports the "
                    "stage reached.\n"
-                   "--discover: passive BLE scan for 10 seconds; aggregate report counts only.\n"
+                   "--discover: active BLE scan for 10 seconds; aggregate report counts only.\n"
                    "--discover-classic: Classic inquiry (5.12s) and registered Meta service "
                    "lookup.\n"
                    "--connect-classic: require one paired Meta service; open/close socket, no "
@@ -865,8 +624,8 @@ int main(int argc, char* argv[]) {
                    "on stdin;\n"
                    "one unpaired transport/hello probe, no application writes or route fallback.\n"
                    "Meta marker is a candidate, not verified model or authenticated glasses.\n"
-                   "Only --pair-classic requests Windows pairing. No Meta login, identifiers or "
-                   "network changes.\n"
+                   "Only --pair-classic requests Windows pairing. The diagnostics make no Meta "
+                   "login, record no identifiers and change no network settings.\n"
                    "Exit: 0 completed; 2 hardware missing; 3 API/probe failure; 4 report I/O; "
                    "5 invalid arguments/address; "
                    "6 no Meta candidate/service; 7 ambiguous Meta services.\n";
@@ -888,14 +647,11 @@ int main(int argc, char* argv[]) {
         if (mode == "--link") {
             return runLink();
         }
-        if (mode == "--wifi") {
-            return runWifi();
-        }
-        if (mode == "--wifi-join") {
-            return runWifiJoin();
-        }
         if (mode == "--stream") {
             return runStream();
+        }
+        if (mode == "--forget") {
+            return runForget();
         }
         if (mode == "--direct-classic-uuid" || mode == "--direct-classic-channel7") {
             return runDirectProbe(mode == "--direct-classic-channel7"

@@ -20,11 +20,12 @@ struct OwnerIdentity {
 // true on success. The blob is DPAPI-sealed before it touches disk.
 [[nodiscard]] bool saveOwnerIdentity(const OwnerIdentity& identity);
 [[nodiscard]] std::optional<OwnerIdentity> loadOwnerIdentity();
-// Forget deletes this plugin's stored identity only. true if removed or already absent.
+// Forget deletes this plugin's stored owner identity and any imported token store, nothing else.
+// true if both are removed or already absent.
 [[nodiscard]] bool forgetOwnerIdentity();
 
-// The Meta client tokens, stored as the extracted text: the HW token line and the bare
-// appid|secret candidate lines used to find the AR token.
+// Imported Meta app tokens, which override the built-in ones: an "HW|..." line and "AR|..." or
+// bare "<id>|<secret>" lines, sealed as given.
 [[nodiscard]] bool saveTokenBlob(const std::string& text);
 [[nodiscard]] std::optional<std::string> loadTokenBlob();
 

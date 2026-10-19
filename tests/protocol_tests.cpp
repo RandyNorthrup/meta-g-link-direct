@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Independent vectors for the portable DataX/protobuf/SDU/encoding layers.
+#include "mgl/bytes.hpp"
 #include "mgl/datax.hpp"
 #include "mgl/encoding.hpp"
 #include "mgl/protobuf.hpp"
 #include "mgl/sdu.hpp"
+#include "mgl/stream.hpp"
 
 #include <array>
 #include <cstddef>
@@ -12,24 +14,44 @@
 #include <cstdlib>
 #include <exception>
 #include <iostream>
+#include <optional>
 #include <span>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
 namespace {
-int g_cases = 0;
+// Fails the run on the first false case and counts every case checked.
+class Checks {
+  public:
+    void operator()(bool ok, const char* name) {
+        ++count_;
+        if (!ok) {
+            fail(name);
+        }
+    }
+    // A case that holds when the optional has a value; returns that value.
+    template <typename T>
+    [[nodiscard]] const T& present(const std::optional<T>& value, const char* name) {
+        ++count_;
+        if (!value) {
+            fail(name);
+        }
+        return *value;
+    }
+    [[nodiscard]] int count() const noexcept { return count_; }
 
-void check(bool ok, const char* name) {
-    ++g_cases;
-    if (!ok) {
+  private:
+    int count_ = 0;
+
+    [[noreturn]] static void fail(const char* name) {
         throw std::runtime_error(std::string(name) + ": failed");
     }
-}
+};
 
 mgl::ByteView view(const mgl::Bytes& bytes) { return {bytes.data(), bytes.size()}; }
 
-void testSduPhases() {
+void testSduPhases(Checks& check) {
     using enum mgl::PrefixStatus;
     // Encrypted phase: 0x80 is a two-byte COMMAND frame, not a DataX message.
     const std::array<std::uint8_t, 2> command{0x80, 0x01};
@@ -52,20 +74,20 @@ void testSduPhases() {
           "encrypted unframeable is invalid");
 }
 
-void testProtobuf() {
+void testProtobuf(Checks& check) {
     mgl::Bytes out;
     mgl::proto::appendVarintField(out, 1, 300);
     mgl::proto::appendStringField(out, 2, "hi");
     const std::array<std::uint8_t, 3> raw{0xDE, 0xAD, 0xBE};
     mgl::proto::appendBytesField(out, 3, {raw.data(), raw.size()});
     const auto message = mgl::proto::Message::parse(view(out));
-    check(message.has_value(), "protobuf parses what it built");
-    check(message->varint(1) == 300U, "varint field 1 roundtrips 300");
-    const auto two = message->bytes(2);
-    check(two && two->size() == 2 && (*two)[0] == 'h' && (*two)[1] == 'i', "string field 2");
-    const auto three = message->bytes(3);
-    check(three && three->size() == 3 && (*three)[0] == 0xDE, "bytes field 3");
-    check(!message->varint(9).has_value(), "absent field is nullopt");
+    const auto& parsed = check.present(message, "protobuf parses what it built");
+    check(parsed.varint(1) == 300U, "varint field 1 roundtrips 300");
+    const auto two = parsed.bytes(2);
+    check(two && two->size() == 2 && two->front() == 'h' && two->back() == 'i', "string field 2");
+    const auto three = parsed.bytes(3);
+    check(three && three->size() == 3 && three->front() == 0xDE, "bytes field 3");
+    check(!parsed.varint(9).has_value(), "absent field is nullopt");
     // A truncated length-delimited field is rejected, not read past the end.
     const std::array<std::uint8_t, 3> truncated{0x12, 0x05, 0x01};
     check(!mgl::proto::Message::parse({truncated.data(), truncated.size()}).has_value(),
@@ -76,20 +98,19 @@ void testProtobuf() {
           "truncated varint is rejected");
 }
 
-void testDataxHeader() {
+void testDataxHeader(Checks& check) {
     mgl::datax::Tags tags;
     tags.service = static_cast<std::uint16_t>(28);
     tags.type = static_cast<std::uint16_t>(2000);
     const std::array<std::uint8_t, 4> payload{1, 2, 3, 4};
     const auto built = mgl::datax::buildMessage(0x8002, tags, {payload.data(), payload.size()});
-    check(built.has_value(), "message builds");
-    const auto header = mgl::datax::parseHeader(view(*built));
-    check(header.has_value(), "header parses");
-    check(header->channel == 0x8002, "channel roundtrips");
-    check(header->service == 28 && header->has_service, "service tag roundtrips");
-    check(header->type == 2000 && header->has_type, "type tag roundtrips");
-    check(header->dataSize() == 4, "data size excludes header and tags");
-    check(mgl::datax::mirror(0x8002) == 0x0002, "mirror clears the originator bit");
+    const auto header = mgl::datax::parseHeader(view(check.present(built, "message builds")));
+    const auto& parsed = check.present(header, "header parses");
+    check(parsed.channel == 0x8002, "channel roundtrips");
+    check(parsed.service == 28 && parsed.has_service, "service tag roundtrips");
+    check(parsed.type == 2000 && parsed.has_type, "type tag roundtrips");
+    check(parsed.dataSize() == 4, "data size excludes header and tags");
+    check(mgl::datax::mirror(parsed.channel) == 0x0002, "mirror clears the originator bit");
     // A service id of zero closes the channel.
     mgl::datax::Tags close;
     close.service = static_cast<std::uint16_t>(0);
@@ -97,12 +118,12 @@ void testDataxHeader() {
     const auto closed = mgl::datax::parseHeader(view(*closing));
     check(closed && closed->closed, "service 0 marks the channel closed");
     // A header short of four bytes does not parse.
-    const std::array<std::uint8_t, 3> tooShort{0x80, 0x00, 0x00};
-    check(!mgl::datax::parseHeader({tooShort.data(), tooShort.size()}).has_value(),
+    const std::array<std::uint8_t, 3> too_short{0x80, 0x00, 0x00};
+    check(!mgl::datax::parseHeader({too_short.data(), too_short.size()}).has_value(),
           "a three-byte head does not parse");
 }
 
-void testDecoder() {
+void testDecoder(Checks& check) {
     // Two whole messages in one plaintext buffer split into two.
     mgl::datax::Tags first;
     first.service = static_cast<std::uint16_t>(36);
@@ -117,8 +138,9 @@ void testDecoder() {
     std::vector<mgl::datax::Message> out;
     check(decoder.decode(view(buffer), out), "decode succeeds");
     check(out.size() == 2, "two messages come out");
-    check(out[0].header.service == 36 && out[0].payload.size() == 2, "first message intact");
-    check(out[1].header.type == 0x1001 && out[1].payload.size() == 1, "second message intact");
+    check(out.at(0).header.service == 36 && out.at(0).payload.size() == 2, "first message intact");
+    check(out.at(1).header.type == 0x1001 && out.at(1).payload.size() == 1,
+          "second message intact");
 
     // A message split across two frames reassembles to the right bytes.
     // Frame 1: header declaring 20 payload bytes, but only 10 present, then modified PKCS#7 pad.
@@ -139,12 +161,12 @@ void testDecoder() {
     check(parts.empty(), "no message until the fragment completes");
     check(split.decode(view(frame2), parts), "fragment frame 2 decodes");
     check(parts.size() == 1, "the reassembled message emerges");
-    check(parts[0].payload.size() == 20, "reassembled payload has the declared length");
-    check(parts[0].payload[0] == 0x10 && parts[0].payload[10] == 0x20,
+    check(parts.at(0).payload.size() == 20, "reassembled payload has the declared length");
+    check(parts.at(0).payload.at(0) == 0x10 && parts.at(0).payload.at(10) == 0x20,
           "reassembled bytes in order");
 }
 
-void testRegistry() {
+void testRegistry(Checks& check) {
     mgl::datax::ChannelRegistry registry;
     const auto channel = registry.openLocal(36);
     check(channel.has_value() && (*channel & mgl::datax::OriginatorBit) != 0,
@@ -157,36 +179,118 @@ void testRegistry() {
     check(registry.serviceForInbound(0x8005) == 0, "a closed peer channel forgets its service");
 }
 
-void testEncoding() {
+void testEncoding(Checks& check) {
     const std::array<std::uint8_t, 3> abc{'A', 'B', 'C'};
     check(mgl::encoding::base64Encode({abc.data(), 1}) == "QQ==", "base64 one byte");
     check(mgl::encoding::base64Encode({abc.data(), 2}) == "QUI=", "base64 two bytes");
     check(mgl::encoding::base64Encode({abc.data(), 3}) == "QUJD", "base64 three bytes");
     const auto decoded = mgl::encoding::base64Decode("QUJD");
-    check(decoded.size() == 3 && decoded[0] == 'A' && decoded[2] == 'C',
+    check(decoded.size() == 3 && decoded.at(0) == 'A' && decoded.at(2) == 'C',
           "base64 decode roundtrips");
     check(mgl::encoding::quotePlus("a b+c/d") == "a+b%2Bc%2Fd",
           "quote_plus encodes reserved bytes");
     // A valid gzip stream begins with the magic and the DEFLATE method byte.
     const std::array<std::uint8_t, 5> hello{'h', 'e', 'l', 'l', 'o'};
     const auto gz = mgl::encoding::gzip({hello.data(), hello.size()});
-    check(gz.size() > 18 && gz[0] == 0x1F && gz[1] == 0x8B && gz[2] == 0x08,
+    check(gz.size() > 18 && gz.at(0) == 0x1F && gz.at(1) == 0x8B && gz.at(2) == 0x08,
           "gzip header is well formed");
     // The uncompressed size trailer (little-endian) records the input length.
-    const auto size = gz[gz.size() - 4] | (gz[gz.size() - 3] << 8);
-    check(size == 5, "gzip trailer records the input size");
+    const auto size = static_cast<unsigned>(gz.at(gz.size() - 4)) |
+                      (static_cast<unsigned>(gz.at(gz.size() - 3)) << 8U);
+    check(size == 5U, "gzip trailer records the input size");
+}
+
+std::string text(mgl::ByteView bytes) { return {bytes.begin(), bytes.end()}; }
+
+void testCreateSoftAp(Checks& check) {
+    std::array<std::uint8_t, 16> uuid{};
+    for (std::size_t i = 0; i < uuid.size(); ++i) {
+        uuid.at(i) = static_cast<std::uint8_t>(i + 1);
+    }
+    const auto request = mgl::stream::buildCreateSoftApNetwork("mgl-abc234", "secretpassphrase2345",
+                                                               mgl::stream::Band24GHz,
+                                                               mgl::stream::Bw20MHz, 6, "GB", uuid);
+    const auto parsed = check.present(mgl::proto::Message::parse(view(request)),
+                                      "CreateSoftApNetwork parses as protobuf");
+    check(parsed.varint(3) == mgl::stream::Band24GHz, "band is field 3");
+    check(parsed.varint(4) == 6U, "channel is field 4");
+    check(parsed.varint(9) == mgl::stream::Bw20MHz, "bandwidth is field 9");
+    check(!parsed.varint(1).has_value() && !parsed.bytes(2).has_value(),
+          "fields 1 and 2 stay unused");
+    check(text(check.present(parsed.bytes(6), "country code present")) == "GB",
+          "country code is field 6");
+    const auto id = check.present(parsed.bytes(7), "uuid present");
+    check(id.size() == 16 && id.front() == 1 && id.back() == 16, "uuid is field 7, 16 bytes");
+    const auto credentials = check.present(
+        mgl::proto::Message::parse(check.present(parsed.bytes(8), "credentials present")),
+        "credentials parse");
+    check(text(check.present(credentials.bytes(1), "ssid present")) == "mgl-abc234",
+          "credentials ssid is field 1");
+    check(text(check.present(credentials.bytes(2), "password present")) == "secretpassphrase2345",
+          "credentials password is field 2");
+}
+
+mgl::Bytes networkAddress(const std::string& address) {
+    mgl::Bytes out;
+    mgl::proto::appendVarintField(out, 1, 1);
+    mgl::proto::appendVarintField(out, 2, 24);
+    mgl::proto::appendStringField(out, 3, address);
+    return out;
+}
+
+void testSoftApInfo(Checks& check) {
+    mgl::Bytes credentials;
+    mgl::proto::appendStringField(credentials, 1, "mgl-abc234");
+    mgl::proto::appendStringField(credentials, 2, "secretpassphrase2345");
+    mgl::Bytes reply;
+    mgl::proto::appendVarintField(reply, 1, 1);
+    const auto empty = networkAddress("");
+    const auto real = networkAddress("192.168.56.53");
+    mgl::proto::appendBytesField(reply, 2, view(empty));
+    mgl::proto::appendBytesField(reply, 2, view(real));
+    mgl::proto::appendBytesField(reply, 3, view(credentials));
+    mgl::proto::appendVarintField(reply, 4, 20203);
+    mgl::proto::appendVarintField(reply, 5, 6);
+    const auto info =
+        check.present(mgl::stream::parseSoftApNetworkInfo(view(reply)), "SoftApNetworkInfo parses");
+    check(info.ok(), "a success with address and port is usable");
+    check(info.address == "192.168.56.53", "the first non-empty address is taken");
+    check(info.port == 20203U, "port is field 4");
+    check(info.channel == 6U, "channel is field 5");
+    check(info.ssid == "mgl-abc234" && info.passphrase == "secretpassphrase2345",
+          "echoed credentials are read");
+
+    mgl::Bytes failed;
+    mgl::proto::appendVarintField(failed, 1, 3); // START_AP_FAILED
+    mgl::proto::appendBytesField(failed, 2, view(real));
+    mgl::proto::appendVarintField(failed, 4, 20203);
+    check(!check.present(mgl::stream::parseSoftApNetworkInfo(view(failed)), "failure parses").ok(),
+          "a failure status is not usable");
+
+    mgl::Bytes no_port;
+    mgl::proto::appendVarintField(no_port, 1, 1);
+    mgl::proto::appendBytesField(no_port, 2, view(real));
+    check(!check.present(mgl::stream::parseSoftApNetworkInfo(view(no_port)), "no port parses").ok(),
+          "a success without a port is not usable");
+
+    const mgl::Bytes truncated{0x22, 0x05, 0x01};
+    check(!mgl::stream::parseSoftApNetworkInfo(view(truncated)).has_value(),
+          "a truncated reply is rejected");
 }
 } // namespace
 
 int main() {
     try {
-        testSduPhases();
-        testProtobuf();
-        testDataxHeader();
-        testDecoder();
-        testRegistry();
-        testEncoding();
-        std::cout << g_cases << " protocol/datax/protobuf/encoding cases passed\n";
+        Checks check;
+        testSduPhases(check);
+        testProtobuf(check);
+        testDataxHeader(check);
+        testDecoder(check);
+        testRegistry(check);
+        testEncoding(check);
+        testCreateSoftAp(check);
+        testSoftApInfo(check);
+        std::cout << check.count() << " protocol/datax/protobuf/encoding/stream cases passed\n";
         return EXIT_SUCCESS;
     } catch (const std::exception& error) {
         constexpr int DiagnosticWriteFailed = 4;

@@ -13,6 +13,11 @@ class Apartment final {
     Apartment() { winrt::init_apartment(winrt::apartment_type::multi_threaded); }
     ~Apartment() {
         if (owns_) {
+            // C++/WinRT caches activation factories process-wide. When the last MTA thread
+            // uninitialises, COM may unload the component DLLs those factories live in, and the
+            // next activation reads freed code (seen as an access violation on reconnect). Clearing
+            // first is the documented pairing; entries in use on other threads are left alone.
+            winrt::clear_factory_cache();
             winrt::uninit_apartment();
         }
     }

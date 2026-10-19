@@ -4,8 +4,11 @@
 #include "mgl/rfcomm_transport.hpp"
 
 #include "apartment.hpp"
+#include "meta_service.hpp"
 #include "mgl/transport.hpp"
 #include "sdu_socket.hpp"
+#include "winrt_bluetooth.hpp"
+#include "winrt_wait.hpp"
 
 #include <windows.h> // IWYU pragma: keep — SDK umbrella prerequisites.
 
@@ -27,30 +30,13 @@
 
 namespace mgl {
 namespace {
-using winrt::Windows::Devices::Bluetooth::BluetoothDevice; // NOLINT(misc-include-cleaner)
-using winrt::Windows::Devices::Bluetooth::Rfcomm::
-    IRfcommDeviceServiceStatics; // NOLINT(misc-include-cleaner)
-using winrt::Windows::Devices::Bluetooth::Rfcomm::
-    IRfcommServiceIdStatics; // NOLINT(misc-include-cleaner)
-using winrt::Windows::Devices::Bluetooth::Rfcomm::
-    RfcommDeviceService;                                           // NOLINT(misc-include-cleaner)
-using winrt::Windows::Devices::Bluetooth::Rfcomm::RfcommServiceId; // NOLINT(misc-include-cleaner)
-using winrt::Windows::Devices::Enumeration::DeviceInformation;     // NOLINT(misc-include-cleaner)
-using winrt::Windows::Devices::Enumeration::
-    IDeviceInformationStatics; // NOLINT(misc-include-cleaner)
-using winrt::Windows::Foundation::AsyncStatus;
-
-constexpr winrt::guid MetaRfcommService{
-    0x8B0D2687, 0x42A4, 0x44CB, {0x94, 0x36, 0xFB, 0xA3, 0xB9, 0xB9, 0x6D, 0xE2}};
-
-template <typename Operation>
-bool awaitOperation(const Operation& operation, std::chrono::milliseconds timeout) {
-    if (operation.wait_for(timeout) == AsyncStatus::Started) {
-        operation.Cancel();
-        return false;
-    }
-    return operation.Status() == AsyncStatus::Completed;
-}
+using winrt_bluetooth::DeviceInformation;           // NOLINT(misc-include-cleaner)
+using winrt_bluetooth::IDeviceInformationStatics;   // NOLINT(misc-include-cleaner)
+using winrt_bluetooth::IRfcommDeviceServiceStatics; // NOLINT(misc-include-cleaner)
+using winrt_bluetooth::IRfcommServiceIdStatics;     // NOLINT(misc-include-cleaner)
+using winrt_bluetooth::MetaRfcommService;
+using winrt_bluetooth::RfcommDeviceService; // NOLINT(misc-include-cleaner)
+using winrt_bluetooth::RfcommServiceId;     // NOLINT(misc-include-cleaner)
 
 struct Resolved {
     std::uint64_t address = 0;
@@ -124,7 +110,7 @@ std::unique_ptr<Transport> connectSocket(const Resolved& resolved, RfcommOpen& r
     }
     const auto socket =
         WSASocketW(AF_BTH, SOCK_STREAM, BTHPROTO_RFCOMM, nullptr, 0, WSA_FLAG_NO_HANDLE_INHERIT);
-    if (socket == INVALID_SOCKET) {
+    if (std::cmp_equal(socket, INVALID_SOCKET)) {
         result.status = RfcommConnect::ConnectFailed;
         result.detail = static_cast<std::uint32_t>(WSAGetLastError());
         return nullptr;
@@ -135,13 +121,11 @@ std::unique_ptr<Transport> connectSocket(const Resolved& resolved, RfcommOpen& r
     if (resolved.channel >= 1 && resolved.channel <= 30) {
         remote.port = resolved.channel;
     } else {
-        remote.serviceClassId = GUID{.Data1 = 0x8B0D2687,
-                                     .Data2 = 0x42A4,
-                                     .Data3 = 0x44CB,
-                                     .Data4 = {0x94, 0x36, 0xFB, 0xA3, 0xB9, 0xB9, 0x6D, 0xE2}};
+        remote.serviceClassId = MetaRfcommServiceClass;
     }
-    const auto* const endpoint = reinterpret_cast<const sockaddr*>(
-        &remote); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+    // Winsock's public C ABI type-erases its documented SOCKADDR_BTH structure.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    const auto* const endpoint = reinterpret_cast<const sockaddr*>(&remote);
     if (connect(socket, endpoint, sizeof(remote)) == SOCKET_ERROR) {
         result.status = RfcommConnect::ConnectFailed;
         result.detail = static_cast<std::uint32_t>(WSAGetLastError());

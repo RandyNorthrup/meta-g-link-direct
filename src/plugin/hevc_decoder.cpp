@@ -5,8 +5,12 @@
 
 extern "C" {
 #include <libavcodec/avcodec.h>
+#include <libavcodec/codec.h>
+#include <libavcodec/codec_id.h>
+#include <libavcodec/packet.h>
 #include <libavutil/frame.h>
 #include <libavutil/pixfmt.h>
+#include <libavutil/rational.h>
 }
 
 #include <cstdint>
@@ -26,6 +30,11 @@ struct HevcDecoder::Impl {
     Bytes parameters;
     Bytes scratch;
 
+    Impl() = default;
+    Impl(const Impl&) = delete;
+    Impl& operator=(const Impl&) = delete;
+    Impl(Impl&&) = delete;
+    Impl& operator=(Impl&&) = delete;
     ~Impl() {
         if (frame != nullptr) {
             av_frame_free(&frame);
@@ -51,7 +60,7 @@ bool HevcDecoder::open() {
     if (impl_->context == nullptr) {
         return false;
     }
-    impl_->context->pkt_timebase = AVRational{1, static_cast<int>(MicrosPerSecond)};
+    impl_->context->pkt_timebase = AVRational{.num = 1, .den = static_cast<int>(MicrosPerSecond)};
     // Low-latency: no frame threading, decode and emit as soon as possible.
     impl_->context->thread_count = 1;
     if (avcodec_open2(impl_->context, impl_->codec, nullptr) < 0) {
@@ -89,20 +98,19 @@ void HevcDecoder::decode(std::uint64_t pts_us, ByteView annex_b, bool keyframe,
         return;
     }
     while (avcodec_receive_frame(impl_->context, impl_->frame) == 0) {
-        const auto format = static_cast<AVPixelFormat>(impl_->frame->format);
+        const AVFrame& frame = *impl_->frame;
+        const auto format = static_cast<AVPixelFormat>(frame.format);
         const bool planar_yuv = format == AV_PIX_FMT_YUV420P || format == AV_PIX_FMT_YUVJ420P;
-        if (planar_yuv && impl_->frame->width > 0 && impl_->frame->height > 0) {
+        if (planar_yuv && frame.width > 0 && frame.height > 0) {
             DecodedFrame out;
-            out.width = static_cast<std::uint32_t>(impl_->frame->width);
-            out.height = static_cast<std::uint32_t>(impl_->frame->height);
-            out.pts_us =
-                impl_->frame->pts >= 0 ? static_cast<std::uint64_t>(impl_->frame->pts) : pts_us;
-            out.full_range =
-                format == AV_PIX_FMT_YUVJ420P || impl_->frame->color_range == AVCOL_RANGE_JPEG;
-            for (int plane = 0; plane < 3; ++plane) {
-                out.plane[plane] = impl_->frame->data[plane];
-                out.linesize[plane] = static_cast<std::uint32_t>(impl_->frame->linesize[plane]);
-            }
+            out.width = static_cast<std::uint32_t>(frame.width);
+            out.height = static_cast<std::uint32_t>(frame.height);
+            out.pts_us = frame.pts >= 0 ? static_cast<std::uint64_t>(frame.pts) : pts_us;
+            out.full_range = format == AV_PIX_FMT_YUVJ420P || frame.color_range == AVCOL_RANGE_JPEG;
+            out.plane = {frame.data[0], frame.data[1], frame.data[2]};
+            out.linesize = {static_cast<std::uint32_t>(frame.linesize[0]),
+                            static_cast<std::uint32_t>(frame.linesize[1]),
+                            static_cast<std::uint32_t>(frame.linesize[2])};
             sink(out);
         }
         av_frame_unref(impl_->frame);

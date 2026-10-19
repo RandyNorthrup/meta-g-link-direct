@@ -7,6 +7,8 @@
 #include <windows.h> // IWYU pragma: keep — SDK umbrella prerequisites for bcrypt.h.
 
 #include <bcrypt.h>
+#include <minwindef.h>
+#include <winbase.h>
 
 #include <algorithm>
 #include <array>
@@ -19,6 +21,7 @@
 #include <optional>
 #include <span>
 #include <string>
+#include <string_view>
 #include <utility>
 
 namespace mgl::crypto {
@@ -62,6 +65,8 @@ struct KeyHandle {
     BCRYPT_KEY_HANDLE value = nullptr;
     KeyHandle() = default;
     explicit KeyHandle(BCRYPT_KEY_HANDLE handle) noexcept : value(handle) {}
+    // Gives up ownership without destroying the key.
+    [[nodiscard]] BCRYPT_KEY_HANDLE release() noexcept { return std::exchange(value, nullptr); }
     KeyHandle(const KeyHandle&) = delete;
     KeyHandle& operator=(const KeyHandle&) = delete;
     KeyHandle(KeyHandle&&) = delete;
@@ -122,10 +127,9 @@ PublicKey exportPublic(BCRYPT_KEY_HANDLE key) {
 BCRYPT_KEY_HANDLE generatePair(BCRYPT_ALG_HANDLE algorithm) {
     BCRYPT_KEY_HANDLE key = nullptr;
     check(BCryptGenerateKeyPair(algorithm, &key, P256Bits, 0), "BCryptGenerateKeyPair");
-    KeyHandle owned(key);
+    KeyHandle owned(key); // destroys the key if finalising throws
     check(BCryptFinalizeKeyPair(key, 0), "BCryptFinalizeKeyPair");
-    owned.value = nullptr;
-    return key;
+    return owned.release();
 }
 
 // P-256 group order n and n / 2, big-endian.
@@ -219,13 +223,37 @@ void randomBytes(std::span<std::uint8_t> out) {
           "BCryptGenRandom");
 }
 
+std::string randomText(std::string_view alphabet, std::size_t length) {
+    constexpr std::size_t ByteValues = 256;
+    if (alphabet.empty() || alphabet.size() > ByteValues) {
+        throw CryptoError("randomText needs an alphabet of 1 to 256 symbols");
+    }
+    // Bytes at or above the largest multiple of the alphabet size are rejected, so every symbol is
+    // equally likely; modulo alone would favour the first symbols.
+    const std::size_t accepted = ByteValues - (ByteValues % alphabet.size());
+    std::string out;
+    out.reserve(length);
+    std::array<std::uint8_t, 64> pool{};
+    while (out.size() < length) {
+        randomBytes(pool);
+        for (const std::uint8_t byte : pool) {
+            if (byte < accepted && out.size() < length) {
+                out.push_back(alphabet.at(byte % alphabet.size()));
+            }
+        }
+    }
+    return out;
+}
+
 bool constantTimeEqual(ByteView left, ByteView right) noexcept {
     if (left.size() != right.size()) {
         return false;
     }
     std::uint8_t difference = 0;
-    for (std::size_t index = 0; index < left.size(); ++index) {
-        difference |= static_cast<std::uint8_t>(left[index] ^ right[index]);
+    auto right_byte = right.begin();
+    for (const auto left_byte : left) {
+        difference |= static_cast<std::uint8_t>(left_byte ^ *right_byte);
+        ++right_byte;
     }
     return difference == 0;
 }
@@ -338,12 +366,6 @@ Signature OwnerKey::signDigest(const Digest& digest) const {
     return signature;
 }
 
-bool OwnerKey::verifyDigest(const Digest& digest, const Signature& signature) const {
-    return BCRYPT_SUCCESS(BCryptVerifySignature(handle_->key.value, nullptr, input(digest),
-                                                length(digest.size()), input(signature),
-                                                length(signature.size()), 0));
-}
-
 OwnerKey::OwnerKey(OwnerKey&&) noexcept = default;
 OwnerKey& OwnerKey::operator=(OwnerKey&&) noexcept = default;
 OwnerKey::~OwnerKey() = default;
@@ -356,11 +378,11 @@ Signature lowS(const Signature& signature) noexcept {
     Signature out = signature;
     unsigned borrow = 0;
     for (std::size_t index = ScalarSize; index-- > 0;) {
-        const auto minuend = static_cast<unsigned>(GroupOrder[index]);
-        const auto subtrahend = static_cast<unsigned>(s[index]) + borrow;
+        const auto minuend = static_cast<unsigned>(GroupOrder.at(index));
+        const auto subtrahend = static_cast<unsigned>(signature.at(ScalarSize + index)) + borrow;
         borrow = minuend < subtrahend ? 1U : 0U;
         constexpr unsigned ByteRange = 0x100;
-        out[ScalarSize + index] =
+        out.at(ScalarSize + index) =
             static_cast<std::uint8_t>(minuend + (borrow * ByteRange) - subtrahend);
     }
     return out;

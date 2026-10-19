@@ -1,22 +1,56 @@
 # Meta G Link Direct
 
-Native Windows OBS plugin project for a direct Ray-Ban Meta Gen 2 connection.
+Native Windows OBS plugin that shows the Ray-Ban Meta Gen 2 glasses camera in OBS over a direct local wireless link, with no phone in the loop.
 
-**Current status: the direct connection works and is proven on hardware through a diagnostic CLI — authenticated ownership, an encrypted Bluetooth session, the Wi-Fi Direct handover, and live 720×1280 HEVC camera frames at ~30 fps. The OBS camera source itself (decoding those frames into an OBS source), accessible source controls, reconnection, current-firmware certification, and the 120-minute acceptance run are the remaining work. The OBS module still registers no camera source yet.**
+**Current status: working on real hardware.** The "Ray-Ban Meta Glasses (Direct)" source shows the live 720×1280 HEVC camera at about 30 fps in OBS 32.2.2, after a one-time Meta setup that makes the PC the glasses' owner. The glasses host their own 2.4 GHz Wi-Fi network for the PC, which streamed without a drop in every run so far (longest 180 s; stop and restart verified). This is proven on one PC, one Bluetooth adapter, one Wi-Fi adapter and one pair of glasses. Still open: the glasses-hosted network inside OBS itself (proven so far with the same media session from the command line), reconnection after a real link drop (implemented, not yet exercised on hardware), the other quality presets (only 720×1280 is proven), a Narrator and keyboard pass over the source properties, latency measurement, latest-firmware certification, and the 120-minute run.
 
-Proving ownership moved the glasses' owner key from the iPhone Meta AI app to this PC. To hand the glasses back to the phone, remove and re-add them in Meta AI on the iPhone.
+Setup moves the glasses' owner key from the Meta AI phone app to this PC. The phone app stops working with the glasses until you remove and re-add them in Meta AI.
 
 The confirmed product contract is in [PROJECT_BRIEF.md](PROJECT_BRIEF.md). [PLAN.md](PLAN.md) owns implementation milestones, proof, and deferred gates. The intended product receives local video directly into OBS, with adjustable quality and optional glasses audio disabled by default. Meta authentication is permitted for setup if required; the phone must be off during the eventual local-streaming acceptance tests.
+
+## Install and set up
+
+Needs Windows 11 x64, OBS Studio 32.x, a Bluetooth adapter with Classic and BLE, a Wi-Fi adapter that can join a 2.4 GHz WPA2 network, and the Visual C++ x64 runtime (the OBS installer provides it). No router, hotspot or network setting changes.
+
+While the camera runs, the PC's Wi-Fi adapter is connected to the glasses' own network, which has no internet. A PC that reaches the internet over Ethernet (or a second Wi-Fi adapter) stays online; a PC whose only connection is that Wi-Fi adapter is offline until the camera stops. Windows returns the adapter to its usual networks afterwards.
+
+`scripts/Install-MetaGLinkDirect.ps1` installs from a setup bundle folder containing `plugin/meta-g-link-direct.dll`, `plugin/locale/en-US.ini` and `tools/meta-g-link-probe.exe`. It runs under Windows PowerShell 5.1. In order, it:
+
+1. finds OBS and checks its FFmpeg (`avcodec-62`, `avutil-60`) and the runtime;
+2. waits for OBS to be closed (it never closes OBS);
+3. copies the plugin, elevating only that copy when OBS is under Program Files;
+4. copies the setup tool to `%LOCALAPPDATA%\MetaGLinkDirect\bin`;
+5. imports an optional `meta-tokens.txt`;
+6. offers the one-time glasses setup.
+
+`-WhatIf` lists every action without changing anything. `-Uninstall` removes the plugin and tool but keeps the sealed identity. So far it has been verified with a `-WhatIf` run on the development PC; an install on a fresh PC has not been run yet.
+
+The setup tool has the Meta AI app's two client tokens built in. They identify the app, not a person, and are already public. An imported `meta-tokens.txt` (one `HW|<app id>|<secret>` line and one `AR|<app id>|<secret>` line) overrides them if Meta rotates them. `.gitignore` excludes that file.
+
+The setup steps the installer runs, if you want them by hand:
+
+```powershell
+meta-g-link-probe.exe --auth-url     # prints the Meta login address; log in, then copy the final address
+'<code from that address>' | meta-g-link-probe.exe --provision   # ownership change; seals the owner key
+meta-g-link-probe.exe --link         # the authenticated Bluetooth session reaches ready
+meta-g-link-probe.exe --stream       # the full camera path for 60 s; reports frame counts
+```
+
+Pair the glasses in Windows Bluetooth settings first: fold the arms, then hold the capture button about 12 seconds until the light blinks blue. Turn off Bluetooth on the phone. In OBS, add the "Ray-Ban Meta Glasses (Direct)" source to a scene. It connects when its scene goes live and disconnects when the scene leaves the program output. The source properties offer a quality list and a live status line.
 
 ## What exists
 
 - C++20 frame-prefix library ported from the pinned AGPL-3.0 Visor implementation. It distinguishes incomplete headers, valid frame lengths, and invalid types without allocating or receiving camera data.
-- Native Windows WLAN/Bluetooth probe. Default reports radio presence, Wi-Fi association and controller feature support separately. Explicit `--discover` performs a bounded passive BLE scan using Visor's Meta company/service markers. `--discover-classic` performs Classic inquiry and looks up Windows-registered paired Meta RFCOMM services by UUID. Counts/errors contain no names, addresses or payloads. Candidates and Windows bonds do not establish glasses authentication.
+- The direct camera path, proven on hardware: AirShield handshake and owner trust over Bluetooth RFCOMM, the Meta change-owner setup, a 2.4 GHz / 20 MHz Wi-Fi network the glasses host (svc10 `CreateSoftApNetwork`) that the PC joins as an ordinary client, a second AirShield session over TCP, the stream configuration, HEVC access-unit reassembly and FFmpeg decode to I420. The session and stream protocol is ported from the pinned AGPL-3.0 Visor implementation; the glasses-hosted network follows the Meta AI app's protocol classes.
+- Why the glasses host the network: with the glasses as a Wi-Fi client, video stopped 8–54 s into every run on every access point tried (Windows Mobile Hotspot pinned to 2.4 GHz, a dual-band home router), whatever the bitrate, adapter channel-width setting or audio setting. On their own 2.4 GHz / 20 MHz network, the same stream ran about 180 s (5,370 frames) without a stall. Details: [the Wi-Fi link report](reports/WIFI_LINK_VERIFICATION.md).
+- The OBS source. OBS's video thread starts and stops it, and neither call waits on the radio: a stopped capture is cut off from OBS at once and tears the link down on a background thread. Module unload waits for that teardown. One source drives the glasses at a time; another waits its turn and shows "Waiting". The worker reconnects after a drop with a 2–15 s backoff that resets after video flows. It catches every exception at the thread boundary so a failure cannot take OBS down, and reports "Streaming" only once frames arrive.
+- Each session gives the glasses' network a fresh `mgl-` name and a 20-symbol passphrase from the system CSPRNG, and uses the Windows region as the network's country code. The PC joins with a temporary Windows Wi-Fi profile that is deleted when the camera stops. If the PC cannot join the glasses' network or open the media connection, the plugin closes the network over Bluetooth before retrying. Once the PC has joined, the glasses leave Bluetooth, and after a stream they close the network themselves within about 15 seconds (measured).
+- Native Windows WLAN/Bluetooth probe. Default reports radio presence, Wi-Fi association and controller feature support separately. Explicit `--discover` performs a bounded active BLE scan using Visor's Meta company/service markers. `--discover-classic` performs Classic inquiry and looks up Windows-registered paired Meta RFCOMM services by UUID. Counts/errors contain no names, addresses or payloads. Candidates and Windows bonds do not establish glasses authentication.
 - Explicit `--connect-classic` selects only one Windows-registered Meta service with a paired peer, attempts an encrypted/authenticated Bluetooth socket connection with deadlines, closes it and sends no application frames. Multiple services are refused. It never pairs or silently falls back from BLE. Successful connection behavior still needs actual glasses proof.
 - Explicit uncached per-peer Meta SDP lookup (`--discover-classic-live`), a separate paired socket check (`--connect-classic-live`), and an opt-in native Windows pairing picker (`--pair-classic`). Pairing never runs implicitly.
 - Direct Winsock probes accept a trustworthy glasses Bluetooth address privately on stdin, without a Windows bond prerequisite: `--direct-classic-uuid` resolves the Meta service; `--direct-classic-channel7` explicitly uses the publicly observed Gen 2 control channel. Each waits for one bounded frame, sends no application messages and never switches routes silently. A matching hello prefix is a candidate, not authentication.
-- C17 OBS module foundation compiled against the real OBS 32.2.2 SDK. An isolated loader test checks the DLL against the installed OBS runtime, its exports, and truthful development metadata. This is not a test of an OBS scene or streaming source.
-- Three CTest suites cover 83 framing/truncation/type cases, 20 private-address format/order/boundary cases and OBS module ABI. Three Pester runner tests, 20 CLI contract cases and one separate live SDP test cover diagnostics, private input, report failures and actual query execution. These software checks do not establish a glasses connection.
+- C17 OBS glue (`module.c`, `source.c`) compiled against the real OBS 32.2.2 SDK, with the C++20 camera core behind the small C interface in `src/plugin/camera.h`. An isolated loader test checks the DLL against the installed OBS runtime, its exports and its metadata. It is not a test of an OBS scene or of streaming.
+- Four CTest suites cover 83 framing/truncation/type cases, 20 private-address format/order/boundary cases, 68 protocol cases (SDU phases, protobuf, DataX, encoding, the glasses-hosted network messages) and the OBS module ABI. Three Pester runner tests, 20 CLI contract cases and one separate live SDP test cover diagnostics, private input, report failures and actual query execution. These software checks do not establish a glasses connection.
 - Native build, formatting, static analysis, dead-code/duplication checks, secret/SAST/dependency scanning, and maintained defect/restoration drills.
 
 ## Tested development environment
@@ -66,7 +100,9 @@ Enter the address only at the hidden local prompt. Supported forms: twelve hexad
 
 Controller capability fields are valid only when `bluetooth_features_valid` is true; otherwise inspect `bluetooth_features_error`. A failed optional feature query does not imply LE is unsupported or invalidate successful radio enumeration.
 
-OBS is discovered at its verified per-user installation. For another installation location, set the optional process environment variable `MGL_OBS_RUNTIME` to that installation's `bin/64bit` directory before configuring. The directory must contain `obs.dll`; it is a runtime path, not a credential. There is no `.env` loader or implemented Meta authentication configuration yet.
+OBS is discovered at its verified per-user installation. For another installation location, set the optional process environment variable `MGL_OBS_RUNTIME` to that installation's `bin/64bit` directory before configuring. The directory must contain `obs.dll`; it is a runtime path, not a credential. There is no `.env` loader. Configure from the runner (or with `MGL_OBS_RUNTIME` set): a plain `cmake` re-configure without it registers the module-ABI test with an empty runtime path, and that test then fails.
+
+Opt-in diagnostics: `MGL_HTTP_DEBUG` traces the Meta setup requests by URL, field names, reply status and reply keys, never values. `--stream` runs the same media session as the OBS source and writes its status lines to stderr.
 
 Focused checks:
 
@@ -83,31 +119,41 @@ Windows AddressSanitizer runs in a separate build. Portable ASan/UBSan commands 
 
 ## Structure and ownership
 
-- `include/mgl/`, `src/protocol/`: portable framing contract and implementation.
-- `src/windows/`: local controller capabilities, BLE/Classic diagnostics and a shared private MTA lifetime; later authenticated transport and identity code belongs here.
-- `src/probe/`: diagnostic CLI.
-- `src/plugin/`: native OBS module entry point; no camera source yet.
+- `include/mgl/`, `src/protocol/`: portable protocol contract and implementation (SDU, protobuf, DataX, AirShield framing, stream messages, HEVC, JSON, encodings).
+- `src/windows/`: CNG crypto, DPAPI identity and token storage, Meta setup, WinHTTP, RFCOMM and TCP transports, the Wi-Fi client connection to the glasses' network, the media session, and the radio diagnostics.
+- `src/probe/`: setup and diagnostic CLI.
+- `src/plugin/`: OBS glue in C17 (`module.c`, `source.c`), the C++20 camera core (`camera.cpp`) and the FFmpeg HEVC decoder.
 - `tests/`: independent native examples and disposable-resource runner checks.
-- `scripts/Invoke-Project.ps1`: canonical task and defect-drill runner.
+- `scripts/Invoke-Project.ps1`: canonical task and defect-drill runner. `scripts/Install-MetaGLinkDirect.ps1`: end-user installer.
 - `reports/`: actual observations and source-bound proof linked by the plan.
 
-MSVC compiles native C/C++ and analyzes the C entry point. LLVM performs C++ analysis with the real compilation database. The C entry point avoids an unsupported clang-cl intrinsic in OBS headers; it does not replace OBS declarations with a private ABI.
+MSVC compiles native C/C++ and analyzes the C files with `/analyze`. LLVM performs C++ analysis with the real compilation database. Only the C files include OBS headers, because those headers use an MSVC intrinsic that clang cannot parse; nothing replaces OBS declarations with a private ABI.
 
 Cppcheck uses the same database with MSVC external-include spelling normalized, explicit compiler builtins, standard/Windows models and six real dynamic OBS entry points. Missing-system-header notices from that model-based analysis and third-party dependency headers are excluded explicitly; quoted owned headers remain checked, and the real compiler/LLVM gates validate system includes. See the plan for these scoped analysis decisions and their required drills.
 
-## Privacy and future credentials
+## Privacy and credentials
 
-Current code enumerates local radios, optionally scans BLE/Classic or queries SDP, offers explicit Windows pairing and bounded socket/hello checks, and exposes module metadata. Peer addresses exist transiently in memory for native API calls. Direct probes use hidden local input or caller-controlled stdin; reports retain counters and errors, never names, addresses, payloads or owner credentials. Only an explicitly requested direct-probe report is saved. It has no Meta login, stored owner identity, media recording, telemetry, automatic update check, or phone data importer. The accepted future policy requires protected local identity, explicit Forget, transient media buffers, requested redacted diagnostics, and OBS-controlled recording. Never put passwords, owner keys, tokens, Wi-Fi passphrases, raw captures, or private diagnostic bundles into this repository.
+The owner key and any imported Meta tokens are sealed with Windows DPAPI for the current Windows account, in `%LOCALAPPDATA%\MetaGLinkDirect` (`identity.bin`, `tokens.bin`). Nothing prints or logs them. Delete that folder to forget the glasses identity.
 
-## Troubleshooting and next milestone
+Meta is contacted only during setup: the OIDC login, the AR login and the two pairing calls. Streaming makes no Meta or cloud call; video travels over the glasses' own Wi-Fi network to this PC and into OBS. The plugin has no telemetry and no update checks, and it records nothing; recording stays under OBS's control. Logs carry status lines only, never payloads, addresses or credentials.
 
-Randy requires continued work with the existing adapter. It reports Classic supported and LE unsupported (HCI/LMP version fields 4). BLE discovery fails with `TransportNotSupported`; that rules out the documented BLE route on this controller, not every possible Classic-only route. Earlier registered lookup found no Meta service. Actual uncached queries over two resolved peers also found none; one query timed out, so this was incomplete discovery. The Windows picker was canceled because glasses were absent; no new bond or socket was created. The existing paired headphones are separate from the glasses. See the current source-bound report in `PLAN.md`; [earlier Classic verification](reports/CLASSIC_VERIFICATION.md) remains historical.
+The only credentials in this repository are the Meta AI app's two public client tokens (see `AGENTS.md` revision 3). Never add passwords, owner keys, user tokens, Wi-Fi passphrases, raw captures or private diagnostic bundles.
 
-[Public Gen 2 Linux research](https://github.com/MoTechnocious/rayban-meta-linux/blob/823225a7c3bd9917f9a64ce88b32a6893d1df591/research/channel7-findings.md) reports an unpaired RFCOMM channel-7 server hello. This supports trying a targeted Windows transport probe; it does not prove this adapter, current firmware, application authentication or streaming. The glasses' trustworthy Classic address has not been identified. If Meta AI exposes a specifically labeled Bluetooth address, use private local input above; no phone-content importer or address guessing is implemented.
+## Troubleshooting
 
-Same LAN does not supply a camera endpoint. The [Visor protocol](https://github.com/macedonga/visor/wiki/Radios-and-links) negotiates a Wi-Fi endpoint through authenticated Bluetooth control. Actual Windows group-owner operation is still untested. Next: identify the glasses' Classic address and run the explicit UUID/channel-7 probes, then implement and prove protected application authentication, Meta setup if needed, and a real frame with the phone off. Meta AI on iPhone remains the companion; no supported local owner-key export has been established. Ownership/recovery behavior must be explained before any actual ownership change.
+The source's properties show its live status. The OBS log (Help > Log Files) has each connection step under `[meta-g-link-direct]`.
 
-Do not infer current-firmware compatibility, 720p/30fps, latency, accessible source UI, or two-hour stability from the foundation tests. Those remain explicit hardware/OBS gates.
+- **Stuck on Connecting or Reconnecting:** check that the glasses are on, charged and in range, and that phone Bluetooth is off. The source retries on its own with a 2–15 s backoff.
+- **"No stored glasses identity" or "Could not connect … set up for this PC":** run the setup. It also fails this way if another PC or the phone took ownership since.
+- **"This PC could not join the glasses' Wi-Fi network":** check that Wi-Fi is on and airplane mode is off. "No Wi-Fi adapter is available" means Windows sees no Wi-Fi adapter at all.
+- **"The glasses did not start their Wi-Fi network":** the glasses' Wi-Fi may still be busy with an earlier session. The source retries; if it keeps failing, power-cycle the glasses.
+- **The internet drops while the camera runs:** the PC's Wi-Fi adapter is on the glasses' network, which has no internet. Use Ethernet or a second Wi-Fi adapter for an online stream.
+- **Waiting:** another Ray-Ban Meta source is using the glasses. It takes over when the other source leaves the program output.
+- **After OBS crashed mid-stream:** the glasses close their network on their own within about 15 seconds. Delete any leftover `mgl-` network in Windows Wi-Fi settings if one remains.
+
+Hardware history from before the BLE adapter is in [earlier Classic verification](reports/CLASSIC_VERIFICATION.md) and `PLAN.md`.
+
+Do not infer latest-firmware compatibility, latency, accessibility or two-hour stability from these tests. Those remain explicit hardware and OBS gates.
 
 ## License
 

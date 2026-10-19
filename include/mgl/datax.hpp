@@ -76,7 +76,7 @@ class Decoder {
     struct Fragment {
         Header header;
         Bytes data;
-        std::size_t needed;
+        std::size_t needed = 0;
     };
     std::optional<Fragment> fragment_;
     std::unordered_map<std::uint16_t, std::uint16_t> last_type_;

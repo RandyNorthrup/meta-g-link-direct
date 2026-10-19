@@ -10,12 +10,16 @@
 #include "mgl/sdu.hpp"
 #include "mgl/transport.hpp"
 
+#include <algorithm>
 #include <array>
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
+#include <iterator>
 #include <memory>
 #include <optional>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace mgl {
@@ -38,7 +42,7 @@ std::unordered_map<std::uint16_t, std::uint16_t>& serviceChannels() {
 } // namespace
 
 GlassesSession::GlassesSession(Transport& transport, const crypto::OwnerKey* owner)
-    : transport_(transport), owner_(owner) {
+    : transport_(&transport), owner_(owner) {
     serviceChannels().clear();
 }
 
@@ -50,7 +54,7 @@ bool GlassesSession::sendPlaintextSetup(std::uint16_t channel, std::uint16_t typ
         tags.service = airshield::LinkSetupService;
     }
     const auto message = datax::buildMessage(channel, tags, payload);
-    return message && transport_.send(*message);
+    return message && transport_->send(*message);
 }
 
 bool GlassesSession::sealAndSend(ByteView plaintext) {
@@ -59,7 +63,7 @@ bool GlassesSession::sealAndSend(ByteView plaintext) {
     frame.push_back(AirshieldData); // stream 0
     const auto sealed = tx_->seal(plaintext);
     append(frame, sealed);
-    return transport_.send(frame);
+    return transport_->send(frame);
 }
 
 std::optional<datax::Message> GlassesSession::nextMessage(std::chrono::milliseconds timeout) {
@@ -72,8 +76,9 @@ std::optional<datax::Message> GlassesSession::nextMessage(std::chrono::milliseco
     while (std::chrono::steady_clock::now() < deadline) {
         const auto remaining = std::chrono::duration_cast<std::chrono::milliseconds>(
             deadline - std::chrono::steady_clock::now());
-        auto sdu = transport_.receive(LinkPhase::Encrypted, remaining);
+        auto sdu = transport_->receive(LinkPhase::Encrypted, remaining);
         if (sdu.status != TransportStatus::Ok) {
+            link_lost_ = link_lost_ || sdu.status != TransportStatus::TimedOut;
             return std::nullopt;
         }
         const ByteView frame(sdu.frame);
@@ -83,15 +88,15 @@ std::optional<datax::Message> GlassesSession::nextMessage(std::chrono::milliseco
         }
         auto plaintext = rx_->open(frame.subspan(1), /*strip_pad=*/false);
         if (!plaintext) {
+            // A frame that fails authentication breaks the per-direction IV chain for good.
+            link_lost_ = true;
             return std::nullopt;
         }
         std::vector<datax::Message> messages;
         if (!decoder_.decode(*plaintext, messages)) {
             return std::nullopt;
         }
-        for (auto& message : messages) {
-            inbox_.push_back(std::move(message));
-        }
+        std::ranges::move(messages, std::back_inserter(inbox_));
         if (!inbox_.empty()) {
             auto message = std::move(inbox_.front());
             inbox_.erase(inbox_.begin());
@@ -138,7 +143,7 @@ LinkOutcome GlassesSession::openHandshake() {
     crypto::randomBytes(seq_bytes);
     std::uint32_t my_sequence = 0;
     for (std::size_t index = 0; index < seq_bytes.size(); ++index) {
-        my_sequence |= static_cast<std::uint32_t>(seq_bytes[index]) << (index * 8U);
+        my_sequence |= static_cast<std::uint32_t>(seq_bytes.at(index)) << (index * 8U);
     }
 
     const auto request = airshield::encodeRequestEncryption(ephemeral.publicKey(), my_challenge);
@@ -161,7 +166,7 @@ LinkOutcome GlassesSession::openHandshake() {
         if (remaining <= 0ms) {
             break;
         }
-        auto sdu = transport_.receive(LinkPhase::Plaintext, remaining);
+        auto sdu = transport_->receive(LinkPhase::Plaintext, remaining);
         if (sdu.status != TransportStatus::Ok) {
             outcome.error = LinkError::TransportFailed;
             return outcome;
@@ -235,31 +240,14 @@ bool GlassesSession::runTrust(LinkOutcome& outcome) {
         if (!message) {
             break;
         }
-        const auto& info = message->header;
-        if (info.has_error && info.channel == our_status_channel) {
-            outcome.trust_status = info.error;
-            if (info.error == datax::StatusSuccess) {
-                outcome.trust_tx_ok = true;
-            }
-            continue;
-        }
-        const bool peer_opened = (info.channel & datax::OriginatorBit) != 0;
-        if (peer_opened && info.service == IdentityService &&
-            (info.type == IdentityEnableTrust || info.type == IdentityEnableTrustEc)) {
-            datax::Tags status;
-            status.error = datax::StatusSuccess;
-            const auto ack = datax::buildMessage(datax::mirror(info.channel), status, {});
-            if (ack && sealAndSend(*ack)) {
-                outcome.trust_rx_ok = true;
-            }
+        if (consumeTrustMessage(*message, our_status_channel, outcome)) {
             continue;
         }
         deferred.push_back(std::move(*message));
     }
     // Anything not consumed belongs to the caller, in order.
-    for (auto it = deferred.rbegin(); it != deferred.rend(); ++it) {
-        inbox_.insert(inbox_.begin(), std::move(*it));
-    }
+    inbox_.insert(inbox_.begin(), std::make_move_iterator(deferred.begin()),
+                  std::make_move_iterator(deferred.end()));
     if (outcome.trust_tx_ok && outcome.trust_rx_ok) {
         outcome.stage = LinkStage::TrustAccepted;
     } else {
@@ -267,6 +255,30 @@ bool GlassesSession::runTrust(LinkOutcome& outcome) {
     }
     // Trust failure is not fatal to the link: the glasses still answer EndLinkSetup, so go on.
     return true;
+}
+
+bool GlassesSession::consumeTrustMessage(const datax::Message& message,
+                                         std::uint16_t our_status_channel, LinkOutcome& outcome) {
+    const auto& info = message.header;
+    if (info.has_error && info.channel == our_status_channel) {
+        outcome.trust_status = info.error;
+        if (info.error == datax::StatusSuccess) {
+            outcome.trust_tx_ok = true;
+        }
+        return true;
+    }
+    const bool peer_opened = (info.channel & datax::OriginatorBit) != 0;
+    if (peer_opened && info.service == IdentityService &&
+        (info.type == IdentityEnableTrust || info.type == IdentityEnableTrustEc)) {
+        datax::Tags status;
+        status.error = datax::StatusSuccess;
+        const auto ack = datax::buildMessage(datax::mirror(info.channel), status, {});
+        if (ack && sealAndSend(*ack)) {
+            outcome.trust_rx_ok = true;
+        }
+        return true;
+    }
+    return false;
 }
 
 bool GlassesSession::finishLinkSetup() {
@@ -365,37 +377,21 @@ std::optional<RawMessage> GlassesSession::receiveRaw(std::chrono::milliseconds t
 }
 
 std::optional<ServiceMessage> GlassesSession::receive(std::chrono::milliseconds timeout) {
+    // receiveRaw without status frames and empty channel closes.
     const auto deadline = std::chrono::steady_clock::now() + timeout;
     while (std::chrono::steady_clock::now() < deadline) {
         const auto remaining = std::chrono::duration_cast<std::chrono::milliseconds>(
             deadline - std::chrono::steady_clock::now());
-        auto message = nextMessage(remaining);
+        auto message = receiveRaw(remaining);
         if (!message) {
             return std::nullopt;
         }
-        auto& info = message->header;
-        if (info.service != 0) {
-            registry_.bindInbound(info.channel, info.service);
-        }
-        const auto service = registry_.serviceForInbound(info.channel);
-        const bool peer_opened = (info.channel & datax::OriginatorBit) != 0;
-        if ((service == 30 || service == 79) && peer_opened && !info.has_error) {
-            datax::Tags status;
-            status.error = datax::StatusServiceNotFound;
-            const auto refusal = datax::buildMessage(datax::mirror(info.channel), status, {});
-            if (refusal) {
-                (void)sealAndSend(*refusal);
-            }
+        if (message->has_error || (message->closed && message->payload.empty())) {
             continue;
         }
-        if (info.has_error) {
-            continue;
-        }
-        if (info.closed && message->payload.empty()) {
-            continue;
-        }
-        return ServiceMessage{
-            .service = service, .type = info.type, .payload = std::move(message->payload)};
+        return ServiceMessage{.service = message->service,
+                              .type = message->type,
+                              .payload = std::move(message->payload)};
     }
     return std::nullopt;
 }

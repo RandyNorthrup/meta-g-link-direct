@@ -6,17 +6,22 @@
 
 #include "mgl/bytes.hpp"
 
+#include <array>
+#include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <memory>
 
 namespace mgl::plugin {
+// Planar YUV 4:2:0 carries Y, U and V planes.
+inline constexpr std::size_t PlaneCount = 3;
+
 struct DecodedFrame {
     std::uint32_t width = 0;
     std::uint32_t height = 0;
     std::uint64_t pts_us = 0;
-    const std::uint8_t* plane[3] = {nullptr, nullptr, nullptr};
-    std::uint32_t linesize[3] = {0, 0, 0};
+    std::array<const std::uint8_t*, PlaneCount> plane{};
+    std::array<std::uint32_t, PlaneCount> linesize{};
     bool full_range = false;
 };
 

@@ -3,6 +3,7 @@
 
 #include "mgl/bytes.hpp"
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <optional>
@@ -35,7 +36,8 @@ struct Cursor {
             if (offset >= data.size()) {
                 return std::nullopt;
             }
-            const auto byte = data[offset++];
+            const auto byte = data.subspan(offset).front();
+            ++offset;
             const auto bits = static_cast<std::uint64_t>(byte & PayloadBits);
             // The tenth byte may contribute only the top bit of a 64-bit value.
             if (index == MaximumVarintBytes - 1 && bits > 1) {
@@ -57,6 +59,17 @@ struct Cursor {
         return true;
     }
 };
+
+// The key and length that precede a length-delimited field's bytes.
+// A field key: the field number above the three wire-type bits.
+std::uint64_t fieldKey(std::uint32_t field, std::uint64_t wire_type) {
+    return (static_cast<std::uint64_t>(field) << WireTypeBits) | wire_type;
+}
+
+void appendLengthDelimitedPrefix(Bytes& out, std::uint32_t field, std::size_t size) {
+    appendVarint(out, fieldKey(field, WireLengthDelimited));
+    appendVarint(out, size);
+}
 } // namespace
 
 void appendVarint(Bytes& out, std::uint64_t value) {
@@ -68,21 +81,18 @@ void appendVarint(Bytes& out, std::uint64_t value) {
 }
 
 void appendVarintField(Bytes& out, std::uint32_t field, std::uint64_t value) {
-    appendVarint(out, (static_cast<std::uint64_t>(field) << WireTypeBits) | WireVarint);
+    appendVarint(out, fieldKey(field, WireVarint));
     appendVarint(out, value);
 }
 
 void appendBytesField(Bytes& out, std::uint32_t field, ByteView value) {
-    appendVarint(out, (static_cast<std::uint64_t>(field) << WireTypeBits) | WireLengthDelimited);
-    appendVarint(out, value.size());
+    appendLengthDelimitedPrefix(out, field, value.size());
     append(out, value);
 }
 
 void appendStringField(Bytes& out, std::uint32_t field, std::string_view value) {
-    const auto* const first = reinterpret_cast<
-        const std::uint8_t*>( // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-        value.data());
-    appendBytesField(out, field, ByteView(first, value.size()));
+    appendLengthDelimitedPrefix(out, field, value.size());
+    out.insert(out.end(), value.begin(), value.end());
 }
 
 std::optional<Message> Message::parse(ByteView data) {
@@ -140,21 +150,17 @@ std::optional<Message> Message::parse(ByteView data) {
 }
 
 std::optional<std::uint64_t> Message::varint(std::uint32_t field) const {
-    for (const auto& entry : fields_) {
-        if (entry.number == field && !entry.length_delimited) {
-            return entry.varint;
-        }
-    }
-    return std::nullopt;
+    const auto found = std::ranges::find_if(fields_, [field](const auto& entry) {
+        return entry.number == field && !entry.length_delimited;
+    });
+    return found != fields_.end() ? std::optional(found->varint) : std::nullopt;
 }
 
 std::optional<ByteView> Message::bytes(std::uint32_t field) const {
-    for (const auto& entry : fields_) {
-        if (entry.number == field && entry.length_delimited) {
-            return entry.bytes;
-        }
-    }
-    return std::nullopt;
+    const auto found = std::ranges::find_if(fields_, [field](const auto& entry) {
+        return entry.number == field && entry.length_delimited;
+    });
+    return found != fields_.end() ? std::optional(found->bytes) : std::nullopt;
 }
 
 std::vector<ByteView> Message::repeatedBytes(std::uint32_t field) const {

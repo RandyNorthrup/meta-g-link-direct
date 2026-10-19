@@ -6,7 +6,10 @@
 
 #include <windows.h> // IWYU pragma: keep — SDK umbrella prerequisites for winhttp.h.
 
+#include <minwindef.h>
+#include <stringapiset.h>
 #include <winhttp.h>
+#include <winnls.h>
 
 #include <array>
 #include <cstddef>

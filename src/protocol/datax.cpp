@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <optional>
+#include <utility>
 #include <vector>
 
 namespace mgl::datax {
@@ -24,10 +25,18 @@ constexpr std::uint8_t TagError = 3;
 constexpr std::uint8_t TagTypeClosed = 4;
 constexpr std::uint8_t PadOffset = 0xC0;
 constexpr std::size_t MaximumPad = 16;
+constexpr std::size_t Big16Size = 2;
 
 std::uint16_t readBig16(ByteView data, std::size_t offset) noexcept {
-    return static_cast<std::uint16_t>((static_cast<unsigned>(data[offset]) << ByteShift) |
-                                      data[offset + 1]);
+    const auto field = data.subspan(offset, Big16Size);
+    return static_cast<std::uint16_t>((static_cast<unsigned>(field.front()) << ByteShift) |
+                                      field.back());
+}
+
+// The 14-bit payload length carried by the first two header bytes.
+std::size_t payloadLength(ByteView data) noexcept {
+    const auto field = data.first(Big16Size);
+    return (static_cast<std::size_t>(field.front() & LengthHighMask) << ByteShift) | field.back();
 }
 
 void appendTag(Bytes& out, std::uint8_t id, std::uint16_t value, bool more) {
@@ -69,11 +78,9 @@ std::optional<Header> parseHeader(ByteView data) {
         return std::nullopt;
     }
     Header header;
-    const auto first = data[0];
-    header.payload_length = static_cast<std::uint16_t>(
-        (static_cast<unsigned>(first & LengthHighMask) << ByteShift) | data[1]);
+    header.payload_length = static_cast<std::uint16_t>(payloadLength(data));
     header.channel = readBig16(data, 2);
-    if ((first & ExtensionBit) == 0) {
+    if ((data.front() & ExtensionBit) == 0) {
         return header;
     }
     const auto available = std::min(data.size(), header.wireSize());
@@ -81,9 +88,9 @@ std::optional<Header> parseHeader(ByteView data) {
         if (header.header_size + TagSize > available) {
             return std::nullopt;
         }
-        const auto offset = header.header_size;
-        const auto tag = data[offset];
-        applyTag(header, static_cast<std::uint8_t>(tag & TagIdMask), readBig16(data, offset + 2));
+        const auto entry = data.subspan(header.header_size, TagSize);
+        const auto tag = entry.front();
+        applyTag(header, static_cast<std::uint8_t>(tag & TagIdMask), readBig16(entry, 2));
         header.header_size += TagSize;
         if ((tag & ContinuationBit) == 0) {
             return header;
@@ -118,7 +125,8 @@ std::optional<Bytes> buildMessage(std::uint16_t channel, const Tags& tags, ByteV
     out.push_back(static_cast<std::uint8_t>(channel >> ByteShift));
     out.push_back(static_cast<std::uint8_t>(channel));
     for (std::size_t index = 0; index < entries.size(); ++index) {
-        appendTag(out, entries[index].id, entries[index].value, index + 1 < entries.size());
+        const auto& entry = entries.at(index);
+        appendTag(out, entry.id, entry.value, index + 1 < entries.size());
     }
     append(out, payload);
     return out;
@@ -168,9 +176,7 @@ bool Decoder::decode(ByteView plaintext, std::vector<Message>& out) {
     }
     while (plaintext.size() - position >= FixedHeaderSize) {
         const auto rest = plaintext.subspan(position);
-        const auto wire_size =
-            FixedHeaderSize +
-            ((static_cast<std::size_t>(rest[0] & LengthHighMask) << ByteShift) | rest[1]);
+        const auto wire_size = FixedHeaderSize + payloadLength(rest);
         if (rest.size() >= wire_size) {
             const auto header = parseHeader(rest.first(wire_size));
             if (!header) {
@@ -195,10 +201,7 @@ bool Decoder::decode(ByteView plaintext, std::vector<Message>& out) {
                      .data = Bytes(head.begin() + static_cast<std::ptrdiff_t>(header->header_size),
                                    head.end()),
                      .needed = header->dataSize()};
-        if (fragment_->data.size() >= fragment_->needed) {
-            return false;
-        }
-        return true;
+        return fragment_->data.size() < fragment_->needed;
     }
     return true;
 }

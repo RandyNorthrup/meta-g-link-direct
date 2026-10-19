@@ -1,0 +1,9 @@
+Drill: SoftApNetworkInfo port field (src/protocol/stream.cpp)
+Mutation: parseSoftApNetworkInfo reads the port from field 3 instead of field 4.
+before sha256:  4f58f94c3ecfd5c06ed85a78d0ef8b7e9e163641bf9d727f43d7f93e511345a5
+mutated sha256: 03ef10629aaf09134248e4db4f613dc6e1035078292143103078932097e525d5
+after sha256:   4f58f94c3ecfd5c06ed85a78d0ef8b7e9e163641bf9d727f43d7f93e511345a5
+restored identical: True
+baseline exit: 0  output: 68 protocol/datax/protobuf/encoding/stream cases passed
+mutated exit:  1  output: a success with address and port is usable: failed
+restored exit: 0  output: 68 protocol/datax/protobuf/encoding/stream cases passed

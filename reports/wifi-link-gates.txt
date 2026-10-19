@@ -1,0 +1,15 @@
+Gate run for the glasses-hosted Wi-Fi link, 2026-10-18, Windows 11 x64 build 26200.
+Each line: task, native exit, duration. Full logs stayed local.
+format:check       exit=0      1s
+lint:cpp           exit=0    189s
+lint:powershell    exit=0      4s
+lint:workflow      exit=0      1s
+deadcode:cpp       exit=0      6s
+deadcode:copies    exit=0      2s
+security:secrets   exit=0      1s
+security:sast      exit=0      6s
+security:npm       exit=0      1s
+security:osv       exit=0      1s
+test               exit=0
+CTest: 4/4 passed (protocol-prefix, private-address, protocol-datax with 68 cases, module-abi).
+Pester: runner 3 passed; CLI 20 passed; 0 failed, 0 skipped.

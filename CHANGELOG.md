@@ -19,8 +19,51 @@ All notable changes to this project will be documented here. The project uses se
 - Ported protocol stack (C++20): strict protobuf, DataX header/channel-registry/frame-splitter, AirShield KDF and per-frame AES-256-CBC + HMAC-SHA-256 cipher, handshake messages, channel binding and svc36 trust, with Windows CNG crypto. Independent protocol/DataX/protobuf/encoding test vectors (42 cases) alongside the existing suites.
 - Synchronous `GlassesSession` over a whole-SDU transport: AirShield handshake, trust with the owner key, EndLinkSetup, and a DataX receive loop. Proven on hardware — `--handshake` reaches key derivation and `--link` reaches READY with trust success in both directions, reproducibly.
 - Meta-authenticated change of owner: OIDC browser login to the FRLA, the AR-universe user-token exchange, and the svc36 change-owner flow (`--provision`). Verified on hardware: this computer now holds the glasses owner key, sealed locally with DPAPI. Tokens and identity never enter the repo, logs or diagnostics.
-- Windows Wi-Fi group owner (Mobile Hotspot, 2.4 GHz; WiFiDirect legacy AP fallback), the svc10 Wi-Fi join, a TCP transport, and the svc51350 stream control. Verified end to end (`--stream`): the glasses join the group and deliver live 720x1280 HEVC frames at ~30 fps over TCP.
+- A TCP transport and the svc51350 stream control. First verified end to end (`--stream`) with a Windows-hosted network the glasses joined, delivering live 720x1280 HEVC frames at ~30 fps; that network has since been replaced (see Removed).
 - HEVC Annex-B helpers (frame/keyframe detection, SPS picture size) used to confirm real decoded camera frames.
+- The OBS camera source "Ray-Ban Meta Glasses (Direct)": FFmpeg HEVC decode to I420, a quality list and a live status line in its properties. Verified live in OBS 32.2.2 at 720x1280.
+- `scripts/Install-MetaGLinkDirect.ps1`, an end-user installer for a setup bundle (Windows PowerShell 5.1, `-WhatIf`, `-Uninstall`). It never closes OBS and elevates only the plugin copy. Verified by a real install on the development PC.
+- `--forget` deletes this PC's sealed glasses identity and imported tokens.
+- The Meta AI app's two public client tokens are built in as defaults (AGENTS.md revision 3), so setup needs no token step; `--import-tokens` still overrides them.
+- The glasses host their own Wi-Fi network for the camera stream: svc10 `CreateSoftApNetwork` (0x1000) on 2.4 GHz at 20 MHz, channel 6, with the Windows region as country code, answered by `SoftApNetworkInfo` (0x1001). Message numbers and fields come from the Meta AI app's `com.oculus.atc` protocol classes. A Native Wi-Fi client connection (`connectWifiStation`) joins the PC to that network with a temporary profile. Verified on hardware: 180 s (5,370 frames) and 120 s runs through the production media session with no stall, and two back-to-back stop/start cycles.
+- Protocol tests for the glasses-hosted network messages (26 new cases, 68 in that suite), with a port-field red drill.
+
+### Changed
+
+- OBS headers are now included only by C17 files (`module.c`, `source.c`, both under `/analyze`). The camera core is C++20 behind `src/plugin/camera.h`, so clang-tidy covers all C++.
+- Starting and stopping the camera no longer blocks OBS's video thread. A stopped capture is cut off from OBS at once and tears the link down on a background thread; module unload waits up to ten seconds for it. The previous build stalled OBS rendering for 29.7 s in one observed scene switch.
+- One process-wide radio lease: a second camera source waits ("Waiting") instead of idling forever.
+- The media worker now:
+  - reconnects with a 2–15 s backoff that resets after video flows;
+  - detects a dropped link immediately;
+  - stops promptly during every wait;
+  - reports "Streaming" only once frames arrive;
+  - logs a stream configuration the glasses reject.
+- The camera no longer uses a PC-hosted network. With the glasses joining an access point (Windows Mobile Hotspot pinned to 2.4 GHz, or a dual-band home router), video stopped 8–54 s into every run, whatever the bitrate (600 kbit/s to 4 Mbit/s), adapter channel-width setting, audio or Bluetooth setting. On the glasses' own network the stream holds. See `reports/WIFI_LINK_VERIFICATION.md`.
+- If the PC cannot join the glasses' network or open the media connection, the glasses' network is closed over Bluetooth, which the glasses acknowledge. A failed join also deletes the temporary Windows Wi-Fi profile. After a stream the glasses have left Bluetooth and close the network themselves within about 15 s (measured); a close sent over the Wi-Fi link was never acknowledged, so none is sent.
+- The media status log no longer includes the glasses' network address.
+- `--stream` runs the same media session as the OBS source instead of a separate copy.
+- `MGL_HTTP_DEBUG` prints field names, reply keys and status only, never token or receipt values.
+- The strict clang-tidy, Cppcheck and jscpd gates pass on all new code. Duplicate helpers were merged: little-endian writing, the Meta RFCOMM UUID (four copies), C++/WinRT Bluetooth names, and session receive handling.
+
+### Removed
+
+- The Windows Mobile Hotspot and Wi-Fi Direct group owners, the svc10 `JoinAccessPoint` path, and the probe's `--wifi` and `--wifi-join` diagnostics. None of them carried a stream past a minute, and the hotspot path rewrote the user's Mobile Hotspot settings.
+
+### Fixed
+
+- The Wi-Fi passphrase came from `CoCreateGuid` bytes with the call's failure ignored, so a failure produced an all-`a` passphrase. It is now 20 symbols drawn uniformly from the system CSPRNG, and an RNG failure stops the start.
+- Any exception on the media worker thread (a CNG failure, for example) would have terminated OBS. The worker now catches it at its boundary, logs it and retries.
+- The SPS parser could shift a 32-bit value by 32 bits (undefined behaviour) on malformed input. Out-of-range picture sizes are now rejected.
+- `datax::Decoder` left a fragment length uninitialised.
+- JSON parsing is now limited to 128 nesting levels, so hostile input cannot overflow the stack.
+- A decoder that fails to open is reported, not ignored.
+
+### Known gaps
+
+- The PC acknowledges the glasses' trust message without verifying its signature. The Bluetooth bond and the private network passphrase limit the exposure, but verification against the glasses' device-certificate key is still to be built and proven with hardware.
+- While the camera runs, the PC's Wi-Fi adapter is on the glasses' network, which has no internet. A PC online only through that adapter is offline until the camera stops.
+- The glasses-hosted network is proven through the production media session from the command line; a run inside OBS is still to be done.
 
 ### Engineering decisions
 
@@ -28,6 +71,17 @@ All notable changes to this project will be documented here. The project uses se
 - Normalize Cppcheck's MSVC compilation database and model real dynamic OBS entry points. Keep analysis limitations explicit.
 - Preserve original failed canary evidence, correct the AWS canary to the scanner's documented base32 pattern, and retain exact-restoration checks.
 
-Direct authentication, the owner change, the Wi-Fi handover and live 720x1280 HEVC camera frames are now proven on hardware through the diagnostic CLI. Remaining work: the OBS camera source itself (decode into an OBS async source), accessible source properties, reconnection, latest-firmware proof and the 120-minute acceptance run. The earlier foundation ZIP is historical and does not contain the new CLI or protocol stack.
+Direct authentication, the owner change, the glasses-hosted Wi-Fi network, live 720x1280 HEVC camera frames and the OBS source are proven on hardware. Remaining work:
+
+- the glasses-hosted network inside OBS;
+- reconnection after a real link drop on hardware;
+- the non-default quality presets;
+- a Narrator and keyboard pass over the source properties;
+- latency measurement;
+- latest-firmware proof;
+- glasses trust-signature verification;
+- the 120-minute acceptance run.
+
+The earlier foundation ZIP is historical and does not contain the new CLI or protocol stack.
 
 Ownership note: provisioning moved the glasses' owner key to this PC, so the iPhone Meta AI app is no longer the owner until the glasses are re-added there.

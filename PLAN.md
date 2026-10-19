@@ -8,6 +8,8 @@ The confirmed [project brief](PROJECT_BRIEF.md) is authoritative. This plan cove
 
 The initial workspace was empty. PROJECT_BRIEF.md now owns product decisions and AGENTS.md owns rules. Reuse Visor's documented framing and later protocol/session behavior at commit e7077b4051b1e3e605c667aa2a010fbe41f346a0 with AGPL-3.0 attribution. Reuse OBS's published module API and actual 32.2.2 development inputs; do not create private OBS ABI declarations or a fake camera source. New protocol, platform and module paths separate different responsibilities and have actual test/diagnostic consumers. Rescan these canonical paths before every change.
 
+Wi-Fi link (2026-10-18): the glasses-hosted network extends the canonical paths instead of adding parallel ones. `src/protocol/stream.cpp` gains the svc10 `CreateSoftApNetwork`/`SoftApNetworkInfo` messages beside the existing stream messages; `MediaSession` keeps its worker, lease, reconnect loop, stream setup and keepalive and swaps only the network step; `randomWifiCredentials` (`src/windows/wifi_credentials.hpp`) remains the single CSPRNG credential generator. One new responsibility is added, `src/windows/wifi_station.cpp`, because joining a network as a Native Wi-Fi client has no existing owner. The Mobile Hotspot and Wi-Fi Direct owners, the `JoinAccessPoint` messages and the probe's `--wifi`/`--wifi-join` were deleted rather than kept as a fallback: no remaining consumer, none carried a stream past a minute, and the hotspot path rewrote the user's Mobile Hotspot settings. `apartment.hpp` and `winrt_wait.hpp` stay for their Bluetooth consumers.
+
 ## Architecture and verified compatibility inputs
 
 Use C++20 for owned code, CMake 3.31.3, installed LLVM 22.1.1 and Visual Studio 2022/MSVC compiler 19.44.35222.0 (toolset 14.44.35207) with Windows SDK 10.0.26100.0. OBS 32.2.2 is installed and its official release/source tag was queried successfully. The official plugin template documents Windows Visual Studio 2022 and CMake >=3.28; owned CMake targets will use the published libobs package/module contract. The frame-prefix library stays portable, while device probing, transport and protected identity live under Windows-specific paths. OBS is a thin consumer of the proved connection/media library. No Qt/custom web UI is required for the planned native properties controls.
@@ -22,6 +24,8 @@ M1 (TASK-AUTH) ports actual connection/identity behavior and validates it on gla
 
 M2 (TASK-MEDIA) ports the actual Wi-Fi group-owner/access-point role, frame reassembly, HEVC/AAC decode, timing and supported quality selection. Test malformed/truncated/oversized input, codec configuration changes, bounded queues, timestamps and decoder errors with intended red drills. Measure real resolution/fps, independent end-to-end latency, CPU/memory and thermal behavior. Audio remains optional. Record exact current stable firmware; do not demand a downgrade or treat an Android upstream result as Windows proof. Update use/troubleshooting and privacy documentation with actual behavior.
 
+Current state (2026-10-18): M1 authentication and the Meta owner change are proven on hardware (`--link` reaches ready with trust success; this PC holds the owner key). Trust-signature verification is not built, so AC-AUTH stays open. M2 live 720×1280 HEVC at ~30 fps is proven. With the glasses joining an access point, video stopped within 8–54 s on every path tried; with the glasses hosting their own 2.4 GHz / 20 MHz network, the production media session streamed without a stall (about 179 s, 120 s, and two stop/start cycles). See [the Wi-Fi link report](reports/WIFI_LINK_VERIFICATION.md). Other quality profiles, latency, CPU/memory, thermal behaviour, audio and the firmware build remain open. M3: the OBS source runs live at 720×1280 on the earlier hotspot link; a run on the glasses-hosted link, reconnection after a real drop, the accessibility pass and the 120-minute run remain open.
+
 M3 (TASK-OBS) adds the real source only after the direct path is demonstrated. Test source start/stop/destroy, reconnect, optional audio synchronization, quality changes and failures; verify native UI with keyboard, Narrator, themes and scaling. The final certification requires the complete >=120-minute run, phone off, no cloud media path, no unbounded memory/queue growth and all numeric/visual gates in AC-OBS. Hardware limits may make acceptance fail; report this without lowering the target. Native source tests/red drills and current artifact/source binding accompany manual hardware and visual records. README, CHANGELOG, supported-version evidence, installation/uninstall/rollback and diagnostics instructions must match the final artifact.
 
 ## Gate policy and evidence
@@ -33,6 +37,8 @@ ASan/UBSan and TSan are separate supported builds. Use portable protocol code on
 Detailed logs and context belong under reports/. Do not copy full command output into this narrative. Readiness review is separate from implementation/test proof. Technical unknowns and future manual gates remain open in the ledger even when M0 software checks pass.
 
 ## Open technical verification and deferred public scope
+
+Open on the current link (2026-10-18): an OBS run on the glasses-hosted network; hardware proof of the rewritten DHCP detection in `wifi_station.cpp`; reconnection after a real drop; trust-signature verification; quality presets, latency and resource measurement; the accessibility pass; the firmware build; and the 120-minute run. Randy's direction for the link: no router, hotspot or network changes, no phone, full resolution. While streaming, the PC's Wi-Fi adapter has no internet. The paragraph below is the historical Classic-discovery state; Bluetooth pairing and authentication have since been proven.
 
 Randy requires continued work with the existing adapter; replacement hardware is not a prerequisite of this plan. The current controller reports Classic supported and LE unsupported; the documented LE path is unavailable. This does not establish that Classic-only access is impossible. Initial and controlled uncached queries found no Meta service and one peer timed out. The explicit Windows picker was canceled because glasses were absent; no new bond or socket was created. Randy confirmed the paired headphones are separate from the glasses. Public Gen 2 research reports an unpaired channel-7 server hello, so targeted Winsock probes are implemented separately from the bonded WinRT route. The glasses' trustworthy Classic address remains unidentified; a question about a Bluetooth-address field in Meta AI is pending. Addresses are entered privately on local stdin, never chat/argv/logs. No current-firmware, authentication, camera or ownership success is claimed. Same LAN does not supply the authenticated Wi-Fi endpoint; group-owner capability and all real media/OBS acceptance remain unproved. No driver/network changes, purchase, reset or firmware downgrade are authorized by this investigation.
 
@@ -560,7 +566,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
           "action": "create"
         }
       ],
-      "status": "blocked",
+      "status": "in_progress",
       "evidence": [
         "EV-DISCOVERY-CLI-SOFTWARE",
         "EV-DISCOVERY-RED-PROBE-ARGUMENTS",
@@ -575,7 +581,7 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
         "EV-EXISTING-ADAPTER-RED-UNCACHED-QUERY-LOOP",
         "EV-EXISTING-ADAPTER-HARDWARE-DEFERRED"
       ],
-      "blocker": "Glasses Classic Bluetooth address is unidentified; uncached inquiries found zero Meta services with a timeout, native picker was canceled and paired headphones are separate. Private targeted probe awaits trustworthy address. Authentication/identity/Meta setup remain unimplemented.",
+      "blocker": "Owner change and authenticated session are proven on hardware; glasses trust-signature verification is not built, so AC-AUTH stays open.",
       "superseded_by": null
     },
     {
@@ -589,28 +595,48 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       ],
       "changes": [
         {
-          "path": "src/windows/wifi_group.cpp",
+          "path": "src/windows/wifi_station.cpp",
           "action": "create"
         },
         {
-          "path": "src/media/decoder.cpp",
+          "path": "include/mgl/wifi_station.hpp",
           "action": "create"
         },
         {
-          "path": "src/media/stream.cpp",
-          "action": "create"
+          "path": "src/protocol/stream.cpp",
+          "action": "modify"
         },
         {
           "path": "include/mgl/stream.hpp",
-          "action": "create"
+          "action": "modify"
         },
         {
-          "path": "tests/stream_tests.cpp",
-          "action": "create"
+          "path": "src/windows/media_session.cpp",
+          "action": "modify"
+        },
+        {
+          "path": "tests/protocol_tests.cpp",
+          "action": "modify"
+        },
+        {
+          "path": "src/windows/wifi_group.cpp",
+          "action": "delete"
+        },
+        {
+          "path": "src/windows/wifi_hotspot.cpp",
+          "action": "delete"
+        },
+        {
+          "path": "include/mgl/wifi_group.hpp",
+          "action": "delete"
         }
       ],
-      "status": "planned",
-      "evidence": [],
+      "status": "in_progress",
+      "evidence": [
+        "EV-WIFI-LINK-HARDWARE",
+        "EV-WIFI-LINK-SOFTWARE",
+        "EV-WIFI-LINK-RED-SOFTAP-PORT"
+      ],
       "blocker": null,
       "superseded_by": null
     },
@@ -641,8 +667,10 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
           "action": "create"
         }
       ],
-      "status": "planned",
-      "evidence": [],
+      "status": "in_progress",
+      "evidence": [
+        "EV-WIFI-LINK-OBS-DEFERRED"
+      ],
       "blocker": null,
       "superseded_by": null
     }
@@ -19124,6 +19152,317 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       "scope_sha256": "d70cca17793217ef03029c6825bfec8e1e743fbee2e1b86cdccd7a34a37dbf4d",
       "red": null,
       "reason": null
+    },
+    {
+      "id": "EV-WIFI-LINK-HARDWARE",
+      "acceptance": [
+        "AC-MEDIA"
+      ],
+      "kind": "manual",
+      "status": "pass",
+      "command": [],
+      "method": "Observed on real glasses, phone Bluetooth off: glasses-hosted 2.4 GHz / 20 MHz network via CreateSoftApNetwork; 5,370 frames in about 179 s (standalone harness), 3,127 frames in a 120 s production MediaSession run, two back-to-back 30 s MediaSession runs, Bluetooth close acknowledged, network gone 8-14 s after a stream on fresh scans. Every earlier join-an-access-point path stopped video within 8-54 s. The rewritten DHCP detection in wifi_station.cpp and an OBS run are not covered.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": null,
+      "artifact": {
+        "path": "reports/WIFI_LINK_VERIFICATION.md",
+        "sha256": "55528a57ce828864bf3734abab556de8428612303b9db03a856b62e5a2cfb0af"
+      },
+      "inputs": [
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "edf508bd8b91c85951f555ede63c42436b9cf8935c8d7dde09ea70b81b681108"
+        },
+        {
+          "path": "include/mgl/stream.hpp",
+          "sha256": "0588814c1b39e08aec407542a2d973c71cfb442f72e941081c00be45d686508a"
+        },
+        {
+          "path": "src/protocol/stream.cpp",
+          "sha256": "4f58f94c3ecfd5c06ed85a78d0ef8b7e9e163641bf9d727f43d7f93e511345a5"
+        },
+        {
+          "path": "include/mgl/wifi_station.hpp",
+          "sha256": "ccc16d781a97b2cad0c0491543e25ea7a3137b795fadf2d37b72c556e2be9151"
+        },
+        {
+          "path": "src/windows/wifi_station.cpp",
+          "sha256": "4c9ebc5d0e62a91ffe0613a3a9eb616f78161609a6f0854bc1bea03c1f3b01e1"
+        },
+        {
+          "path": "src/windows/wifi_credentials.hpp",
+          "sha256": "fdaaedd93bc48b18f0b5833f1ae7abde37d4035ad42ba610b9dc72f9e4fd9fe6"
+        },
+        {
+          "path": "include/mgl/media_session.hpp",
+          "sha256": "f72e0e09aa11a591a69d54c4d91447d81fae13906cb812db26a2c670e105a10c"
+        },
+        {
+          "path": "src/windows/media_session.cpp",
+          "sha256": "d1c912e636038eb4c96db2b105ad07855ac46d35f56dd530c0ef74e467c6fcc3"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "6fb691e1b34541ba2cb19cacae66942682047ef9f60fe3536d5d2c8f38cf778b"
+        },
+        {
+          "path": "tests/protocol_tests.cpp",
+          "sha256": "f56c414cc9b814861aaffcbb40d35983e4cd6e6cbc1858716eec986816ecb7f9"
+        },
+        {
+          "path": "include/mgl/wifi_group.hpp",
+          "sha256": null
+        },
+        {
+          "path": "src/windows/wifi_group.cpp",
+          "sha256": null
+        },
+        {
+          "path": "src/windows/wifi_hotspot.cpp",
+          "sha256": null
+        }
+      ],
+      "scope_sha256": null,
+      "red": null,
+      "reason": "The scope fingerprint tool behind earlier entries is not available in this session; inputs carry their own hashes (null = deleted file)."
+    },
+    {
+      "id": "EV-WIFI-LINK-SOFTWARE",
+      "acceptance": [
+        "AC-MEDIA",
+        "AC-GATES"
+      ],
+      "kind": "behavior",
+      "status": "pass",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/Invoke-Project.ps1",
+        "test"
+      ],
+      "method": "Native build; format:check, lint:cpp, lint:powershell, lint:workflow, deadcode:cpp, deadcode:copies, security:secrets, security:sast, security:npm and security:osv each exited 0; the test task passed, including 68 protocol cases with 26 for the glasses-hosted network messages.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/wifi-link-gates.txt",
+        "sha256": "5fe3c9b44c5315477afdce1a39b856dd025ba2e205e182972ae54d97034f9b46"
+      },
+      "inputs": [
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "edf508bd8b91c85951f555ede63c42436b9cf8935c8d7dde09ea70b81b681108"
+        },
+        {
+          "path": "include/mgl/stream.hpp",
+          "sha256": "0588814c1b39e08aec407542a2d973c71cfb442f72e941081c00be45d686508a"
+        },
+        {
+          "path": "src/protocol/stream.cpp",
+          "sha256": "4f58f94c3ecfd5c06ed85a78d0ef8b7e9e163641bf9d727f43d7f93e511345a5"
+        },
+        {
+          "path": "include/mgl/wifi_station.hpp",
+          "sha256": "ccc16d781a97b2cad0c0491543e25ea7a3137b795fadf2d37b72c556e2be9151"
+        },
+        {
+          "path": "src/windows/wifi_station.cpp",
+          "sha256": "4c9ebc5d0e62a91ffe0613a3a9eb616f78161609a6f0854bc1bea03c1f3b01e1"
+        },
+        {
+          "path": "src/windows/wifi_credentials.hpp",
+          "sha256": "fdaaedd93bc48b18f0b5833f1ae7abde37d4035ad42ba610b9dc72f9e4fd9fe6"
+        },
+        {
+          "path": "include/mgl/media_session.hpp",
+          "sha256": "f72e0e09aa11a591a69d54c4d91447d81fae13906cb812db26a2c670e105a10c"
+        },
+        {
+          "path": "src/windows/media_session.cpp",
+          "sha256": "d1c912e636038eb4c96db2b105ad07855ac46d35f56dd530c0ef74e467c6fcc3"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "6fb691e1b34541ba2cb19cacae66942682047ef9f60fe3536d5d2c8f38cf778b"
+        },
+        {
+          "path": "tests/protocol_tests.cpp",
+          "sha256": "f56c414cc9b814861aaffcbb40d35983e4cd6e6cbc1858716eec986816ecb7f9"
+        },
+        {
+          "path": "include/mgl/wifi_group.hpp",
+          "sha256": null
+        },
+        {
+          "path": "src/windows/wifi_group.cpp",
+          "sha256": null
+        },
+        {
+          "path": "src/windows/wifi_hotspot.cpp",
+          "sha256": null
+        }
+      ],
+      "scope_sha256": null,
+      "red": null,
+      "reason": "The scope fingerprint tool behind earlier entries is not available in this session; inputs carry their own hashes (null = deleted file)."
+    },
+    {
+      "id": "EV-WIFI-LINK-RED-SOFTAP-PORT",
+      "acceptance": [
+        "AC-MEDIA"
+      ],
+      "kind": "red",
+      "status": "pass",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "red-softap-port.ps1",
+        "-Repo",
+        "."
+      ],
+      "method": "Inspected the recorded intended failure and exact byte restoration.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/red/softap-port.txt",
+        "sha256": "5d3f7e7f0a29496e07e6f83892c7406f70f12d5e001d2d6e42ded8a9de375686"
+      },
+      "inputs": [
+        {
+          "path": "src/protocol/stream.cpp",
+          "sha256": "4f58f94c3ecfd5c06ed85a78d0ef8b7e9e163641bf9d727f43d7f93e511345a5"
+        }
+      ],
+      "scope_sha256": null,
+      "red": {
+        "mutation": "parseSoftApNetworkInfo reads the port from field 3 instead of field 4; the protocol tests must fail.",
+        "baseline_exit": 0,
+        "mutated_exit": 1,
+        "restored_exit": 0,
+        "expected_diagnostic": "a success with address and port is usable: failed",
+        "observed_diagnostic": "1  output: a success with address and port is usable: failed",
+        "before": [
+          {
+            "path": "src/protocol/stream.cpp",
+            "sha256": "4f58f94c3ecfd5c06ed85a78d0ef8b7e9e163641bf9d727f43d7f93e511345a5"
+          }
+        ],
+        "mutated": [
+          {
+            "path": "src/protocol/stream.cpp",
+            "sha256": "03ef10629aaf09134248e4db4f613dc6e1035078292143103078932097e525d5"
+          }
+        ],
+        "after": [
+          {
+            "path": "src/protocol/stream.cpp",
+            "sha256": "4f58f94c3ecfd5c06ed85a78d0ef8b7e9e163641bf9d727f43d7f93e511345a5"
+          }
+        ]
+      },
+      "reason": "The scope fingerprint tool behind earlier entries is not available in this session; inputs carry their own hashes (null = deleted file)."
+    },
+    {
+      "id": "EV-WIFI-LINK-OBS-DEFERRED",
+      "acceptance": [
+        "AC-OBS"
+      ],
+      "kind": "manual",
+      "status": "deferred",
+      "command": [],
+      "method": "Not yet run: the OBS source on the glasses-hosted network, reconnection after a real drop, the accessibility pass and the 120-minute run.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": null,
+      "artifact": null,
+      "inputs": [],
+      "scope_sha256": null,
+      "red": null,
+      "reason": "OBS was open during this session and the plugin was not reinstalled; the glasses were charging."
     }
   ],
   "checkpoint": {
@@ -19392,8 +19731,8 @@ OSV and npm audit currently cover the nine locked npm development packages. The 
       "TASK-SETUP"
     ],
     "pending_operations": [],
-    "next_action": "Resolve pending Meta AI Bluetooth-address availability answer. If available, launch hidden-input local console UUID probe and observe redacted result, then channel-7 separately if needed. Continue with existing adapter; never target headphones or guess addresses. Authentication/media/OBS acceptance stays open.",
-    "source_revision": "7fe41835f252034691aa5fabc2276b6e243a4404"
+    "next_action": "Hardware-check the rewritten DHCP detection with the production MediaSession, then reinstall the plugin with OBS closed and run the source on the glasses-hosted network; then reconnection after a real drop, the accessibility pass, trust-signature verification and the 120-minute run.",
+    "source_revision": "4d1cab2a5350c76f56efcdc6b883fde4fa4d0918"
   }
 }
 ```

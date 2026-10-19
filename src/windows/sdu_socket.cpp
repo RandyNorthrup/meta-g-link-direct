@@ -5,6 +5,9 @@
 #include "mgl/sdu.hpp"
 #include "mgl/transport.hpp"
 
+#include <windows.h> // IWYU pragma: keep — SDK umbrella prerequisites.
+
+#include <minwindef.h>
 #include <winsock2.h>
 
 #include <algorithm>
@@ -38,22 +41,21 @@ SduSocket::SduSocket(WinsockLibrary library, SOCKET socket)
 SduSocket::~SduSocket() { SduSocket::close(); }
 
 void SduSocket::close() {
-    if (socket_ != INVALID_SOCKET) {
+    if (std::cmp_not_equal(socket_, INVALID_SOCKET)) {
         closesocket(socket_);
         socket_ = INVALID_SOCKET;
     }
 }
 
 bool SduSocket::send(ByteView frame) {
+    // Winsock's C ABI takes the byte buffer as char.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    const auto* const bytes = reinterpret_cast<const char*>(frame.data());
     std::size_t sent = 0;
     while (sent < frame.size()) {
         constexpr std::size_t MaxChunk = 0x4000;
         const auto chunk = static_cast<int>(std::min(frame.size() - sent, MaxChunk));
-        const auto wrote =
-            ::send(socket_,
-                   reinterpret_cast<const char*>(
-                       frame.data() + sent), // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-                   chunk, 0);
+        const auto wrote = ::send(socket_, bytes + sent, chunk, 0);
         if (wrote == SOCKET_ERROR || wrote <= 0) {
             return false;
         }
@@ -87,11 +89,10 @@ TransportStatus SduSocket::fill(std::chrono::milliseconds timeout) {
     fd_set readable;
     FD_ZERO(&readable);
     FD_SET(socket_, &readable);
-    constexpr long MicrosPerMilli = 1000;
-    constexpr long MicrosPerSecond = 1000000;
-    const auto micros = timeout.count() * MicrosPerMilli;
-    timeval tv{.tv_sec = static_cast<long>(micros / MicrosPerSecond),
-               .tv_usec = static_cast<long>(micros % MicrosPerSecond)};
+    const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(timeout);
+    const auto micros = std::chrono::duration_cast<std::chrono::microseconds>(timeout - seconds);
+    const timeval tv{.tv_sec = static_cast<decltype(timeval::tv_sec)>(seconds.count()),
+                     .tv_usec = static_cast<decltype(timeval::tv_usec)>(micros.count())};
     const auto ready = select(0, &readable, nullptr, nullptr, &tv);
     if (ready == 0) {
         return TransportStatus::TimedOut;
@@ -104,8 +105,9 @@ TransportStatus SduSocket::fill(std::chrono::milliseconds timeout) {
     if (read == 0 || read == SOCKET_ERROR) {
         return TransportStatus::Closed;
     }
-    const auto* const first = reinterpret_cast<const std::uint8_t*>(
-        chunk.data()); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+    // Winsock's C ABI returns the byte buffer as char.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    const auto* const first = reinterpret_cast<const std::uint8_t*>(chunk.data());
     buffer_.insert(buffer_.end(), first, first + read);
     return TransportStatus::Ok;
 }

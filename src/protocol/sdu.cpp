@@ -25,7 +25,7 @@ FramePrefix airshieldData(std::span<const std::uint8_t> head) noexcept {
     if (head.size() < AirshieldHeader) {
         return {.status = PrefixStatus::NeedMore, .frame_size = 0};
     }
-    const auto block_count = static_cast<std::size_t>(head[AirshieldHeader - 1]) + 1;
+    const auto block_count = static_cast<std::size_t>(head.first(AirshieldHeader).back()) + 1;
     return {.status = PrefixStatus::Ready,
             .frame_size = AirshieldHeader + (AesBlock * block_count)};
 }
@@ -33,13 +33,15 @@ FramePrefix airshieldData(std::span<const std::uint8_t> head) noexcept {
 // COMMAND: [0x80 | stream][code]; the ADVERTISEMENT long form sets bit 7 of the code and adds a
 // big-endian 16-bit length of at most 1024 payload bytes.
 FramePrefix airshieldCommand(std::span<const std::uint8_t> head) noexcept {
-    if ((head[1] & LongCommandBit) == 0) {
+    if ((head.first(CommandSize).back() & LongCommandBit) == 0) {
         return {.status = PrefixStatus::Ready, .frame_size = CommandSize};
     }
     if (head.size() < LongCommandHeader) {
         return {.status = PrefixStatus::NeedMore, .frame_size = 0};
     }
-    const auto length = (static_cast<std::size_t>(head[2]) << LengthHighShift) | head[3];
+    const auto length_field = head.first(LongCommandHeader).subspan(CommandSize);
+    const auto length =
+        (static_cast<std::size_t>(length_field.front()) << LengthHighShift) | length_field.back();
     if (length > MaximumAdvertisement) {
         return {.status = PrefixStatus::Invalid, .frame_size = 0};
     }
@@ -68,7 +70,7 @@ FramePrefix inspectFramePrefix(std::span<const std::uint8_t> head, LinkPhase pha
     if ((first & DataxBit) != 0) {
         const auto payload_size =
             (static_cast<std::size_t>(first & LengthHighMask) << LengthHighShift) |
-            static_cast<std::size_t>(head[1]);
+            static_cast<std::size_t>(head.first(MinimumPrefix).back());
         return {.status = PrefixStatus::Ready, .frame_size = DataxHeader + payload_size};
     }
     return {.status = PrefixStatus::Invalid, .frame_size = 0};

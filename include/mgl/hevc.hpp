@@ -17,9 +17,6 @@ namespace mgl::hevc {
 // True when the buffer carries an IRAP (keyframe) NAL, types 16..21.
 [[nodiscard]] bool hasKeyframe(ByteView annex_b);
 
-// VPS/SPS/PPS parameter-set NAL types are 32..34.
-[[nodiscard]] bool hasParameterSets(ByteView annex_b);
-
 struct Dimensions {
     std::uint32_t width = 0;
     std::uint32_t height = 0;

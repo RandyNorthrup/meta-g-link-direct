@@ -7,6 +7,7 @@
 #include "mgl/crypto.hpp"
 #include "mgl/protobuf.hpp"
 
+#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <cstdint>
@@ -30,12 +31,6 @@ ByteView view(const auto& container) { return ByteView(container.data(), contain
 crypto::Digest hkdfExpand(const crypto::Digest& prk, ByteView info) {
     const std::array<std::uint8_t, 1> counter{1};
     return crypto::hmacSha256(view(prk), {info, {counter.data(), counter.size()}});
-}
-
-void writeLittle32(Bytes& out, std::uint32_t value) {
-    for (std::size_t index = 0; index < sizeof(value); ++index) {
-        out.push_back(static_cast<std::uint8_t>(value >> (index * 8U)));
-    }
 }
 
 Bytes modifiedPad(ByteView data) {
@@ -71,9 +66,9 @@ FrameCrypto::FrameCrypto(const DirectionKeys& keys, std::uint32_t initial_sequen
 crypto::Digest FrameCrypto::tag(std::uint32_t sequence, std::uint8_t block_count,
                                 ByteView ciphertext) const {
     Bytes counter;
-    counter.reserve(sizeof(std::uint32_t) * 2 + 1);
-    writeLittle32(counter, CounterPrefix);
-    writeLittle32(counter, sequence);
+    counter.reserve((sizeof(std::uint32_t) * 2) + 1);
+    appendLittleEndian(counter, CounterPrefix);
+    appendLittleEndian(counter, sequence);
     counter.push_back(block_count);
     return hmac_.compute({view(counter), ciphertext});
 }
@@ -98,8 +93,9 @@ std::optional<Bytes> FrameCrypto::open(ByteView frame, bool strip_pad) {
         return std::nullopt;
     }
     const auto received_tag = frame.first(TagSize);
-    const auto block_count = frame[TagSize];
-    const auto ciphertext = frame.subspan(TagSize + 1);
+    const auto body = frame.subspan(TagSize);
+    const auto block_count = body.front();
+    const auto ciphertext = body.subspan(1);
     if (ciphertext.size() != (static_cast<std::size_t>(block_count) + 1) * BlockSize) {
         return std::nullopt;
     }
@@ -185,22 +181,37 @@ bool readHandshakeMessage(std::uint16_t message_type, ByteView payload, PeerHand
     return false;
 }
 
+namespace {
+// RFC 4122: the version is the high nibble of byte 6, the variant the top two bits of byte 8.
+constexpr std::size_t VersionByte = 6;
+constexpr std::size_t VariantByte = 8;
+constexpr std::uint8_t VersionField = 0xF0;
+constexpr std::uint8_t VersionMask = 0x0F;
+constexpr std::uint8_t Version4 = 0x40;
+constexpr std::uint8_t VariantField = 0xC0;
+constexpr std::uint8_t VariantMask = 0x3F;
+constexpr std::uint8_t Variant10 = 0x80;
+} // namespace
+
 Uuid randomUuid() {
     Uuid uuid{};
-    do {
+    for (;;) {
         crypto::randomBytes(uuid);
-        constexpr std::uint8_t VersionMask = 0x0F;
-        constexpr std::uint8_t Version4 = 0x40;
-        constexpr std::uint8_t VariantMask = 0x3F;
-        constexpr std::uint8_t Variant10 = 0x80;
-        uuid[6] = static_cast<std::uint8_t>((uuid[6] & VersionMask) | Version4);
-        uuid[8] = static_cast<std::uint8_t>((uuid[8] & VariantMask) | Variant10);
-    } while (!validUuid(uuid));
-    return uuid;
+        auto& version = std::get<VersionByte>(uuid);
+        auto& variant = std::get<VariantByte>(uuid);
+        version =
+            static_cast<std::uint8_t>((static_cast<unsigned>(version) & VersionMask) | Version4);
+        variant =
+            static_cast<std::uint8_t>((static_cast<unsigned>(variant) & VariantMask) | Variant10);
+        if (validUuid(uuid)) {
+            return uuid;
+        }
+    }
 }
 
 bool validUuid(const Uuid& uuid) noexcept {
-    return (uuid[6] & 0xF0) == 0x40 && (uuid[8] & 0xC0) == 0x80;
+    return (std::get<VersionByte>(uuid) & VersionField) == Version4 &&
+           (std::get<VariantByte>(uuid) & VariantField) == Variant10;
 }
 
 crypto::Digest channelBinding(ByteView glasses_challenge,

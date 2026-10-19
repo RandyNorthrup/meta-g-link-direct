@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 #include "mgl/rfcomm.hpp"
+#include "meta_service.hpp"
 #include "mgl/sdu.hpp"
 
 #include <windows.h> // IWYU pragma: keep — SDK architecture prerequisites; WIN32_LEAN_AND_MEAN excludes Winsock 1.
@@ -205,10 +206,7 @@ void runDirect(std::uint64_t address, DirectRfcommRoute route, DirectRfcommResul
         constexpr std::uint32_t DocumentedControlChannel = 7;
         remote.port = DocumentedControlChannel;
     } else {
-        remote.serviceClassId = GUID{.Data1 = 0x8B0D2687,
-                                     .Data2 = 0x42A4,
-                                     .Data3 = 0x44CB,
-                                     .Data4 = {0x94, 0x36, 0xFB, 0xA3, 0xB9, 0xB9, 0x6D, 0xE2}};
+        remote.serviceClassId = MetaRfcommServiceClass;
     }
     constexpr auto ConnectTimeout = std::chrono::seconds(5);
     const auto deadline = std::chrono::steady_clock::now() + ConnectTimeout;

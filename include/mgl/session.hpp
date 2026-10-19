@@ -90,16 +90,19 @@ class GlassesSession {
     // Used by the change-owner flow, which must observe svc36 status codes.
     [[nodiscard]] std::optional<RawMessage> receiveRaw(std::chrono::milliseconds timeout);
 
+    // True once the link is unusable: the transport closed or failed, or an inbound frame failed
+    // authentication. A plain receive timeout does not set it.
+    [[nodiscard]] bool linkLost() const noexcept { return link_lost_; }
+
   private:
-    Transport& transport_;
+    bool link_lost_ = false;
+    Transport* transport_; // never null: bound from the constructor's reference
     const crypto::OwnerKey* owner_;
     datax::ChannelRegistry registry_;
     datax::Decoder decoder_;
     std::unique_ptr<airshield::FrameCrypto> tx_;
     std::unique_ptr<airshield::FrameCrypto> rx_;
-    std::vector<Bytes> pending_plaintext_;
     std::vector<datax::Message> inbox_;
-    airshield::Uuid last_binding_scope_{};
     crypto::Digest binding_{};
     bool have_binding_ = false;
 
@@ -108,6 +111,9 @@ class GlassesSession {
     [[nodiscard]] bool sealAndSend(ByteView plaintext);
     [[nodiscard]] std::optional<datax::Message> nextMessage(std::chrono::milliseconds timeout);
     [[nodiscard]] bool runTrust(LinkOutcome& outcome);
+    // Handles one svc36 status or peer trust message; false leaves it for the caller.
+    [[nodiscard]] bool consumeTrustMessage(const datax::Message& message,
+                                           std::uint16_t our_status_channel, LinkOutcome& outcome);
     [[nodiscard]] bool finishLinkSetup();
     [[nodiscard]] bool answerPeerEndLinkSetup(std::chrono::milliseconds timeout);
 };

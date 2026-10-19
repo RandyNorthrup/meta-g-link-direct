@@ -2,6 +2,7 @@
 // Meta service UUID: pinned Visor BluetoothRfcommTransport.kt; see THIRD_PARTY_NOTICES.md.
 #include "apartment.hpp"
 #include "mgl/discovery.hpp"
+#include "winrt_bluetooth.hpp"
 
 #include <windows.h> // IWYU pragma: keep — SDK umbrella prerequisites.
 
@@ -35,21 +36,16 @@ using winrt::Windows::Devices::Bluetooth::BluetoothCacheMode;      // NOLINT(mis
 using winrt::Windows::Devices::Bluetooth::BluetoothDevice;         // NOLINT(misc-include-cleaner)
 using winrt::Windows::Devices::Bluetooth::BluetoothError;          // NOLINT(misc-include-cleaner)
 using winrt::Windows::Devices::Bluetooth::IBluetoothDeviceStatics; // NOLINT(misc-include-cleaner)
-using winrt::Windows::Devices::Bluetooth::Rfcomm::
-    IRfcommDeviceServiceStatics; // NOLINT(misc-include-cleaner)
-using winrt::Windows::Devices::Bluetooth::Rfcomm::
-    IRfcommServiceIdStatics; // NOLINT(misc-include-cleaner)
-using winrt::Windows::Devices::Bluetooth::Rfcomm::
-    RfcommDeviceService;                                           // NOLINT(misc-include-cleaner)
-using winrt::Windows::Devices::Bluetooth::Rfcomm::RfcommServiceId; // NOLINT(misc-include-cleaner)
-using winrt::Windows::Devices::Enumeration::DeviceInformation;     // NOLINT(misc-include-cleaner)
-using winrt::Windows::Devices::Enumeration::
-    IDeviceInformationStatics;                                    // NOLINT(misc-include-cleaner)
-using winrt::Windows::Foundation::AsyncStatus;                    // NOLINT(misc-include-cleaner)
-using winrt::Windows::Networking::Sockets::SocketProtectionLevel; // NOLINT(misc-include-cleaner)
-using winrt::Windows::Networking::Sockets::StreamSocket;          // NOLINT(misc-include-cleaner)
-constexpr winrt::guid MetaRfcommService{
-    0x8B0D2687, 0x42A4, 0x44CB, {0x94, 0x36, 0xFB, 0xA3, 0xB9, 0xB9, 0x6D, 0xE2}};
+using winrt::Windows::Networking::Sockets::SocketProtectionLevel;  // NOLINT(misc-include-cleaner)
+using winrt::Windows::Networking::Sockets::StreamSocket;           // NOLINT(misc-include-cleaner)
+using winrt_bluetooth::AsyncStatus;                                // NOLINT(misc-include-cleaner)
+using winrt_bluetooth::DeviceInformation;                          // NOLINT(misc-include-cleaner)
+using winrt_bluetooth::IDeviceInformationStatics;                  // NOLINT(misc-include-cleaner)
+using winrt_bluetooth::IRfcommDeviceServiceStatics;                // NOLINT(misc-include-cleaner)
+using winrt_bluetooth::IRfcommServiceIdStatics;                    // NOLINT(misc-include-cleaner)
+using winrt_bluetooth::MetaRfcommService;
+using winrt_bluetooth::RfcommDeviceService; // NOLINT(misc-include-cleaner)
+using winrt_bluetooth::RfcommServiceId;     // NOLINT(misc-include-cleaner)
 constexpr std::uint32_t NullInterfaceHresult = 0x80004003;
 constexpr std::uint32_t AccessDeniedHresult = 0x80070005;
 constexpr std::uint32_t TimeoutHresult = 0x800705B4;

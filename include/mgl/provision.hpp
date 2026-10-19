@@ -11,9 +11,20 @@
 #include <cstdint>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace mgl::provision {
+// The Meta AI app's client tokens, "<kind>|<app id>|<client secret>". They identify the Meta AI
+// app, not a person: every copy of that app carries them, and they are already public (for
+// example github.com/callbacked/kinesis, Sources/Kinesis/MetaAuth.swift). They are only defaults:
+// a token store imported with --import-tokens takes precedence, so a rotation by Meta needs no new
+// build. User tokens, owner keys and passwords are never embedded.
+inline constexpr std::string_view DefaultHwAppToken =
+    "HW|1312539125771114|98588f106d5d542adbf590619ca071fe"; // gitleaks:allow
+inline constexpr std::string_view DefaultArAppToken =
+    "AR|306760944872162|a919421a55a8ea18080ab2f10f57f1be"; // gitleaks:allow
+
 // The browser login half.
 struct Authorize {
     std::string url;   // the accounts.meta.com page to open

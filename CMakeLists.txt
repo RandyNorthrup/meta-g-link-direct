@@ -56,13 +56,12 @@ if(WIN32)
     src/windows/http.cpp
     src/windows/identity.cpp
     src/windows/provision.cpp
-    src/windows/wifi_group.cpp
-    src/windows/wifi_hotspot.cpp
+    src/windows/wifi_station.cpp
     src/windows/media_session.cpp
     src/protocol/airshield.cpp)
   target_include_directories(mgl_windows PUBLIC include)
   target_compile_definitions(mgl_windows PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
-  target_link_libraries(mgl_windows PUBLIC mgl_protocol PRIVATE wlanapi bthprops windowsapp ws2_32 bcrypt winhttp crypt32 shell32 ole32)
+  target_link_libraries(mgl_windows PUBLIC mgl_protocol PRIVATE wlanapi bthprops windowsapp ws2_32 bcrypt winhttp crypt32 shell32 ole32 iphlpapi)
   mgl_owned_target(mgl_windows)
 
   add_executable(meta-g-link-probe src/probe/main.cpp src/probe/private_input.cpp)
@@ -84,16 +83,20 @@ if(MGL_BUILD_OBS_PLUGIN)
   # FFmpeg for HEVC decode; the matching runtime DLLs ship with OBS.
   find_library(MGL_AVCODEC NAMES avcodec PATHS "${obs_deps_root}/lib" REQUIRED)
   find_library(MGL_AVUTIL NAMES avutil PATHS "${obs_deps_root}/lib" REQUIRED)
-  # libobs's _udiv128 header requires the MSVC C compiler; LLVM issue #59168. The C ABI stays C17;
-  # the camera source and HEVC decoder are C++20 and do not take /analyze.
+  # libobs's _udiv128 header requires the MSVC C compiler; LLVM issue #59168. Every file that
+  # includes OBS headers (module.c, source.c) is C17 with /analyze. The camera core and HEVC
+  # decoder are C++20 behind src/plugin/camera.h, include no OBS headers, and are checked by
+  # clang-tidy instead.
   add_library(meta-g-link-direct MODULE
     src/plugin/module.c
-    src/plugin/source.cpp
+    src/plugin/source.c
+    src/plugin/camera.cpp
     src/plugin/hevc_decoder.cpp)
   target_include_directories(meta-g-link-direct PRIVATE "${obs_deps_root}/include")
   target_link_libraries(meta-g-link-direct PRIVATE OBS::libobs mgl_windows
     "${MGL_AVCODEC}" "${MGL_AVUTIL}")
-  set_source_files_properties(src/plugin/module.c PROPERTIES COMPILE_OPTIONS "/analyze")
+  set_source_files_properties(src/plugin/module.c src/plugin/source.c
+    PROPERTIES COMPILE_OPTIONS "/analyze")
   target_compile_definitions(meta-g-link-direct PRIVATE MGL_VERSION="${PROJECT_VERSION}"
     WIN32_LEAN_AND_MEAN NOMINMAX)
   set_target_properties(meta-g-link-direct PROPERTIES PREFIX "")

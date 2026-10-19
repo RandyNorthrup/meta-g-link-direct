@@ -7,6 +7,7 @@
 #ifndef MGL_JSON_HPP
 #define MGL_JSON_HPP
 
+#include <cstdint>
 #include <memory>
 #include <optional>
 #include <string>
@@ -23,7 +24,7 @@ enum class Kind : std::uint8_t { Null, Bool, Number, String, Object, Array };
 
 class Value {
   public:
-    Value() : kind_(Kind::Null) {}
+    Value() = default;
     static Value makeBool(bool value);
     static Value makeNumber(std::string raw); // kept as its source text
     static Value makeString(std::string value);
@@ -42,14 +43,15 @@ class Value {
     [[nodiscard]] const Value* at(std::string_view key) const;
 
   private:
-    Kind kind_;
+    Kind kind_ = Kind::Null;
     bool bool_ = false;
     std::string text_;
     std::shared_ptr<Object> object_;
     std::shared_ptr<Array> array_;
 };
 
-// nullopt on malformed input. The parser is strict and bounded to the bytes given.
+// nullopt on malformed input. The parser is strict and bounded to the bytes given, and rejects
+// containers nested beyond a fixed depth limit (128).
 [[nodiscard]] std::optional<Value> parse(std::string_view text);
 
 // Python json.dumps(value) with its defaults: ", " and ": " separators, ensure_ascii escaping.

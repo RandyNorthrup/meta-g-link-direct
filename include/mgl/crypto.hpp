@@ -14,6 +14,8 @@
 #include <optional>
 #include <span>
 #include <stdexcept>
+#include <string>
+#include <string_view>
 
 namespace mgl::crypto {
 inline constexpr std::size_t DigestSize = 32;
@@ -70,7 +72,11 @@ class AesCbc {
     std::unique_ptr<Handle> handle_;
 };
 
+// Fills out from the system CSPRNG. Throws CryptoError if the generator fails.
 void randomBytes(std::span<std::uint8_t> out);
+// length symbols drawn uniformly from alphabet (1 to 256 distinct symbols) with the system CSPRNG.
+// Throws CryptoError on a bad alphabet or a generator failure; never returns weak output.
+[[nodiscard]] std::string randomText(std::string_view alphabet, std::size_t length);
 
 [[nodiscard]] bool constantTimeEqual(ByteView left, ByteView right) noexcept;
 
@@ -105,7 +111,6 @@ class OwnerKey {
     [[nodiscard]] const PublicKey& publicKey() const noexcept { return public_key_; }
     // ECDSA over an already-hashed 32-byte value (NONEwithECDSA), r || s, s not yet normalised.
     [[nodiscard]] Signature signDigest(const Digest& digest) const;
-    [[nodiscard]] bool verifyDigest(const Digest& digest, const Signature& signature) const;
 
     OwnerKey(OwnerKey&&) noexcept;
     OwnerKey& operator=(OwnerKey&&) noexcept;

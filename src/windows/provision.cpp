@@ -5,17 +5,21 @@
 
 #include "mgl/bytes.hpp"
 #include "mgl/crypto.hpp"
+#include "mgl/datax.hpp"
 #include "mgl/encoding.hpp"
 #include "mgl/http.hpp"
 #include "mgl/json.hpp"
 #include "mgl/protobuf.hpp"
 #include "mgl/session.hpp"
 
+#include <algorithm>
 #include <array>
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
+#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -50,23 +54,51 @@ constexpr std::uint16_t MtFinishChangeOwnerResp = 0x2005;
 constexpr auto StepTimeout = 20s;
 
 ByteView view(std::string_view text) {
-    return ByteView(reinterpret_cast<const std::uint8_t*>(text.data()),
-                    text.size()); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast) — byte view of the form text.
+    return {reinterpret_cast<const std::uint8_t*>(text.data()), text.size()};
 }
 
 bool httpDebug() {
-    char* value = nullptr;
+    char* raw = nullptr;
     std::size_t size = 0;
-    if (_dupenv_s(&value, &size, "MGL_HTTP_DEBUG") != 0 || value == nullptr) {
-        return false;
-    }
-    std::free(value);
-    return true;
+    // NOLINTNEXTLINE(misc-include-cleaner) - UCRT-only; declared in <stdlib.h>, under <cstdlib>.
+    const auto status = _dupenv_s(&raw, &size, "MGL_HTTP_DEBUG");
+    // _dupenv_s hands back a CRT allocation the caller must release with free.
+    const std::unique_ptr<char, decltype(&std::free)> value(raw, &std::free);
+    return status == 0 && value != nullptr;
 }
 
-std::string toString(ByteView data) {
-    return std::string(reinterpret_cast<const char*>(data.data()),
-                       data.size()); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+std::string toString(ByteView data) { return {data.begin(), data.end()}; }
+
+// Debug traces name request fields and reply keys but never print values: request bodies carry
+// the app and user tokens, and replies carry ownership receipts and account ids. Trace writes are
+// best effort; a failed stderr write does not affect the request.
+void debugRequest(std::string_view url,
+                  const std::vector<std::pair<std::string, std::string>>& fields) {
+    std::string line = "[post] " + std::string(url) + " fields:";
+    for (const auto& field : fields) {
+        line += ' ';
+        line += field.first;
+    }
+    line += '\n';
+    (void)std::fputs(line.c_str(), stderr);
+}
+
+void debugReply(std::string_view label, unsigned status, ByteView body) {
+    std::string line = std::string(label) + " HTTP " + std::to_string(status);
+    const auto parsed = json::parse(toString(body));
+    if (parsed && parsed->kind() == json::Kind::Object) {
+        line += " keys:";
+        for (const auto& member : parsed->object()) {
+            line += ' ';
+            line += member.first;
+        }
+        if (const auto* err = parsed->at("error")) {
+            line += " error: " + err->stringAt("message").value_or("(no message)");
+        }
+    }
+    line += '\n';
+    (void)std::fputs(line.c_str(), stderr);
 }
 
 std::string randomState() {
@@ -140,11 +172,7 @@ std::optional<json::Value> postForm(std::string_view url,
                                     bool gzip_body, std::string& error) {
     const auto encoded = encoding::formUrlEncode(fields);
     if (httpDebug()) {
-        std::fputs("\n[post] ", stderr);
-        std::fputs(std::string(url).c_str(), stderr);
-        std::fputc('\n', stderr);
-        std::fputs(encoded.c_str(), stderr);
-        std::fputc('\n', stderr);
+        debugRequest(url, fields);
     }
     const auto body =
         gzip_body ? encoding::gzip(view(encoded)) : Bytes(encoded.begin(), encoded.end());
@@ -155,17 +183,13 @@ std::optional<json::Value> postForm(std::string_view url,
     }
     const auto reply = http::post(url, headers, body, UserAgent);
     if (httpDebug()) {
-        std::fputs("[reply] ", stderr);
-        std::fputs(std::to_string(reply.status).c_str(), stderr);
-        std::fputc(' ', stderr);
-        std::fputs(toString(reply.body).c_str(), stderr);
-        std::fputc('\n', stderr);
+        debugReply("[reply]", reply.status, reply.body);
     }
     if (reply.status == 0) {
         error = "network error contacting Meta";
         return std::nullopt;
     }
-    const auto parsed = json::parse(toString(reply.body));
+    auto parsed = json::parse(toString(reply.body));
     if (!parsed) {
         error = "Meta returned a non-JSON body (HTTP " + std::to_string(reply.status) + ")";
         return std::nullopt;
@@ -213,6 +237,21 @@ bool awaitType(GlassesSession& session, std::uint16_t type, Bytes& payload,
     error = "timed out waiting for the glasses";
     return false;
 }
+
+// One svc36 request/reply step of the change-owner exchange. On failure result.error carries the
+// glasses' or transport's reason, or fallback_error when neither gave one.
+bool identityStep(GlassesSession& session, std::uint16_t request_type, ByteView request,
+                  std::uint16_t reply_type, Bytes& payload, ProvisionResult& result,
+                  std::string_view fallback_error) {
+    if (session.sendOnService(IdentityService, request_type, request) &&
+        awaitType(session, reply_type, payload, result.glasses_status, result.error)) {
+        return true;
+    }
+    if (result.error.empty()) {
+        result.error = fallback_error;
+    }
+    return false;
+}
 } // namespace
 
 Authorize authorizeRequest() {
@@ -237,7 +276,7 @@ std::optional<std::string> exchangeCode(const std::string& code, std::string& er
     if (!parsed) {
         return std::nullopt;
     }
-    const auto token = parsed->stringAt("access_token");
+    auto token = parsed->stringAt("access_token");
     // user_id comes back as a JSON number, so require only its presence, not a string.
     if (!token || token->empty() || parsed->at("user_id") == nullptr) {
         error = "token-exchange returned no access_token/user_id (the code may be stale)";
@@ -262,9 +301,7 @@ std::optional<std::string> arLogin(const std::string& frla, const std::string& a
         {"Content-Type", std::string(FormUrlEncoded)}};
     const auto reply = http::post(ArLoginUrl, headers, view(encoded), UserAgent);
     if (httpDebug()) {
-        std::fputs("[ar-login] ", stderr);
-        std::fputs(std::to_string(reply.status).c_str(), stderr);
-        std::fputc('\n', stderr);
+        debugReply("[ar-login]", reply.status, reply.body);
     }
     if (reply.status == 0) {
         error = "network error contacting ar.graph";
@@ -279,7 +316,7 @@ std::optional<std::string> arLogin(const std::string& frla, const std::string& a
         error = err->stringAt("message").value_or("AR login error");
         return std::nullopt;
     }
-    const auto token = parsed->stringAt("access_token");
+    auto token = parsed->stringAt("access_token");
     if (!token || token->empty()) {
         error = "AR login returned no access_token";
         return std::nullopt;
@@ -292,7 +329,7 @@ AuthResult authenticate(const std::string& auth_code,
                         const std::vector<std::string>& ar_app_tokens) {
     AuthResult result;
     if (ar_app_tokens.empty()) {
-        result.error = "no AR app token in the token store (expected an \"AR|<id>|<secret>\" line)";
+        result.error = "no AR app token to log in with (expected an \"AR|<id>|<secret>\" token)";
         return result;
     }
     std::string error;
@@ -301,15 +338,18 @@ AuthResult authenticate(const std::string& auth_code,
         result.error = error;
         return result;
     }
-    // One of the stored AR app tokens must be accepted by ar.graph; try each until the login
+    // One of the AR app tokens must be accepted by ar.graph; try each in order until the login
     // returns an ARAe. The last failure's reason is reported if none works.
-    for (const auto& ar_app_token : ar_app_tokens) {
-        if (const auto arae = arLogin(*frla, ar_app_token, error)) {
-            result.token = *arae;
-            return result;
+    const auto accepted = std::ranges::find_if(ar_app_tokens, [&](const std::string& ar_app_token) {
+        auto arae = arLogin(*frla, ar_app_token, error);
+        if (arae) {
+            result.token = std::move(*arae);
         }
+        return arae.has_value();
+    });
+    if (accepted == ar_app_tokens.end()) {
+        result.error = error.empty() ? "Meta accepted none of the AR app tokens" : error;
     }
-    result.error = error.empty() ? "no stored AR app token was accepted by Meta" : error;
     return result;
 }
 
@@ -319,11 +359,8 @@ ProvisionResult runChangeOwner(GlassesSession& session, const crypto::OwnerKey& 
     Bytes payload;
 
     result.stage = ProvisionStage::Identity;
-    if (!session.sendOnService(IdentityService, MtIdentityRequest, {}) ||
-        !awaitType(session, MtIdentityResponse, payload, result.glasses_status, result.error)) {
-        if (result.error.empty()) {
-            result.error = "could not ask the glasses who they are";
-        }
+    if (!identityStep(session, MtIdentityRequest, {}, MtIdentityResponse, payload, result,
+                      "could not ask the glasses who they are")) {
         return result;
     }
     const auto identity = proto::Message::parse(payload);
@@ -340,11 +377,8 @@ ProvisionResult runChangeOwner(GlassesSession& session, const crypto::OwnerKey& 
     const std::string serial = toString(*serial_bytes);
 
     result.stage = ProvisionStage::SkipChallenge;
-    if (!session.sendOnService(IdentityService, MtSkipChallenge, {}) ||
-        !awaitType(session, MtSkipChallengeAck, payload, result.glasses_status, result.error)) {
-        if (result.error.empty()) {
-            result.error = "the glasses did not answer the skip-challenge";
-        }
+    if (!identityStep(session, MtSkipChallenge, {}, MtSkipChallengeAck, payload, result,
+                      "the glasses did not answer the skip-challenge")) {
         return result;
     }
     const auto challenge = proto::Message::parse(payload);
@@ -378,11 +412,8 @@ ProvisionResult runChangeOwner(GlassesSession& session, const crypto::OwnerKey& 
     }
 
     result.stage = ProvisionStage::StartChangeOwner;
-    if (!session.sendOnService(IdentityService, MtStartChangeOwnerReq, pending->encode()) ||
-        !awaitType(session, MtStartChangeOwnerResp, payload, result.glasses_status, result.error)) {
-        if (result.error.empty()) {
-            result.error = "the glasses did not accept the pending receipt";
-        }
+    if (!identityStep(session, MtStartChangeOwnerReq, pending->encode(), MtStartChangeOwnerResp,
+                      payload, result, "the glasses did not accept the pending receipt")) {
         return result;
     }
     const auto device_pending = proto::Message::parse(payload);
@@ -409,12 +440,9 @@ ProvisionResult runChangeOwner(GlassesSession& session, const crypto::OwnerKey& 
     }
 
     result.stage = ProvisionStage::FinishChangeOwner;
-    if (!session.sendOnService(IdentityService, MtFinishChangeOwnerReq, final_receipt->encode()) ||
-        !awaitType(session, MtFinishChangeOwnerResp, payload, result.glasses_status,
-                   result.error)) {
-        if (result.error.empty()) {
-            result.error = "the glasses did not acknowledge the final receipt";
-        }
+    if (!identityStep(session, MtFinishChangeOwnerReq, final_receipt->encode(),
+                      MtFinishChangeOwnerResp, payload, result,
+                      "the glasses did not acknowledge the final receipt")) {
         return result;
     }
 

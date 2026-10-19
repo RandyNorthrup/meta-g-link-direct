@@ -31,9 +31,9 @@ class Message {
 
   private:
     struct Field {
-        std::uint32_t number;
-        bool length_delimited;
-        std::uint64_t varint;
+        std::uint32_t number = 0;
+        bool length_delimited = false;
+        std::uint64_t varint = 0;
         ByteView bytes;
     };
     std::vector<Field> fields_;

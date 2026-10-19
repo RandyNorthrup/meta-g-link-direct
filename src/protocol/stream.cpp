@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-// Port of Visor core/media Wifi.kt and StreamProto.kt at the revision in THIRD_PARTY_NOTICES.md.
+// Media streaming messages ported from Visor core/media StreamProto.kt at the revision in
+// THIRD_PARTY_NOTICES.md. The glasses-hosted access point messages (svc10 CreateSoftApNetwork and
+// SoftApNetworkInfo) follow the Meta AI app's protocol classes, com.oculus.atc.
 #include "mgl/stream.hpp"
 
 #include "mgl/bytes.hpp"
@@ -13,48 +15,58 @@
 
 namespace mgl::stream {
 namespace {
-std::string textOf(ByteView bytes) {
-    return std::string(reinterpret_cast<const char*>(bytes.data()),
-                       bytes.size()); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-}
-ByteView strView(std::string_view text) {
-    return {reinterpret_cast<const std::uint8_t*>(text.data()),
-            text.size()}; // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-}
+std::string textOf(ByteView bytes) { return {bytes.begin(), bytes.end()}; }
 } // namespace
 
-Bytes buildJoinAccessPoint(const std::string& ssid, const std::string& passphrase,
-                           const std::array<std::uint8_t, 16>& uuid, std::uint8_t bandwidth) {
+Bytes buildCreateSoftApNetwork(const std::string& ssid, const std::string& passphrase,
+                               std::uint32_t band, std::uint32_t bandwidth, std::uint32_t channel,
+                               const std::string& country_code,
+                               const std::array<std::uint8_t, 16>& uuid) {
+    Bytes credentials;
+    proto::appendStringField(credentials, 1, ssid);
+    proto::appendStringField(credentials, 2, passphrase);
     Bytes out;
-    proto::appendStringField(out, 1, ssid);
-    proto::appendStringField(out, 2, passphrase);
-    proto::appendBytesField(out, 3, {uuid.data(), uuid.size()});
-    proto::appendVarintField(out, 4, bandwidth);
+    proto::appendVarintField(out, 3, band);
+    proto::appendVarintField(out, 4, channel);
+    proto::appendStringField(out, 6, country_code);
+    proto::appendBytesField(out, 7, {uuid.data(), uuid.size()});
+    proto::appendBytesField(out, 8, {credentials.data(), credentials.size()});
+    proto::appendVarintField(out, 9, bandwidth);
     return out;
 }
 
-std::optional<JoinResult> parseJoinResult(ByteView payload) {
+std::optional<SoftApInfo> parseSoftApNetworkInfo(ByteView payload) {
     const auto message = proto::Message::parse(payload);
     if (!message) {
         return std::nullopt;
     }
-    JoinResult result;
-    result.status = static_cast<std::uint32_t>(message->varintOr(1, 0));
-    result.port = static_cast<std::uint32_t>(message->varintOr(3, 0));
+    SoftApInfo info;
+    info.status = static_cast<std::uint32_t>(message->varintOr(1, 0));
+    info.port = static_cast<std::uint32_t>(message->varintOr(4, 0));
+    info.channel = static_cast<std::uint32_t>(message->varintOr(5, 0));
     // field 2 repeated NetworkAddress, each with the address text in field 3.
     for (const auto entry : message->repeatedBytes(2)) {
-        const auto address = proto::Message::parse(entry);
-        if (address) {
+        if (const auto address = proto::Message::parse(entry)) {
             if (const auto text = address->bytes(3)) {
-                const auto value = textOf(*text);
-                if (!value.empty()) {
-                    result.address = value;
+                if (const auto value = textOf(*text); !value.empty()) {
+                    info.address = value;
                     break;
                 }
             }
         }
     }
-    return result;
+    // field 3 credentials {1 ssid, 2 password}, echoed back.
+    if (const auto creds = message->bytes(3)) {
+        if (const auto parsed = proto::Message::parse(*creds)) {
+            if (const auto ssid = parsed->bytes(1)) {
+                info.ssid = textOf(*ssid);
+            }
+            if (const auto pass = parsed->bytes(2)) {
+                info.passphrase = textOf(*pass);
+            }
+        }
+    }
+    return info;
 }
 
 Bytes buildStartApp(std::uint16_t app_id) {
@@ -155,5 +167,55 @@ std::optional<CodecConfig> parseCodecConfig(ByteView payload) {
         config.data.assign(data->begin(), data->end());
     }
     return config;
+}
+
+std::optional<std::uint64_t> parseStreamStopped(ByteView payload) {
+    const auto message = proto::Message::parse(payload);
+    if (!message) {
+        return std::nullopt;
+    }
+    return message->varintOr(2, 0);
+}
+
+std::string_view stopReasonText(std::uint64_t reason) {
+    // The firmware's ControlStreamStopped reasons, in enum order (Visor StreamProto.kt).
+    constexpr std::array<std::string_view, 24> Reasons{"unknown",
+                                                       "user initiated",
+                                                       "system preempt",
+                                                       "system shutdown",
+                                                       "battery low",
+                                                       "thermal threshold",
+                                                       "inactivity",
+                                                       "camera failure",
+                                                       "doff",
+                                                       "temples closed",
+                                                       "audio failure",
+                                                       "mobile stream error",
+                                                       "peak power interrupt",
+                                                       "user pause",
+                                                       "tamper detected",
+                                                       "hardware toggle",
+                                                       "shutdown for battery",
+                                                       "frame initiated",
+                                                       "client preempt",
+                                                       "version not supported",
+                                                       "client initiated",
+                                                       "companion requested stop",
+                                                       "weak signal",
+                                                       "service destroyed"};
+    return reason < Reasons.size() ? Reasons.at(reason) : Reasons.front();
+}
+
+std::optional<HealthEvent> parseHealthEvent(ByteView payload) {
+    const auto message = proto::Message::parse(payload);
+    if (!message) {
+        return std::nullopt;
+    }
+    // Field 3 is a zigzag-coded sint64.
+    const auto raw = message->varintOr(3, 0);
+    const auto magnitude = static_cast<std::int64_t>(raw >> 1U);
+    return HealthEvent{.status = message->varintOr(1, 0),
+                       .type = message->varintOr(2, 0),
+                       .level = (raw & 1U) != 0 ? -magnitude - 1 : magnitude};
 }
 } // namespace mgl::stream

@@ -17,7 +17,7 @@ struct TcpOpen {
     std::unique_ptr<Transport> transport;
 };
 
-// Connects to the glasses' Wi-Fi address and port from the JoinAccessPoint result.
+// Connects to the glasses' Wi-Fi address and port from their SoftApNetworkInfo.
 [[nodiscard]] TcpOpen openTcp(const std::string& address, std::uint16_t port);
 } // namespace mgl
 #endif

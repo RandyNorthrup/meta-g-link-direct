@@ -81,7 +81,7 @@ Describe 'Native diagnostic probe contract' {
         $result = Invoke-ProbeProcess -ProbeArguments '--help'
         $result.Code | Should -Be 0
         $result.Error | Should -BeNullOrEmpty
-        $result.Out | Should -Match 'passive BLE scan for 10 seconds'
+        $result.Out | Should -Match 'active BLE scan for 10 seconds'
         $result.Out | Should -Match 'not verified model or authenticated glasses'
     }
 

@@ -3,6 +3,7 @@
 
 #include "mgl/bytes.hpp"
 
+#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <cstdint>
@@ -18,6 +19,16 @@ constexpr std::string_view Base64Alphabet =
 constexpr char Pad = '=';
 constexpr unsigned ByteBits = 8;
 constexpr unsigned SextetBits = 6;
+constexpr std::uint32_t ByteMask = 0xFFU;
+constexpr std::uint32_t SextetMask = 0x3FU;
+constexpr unsigned NibbleBits = 4;
+constexpr unsigned NibbleMask = 0x0FU;
+// Base64 maps each group of three bytes (24 bits) to four symbols.
+constexpr std::size_t GroupBytes = 3;
+constexpr std::size_t GroupSymbols = 4;
+constexpr unsigned GroupBits = 24;
+constexpr unsigned StoredLengthBytes = 2;
+constexpr unsigned TrailerFieldBytes = 4;
 
 std::uint8_t decodeSymbol(char symbol) {
     if (symbol >= 'A' && symbol <= 'Z') {
@@ -53,36 +64,33 @@ std::uint32_t crc32(ByteView data) {
     }
     return ~crc;
 }
+
+// Appends the four symbols for one to three bytes; a short final group carries one symbol more
+// than its byte count and is padded with '='.
+void encodeGroup(ByteView group, std::string& out) {
+    std::uint32_t bits = 0;
+    unsigned shift = GroupBits;
+    for (const auto byte : group) {
+        shift -= ByteBits;
+        bits |= static_cast<std::uint32_t>(byte) << shift;
+    }
+    shift = GroupBits;
+    for (std::size_t symbol = 0; symbol < GroupSymbols; ++symbol) {
+        shift -= SextetBits;
+        out.push_back(symbol <= group.size() ? Base64Alphabet.at((bits >> shift) & SextetMask)
+                                             : Pad);
+    }
+}
+
 } // namespace
 
 std::string base64Encode(ByteView data) {
     std::string out;
-    out.reserve(((data.size() + 2) / 3) * 4);
-    std::size_t index = 0;
-    while (index + 3 <= data.size()) {
-        const std::uint32_t triple = (static_cast<std::uint32_t>(data[index]) << 16) |
-                                     (static_cast<std::uint32_t>(data[index + 1]) << 8) |
-                                     data[index + 2];
-        out.push_back(Base64Alphabet[(triple >> 18) & 0x3F]);
-        out.push_back(Base64Alphabet[(triple >> 12) & 0x3F]);
-        out.push_back(Base64Alphabet[(triple >> 6) & 0x3F]);
-        out.push_back(Base64Alphabet[triple & 0x3F]);
-        index += 3;
-    }
-    const auto remaining = data.size() - index;
-    if (remaining == 1) {
-        const std::uint32_t triple = static_cast<std::uint32_t>(data[index]) << 16;
-        out.push_back(Base64Alphabet[(triple >> 18) & 0x3F]);
-        out.push_back(Base64Alphabet[(triple >> 12) & 0x3F]);
-        out.push_back(Pad);
-        out.push_back(Pad);
-    } else if (remaining == 2) {
-        const std::uint32_t triple = (static_cast<std::uint32_t>(data[index]) << 16) |
-                                     (static_cast<std::uint32_t>(data[index + 1]) << 8);
-        out.push_back(Base64Alphabet[(triple >> 18) & 0x3F]);
-        out.push_back(Base64Alphabet[(triple >> 12) & 0x3F]);
-        out.push_back(Base64Alphabet[(triple >> 6) & 0x3F]);
-        out.push_back(Pad);
+    out.reserve(((data.size() + GroupBytes - 1) / GroupBytes) * GroupSymbols);
+    for (auto rest = data; !rest.empty();) {
+        const auto group = rest.first(std::min(GroupBytes, rest.size()));
+        encodeGroup(group, out);
+        rest = rest.subspan(group.size());
     }
     return out;
 }
@@ -99,7 +107,7 @@ Bytes base64Decode(std::string_view text) {
         bits += SextetBits;
         if (bits >= ByteBits) {
             bits -= ByteBits;
-            out.push_back(static_cast<std::uint8_t>((accumulator >> bits) & 0xFF));
+            out.push_back(static_cast<std::uint8_t>((accumulator >> bits) & ByteMask));
         }
     }
     return out;
@@ -117,8 +125,8 @@ std::string quotePlus(std::string_view value) {
             out.push_back('+');
         } else {
             out.push_back('%');
-            out.push_back(Hex[ch >> 4]);
-            out.push_back(Hex[ch & 0x0F]);
+            out.push_back(Hex.at(static_cast<unsigned>(ch) >> NibbleBits));
+            out.push_back(Hex.at(static_cast<unsigned>(ch) & NibbleMask));
         }
     }
     return out;
@@ -159,21 +167,15 @@ Bytes gzip(ByteView data) {
         const auto chunk = std::min(MaxBlock, data.size() - offset);
         const bool final_block = offset + chunk >= data.size();
         out.push_back(final_block ? 0x01 : 0x00);
-        out.push_back(static_cast<std::uint8_t>(chunk & 0xFF));
-        out.push_back(static_cast<std::uint8_t>((chunk >> 8) & 0xFF));
-        const auto inverted = static_cast<std::uint16_t>(~chunk);
-        out.push_back(static_cast<std::uint8_t>(inverted & 0xFF));
-        out.push_back(static_cast<std::uint8_t>((inverted >> 8) & 0xFF));
+        const auto length = static_cast<std::uint32_t>(chunk);
+        appendLittleEndian(out, length, StoredLengthBytes);
+        appendLittleEndian(out, ~length, StoredLengthBytes); // NLEN, the one's complement of LEN
         append(out, data.subspan(offset, chunk));
         offset += chunk;
     }
-    const auto crc = crc32(data);
-    const auto size = static_cast<std::uint32_t>(data.size());
-    for (const auto value : {crc, size}) {
-        for (unsigned shift = 0; shift < 32; shift += ByteBits) {
-            out.push_back(static_cast<std::uint8_t>((value >> shift) & 0xFF));
-        }
-    }
+    // Trailer: CRC-32, then the input size modulo 2^32.
+    appendLittleEndian(out, crc32(data), TrailerFieldBytes);
+    appendLittleEndian(out, static_cast<std::uint32_t>(data.size()), TrailerFieldBytes);
     return out;
 }
 } // namespace mgl::encoding
