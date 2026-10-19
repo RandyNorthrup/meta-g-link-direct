@@ -31,18 +31,34 @@ static void output_frame(void* context, const struct MglCameraFrame* picture) {
     obs_source_output_video(source, &frame);
 }
 
+// Runs on the camera worker thread for each block of decoded glasses audio (mono or stereo).
+static void output_audio(void* context, const struct MglCameraAudio* sound) {
+    obs_source_t* source = context;
+    struct obs_source_audio audio = {0};
+    for (uint32_t plane = 0; plane < sound->channels && plane < MAX_AV_PLANES; ++plane) {
+        audio.data[plane] = (const uint8_t*)sound->planes[plane];
+    }
+    audio.frames = sound->frames;
+    audio.speakers = sound->channels == 1 ? SPEAKERS_MONO : SPEAKERS_STEREO;
+    audio.format = AUDIO_FORMAT_FLOAT_PLANAR;
+    audio.samples_per_sec = sound->sample_rate;
+    audio.timestamp = sound->timestamp_ns;
+    obs_source_output_audio(source, &audio);
+}
+
 static const char* source_get_name(void* type_data) {
     (void)type_data;
     return obs_module_text("MetaGLinkCamera");
 }
 
 static void* source_create(obs_data_t* settings, obs_source_t* source) {
-    struct MglCamera* camera = mglCameraCreate(output_frame, log_line, source);
+    struct MglCamera* camera = mglCameraCreate(output_frame, output_audio, log_line, source);
     if (camera == NULL) {
         return NULL;
     }
     mglCameraSetQuality(camera, obs_data_get_string(settings, "quality"));
     mglCameraSetWifiAdapter(camera, obs_data_get_string(settings, "wifi_adapter"));
+    mglCameraSetAudio(camera, obs_data_get_bool(settings, "glasses_audio"));
     // Present frames as they arrive: the glasses' presentation clock is unrelated to OBS's, so the
     // default timestamp-buffered path would schedule them far in the future and show nothing.
     obs_source_set_async_unbuffered(source, true);
@@ -60,6 +76,7 @@ static void source_deactivate(void* data) { mglCameraStop(data); }
 static void source_get_defaults(obs_data_t* settings) {
     obs_data_set_default_string(settings, "quality", mglCameraQualityKey(0));
     obs_data_set_default_string(settings, "wifi_adapter", "");
+    obs_data_set_default_bool(settings, "glasses_audio", false);
 }
 
 // The adapters shown in the Wi-Fi adapter list; PCs rarely have more than one or two.
@@ -92,6 +109,9 @@ static obs_properties_t* source_get_properties(void* data) {
     }
     obs_property_set_long_description(quality, obs_module_text("Quality.Desc"));
     add_wifi_adapter_list(props);
+    obs_property_t* audio =
+        obs_properties_add_bool(props, "glasses_audio", obs_module_text("GlassesAudio"));
+    obs_property_set_long_description(audio, obs_module_text("GlassesAudio.Desc"));
     // A Narrator-readable status line showing the current connection state.
     obs_properties_add_text(props, "status", obs_module_text(mglCameraStatusKey(data)),
                             OBS_TEXT_INFO);
@@ -100,9 +120,10 @@ static obs_properties_t* source_get_properties(void* data) {
 }
 
 static void source_update(void* data, obs_data_t* settings) {
-    // A running capture picks up the new quality and Wi-Fi adapter on its next start.
+    // A running capture picks up the new quality, Wi-Fi adapter and audio choice on its next start.
     mglCameraSetQuality(data, obs_data_get_string(settings, "quality"));
     mglCameraSetWifiAdapter(data, obs_data_get_string(settings, "wifi_adapter"));
+    mglCameraSetAudio(data, obs_data_get_bool(settings, "glasses_audio"));
 }
 
 // Called once from obs_module_load in module.c.
@@ -110,7 +131,9 @@ void mgl_register_camera_source(void) {
     static struct obs_source_info info = {
         .id = "meta_g_link_camera",
         .type = OBS_SOURCE_TYPE_INPUT,
-        .output_flags = OBS_SOURCE_ASYNC_VIDEO | OBS_SOURCE_DO_NOT_DUPLICATE,
+        // OBS_SOURCE_AUDIO puts the source in the audio mixer; it stays silent unless glasses
+        // audio is turned on in the properties.
+        .output_flags = OBS_SOURCE_ASYNC_VIDEO | OBS_SOURCE_AUDIO | OBS_SOURCE_DO_NOT_DUPLICATE,
         .get_name = source_get_name,
         .create = source_create,
         .destroy = source_destroy,

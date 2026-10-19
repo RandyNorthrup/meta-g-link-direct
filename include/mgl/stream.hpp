@@ -101,8 +101,16 @@ struct VideoConfig {
 [[nodiscard]] Bytes buildSessionSettings(std::uint16_t app_type, bool bypass_don);
 // ConfigureVideoStreamRequest (type 5): nonce, VideoConfig, enabled.
 [[nodiscard]] Bytes buildConfigureVideo(std::uint32_t nonce, const VideoConfig& config);
-// ConfigureAudioStreamRequest (type 3): nonce, AudioConfig, enabled flag.
+// The audio format asked of the glasses' microphones, as the Meta app asks for it.
+inline constexpr std::uint32_t AudioSampleRate = 48'000;
+inline constexpr std::uint32_t AudioChannels = 2;
+inline constexpr std::uint32_t AudioBitrate = 96'000;
+// ConfigureAudioStreamRequest (type 3): nonce, AudioConfig {AAC-LC, the format above}, enabled.
 [[nodiscard]] Bytes buildConfigureAudio(std::uint32_t nonce, bool enabled);
+// The AAC AudioSpecificConfig (ISO/IEC 14496-3) for the format buildConfigureAudio asks for. The
+// glasses send raw AAC access units and no configuration of their own (observed on Gen 2), so a
+// decoder needs this to start.
+[[nodiscard]] Bytes requestedAudioSpecificConfig();
 // ControlStreamRequest (type 7): nonce, action.
 [[nodiscard]] Bytes buildControlStream(std::uint32_t nonce, std::uint8_t action);
 
@@ -126,11 +134,22 @@ struct HealthEvent {
 };
 [[nodiscard]] std::optional<HealthEvent> parseHealthEvent(ByteView payload);
 
-// CodecConfigurationUpdateRequest (type 1): field 2 codec (1 audio, 2 video), field 3 bytes.
+// CodecConfigurationUpdateRequest (type 1): field 2 codec, field 3 bytes.
+inline constexpr std::uint32_t CodecAudio = 1;
+inline constexpr std::uint32_t CodecVideo = 2;
 struct CodecConfig {
     std::uint32_t codec = 0;
-    Bytes data; // Annex-B parameter sets for video
+    Bytes data; // Annex-B parameter sets for video; an AAC AudioSpecificConfig for audio
 };
 [[nodiscard]] std::optional<CodecConfig> parseCodecConfig(ByteView payload);
+
+// A reassembled media access unit (video or audio): an 8-byte little-endian presentation time in
+// microseconds on the glasses' clock, then the coded payload. nullopt when nothing follows the
+// prefix.
+struct TimedUnit {
+    std::uint64_t pts_us = 0;
+    ByteView payload;
+};
+[[nodiscard]] std::optional<TimedUnit> splitTimedUnit(ByteView unit);
 } // namespace mgl::stream
 #endif

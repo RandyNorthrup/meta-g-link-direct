@@ -29,11 +29,22 @@ struct MglCameraFrame {
     bool full_range;
 };
 
+// A block of decoded glasses audio as 32-bit float planar samples, one plane per channel. The
+// planes are valid only for the duration of the callback.
+struct MglCameraAudio {
+    const float* planes[8]; // NOLINT(modernize-avoid-c-arrays) — C ABI; OBS takes up to 8 planes
+    uint32_t channels;
+    uint32_t frames; // samples per channel
+    uint32_t sample_rate;
+    uint64_t timestamp_ns;
+};
+
 struct MglCamera;
 
-// Returns NULL if the camera cannot be allocated. Both callbacks run on the camera's worker
-// thread; context is passed back to on_frame unchanged.
+// Returns NULL if the camera cannot be allocated. The callbacks run on the camera's worker thread;
+// context is passed back to on_frame and on_audio unchanged. on_audio may be NULL.
 struct MglCamera* mglCameraCreate(void (*on_frame)(void* context, const struct MglCameraFrame* frame),
+                                  void (*on_audio)(void* context, const struct MglCameraAudio* audio),
                                   void (*on_log)(const char* message), void* context);
 // Stops any capture and frees the camera. NULL is ignored. Returns without waiting for the radio:
 // the link is torn down on a background thread (see mglCameraShutdown).
@@ -53,6 +64,8 @@ const char* mglCameraQualityKey(size_t index);
 // Selects a quality preset by locale key; NULL or unknown keys are ignored. A running capture
 // picks up the new preset on its next start.
 void mglCameraSetQuality(struct MglCamera* camera, const char* key);
+// Turns the glasses' microphones on or off for the next start. Off by default.
+void mglCameraSetAudio(struct MglCamera* camera, bool enabled);
 // Locale key describing the current connection state. NULL reports the idle state.
 const char* mglCameraStatusKey(const struct MglCamera* camera);
 

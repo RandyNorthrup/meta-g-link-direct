@@ -1,0 +1,53 @@
+BASELINE EXIT 0
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 4 tests in 177ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\installer.Tests.ps1'
+Describing Installer locations
+  [+] takes system folders from Windows rather than from drive letters 109ms (80ms|29ms)
+  [+] puts the shared plugin folder in the ProgramData folder that Windows reports 201ms (200ms|1ms)
+  [+] derives the OBS folder from obs64.exe on any drive 4ms (2ms|3ms)
+  [+] reads Steam library folders on other drives 25ms (24ms|1ms)
+Tests completed in 919ms
+Tests Passed: 4, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+
+MUTATED EXIT 1
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 4 tests in 176ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\installer.Tests.ps1'
+Describing Installer locations
+  [-] takes system folders from Windows rather than from drive letters 141ms (113ms|28ms)
+   Expected $null or empty, because the installer must not assume a drive letter, but got ''C:\ProgramData''.
+   at $literals | Should -BeNullOrEmpty -Because 'the installer must not assume a drive letter', C:\Users\Randy\Coding\meta_g_link_direct\tests\installer.Tests.ps1:28
+   at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\installer.Tests.ps1:28
+  [+] puts the shared plugin folder in the ProgramData folder that Windows reports 193ms (192ms|1ms)
+  [+] derives the OBS folder from obs64.exe on any drive 5ms (2ms|3ms)
+  [+] reads Steam library folders on other drives 23ms (22ms|1ms)
+Tests completed in 989ms
+Tests Passed: 3, Failed: 1, Skipped: 0, Inconclusive: 0, NotRun: 0
+Write-Error: Pester installer tests failed or discovery count changed
+
+RESTORED EXIT 0
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 4 tests in 178ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\installer.Tests.ps1'
+Describing Installer locations
+  [+] takes system folders from Windows rather than from drive letters 115ms (86ms|29ms)
+  [+] puts the shared plugin folder in the ProgramData folder that Windows reports 211ms (210ms|1ms)
+  [+] derives the OBS folder from obs64.exe on any drive 4ms (2ms|3ms)
+  [+] reads Steam library folders on other drives 25ms (24ms|1ms)
+Tests completed in 954ms
+Tests Passed: 4, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+
+RESTORATION SHA256 3b45b7023416a047163d7edabeba7413cfb2b9d7e073983f02eb0910284a7865

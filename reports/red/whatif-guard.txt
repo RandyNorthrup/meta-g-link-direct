@@ -2,27 +2,27 @@ BASELINE EXIT 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 3 tests in 209ms.
+Discovery found 3 tests in 171ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 612ms (580ms|31ms)
-  [+] formats a disposable source when effects are requested 598ms (596ms|2ms)
-  [+] propagates native formatter errors 735ms (734ms|1ms)
-Tests completed in 2.63s
+  [+] does not modify files with WhatIf 476ms (439ms|37ms)
+  [+] formats a disposable source when effects are requested 510ms (508ms|2ms)
+  [+] propagates native formatter errors 588ms (587ms|1ms)
+Tests completed in 2.18s
 Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
 MUTATED EXIT 1
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 3 tests in 212ms.
+Discovery found 3 tests in 187ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [-] does not modify files with WhatIf 689ms (659ms|30ms)
+  [-] does not modify files with WhatIf 633ms (601ms|33ms)
    Expected strings to be the same, but they were different.
    Expected length: 23
    Actual length:   25
@@ -32,9 +32,9 @@ Describing Project task runner
               ---------^
    at [IO.File]::ReadAllText($samplePath) | Should -BeExactly $originalSample, C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1:26
    at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1:26
-  [+] formats a disposable source when effects are requested 562ms (559ms|3ms)
-  [+] propagates native formatter errors 692ms (691ms|1ms)
-Tests completed in 2.66s
+  [+] formats a disposable source when effects are requested 555ms (553ms|2ms)
+  [+] propagates native formatter errors 562ms (561ms|1ms)
+Tests completed in 2.36s
 Tests Passed: 2, Failed: 1, Skipped: 0, Inconclusive: 0, NotRun: 0
 Write-Error: Pester runner tests failed or discovery count changed
 
@@ -42,15 +42,15 @@ RESTORED EXIT 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 3 tests in 206ms.
+Discovery found 3 tests in 214ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 592ms (555ms|37ms)
-  [+] formats a disposable source when effects are requested 604ms (599ms|6ms)
-  [+] propagates native formatter errors 709ms (707ms|2ms)
-Tests completed in 2.67s
+  [+] does not modify files with WhatIf 531ms (499ms|32ms)
+  [+] formats a disposable source when effects are requested 582ms (578ms|4ms)
+  [+] propagates native formatter errors 677ms (676ms|1ms)
+Tests completed in 2.45s
 Tests Passed: 3, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
-RESTORATION SHA256 de78c654f25a0ad94f656ad78b5bd6e1aee0f8dba3423574089510fbfb5b0d1c
+RESTORATION SHA256 840ad4ffbe235c6458119df5bc59dc96012396525257d02cf0fc356866cb0eb6

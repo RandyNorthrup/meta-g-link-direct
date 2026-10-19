@@ -15,7 +15,7 @@ Meta G Link Direct is licensed under the GNU Affero General Public License versi
   - `core/session/SecureLink.kt`, `core/session/GlassesSession.kt` → `src/windows/session.cpp` (handshake, trust, EndLinkSetup, DataX receive loop).
   - `app/connection/AndroidTransportFactory.kt` and `core/transport` → `src/windows/rfcomm_transport.cpp` (RFCOMM whole-SDU transport over WinRT service resolution and Winsock).
   - `core/identity/token/WebLogin.kt`, `Frla.kt`, `core/identity/provision/Provision.kt`, `PyJson.kt` → `src/windows/provision.cpp`, `src/protocol/json.cpp` (Meta login, svc36 change of owner, Python-compatible JSON for ownership receipts).
-  - `core/media/StreamProto.kt`, `LiveStream.kt`, `Canary.kt` → `src/protocol/stream.cpp`, `src/protocol/hevc.cpp`, `src/windows/media_session.cpp` (stream configuration and control messages, HEVC access-unit reassembly, stream bring-up order, svc100 keepalive).
+  - `core/media/StreamProto.kt`, `LiveStream.kt`, `Canary.kt` → `src/protocol/stream.cpp`, `src/protocol/hevc.cpp`, `src/windows/media_session.cpp` (stream configuration and control messages including the audio configuration, HEVC and AAC access-unit reassembly with the presentation-time prefix, codec-configuration routing, stream bring-up order, svc100 keepalive). The fallback AudioSpecificConfig is this project's own: on Gen 2 the glasses sent no audio configuration.
   - `app/setup/NearbyGlasses.kt` and `core/transport/BluetoothRfcommTransport.kt` → `src/windows/discovery.cpp`, `src/windows/classic.cpp` (the Meta manufacturer and service markers and the RFCOMM service UUID used by the diagnostics).
 - Protocol facts (service ids, message types, framing, channel binding) also follow the Visor GitHub wiki, read 2026-10-15 to 2026-10-18.
 - Not ported: Visor's Wi-Fi group (`Wifi.kt`). This project uses a glasses-hosted network instead (below).
@@ -36,9 +36,11 @@ The setup tool contains the Meta AI app's two client tokens (see `AGENTS.md` rev
 - The plugin builds against OBS's public module headers and import library (GPL-2.0-or-later in OBS's source notices) and follows the documented module API. No private ABI declaration is copied.
 - Source and dependency archives are downloaded to the ignored `.deps/` and verified against pinned hashes. Their licenses stay with the original packages. Release zips do not redistribute them.
 
+OBS Studio 33.0.0-rc2 (the official Windows zip, SHA-256 `33d5fab2e23ffbcd0e32a4a33ee11c26ebe7b99276a2e550445b27feb75a4127`) was used only as a test runtime for loading the plugin. Nothing from it is copied into this repository or the release zip.
+
 ## FFmpeg
 
-The plugin decodes video with the FFmpeg libraries `avcodec` and `avutil` that ship with OBS Studio (LGPL-2.1-or-later as built by OBS). It links their import libraries from the OBS dependency package and loads the DLLs from the user's OBS installation. Release zips do not include FFmpeg.
+The plugin decodes video and audio with the FFmpeg libraries `avcodec` and `avutil` that ship with OBS Studio (LGPL-2.1-or-later as built by OBS). It links their import libraries from the OBS dependency package and loads the DLLs from the user's OBS installation. Release zips do not include FFmpeg.
 
 ## Microsoft Windows SDK and C++/WinRT
 

@@ -146,11 +146,11 @@
     "mutated_exit": 1,
     "restored_exit": 0,
     "expected_diagnostic": "PSUseApprovedVerbs",
-    "observed_diagnostic": "PSUseApprovedVerbs Warning  Invoke-Project.ps1 565  The cmdlet 'Badverb-RedDrill' uses an unapproved verb.",
+    "observed_diagnostic": "PSUseApprovedVerbs Warning  Invoke-Project.ps1 578  The cmdlet 'Badverb-RedDrill' uses an unapproved verb.",
     "path": "scripts/Invoke-Project.ps1",
-    "before": "de78c654f25a0ad94f656ad78b5bd6e1aee0f8dba3423574089510fbfb5b0d1c",
-    "mutated": "3bfe23936310c70dbe9fd38c40c5a9229f3f6c461d3d7c3723841f576341c0b8",
-    "after": "de78c654f25a0ad94f656ad78b5bd6e1aee0f8dba3423574089510fbfb5b0d1c",
+    "before": "840ad4ffbe235c6458119df5bc59dc96012396525257d02cf0fc356866cb0eb6",
+    "mutated": "a518ec8bbfcee906772b1315c309910ad8c8af3a0f5376077efce97d59f904f6",
+    "after": "840ad4ffbe235c6458119df5bc59dc96012396525257d02cf0fc356866cb0eb6",
     "log": "reports/red/script-analysis.txt"
   },
   {
@@ -174,10 +174,10 @@
     "mutated_exit": 1,
     "restored_exit": 0,
     "expected_diagnostic": "leaks found",
-    "observed_diagnostic": "9:11AM WRN leaks found: 1",
+    "observed_diagnostic": "11:07AM WRN leaks found: 1",
     "path": "src/protocol/sdu.cpp",
     "before": "23f81a1e6ccdf6122fdb9414b839a7e2ca96f3564b1608f35ffa807579178ca0",
-    "mutated": "f60e7603ecc4f444e08c0d94d4f6fd3ff9351305f378aca42c7120aec12d224d",
+    "mutated": "8ec5519fa4f0a1a1fe00a96bf3005916c096e78085039af3e76f9ebb1ef12e40",
     "after": "23f81a1e6ccdf6122fdb9414b839a7e2ca96f3564b1608f35ffa807579178ca0",
     "log": "reports/red/secret-scanner.txt"
   },
@@ -216,7 +216,7 @@
     "mutated_exit": 1,
     "restored_exit": 0,
     "expected_diagnostic": "AddressSanitizer: heap-buffer-overflow",
-    "observed_diagnostic": "==22324==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x120c000a0034 at pc 0x7ff7579253de bp 0x0099daaff9e0 sp 0x0099daaff9e8",
+    "observed_diagnostic": "==37828==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x113beb5a0034 at pc 0x7ff64bf453de bp 0x002046f9fea0 sp 0x002046f9fea8",
     "path": "tests/sdu_tests.cpp",
     "before": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd",
     "mutated": "f0b8a6f71a8f96f071d86024029c536756dd654d9beaea73b9a22d9535147d2e",
@@ -233,7 +233,7 @@
     "observed_diagnostic": "Command Injection in lodash - https://github.com/advisories/GHSA-35jh-r3h4-6jhm",
     "path": "package-lock.json",
     "before": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16",
-    "mutated": "55a94e0ca609f9c43263164d98163a9057daf13c65dd980eccc570ad31f8c11f",
+    "mutated": "1eb4bd3ed798d6ece10bbd0df798013dfdd70b86e60e68c983767e0b3e9c039f",
     "after": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16",
     "log": "reports/red/dependency-npm.txt"
   },
@@ -247,7 +247,7 @@
     "observed_diagnostic": "| https://osv.dev/GHSA-35jh-r3h4-6jhm | 7.2  | npm       | lodash (dev) | 4.17.20 | 4.17.21       | package-lock.json |",
     "path": "package-lock.json",
     "before": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16",
-    "mutated": "55a94e0ca609f9c43263164d98163a9057daf13c65dd980eccc570ad31f8c11f",
+    "mutated": "1eb4bd3ed798d6ece10bbd0df798013dfdd70b86e60e68c983767e0b3e9c039f",
     "after": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16",
     "log": "reports/red/dependency-osv.txt"
   },
@@ -260,9 +260,9 @@
     "expected_diagnostic": "Expected strings to be the same",
     "observed_diagnostic": "Expected strings to be the same, but they were different.",
     "path": "scripts/Invoke-Project.ps1",
-    "before": "de78c654f25a0ad94f656ad78b5bd6e1aee0f8dba3423574089510fbfb5b0d1c",
-    "mutated": "b6350c3aef1fdebbdd34b32daf39c75b2847de5a6ebb86abf887759ee2ba0c28",
-    "after": "de78c654f25a0ad94f656ad78b5bd6e1aee0f8dba3423574089510fbfb5b0d1c",
+    "before": "840ad4ffbe235c6458119df5bc59dc96012396525257d02cf0fc356866cb0eb6",
+    "mutated": "5decb64468769c011efe97d74d14522288d19d53023a62467151f2d425151423",
+    "after": "840ad4ffbe235c6458119df5bc59dc96012396525257d02cf0fc356866cb0eb6",
     "log": "reports/red/whatif-guard.txt"
   },
   {
@@ -274,9 +274,23 @@
     "expected_diagnostic": "Expected 0 to be different from the actual value",
     "observed_diagnostic": "Expected 0 to be different from the actual value, but got the same value.",
     "path": "scripts/Invoke-Project.ps1",
-    "before": "de78c654f25a0ad94f656ad78b5bd6e1aee0f8dba3423574089510fbfb5b0d1c",
-    "mutated": "531292ec3da95d9e03db5e04e5b2948c95ceffc01935353949fb681e28e51f4c",
-    "after": "de78c654f25a0ad94f656ad78b5bd6e1aee0f8dba3423574089510fbfb5b0d1c",
+    "before": "840ad4ffbe235c6458119df5bc59dc96012396525257d02cf0fc356866cb0eb6",
+    "mutated": "96b3a182c0f110f22e41dd757d960afe8bf18a052a4d889988123ee513cfb88d",
+    "after": "840ad4ffbe235c6458119df5bc59dc96012396525257d02cf0fc356866cb0eb6",
     "log": "reports/red/native-exit-propagation.txt"
+  },
+  {
+    "id": "installer-drive-letter",
+    "gate": "test:installer",
+    "baseline_exit": 0,
+    "mutated_exit": 1,
+    "restored_exit": 0,
+    "expected_diagnostic": "because the installer must not assume a drive letter",
+    "observed_diagnostic": "Expected $null or empty, because the installer must not assume a drive letter, but got ''C:\\ProgramData''.",
+    "path": "scripts/Install-MetaGLinkDirect.ps1",
+    "before": "3b45b7023416a047163d7edabeba7413cfb2b9d7e073983f02eb0910284a7865",
+    "mutated": "81be8f497f9843ec1c38590958c9b156bd579e5277fb99452660cf410aaa23a3",
+    "after": "3b45b7023416a047163d7edabeba7413cfb2b9d7e073983f02eb0910284a7865",
+    "log": "reports/red/installer-drive-letter.txt"
   }
 ]

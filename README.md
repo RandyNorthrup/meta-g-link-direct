@@ -4,10 +4,14 @@
 
 <p align="center">
   <a href="https://github.com/RandyNorthrup/meta-g-link-direct/releases"><img alt="Release" src="https://img.shields.io/github/v/release/RandyNorthrup/meta-g-link-direct?include_prereleases&label=release&color=22d3ee"></a>
+  <a href="https://github.com/RandyNorthrup/meta-g-link-direct/releases"><img alt="Downloads" src="https://img.shields.io/github/downloads/RandyNorthrup/meta-g-link-direct/total?label=downloads&color=34d399"></a>
+  <a href="https://github.com/RandyNorthrup/meta-g-link-direct/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/RandyNorthrup/meta-g-link-direct?style=flat&label=stars&color=fbbf24"></a>
   <a href="https://github.com/RandyNorthrup/meta-g-link-direct/actions/workflows/quality.yml"><img alt="Checks" src="https://img.shields.io/github/actions/workflow/status/RandyNorthrup/meta-g-link-direct/quality.yml?branch=main&label=checks"></a>
   <img alt="Windows 11 x64" src="https://img.shields.io/badge/Windows%2011-x64-0078D4">
-  <img alt="OBS Studio 32" src="https://img.shields.io/badge/OBS%20Studio-32.x-302E31">
+  <img alt="OBS Studio 32 and 33" src="https://img.shields.io/badge/OBS%20Studio-32%20%7C%2033-302E31">
   <a href="LICENSE"><img alt="License: AGPL-3.0" src="https://img.shields.io/badge/license-AGPL--3.0-a78bfa"></a>
+  <a href="https://github.com/sponsors/RandyNorthrup"><img alt="Sponsor on GitHub" src="https://img.shields.io/badge/sponsor-GitHub-db61a2"></a>
+  <a href="https://www.paypal.com/donate/?hosted_button_id=Q9VC7B42R7K82"><img alt="Donate with PayPal" src="https://img.shields.io/badge/donate-PayPal-0070ba"></a>
 </p>
 
 Use your **Ray-Ban Meta (Gen 2)** glasses as a first-person camera in **OBS Studio** on Windows. Video comes straight from the glasses over a short-range Wi-Fi network that the glasses create for your PC. No phone, no companion app, and no router or hotspot setup.
@@ -17,17 +21,18 @@ Use your **Ray-Ban Meta (Gen 2)** glasses as a first-person camera in **OBS Stud
 
 ## Features
 
-- 🎥 **Live portrait video**: 720 × 1280 at 30 fps as a native OBS source.
-- 📡 **Direct link**: Bluetooth for control and the glasses' own 2.4 GHz Wi-Fi network for video. Your home network isn't involved.
-- ⚡ **Hands-off**: the camera starts when its scene goes live and stops when the scene leaves the program output. Starting and stopping never stall OBS.
-- 🔒 **Private**: Meta is contacted only during setup. The owner key is sealed to your Windows account. No telemetry, no update checks, no recordings.
+- **Live portrait video**: 720 × 1280 at 30 fps as a native OBS source.
+- **Optional glasses audio**: the glasses' microphones as the source's audio (48 kHz stereo), off by default.
+- **Direct link**: Bluetooth for control and the glasses' own 2.4 GHz Wi-Fi network for video. Your home network isn't involved.
+- **Hands-off**: the camera starts when its scene goes live and stops when the scene leaves the program output. Starting and stopping never stall OBS.
+- **Private**: Meta is contacted only during setup. The owner key is sealed to your Windows account. No telemetry, no update checks, no recordings.
 
 ## What you need
 
 | | |
 |---|---|
 | **PC** | Windows 11 x64 |
-| **OBS** | OBS Studio 32.x (64-bit) |
+| **OBS** | OBS Studio 32 or 33 (64-bit) |
 | **Glasses** | Ray-Ban Meta Gen 2, charged |
 | **Bluetooth** | An adapter that supports both Bluetooth LE and Classic |
 | **Wi-Fi** | Any adapter that can join a 2.4 GHz network |
@@ -64,7 +69,10 @@ If the glasses don't show up:
 1. Download `meta-g-link-direct-<version>-windows-x64.zip` from [**Releases**](https://github.com/RandyNorthrup/meta-g-link-direct/releases).
 2. **Close OBS**, extract the zip, and double-click **`Install.cmd`**.
    The files aren't code-signed. If Windows SmartScreen says "Windows protected your PC", choose **More info → Run anyway**.
-3. The installer checks that you have OBS 32.x with its FFmpeg libraries, copies the plugin into OBS (asking for administrator permission only if OBS is in Program Files) and the setup tool to `%LOCALAPPDATA%\MetaGLinkDirect\bin`, then offers the one-time setup below.
+3. The installer finds OBS on any drive: the OBS that is running, the OBS installer's registry entry, Program Files, your per-user Programs folder and every Steam library. If it picks the wrong one, or finds none, pass the folder that contains `bin\64bit\obs64.exe`: `.\Install.cmd -ObsPath "D:\Apps\obs-studio"`.
+4. It checks that the OBS is version 32 or newer with its FFmpeg libraries, copies the plugin to `%ProgramData%\obs-studio\plugins\meta-g-link-direct` (usually `C:\ProgramData\…`; the plugin location OBS recommends; a portable OBS gets it inside its own folder) and the setup tool to `%LOCALAPPDATA%\MetaGLinkDirect\bin`, then offers the one-time setup below. It prints the folders it uses, and asks for administrator permission only if a folder it has to change is protected.
+
+That folder holds the plugin in both layouts OBS uses. OBS 33 and later load the flat `meta-g-link-direct.dll`; OBS 32 loads `bin\64bit\meta-g-link-direct.dll`; OBS 33 skips the second copy. So upgrading OBS needs no reinstall, and OBS 32 and 33 can share a PC. Copies left by 0.1.0 in the old `obs-plugins` folder, which OBS 34 stops loading, are removed.
 
 Optional: check the download against the `.sha256` file from the same release:
 
@@ -88,7 +96,8 @@ The source's **Properties** show:
 
 - **Video quality**: 720 × 1280 (recommended), 1080 × 1920 (experimental), 504 × 896 or 360 × 640. Only 720 × 1280 has been tested so far.
 - **Wi-Fi adapter**: *Automatic (first adapter)*, or a specific adapter by name. Pick the one you don't need online. If the chosen adapter is unplugged, the source reports it in the log instead of using another adapter.
-- Changes to either setting apply the next time the camera starts.
+- **Glasses microphone audio**: off by default. When on, the glasses' microphones become this source's audio in the OBS audio mixer (48 kHz stereo), where you can mute it, adjust it or route it like any source. The source always appears in the mixer; it stays silent while this is off.
+- Changes to these settings apply the next time the camera starts.
 - **Status**: the connection state when you open the properties (Idle, Connecting, Streaming, Reconnecting, Waiting, Failed or Stopped).
 
 Only one glasses source streams at a time. Another one shows *Waiting* and takes over when the first leaves the program output.
@@ -96,7 +105,9 @@ Only one glasses source streams at a time. Another one shows *Waiting* and takes
 ## Known limits
 
 - **Battery**: streaming drains the glasses quickly. One reading suggests about 35–40 minutes from a full charge (not yet confirmed).
-- **Quality**: only 720 × 1280 at 30 fps has been verified. Glasses audio isn't implemented; use your usual OBS audio device.
+- **Quality**: only 720 × 1280 at 30 fps has been verified.
+- **Audio sync**: video is shown as it arrives and audio goes through OBS's audio buffer, so they can be slightly apart. The offset hasn't been measured; use the source's *Sync Offset* in OBS's Advanced Audio Properties if you need to adjust it.
+- **OBS 33** is verified with the 33.0.0 release candidate (rc2): installed, loaded from the new layout, video and audio streamed. The final 33.0 release hasn't been tested yet.
 - **Reconnecting** after a dropped link is implemented but hasn't been exercised on real hardware yet.
 - **Security**: the PC doesn't yet verify the glasses' identity signature during the handshake.
 - **Coverage**: one PC, one Bluetooth adapter, one Wi-Fi adapter and one pair of glasses. The glasses' firmware build hasn't been recorded yet.
@@ -105,18 +116,18 @@ Only one glasses source streams at a time. Another one shows *Waiting* and takes
 
 ```mermaid
 flowchart LR
-    G["👓 Glasses"] -- "1 · Bluetooth: encrypted, owner-key session" --> P["🖥️ Plugin"]
+    G["Glasses"] -- "1 · Bluetooth: encrypted, owner-key session" --> P["Plugin"]
     P -- "2 · Start your Wi-Fi network" --> G
     G -. "3 · 2.4 GHz network<br/>(the PC joins it)" .-> P
-    G -- "4 · HEVC video over TCP<br/>(second encrypted session)" --> P
-    P -- "5 · decode (OBS's FFmpeg)" --> O["🎬 OBS source"]
+    G -- "4 · HEVC video and optional AAC audio<br/>over TCP (second encrypted session)" --> P
+    P -- "5 · decode (OBS's FFmpeg)" --> O["OBS source"]
 ```
 
 1. The plugin opens an encrypted Bluetooth session and proves it holds the glasses' owner key. If the glasses refuse the key, the source stops and asks for the setup again.
 2. It asks the glasses to start their own 2.4 GHz / 20 MHz Wi-Fi network, with a fresh random name and password each time.
 3. The PC joins that network with the chosen Wi-Fi adapter and a temporary Windows Wi-Fi profile.
-4. A second encrypted session runs over TCP on that network. The camera starts and sends HEVC video.
-5. The plugin decodes the video with the FFmpeg libraries that ship with OBS and hands each frame to OBS.
+4. A second encrypted session runs over TCP on that network. The camera starts and sends HEVC video, plus raw AAC audio when glasses audio is on.
+5. The plugin decodes both with the FFmpeg libraries that ship with OBS and hands each frame and each block of samples to OBS.
 
 When the camera stops, the PC leaves the network and deletes the profile, and the glasses close the network within about 15 seconds.
 
@@ -148,6 +159,7 @@ To test the camera outside OBS, run the setup tool's 60-second stream check. It 
 - The owner key and any imported Meta app tokens are sealed with Windows DPAPI for your account, in `%LOCALAPPDATA%\MetaGLinkDirect`. Nothing prints or logs them.
 - Meta is contacted only during setup: the login and the ownership exchange. Streaming makes no Meta or internet call.
 - The glasses' Wi-Fi network gets a new random name and 20-character password for every session.
+- The glasses' microphones are used only when *Glasses microphone audio* is turned on, and only while the camera runs.
 - No telemetry, update checks or recordings. OBS's own recording stays under your control. Logs contain status lines only: no payloads, addresses or credentials.
 - The setup tool has the Meta AI app's two public client tokens built in. They identify the app, not a person, and were already public.
 
@@ -160,6 +172,16 @@ To test the camera outside OBS, run the setup tool's 60-second stream check. It 
 ## Build from source
 
 See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for the toolchain, build commands, quality gates and project layout.
+
+## Help and contributing
+
+- **Questions and bugs**: [open an issue](https://github.com/RandyNorthrup/meta-g-link-direct/issues/new/choose). [SUPPORT.md](SUPPORT.md) lists what to include and what never to paste.
+- **Security problems**: report them privately, as described in [SECURITY.md](SECURITY.md), not in a public issue.
+- **Contributing**: see [CONTRIBUTING.md](CONTRIBUTING.md). Reports from other PCs, adapters and glasses firmware are especially useful.
+
+## Support this project
+
+If this project saves you time, you can [sponsor me on GitHub](https://github.com/sponsors/RandyNorthrup) or [buy me a coffee](https://www.paypal.com/donate/?hosted_button_id=Q9VC7B42R7K82) via PayPal. Thank you!
 
 ## Credits and license
 

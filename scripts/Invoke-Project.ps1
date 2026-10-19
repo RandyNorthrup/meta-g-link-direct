@@ -6,14 +6,14 @@ param(
         'typecheck', 'deadcode', 'security:audit', 'test:red', 'quality', 'package', 'probe',
         'lint:cpp', 'lint:powershell', 'lint:workflow', 'deadcode:cpp', 'deadcode:copies',
         'security:secrets', 'security:sast', 'security:npm', 'security:osv', 'test:asan', 'test:runner',
-        'test:probe', 'test:address', 'test:live', 'discover', 'discover:classic', 'connect:classic',
+        'test:probe', 'test:installer', 'test:address', 'test:live', 'discover', 'discover:classic', 'connect:classic',
         'discover:classic:live', 'connect:classic:live', 'pair:classic')]
     [string]$Task = 'quality',
     [ValidateSet('all', 'parser-length', 'module-metadata', 'format', 'owned-header',
         'compiler-types', 'unused-code', 'script-analysis', 'workflow-security', 'secret-scanner',
         'unsafe-copy', 'duplicated-code', 'address-sanitizer', 'dependency-npm', 'dependency-osv',
         'whatif-guard', 'native-exit-propagation', 'probe-arguments', 'classic-connection-claim',
-        'private-address-validation', 'uncached-query-loop')]
+        'private-address-validation', 'uncached-query-loop', 'installer-drive-letter')]
     [string]$Drill = 'all'
 )
 
@@ -415,7 +415,12 @@ function Invoke-RedDrillSet {
         param($text)
         $text.Replace('if ($LASTEXITCODE -ne 0) {', 'if ($false) {')
     } -Gate 'test:runner' -ExpectedDiagnostic 'Expected 0 to be different from the actual value'
-    $expectedDrillCount = if ($Drill -eq 'all') { 20 } else { 1 }
+
+    Invoke-RestoredDrill -Id installer-drive-letter -Path (Join-Path $projectRoot 'scripts/Install-MetaGLinkDirect.ps1') -Mutate {
+        param($text)
+        $text.Replace('(Get-KnownFolder -Folder CommonApplicationData)', "'C:\ProgramData'")
+    } -Gate 'test:installer' -ExpectedDiagnostic 'because the installer must not assume a drive letter'
+    $expectedDrillCount = if ($Drill -eq 'all') { 21 } else { 1 }
     if ($script:DrillEvidence.Count -ne $expectedDrillCount) {
         throw 'Red-drill discovery did not match the requested scope'
     }
@@ -434,6 +439,7 @@ function Invoke-Task {
             Invoke-Native -Command ctest -ArgumentList @('--preset', 'windows')
             Invoke-Task -Name 'test:runner'
             Invoke-Task -Name 'test:probe'
+            Invoke-Task -Name 'test:installer'
         }
         'test:runner' {
             $result = Invoke-Pester -Path (Join-Path $projectRoot 'tests/runner.Tests.ps1') `
@@ -447,6 +453,13 @@ function Invoke-Task {
                 -PassThru -Output Detailed
             if ($result.TotalCount -ne 20 -or $result.FailedCount -ne 0 -or $result.PassedCount -ne 20) {
                 throw 'Pester probe tests failed or discovery count changed'
+            }
+        }
+        'test:installer' {
+            $result = Invoke-Pester -Path (Join-Path $projectRoot 'tests/installer.Tests.ps1') `
+                -PassThru -Output Detailed
+            if ($result.TotalCount -ne 4 -or $result.FailedCount -ne 0 -or $result.PassedCount -ne 4) {
+                throw 'Pester installer tests failed or discovery count changed'
             }
         }
         'test:address' {

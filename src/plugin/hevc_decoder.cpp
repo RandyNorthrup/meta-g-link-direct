@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 #include "hevc_decoder.hpp"
 
+#include "ffmpeg_handles.hpp"
 #include "mgl/bytes.hpp"
 
 extern "C" {
@@ -23,52 +24,34 @@ constexpr std::int64_t MicrosPerSecond = 1'000'000;
 } // namespace
 
 struct HevcDecoder::Impl {
-    const AVCodec* codec = nullptr;
-    AVCodecContext* context = nullptr;
-    AVPacket* packet = nullptr;
-    AVFrame* frame = nullptr;
+    CodecContextPtr context;
+    PacketPtr packet;
+    FramePtr frame;
     Bytes parameters;
     Bytes scratch;
-
-    Impl() = default;
-    Impl(const Impl&) = delete;
-    Impl& operator=(const Impl&) = delete;
-    Impl(Impl&&) = delete;
-    Impl& operator=(Impl&&) = delete;
-    ~Impl() {
-        if (frame != nullptr) {
-            av_frame_free(&frame);
-        }
-        if (packet != nullptr) {
-            av_packet_free(&packet);
-        }
-        if (context != nullptr) {
-            avcodec_free_context(&context);
-        }
-    }
 };
 
 HevcDecoder::HevcDecoder() : impl_(std::make_unique<Impl>()) {}
 HevcDecoder::~HevcDecoder() = default;
 
 bool HevcDecoder::open() {
-    impl_->codec = avcodec_find_decoder(AV_CODEC_ID_HEVC);
-    if (impl_->codec == nullptr) {
+    const AVCodec* codec = avcodec_find_decoder(AV_CODEC_ID_HEVC);
+    if (codec == nullptr) {
         return false;
     }
-    impl_->context = avcodec_alloc_context3(impl_->codec);
-    if (impl_->context == nullptr) {
+    impl_->context.reset(avcodec_alloc_context3(codec));
+    if (!impl_->context) {
         return false;
     }
     impl_->context->pkt_timebase = AVRational{.num = 1, .den = static_cast<int>(MicrosPerSecond)};
     // Low-latency: no frame threading, decode and emit as soon as possible.
     impl_->context->thread_count = 1;
-    if (avcodec_open2(impl_->context, impl_->codec, nullptr) < 0) {
+    if (avcodec_open2(impl_->context.get(), codec, nullptr) < 0) {
         return false;
     }
-    impl_->packet = av_packet_alloc();
-    impl_->frame = av_frame_alloc();
-    return impl_->packet != nullptr && impl_->frame != nullptr;
+    impl_->packet.reset(av_packet_alloc());
+    impl_->frame.reset(av_frame_alloc());
+    return impl_->packet && impl_->frame;
 }
 
 void HevcDecoder::setParameters(ByteView annex_b_parameter_sets) {
@@ -94,10 +77,10 @@ void HevcDecoder::decode(std::uint64_t pts_us, ByteView annex_b, bool keyframe,
     impl_->packet->size = size;
     impl_->packet->pts = static_cast<std::int64_t>(pts_us);
     impl_->packet->dts = static_cast<std::int64_t>(pts_us);
-    if (avcodec_send_packet(impl_->context, impl_->packet) < 0) {
+    if (avcodec_send_packet(impl_->context.get(), impl_->packet.get()) < 0) {
         return;
     }
-    while (avcodec_receive_frame(impl_->context, impl_->frame) == 0) {
+    while (avcodec_receive_frame(impl_->context.get(), impl_->frame.get()) == 0) {
         const AVFrame& frame = *impl_->frame;
         const auto format = static_cast<AVPixelFormat>(frame.format);
         const bool planar_yuv = format == AV_PIX_FMT_YUV420P || format == AV_PIX_FMT_YUVJ420P;
@@ -113,7 +96,7 @@ void HevcDecoder::decode(std::uint64_t pts_us, ByteView annex_b, bool keyframe,
                             static_cast<std::uint32_t>(frame.linesize[2])};
             sink(out);
         }
-        av_frame_unref(impl_->frame);
+        av_frame_unref(impl_->frame.get());
     }
 }
 } // namespace mgl::plugin

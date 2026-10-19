@@ -8,6 +8,7 @@
 #include "mgl/protobuf.hpp"
 
 #include <array>
+#include <cstddef>
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -122,15 +123,33 @@ Bytes buildConfigureVideo(std::uint32_t nonce, const VideoConfig& config) {
 Bytes buildConfigureAudio(std::uint32_t nonce, bool enabled) {
     Bytes audio;
     proto::appendStringField(audio, 1, "audio/mp4a-latm");
-    proto::appendVarintField(audio, 2, 48'000);
-    proto::appendVarintField(audio, 3, 96'000);
-    proto::appendVarintField(audio, 4, 2);
+    proto::appendVarintField(audio, 2, AudioSampleRate);
+    proto::appendVarintField(audio, 3, AudioBitrate);
+    proto::appendVarintField(audio, 4, AudioChannels);
     proto::appendVarintField(audio, 5, 0); // AAC-LC
     Bytes out;
     proto::appendVarintField(out, 1, nonce);
     proto::appendBytesField(out, 2, audio);
     proto::appendVarintField(out, 3, enabled ? 1 : 0);
     return out;
+}
+
+Bytes requestedAudioSpecificConfig() {
+    // 5 bits audio object type, 4 bits sampling-frequency index, 4 bits channel configuration,
+    // then three zero GASpecificConfig flags: 16 bits in all.
+    constexpr std::uint32_t ObjectTypeAacLc = 2;
+    constexpr std::uint32_t SamplingIndex48k = 3;
+    static_assert(AudioSampleRate == 48'000, "the sampling index below is for 48 kHz");
+    constexpr unsigned ObjectTypeShift = 11;
+    constexpr unsigned SamplingShift = 7;
+    constexpr unsigned ChannelShift = 3;
+    constexpr unsigned ByteBits = 8;
+    constexpr std::uint32_t ByteMask = 0xFF;
+    constexpr std::uint32_t Bits = (ObjectTypeAacLc << ObjectTypeShift) |
+                                   (SamplingIndex48k << SamplingShift) |
+                                   (AudioChannels << ChannelShift);
+    return {static_cast<std::uint8_t>(Bits >> ByteBits),
+            static_cast<std::uint8_t>(Bits & ByteMask)};
 }
 
 Bytes buildControlStream(std::uint32_t nonce, std::uint8_t action) {
@@ -167,6 +186,22 @@ std::optional<CodecConfig> parseCodecConfig(ByteView payload) {
         config.data.assign(data->begin(), data->end());
     }
     return config;
+}
+
+std::optional<TimedUnit> splitTimedUnit(ByteView unit) {
+    constexpr std::size_t PtsPrefixBytes = 8;
+    constexpr unsigned BitsPerByte = 8;
+    if (unit.size() <= PtsPrefixBytes) {
+        return std::nullopt;
+    }
+    TimedUnit timed;
+    unsigned shift = 0;
+    for (const std::uint8_t byte : unit.first(PtsPrefixBytes)) {
+        timed.pts_us |= static_cast<std::uint64_t>(byte) << shift;
+        shift += BitsPerByte;
+    }
+    timed.payload = unit.subspan(PtsPrefixBytes);
+    return timed;
 }
 
 std::optional<std::uint64_t> parseStreamStopped(ByteView payload) {

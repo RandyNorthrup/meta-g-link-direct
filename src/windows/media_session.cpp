@@ -275,25 +275,46 @@ AckResult awaitMedia(GlassesSession& media, std::uint16_t service, std::uint16_t
     return {.ack = media.linkLost() ? Ack::LinkLost : Ack::Missing, .payload = {}};
 }
 
-// A reassembled access unit starts with its presentation time, little-endian.
-constexpr std::size_t PtsPrefixBytes = 8;
-constexpr unsigned BitsPerByte = 8;
-
-// Hands one reassembled access unit to the frame callback. Returns true if it was delivered.
+// Hands one reassembled video access unit to the frame callback. True if it was delivered.
 bool deliverFrame(ByteView frame, const MediaCallbacks& callbacks) {
-    if (frame.size() <= PtsPrefixBytes || !callbacks.on_frame) {
+    const auto unit = stream::splitTimedUnit(frame);
+    if (!unit || !callbacks.on_frame) {
         return false;
     }
-    std::uint64_t pts = 0;
-    unsigned shift = 0;
-    for (const std::uint8_t byte : frame.first(PtsPrefixBytes)) {
-        pts |= static_cast<std::uint64_t>(byte) << shift;
-        shift += BitsPerByte;
-    }
-    const ByteView annex = frame.subspan(PtsPrefixBytes);
-    callbacks.on_frame(pts, annex, hevc::hasKeyframe(annex));
+    callbacks.on_frame(unit->pts_us, unit->payload, hevc::hasKeyframe(unit->payload));
     return true;
 }
+
+// Hands one reassembled AAC access unit to the audio callback.
+void deliverAudio(ByteView unit, const MediaCallbacks& callbacks) {
+    if (const auto timed = stream::splitTimedUnit(unit); timed && callbacks.on_audio) {
+        callbacks.on_audio(timed->pts_us, timed->payload);
+    }
+}
+
+// Routes a codec configuration. Field 2 names the codec; failing that, video parameter sets are
+// Annex-B NAL units and an AAC AudioSpecificConfig is not (as Visor's LiveStream.kt decides).
+void deliverCodecConfig(const stream::CodecConfig& codec, const MediaCallbacks& callbacks) {
+    if (codec.data.empty()) {
+        return;
+    }
+    const ByteView data = viewOf(codec.data);
+    const bool video = codec.codec == stream::CodecVideo ||
+                       (codec.codec != stream::CodecAudio && !hevc::nalTypes(data).empty());
+    if (video) {
+        if (callbacks.on_parameters) {
+            callbacks.on_parameters(data);
+        }
+    } else if (callbacks.on_audio_config) {
+        callbacks.on_audio_config(data);
+    }
+}
+
+// Media chunks being reassembled into whole access units.
+struct Reassembly {
+    Bytes video;
+    Bytes audio;
+};
 
 enum class MediaEvent : std::uint8_t { Nothing, Frame, StreamStopped };
 
@@ -323,29 +344,32 @@ MediaEvent handleStreamReport(const RawMessage& message, const MediaCallbacks& c
 }
 
 // Feeds one media-service message into access-unit reassembly, or reports it.
-MediaEvent handleMediaMessage(const RawMessage& message, Bytes& frame,
+MediaEvent handleMediaMessage(const RawMessage& message, Reassembly& units,
                               const MediaCallbacks& callbacks, std::set<std::uint16_t>& noted) {
     const ByteView payload(message.payload.data(), message.payload.size());
     switch (message.type) {
     case stream::MtVideoChunk:
-        append(frame, payload);
+        append(units.video, payload);
         return MediaEvent::Nothing;
     case stream::MtVideoChunkEnd: {
-        append(frame, payload);
-        const bool delivered = deliverFrame(viewOf(frame), callbacks);
-        frame.clear();
+        append(units.video, payload);
+        const bool delivered = deliverFrame(viewOf(units.video), callbacks);
+        units.video.clear();
         return delivered ? MediaEvent::Frame : MediaEvent::Nothing;
     }
     case stream::MtCodecConfig:
         if (const auto codec = stream::parseCodecConfig(payload)) {
-            if (!codec->data.empty() && callbacks.on_parameters) {
-                callbacks.on_parameters(viewOf(codec->data));
-            }
+            deliverCodecConfig(*codec, callbacks);
         }
         return MediaEvent::Nothing;
     case stream::MtAudioChunk:
+        append(units.audio, payload);
+        return MediaEvent::Nothing;
     case stream::MtAudioChunkEnd:
-        return MediaEvent::Nothing; // audio is configured off
+        append(units.audio, payload);
+        deliverAudio(viewOf(units.audio), callbacks);
+        units.audio.clear();
+        return MediaEvent::Nothing;
     default:
         return handleStreamReport(message, callbacks, noted);
     }
@@ -412,7 +436,7 @@ StreamEnd receiveVideo(GlassesSession& media, const MediaCallbacks& callbacks,
     constexpr auto StallTimeout = 8s;
     constexpr auto ReceiveSlice = 500ms;
     Keepalive keepalive;
-    Bytes frame;
+    Reassembly units;
     std::set<std::uint16_t> noted_media;
     std::set<std::uint32_t> noted_other;
     bool any_frame = false;
@@ -438,7 +462,7 @@ StreamEnd receiveVideo(GlassesSession& media, const MediaCallbacks& callbacks,
             noteOtherService(*message, callbacks, noted_other);
             continue;
         }
-        const auto event = handleMediaMessage(*message, frame, callbacks, noted_media);
+        const auto event = handleMediaMessage(*message, units, callbacks, noted_media);
         if (event == MediaEvent::StreamStopped) {
             return StreamEnd::GlassesStopped;
         }
@@ -498,9 +522,8 @@ struct MediaSession::ControlLink {
     stream::SoftApInfo access_point;
 };
 
-MediaSession::MediaSession(MediaCallbacks callbacks, const stream::VideoConfig& config,
-                           std::string wifi_adapter)
-    : callbacks_(std::move(callbacks)), config_(config), wifi_adapter_(std::move(wifi_adapter)) {}
+MediaSession::MediaSession(MediaCallbacks callbacks, MediaOptions options)
+    : callbacks_(std::move(callbacks)), options_(std::move(options)) {}
 
 MediaSession::~MediaSession() { stop(); }
 
@@ -620,8 +643,9 @@ MediaSession::SessionEnd MediaSession::runSession() {
     }
     log("Joining the glasses' Wi-Fi network from this PC.");
     WifiStation station;
-    const auto station_link = connectWifiStation(
-        control->access_point.ssid, control->access_point.passphrase, wifi_adapter_, station);
+    const auto station_link =
+        connectWifiStation(control->access_point.ssid, control->access_point.passphrase,
+                           options_.wifi_adapter, station);
     if (!station_link) {
         log(describeStationFailure(station));
         abandonAccessPoint(*control);
@@ -635,6 +659,12 @@ MediaSession::SessionEnd MediaSession::runSession() {
     // From here the glasses have left Bluetooth. They close their network on their own within
     // about 15 s of this PC leaving (measured); a close sent over the Wi-Fi link was never
     // acknowledged, so none is sent.
+    if (options_.audio && callbacks_.on_audio_config) {
+        // The glasses send raw AAC with no AudioSpecificConfig, so describe the format asked of
+        // them. A configuration the glasses do send later replaces it.
+        const Bytes config = stream::requestedAudioSpecificConfig();
+        callbacks_.on_audio_config(viewOf(config));
+    }
     std::uint32_t nonce = 1;
     if (!startCamera(*link->session, nonce)) {
         return SessionEnd::Failed;
@@ -751,12 +781,20 @@ bool MediaSession::awaitStep(GlassesSession& media, std::string_view name, std::
         }
         return !stop_.load();
     }
-    // The video and stream-control answers carry an error code; the glasses refuse, for example,
-    // a video profile they cannot encode. Other answers are only acknowledgements.
+    // The configure and stream-control answers carry an error code; the glasses refuse, for
+    // example, a video profile they cannot encode. Refused audio is not fatal: the camera goes on
+    // without it.
     if (response == stream::MtConfigureVideoResponse ||
+        response == stream::MtConfigureAudioResponse ||
         response == stream::MtControlStreamResponse) {
         if (const auto answer = stream::parseStreamAnswer(viewOf(result.payload));
             answer && answer->error != 0) {
+            if (response == stream::MtConfigureAudioResponse) {
+                log(std::format("The glasses refused the audio stream (error {}); continuing "
+                                "with video only.",
+                                answer->error));
+                return !stop_.load();
+            }
             log(std::format("The glasses rejected {} (error {}).", name, answer->error));
             return false;
         }
@@ -765,8 +803,8 @@ bool MediaSession::awaitStep(GlassesSession& media, std::string_view name, std::
 }
 
 bool MediaSession::startCamera(GlassesSession& media, std::uint32_t& nonce) {
-    const auto video = stream::buildConfigureVideo(nonce++, config_);
-    const auto audio = stream::buildConfigureAudio(nonce++, /*enabled=*/false);
+    const auto video = stream::buildConfigureVideo(nonce++, options_.video);
+    const auto audio = stream::buildConfigureAudio(nonce++, options_.audio);
     const auto start_stream = stream::buildControlStream(nonce++, stream::ActionStart);
     return sendStep(media, "Subscribe", stream::ServiceStatus, stream::MtInit,
                     stream::buildSubscribe()) &&

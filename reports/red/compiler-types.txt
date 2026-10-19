@@ -25,13 +25,13 @@ BASELINE EXIT 0
 [24/34] Generating CXX dyndep file CMakeFiles\mgl-protocol-tests.dir\CXX.dd
 [25/34] Building CXX object CMakeFiles\meta-g-link-probe.dir\src\probe\main.cpp.obj
 [26/34] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\media_session.cpp.obj
-[27/34] Linking CXX static library mgl_windows.lib
-[28/34] Building CXX object CMakeFiles\mgl-sdu-tests.dir\tests\sdu_tests.cpp.obj
+[27/34] Building CXX object CMakeFiles\mgl-sdu-tests.dir\tests\sdu_tests.cpp.obj
+[28/34] Linking CXX static library mgl_windows.lib
 [29/34] Linking CXX executable meta-g-link-probe.exe
 [30/34] Linking CXX shared module meta-g-link-direct.dll
-[31/34] Building CXX object CMakeFiles\mgl-protocol-tests.dir\tests\protocol_tests.cpp.obj
-[32/34] Linking CXX executable mgl-sdu-tests.exe
-[33/34] Linking CXX executable mgl-address-tests.exe
+[31/34] Linking CXX executable mgl-sdu-tests.exe
+[32/34] Linking CXX executable mgl-address-tests.exe
+[33/34] Building CXX object CMakeFiles\mgl-protocol-tests.dir\tests\protocol_tests.cpp.obj
 [34/34] Linking CXX executable mgl-protocol-tests.exe
 
 MUTATED EXIT 1
@@ -54,8 +54,8 @@ RESTORED EXIT 0
 [4/9] Linking CXX static library mgl_protocol.lib
 [5/9] Linking CXX shared module meta-g-link-direct.dll
 [6/9] Linking CXX executable meta-g-link-probe.exe
-[7/9] Linking CXX executable mgl-sdu-tests.exe
-[8/9] Linking CXX executable mgl-address-tests.exe
+[7/9] Linking CXX executable mgl-address-tests.exe
+[8/9] Linking CXX executable mgl-sdu-tests.exe
 [9/9] Linking CXX executable mgl-protocol-tests.exe
 
 RESTORATION SHA256 23f81a1e6ccdf6122fdb9414b839a7e2ca96f3564b1608f35ffa807579178ca0

@@ -3,3 +3,6 @@ contact_links:
   - name: Setup guide
     url: https://github.com/RandyNorthrup/meta-g-link-direct#readme
     about: Pairing, install, setup and troubleshooting steps.
+  - name: Report a security problem
+    url: https://github.com/RandyNorthrup/meta-g-link-direct/security/advisories/new
+    about: Report vulnerabilities privately, not in a public issue.

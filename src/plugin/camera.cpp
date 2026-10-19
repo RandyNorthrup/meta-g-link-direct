@@ -7,6 +7,7 @@
 // worker's callbacks share a per-run Pipeline, so nothing they touch is freed underneath them.
 #include "camera.h"
 
+#include "aac_decoder.hpp"
 #include "hevc_decoder.hpp"
 
 #include "mgl/bytes.hpp"
@@ -67,6 +68,7 @@ constexpr std::array<QualityPreset, 4> QualityPresets{{
 
 using LogFn = void (*)(const char* message);
 using FrameFn = void (*)(void* context, const MglCameraFrame* frame);
+using AudioFn = void (*)(void* context, const MglCameraAudio* audio);
 
 void logLine(LogFn on_log, const std::string& message) {
     if (on_log != nullptr) {
@@ -112,12 +114,16 @@ class StatusCell {
 // it outlives a camera that is stopped or destroyed while a frame is in flight.
 struct Pipeline {
     FrameFn on_frame = nullptr;
+    AudioFn on_audio = nullptr;
     LogFn on_log = nullptr;
     void* context = nullptr;
     std::shared_ptr<StatusCell> status;
     std::uint64_t run = 0;
-    mgl::plugin::HevcDecoder decoder; // worker thread only
-    std::uint64_t decoded = 0;        // worker thread only
+    mgl::plugin::HevcDecoder decoder;      // worker thread only
+    std::uint64_t decoded = 0;             // worker thread only
+    mgl::plugin::AacDecoder audio_decoder; // worker thread only
+    std::uint64_t decoded_audio = 0;       // worker thread only
+    bool audio_layout_reported = false;    // worker thread only
     std::mutex output_mutex;
     bool attached = true; // guarded by output_mutex; false once OBS must not receive frames
 };
@@ -171,9 +177,11 @@ Retirement& retirement() {
 
 struct MglCamera {
     FrameFn on_frame = nullptr;
+    AudioFn on_audio = nullptr;
     LogFn on_log = nullptr;
     void* context = nullptr;
     std::atomic<std::size_t> quality{0}; // index into QualityPresets
+    std::atomic<bool> audio{false};      // glasses microphones on the next start
     // Set from OBS's settings thread, read on start; empty means the first adapter.
     std::mutex wifi_adapter_mutex;
     std::string wifi_adapter;
@@ -229,6 +237,35 @@ void deliverPicture(Pipeline& pipeline, const mgl::plugin::DecodedFrame& decoded
     }
 }
 
+// Runs on the worker thread for each block of decoded audio. Mono and stereo are handed on; the
+// glasses are asked for stereo.
+void deliverSound(Pipeline& pipeline, const mgl::plugin::DecodedAudio& decoded) {
+    constexpr std::uint32_t MaxDeliveredChannels = 2;
+    if (decoded.channels > MaxDeliveredChannels) {
+        if (!pipeline.audio_layout_reported) {
+            pipeline.audio_layout_reported = true;
+            logLine(pipeline.on_log, "The glasses sent " + std::to_string(decoded.channels) +
+                                         "-channel audio; only mono and stereo are supported.");
+        }
+        return;
+    }
+    if (pipeline.decoded_audio == 0) {
+        logLine(pipeline.on_log, "receiving audio " + std::to_string(decoded.sample_rate) +
+                                     " Hz, " + std::to_string(decoded.channels) + " channel(s)");
+    }
+    ++pipeline.decoded_audio;
+    MglCameraAudio sound{};
+    std::ranges::copy(decoded.plane, std::begin(sound.planes));
+    sound.channels = decoded.channels;
+    sound.frames = decoded.frames;
+    sound.sample_rate = decoded.sample_rate;
+    sound.timestamp_ns = decoded.pts_us * NanosPerMicro;
+    const std::scoped_lock lock(pipeline.output_mutex);
+    if (pipeline.attached && pipeline.on_audio != nullptr) {
+        pipeline.on_audio(pipeline.context, &sound);
+    }
+}
+
 void stopCapture(MglCamera& camera, mgl::MediaState final_state) {
     if (camera.pipeline) {
         const std::scoped_lock lock(camera.pipeline->output_mutex);
@@ -247,6 +284,7 @@ void startCapture(MglCamera& camera) {
     }
     auto pipeline = std::make_shared<Pipeline>();
     pipeline->on_frame = camera.on_frame;
+    pipeline->on_audio = camera.on_audio;
     pipeline->on_log = camera.on_log;
     pipeline->context = camera.context;
     pipeline->status = camera.status;
@@ -266,20 +304,32 @@ void startCapture(MglCamera& camera) {
                                      deliverPicture(target, decoded);
                                  });
     };
+    callbacks.on_audio_config = [pipeline](mgl::ByteView config) {
+        if (!pipeline->audio_decoder.configure(config)) {
+            logLine(pipeline->on_log, "The AAC decoder could not open the glasses' audio format; "
+                                      "the camera continues without audio.");
+        }
+    };
+    callbacks.on_audio = [pipeline](std::uint64_t pts, mgl::ByteView aac) {
+        pipeline->audio_decoder.decode(
+            pts, aac, [&target = *pipeline](const mgl::plugin::DecodedAudio& decoded) {
+                deliverSound(target, decoded);
+            });
+    };
     callbacks.on_log = [on_log = camera.on_log](const std::string& message) {
         logLine(on_log, message);
     };
     callbacks.on_state = [pipeline](mgl::MediaState state) {
         pipeline->status->report(pipeline->run, state);
     };
-    std::string wifi_adapter;
+    mgl::MediaOptions options{.video = QualityPresets.at(camera.quality.load()).config,
+                              .audio = camera.audio.load(),
+                              .wifi_adapter = {}};
     {
         const std::scoped_lock lock(camera.wifi_adapter_mutex);
-        wifi_adapter = camera.wifi_adapter;
+        options.wifi_adapter = camera.wifi_adapter;
     }
-    auto session = std::make_unique<mgl::MediaSession>(
-        std::move(callbacks), QualityPresets.at(camera.quality.load()).config,
-        std::move(wifi_adapter));
+    auto session = std::make_unique<mgl::MediaSession>(std::move(callbacks), std::move(options));
     session->start();
     camera.pipeline = std::move(pipeline);
     camera.session = std::move(session);
@@ -302,6 +352,7 @@ template <typename Action> void guarded(MglCamera& camera, std::string_view what
 } // namespace
 
 MglCamera* mglCameraCreate(void (*on_frame)(void* context, const MglCameraFrame* frame),
+                           void (*on_audio)(void* context, const MglCameraAudio* audio),
                            void (*on_log)(const char* message), void* context) {
     if (on_frame == nullptr) {
         return nullptr;
@@ -309,6 +360,7 @@ MglCamera* mglCameraCreate(void (*on_frame)(void* context, const MglCameraFrame*
     try {
         auto camera = std::make_unique<MglCamera>();
         camera->on_frame = on_frame;
+        camera->on_audio = on_audio;
         camera->on_log = on_log;
         camera->context = context;
         // The caller owns the camera from here until mglCameraDestroy.
@@ -363,6 +415,12 @@ void mglCameraSetQuality(MglCamera* camera, const char* key) {
             camera->quality.store(index);
             return;
         }
+    }
+}
+
+void mglCameraSetAudio(MglCamera* camera, bool enabled) {
+    if (camera != nullptr) {
+        camera->audio.store(enabled);
     }
 }
 

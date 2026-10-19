@@ -1,4 +1,7 @@
 BASELINE EXIT 0
+6350 warnings generated.
+Suppressed 6352 warnings (6350 in non-user code, 2 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
 5221 warnings generated.
 Suppressed 5221 warnings (5221 in non-user code).
 Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
@@ -94,6 +97,9 @@ Suppressed 5169 warnings (5169 in non-user code).
 Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
 
 MUTATED EXIT 1
+6350 warnings generated.
+Suppressed 6352 warnings (6350 in non-user code, 2 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
 5221 warnings generated.
 Suppressed 5221 warnings (5221 in non-user code).
 Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
@@ -215,11 +221,11 @@ C:\Users\Randy\Coding\meta_g_link_direct\include\mgl/sdu.hpp:37:12: note: unguar
    37 | inline int red_drill_global = 7;
       |            ^
 C:\Users\Randy\Coding\meta_g_link_direct\include\mgl/sdu.hpp:37:12: error: variable 'red_drill_global' is non-const and globally accessible, consider making it const [cppcoreguidelines-avoid-non-const-global-variables,-warnings-as-errors]
+   37 | inline int red_drill_global = 7;
+      |            ^
 Suppressed 38865 warnings (38863 in non-user code, 2 NOLINT).
 Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
 1 warning treated as error
-   37 | inline int red_drill_global = 7;
-      |            ^
 5189 warnings and 1 error generated.
 Error while processing C:\Users\Randy\Coding\meta_g_link_direct\src\windows\session.cpp.
 C:\Users\Randy\Coding\meta_g_link_direct\include\mgl/sdu.hpp:37:12: error: redefinition of 'red_drill_global' [clang-diagnostic-error]
@@ -286,6 +292,9 @@ Use -header-filter=.* or leave it as default to display errors from all non-syst
 Write-Error: clang-tidy rejected: main.cpp, sdu.cpp, media_session.cpp, provision.cpp, rfcomm_transport.cpp, rfcomm.cpp, sdu_socket.cpp, session.cpp, tcp_transport.cpp, protocol_tests.cpp, sdu_tests.cpp
 
 RESTORED EXIT 0
+6350 warnings generated.
+Suppressed 6352 warnings (6350 in non-user code, 2 NOLINT).
+Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
 5221 warnings generated.
 Suppressed 5221 warnings (5221 in non-user code).
 Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.

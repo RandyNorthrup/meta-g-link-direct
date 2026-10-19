@@ -277,6 +277,37 @@ void testSoftApInfo(Checks& check) {
     check(!mgl::stream::parseSoftApNetworkInfo(view(truncated)).has_value(),
           "a truncated reply is rejected");
 }
+void testTimedUnits(Checks& check) {
+    // 8-byte little-endian presentation time, then the payload.
+    const mgl::Bytes unit{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0xAA, 0xBB};
+    const auto timed = check.present(mgl::stream::splitTimedUnit(view(unit)), "unit splits");
+    check(timed.pts_us == 0x0807060504030201ULL, "presentation time is little-endian");
+    check(timed.payload.size() == 2 && timed.payload.front() == 0xAA, "payload follows prefix");
+    const mgl::Bytes prefix_only{1, 2, 3, 4, 5, 6, 7, 8};
+    check(!mgl::stream::splitTimedUnit(view(prefix_only)).has_value(),
+          "a unit with no payload is rejected");
+    check(!mgl::stream::splitTimedUnit({}).has_value(), "an empty unit is rejected");
+}
+
+void testConfigureAudio(Checks& check) {
+    for (const bool enabled : {false, true}) {
+        const auto request = mgl::stream::buildConfigureAudio(7, enabled);
+        const auto parsed =
+            check.present(mgl::proto::Message::parse(view(request)), "ConfigureAudio parses");
+        check(parsed.varint(1) == 7U, "nonce is field 1");
+        check(parsed.varint(3) == (enabled ? 1U : 0U), "enabled flag is field 3");
+        const auto config = check.present(
+            mgl::proto::Message::parse(check.present(parsed.bytes(2), "AudioConfig present")),
+            "AudioConfig parses");
+        check(text(check.present(config.bytes(1), "mime present")) == "audio/mp4a-latm",
+              "AAC mime");
+        check(config.varint(2) == 48'000U && config.varint(4) == 2U, "48 kHz stereo");
+    }
+    // AAC-LC (2), 48 kHz (index 3), 2 channels: 00010 0011 0010 000.
+    const auto asc = mgl::stream::requestedAudioSpecificConfig();
+    check(asc.size() == 2 && asc.at(0) == 0x11 && asc.at(1) == 0x90,
+          "AudioSpecificConfig describes the requested AAC-LC 48 kHz stereo");
+}
 } // namespace
 
 int main() {
@@ -290,6 +321,8 @@ int main() {
         testEncoding(check);
         testCreateSoftAp(check);
         testSoftApInfo(check);
+        testTimedUnits(check);
+        testConfigureAudio(check);
         std::cout << check.count() << " protocol/datax/protobuf/encoding/stream cases passed\n";
         return EXIT_SUCCESS;
     } catch (const std::exception& error) {

@@ -43,18 +43,30 @@ struct MediaCallbacks {
     std::function<void(std::uint64_t pts_us, ByteView annex_b, bool keyframe)> on_frame;
     // The HEVC parameter sets (VPS/SPS/PPS, Annex-B) when the glasses send or update them.
     std::function<void(ByteView parameter_sets)> on_parameters;
+    // With audio on: the AAC AudioSpecificConfig when the glasses send or update it, then one
+    // raw AAC access unit at a time (presentation time in microseconds, glasses clock). Called on
+    // the worker thread. Optional.
+    std::function<void(ByteView audio_specific_config)> on_audio_config;
+    std::function<void(std::uint64_t pts_us, ByteView aac)> on_audio;
     // A human-readable status line, redacted of identifiers. Optional.
     std::function<void(const std::string&)> on_log;
     // A state transition. Optional.
     std::function<void(MediaState)> on_state;
 };
 
+// What one session asks of the glasses and the PC.
+struct MediaOptions {
+    stream::VideoConfig video;
+    // Also stream the glasses' microphones (48 kHz stereo AAC). Off by default.
+    bool audio = false;
+    // The WifiAdapter::id that joins the glasses' network; empty uses the first adapter Windows
+    // lists.
+    std::string wifi_adapter;
+};
+
 class MediaSession {
   public:
-    // wifi_adapter is the WifiAdapter::id that joins the glasses' network; empty uses the first
-    // adapter Windows lists.
-    explicit MediaSession(MediaCallbacks callbacks, const stream::VideoConfig& config = {},
-                          std::string wifi_adapter = {});
+    explicit MediaSession(MediaCallbacks callbacks, MediaOptions options = {});
     ~MediaSession();
     MediaSession(const MediaSession&) = delete;
     MediaSession& operator=(const MediaSession&) = delete;
@@ -82,8 +94,7 @@ class MediaSession {
     struct ControlLink;
 
     MediaCallbacks callbacks_;
-    stream::VideoConfig config_;
-    std::string wifi_adapter_;
+    MediaOptions options_;
     std::atomic<MediaState> state_{MediaState::Idle};
     std::atomic<bool> stop_{false};
     std::thread worker_;

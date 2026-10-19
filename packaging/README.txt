@@ -34,7 +34,15 @@ BEFORE YOU START
 
 USE
 In OBS, add the "Ray-Ban Meta Glasses (Direct)" source to a scene and make the
-scene live. The first frame takes about 20 seconds.
+scene live. The first frame takes about 20 seconds. The source's properties
+choose the video quality, the Wi-Fi adapter, and whether the glasses'
+microphones are sent to OBS as the source's audio (off by default).
+
+Works with OBS Studio 32 and 33, on any drive. The plugin is installed to
+%ProgramData%\obs-studio\plugins\meta-g-link-direct (usually C:\ProgramData),
+in the layouts both versions read, so upgrading OBS needs no reinstall. If the
+installer picks the wrong OBS or finds none, run it from a terminal with the
+OBS folder: .\Install.cmd -ObsPath "D:\Apps\obs-studio"
 
 REMOVE
 Double-click Uninstall.cmd. It keeps the glasses' stored identity; to forget it

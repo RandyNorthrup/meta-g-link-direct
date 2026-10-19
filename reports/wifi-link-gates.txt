@@ -1,7 +1,8 @@
-Release gate run for 0.1.0, 2026-10-19, Windows 11 x64 build 26200 (scripts/Invoke-Project.ps1 package).
+Release gate run for 0.2.0, 2026-10-19, Windows 11 x64 build 26200 (scripts/Invoke-Project.ps1 package).
 quality stages, each exited 0: configure, build, format:check, lint, deadcode, security:audit, test, test:live, test:red.
-CTest: 4/4 passed (protocol-prefix, private-address, protocol-datax with 68 cases, module-abi).
-Pester: runner 3, CLI 20 and live SDP 1 passed; 0 failed, 0 skipped.
-Red drills: 20 passed (green, intended red, exact restoration, green), 0 failed.
-Release zip: dist/meta-g-link-direct-0.1.0-windows-x64.zip, SHA-256 27d7fbae13cddf582d1ee76b3e2fcc3764b18b5971101f3e5899190278f173fe.
+CTest: 4/4 passed (protocol-prefix, private-address, protocol-datax with 90 cases, module-abi).
+Pester: runner 3, CLI 20, installer 4 and live SDP 1 passed; 0 failed, 0 skipped.
+Red drills: 21 passed (green, intended red, exact restoration, green), 0 failed.
+Release zip: dist/meta-g-link-direct-0.2.0-windows-x64.zip, SHA-256 debb454b0990d21902acbf30ebb077c244873a78089d3b3ff5d144b8a9c7b693.
+Module ABI test also passed against the OBS 33.0.0-rc2 runtime.
 Full logs stayed local.

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28...3.31)
-project(meta_g_link_direct VERSION 0.1.0 LANGUAGES C CXX)
+project(meta_g_link_direct VERSION 0.2.0 LANGUAGES C CXX)
 
 include(CTest)
 set(CMAKE_CXX_STANDARD 20)
@@ -91,7 +91,8 @@ if(MGL_BUILD_OBS_PLUGIN)
     src/plugin/module.c
     src/plugin/source.c
     src/plugin/camera.cpp
-    src/plugin/hevc_decoder.cpp)
+    src/plugin/hevc_decoder.cpp
+    src/plugin/aac_decoder.cpp)
   target_include_directories(meta-g-link-direct PRIVATE "${obs_deps_root}/include")
   target_link_libraries(meta-g-link-direct PRIVATE OBS::libobs mgl_windows
     "${MGL_AVCODEC}" "${MGL_AVUTIL}")

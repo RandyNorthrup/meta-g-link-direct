@@ -6,10 +6,12 @@ Installs the Meta G Link Direct OBS plugin and its setup tool from an unpacked b
 .DESCRIPTION
 Run from a bundle folder that contains plugin\meta-g-link-direct.dll,
 plugin\locale\en-US.ini and tools\meta-g-link-probe.exe. The script:
-  1. finds OBS Studio 32.x and checks its FFmpeg and the Visual C++ runtime,
+  1. finds OBS Studio 32 or newer and checks its FFmpeg and the Visual C++ runtime,
   2. waits for OBS to be closed (it never closes OBS itself),
-  3. copies the plugin into OBS, elevating only that copy when OBS lives under
-     Program Files,
+  3. copies the plugin into the folder OBS loads plugins from
+     (%ProgramData%\obs-studio\plugins\meta-g-link-direct, or the OBS folder for a
+     portable OBS), removes copies an earlier install left in other layouts, and
+     elevates only that step when a folder is protected,
   4. copies the setup tool to %LOCALAPPDATA%\MetaGLinkDirect\bin,
   5. imports meta-tokens.txt, if present, into the DPAPI-sealed token store; it overrides the
      Meta AI app tokens built into the setup tool, for when Meta rotates them,
@@ -19,8 +21,10 @@ The ownership change makes this PC the owner of the glasses; the Meta AI phone
 app, or another PC, loses access until the glasses are set up there again.
 
 .PARAMETER ObsPath
-OBS Studio installation folder (the one containing bin\64bit\obs64.exe). Found
-automatically when omitted.
+OBS Studio installation folder (the one containing bin\64bit\obs64.exe), on any
+drive. When omitted, the installer looks for a running OBS, the OBS installer's
+registry entry, Program Files, the per-user Programs folder and every Steam
+library folder.
 
 .PARAMETER TokenFile
 Optional Meta app token file to import over the built-in tokens. Defaults to meta-tokens.txt
@@ -52,11 +56,29 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+# Windows, Program Files, ProgramData and user profiles can each be on any drive, so every system
+# folder comes from Windows rather than from a drive letter.
+function Get-KnownFolder {
+    param([Parameter(Mandatory)][Environment+SpecialFolder]$Folder)
+    $path = [Environment]::GetFolderPath($Folder)
+    if ([string]::IsNullOrWhiteSpace($path)) {
+        throw "Windows did not report the $Folder folder."
+    }
+    return $path
+}
+
 $moduleName = 'meta-g-link-direct'
 $bundleRoot = $PSScriptRoot
-$toolRoot = [IO.Path]::Combine($env:LOCALAPPDATA, 'MetaGLinkDirect', 'bin')
+$toolRoot = [IO.Path]::Combine((Get-KnownFolder -Folder LocalApplicationData), 'MetaGLinkDirect', 'bin')
 $toolPath = [IO.Path]::Combine($toolRoot, 'meta-g-link-probe.exe')
-$requiredObsMajor = 32
+$minimumObsMajor = 32
+$testedObsMajors = @(32, 33)
+# OBS 33 introduced the flat plugin layout (plugins\<name>\<name>.dll); OBS 32 reads
+# plugins\<name>\bin\64bit. OBS 34 stops loading plugins from the Program Files folder. The flat
+# layout is what a portable OBS 33 or later reads from its own plugins folder.
+$flatLayoutObsMajor = 33
+# OBS resolves this folder through the same Windows call (the common application data folder).
+$programDataPlugins = [IO.Path]::Combine((Get-KnownFolder -Folder CommonApplicationData), 'obs-studio', 'plugins')
 $requiredFfmpeg = @('avcodec-62.dll', 'avutil-60.dll')
 $requiredRuntime = @('msvcp140.dll', 'vcruntime140.dll', 'vcruntime140_1.dll')
 $runtimeUrl = 'https://aka.ms/vs/17/release/vc_redist.x64.exe'
@@ -74,6 +96,62 @@ function Test-ObsInstallation {
     return Test-Path -LiteralPath ([IO.Path]::Combine($Path, 'bin', '64bit', 'obs64.exe'))
 }
 
+# A registry string value, or $null when the key or the value is absent. An empty name reads the
+# key's default value.
+function Get-RegistryText {
+    param([Parameter(Mandatory)][string]$Key, [Parameter(Mandatory)][AllowEmptyString()][string]$Name)
+    if (-not (Test-Path -LiteralPath $Key)) {
+        return $null
+    }
+    return (Get-Item -LiteralPath $Key).GetValue($Name)
+}
+
+# The OBS folder that holds <obs>\bin\64bit\obs64.exe.
+function Get-ObsRootFromExecutable {
+    param([Parameter(Mandatory)][string]$Path)
+    return Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Path))
+}
+
+# Running OBS processes show where the user's OBS is, wherever it was installed or extracted.
+function Get-RunningObsRoot {
+    # Loading the CIM module defines aliases, which -WhatIf would otherwise report as actions.
+    $processes = & {
+        $WhatIfPreference = $false
+        @(Get-CimInstance -ClassName Win32_Process -Filter "Name = 'obs64.exe'")
+    }
+    foreach ($process in $processes) {
+        # ExecutablePath is empty for a process this account may not inspect, such as an OBS
+        # running as administrator; the other locations are still searched.
+        if ($process.ExecutablePath) {
+            Get-ObsRootFromExecutable -Path $process.ExecutablePath
+        }
+    }
+}
+
+# Steam's own folder and the library folders, on any drive, that it lists in
+# steamapps\libraryfolders.vdf. Paths in that file are quoted with backslashes escaped.
+function Get-SteamLibraryFolder {
+    param([Parameter(Mandatory)][string]$SteamRoot)
+    $folders = [Collections.Generic.List[string]]::new()
+    $folders.Add($SteamRoot)
+    $manifest = [IO.Path]::Combine($SteamRoot, 'steamapps', 'libraryfolders.vdf')
+    if (Test-Path -LiteralPath $manifest) {
+        $text = Get-Content -LiteralPath $manifest -Raw
+        foreach ($match in [regex]::Matches($text, '"path"\s+"((?:[^"\\]|\\.)*)"')) {
+            $folders.Add([regex]::Replace($match.Groups[1].Value, '\\(.)', '$1'))
+        }
+    }
+    return $folders
+}
+
+function Get-SteamRoot {
+    $roots = @(
+        (Get-RegistryText -Key 'HKCU:\Software\Valve\Steam' -Name 'SteamPath'),
+        (Get-RegistryText -Key 'HKLM:\SOFTWARE\WOW6432Node\Valve\Steam' -Name 'InstallPath'),
+        [IO.Path]::Combine((Get-KnownFolder -Folder ProgramFilesX86), 'Steam'))
+    return @($roots | Where-Object { $_ -and (Test-Path -LiteralPath $_ -PathType Container) })
+}
+
 function Find-ObsInstallation {
     param([string]$Requested)
     if (-not [string]::IsNullOrWhiteSpace($Requested)) {
@@ -83,41 +161,75 @@ function Find-ObsInstallation {
         return (Resolve-Path -LiteralPath $Requested).Path
     }
     $candidates = [Collections.Generic.List[string]]::new()
+    foreach ($root in @(Get-RunningObsRoot)) {
+        $candidates.Add($root)
+    }
     foreach ($key in @('HKLM:\SOFTWARE\OBS Studio', 'HKCU:\SOFTWARE\OBS Studio')) {
-        if (Test-Path -LiteralPath $key) {
-            $value = (Get-ItemProperty -LiteralPath $key).'(default)'
-            if ($value) {
-                $candidates.Add($value)
+        $value = Get-RegistryText -Key $key -Name ''
+        if ($value) {
+            $candidates.Add($value)
+        }
+    }
+    $candidates.Add([IO.Path]::Combine((Get-KnownFolder -Folder ProgramFiles), 'obs-studio'))
+    $candidates.Add([IO.Path]::Combine((Get-KnownFolder -Folder LocalApplicationData), 'Programs', 'obs-studio'))
+    foreach ($steam in @(Get-SteamRoot)) {
+        foreach ($library in @(Get-SteamLibraryFolder -SteamRoot $steam)) {
+            $candidates.Add([IO.Path]::Combine($library, 'steamapps', 'common', 'OBS Studio'))
+        }
+    }
+    # The same folder can be reached through several sources, spelled with different case or
+    # slashes.
+    $seen = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+    $found = @(foreach ($candidate in $candidates) {
+            if (Test-ObsInstallation -Path $candidate) {
+                $full = [IO.Path]::GetFullPath($candidate).TrimEnd([IO.Path]::DirectorySeparatorChar)
+                if ($seen.Add($full)) {
+                    $full
+                }
             }
-        }
+        })
+    if ($found.Count -eq 0) {
+        throw 'OBS Studio was not found. Install OBS 32 or newer, or pass -ObsPath "<OBS folder>" (the folder that contains bin\64bit\obs64.exe).'
     }
-    $candidates.Add([IO.Path]::Combine($env:ProgramFiles, 'obs-studio'))
-    $candidates.Add([IO.Path]::Combine($env:LOCALAPPDATA, 'Programs', 'obs-studio'))
-    if (${env:ProgramFiles(x86)}) {
-        $candidates.Add([IO.Path]::Combine(${env:ProgramFiles(x86)}, 'Steam', 'steamapps', 'common', 'OBS Studio'))
+    if ($found.Count -gt 1) {
+        Write-Step "OBS was found in more than one folder ($($found -join '; ')). Using the first; pass -ObsPath to choose another."
     }
-    foreach ($candidate in $candidates) {
-        if (Test-ObsInstallation -Path $candidate) {
-            return $candidate
-        }
+    return $found[0]
+}
+
+function Get-ObsVersion {
+    param([Parameter(Mandatory)][string]$Obs)
+    $exe = [IO.Path]::Combine($Obs, 'bin', '64bit', 'obs64.exe')
+    $version = "$((Get-Item -LiteralPath $exe).VersionInfo.ProductVersion)"
+    $major = 0
+    if (-not ($version -match '^(\d+)\.' -and [int]::TryParse($Matches[1], [ref]$major))) {
+        throw "Could not read the OBS version from $exe."
     }
-    throw 'OBS Studio was not found. Install OBS 32.x, or pass -ObsPath <OBS folder>.'
+    [PSCustomObject]@{ Text = $version; Major = $major }
 }
 
 function Test-ObsCompatibility {
     param([Parameter(Mandatory)][string]$Obs)
-    $binary = [IO.Path]::Combine($Obs, 'bin', '64bit')
-    $version = (Get-Item -LiteralPath ([IO.Path]::Combine($binary, 'obs64.exe'))).VersionInfo.ProductVersion
-    $major = 0
-    if (-not ("$version" -match '^(\d+)\.' -and [int]::TryParse($Matches[1], [ref]$major)) -or
-        $major -ne $requiredObsMajor) {
-        throw "Found OBS $version. This build needs OBS $requiredObsMajor.x."
+    $version = Get-ObsVersion -Obs $Obs
+    if ($version.Major -lt $minimumObsMajor) {
+        throw "Found OBS $($version.Text). This build needs OBS $minimumObsMajor or newer."
     }
+    if ($version.Major -notin $testedObsMajors) {
+        Write-Step "OBS $($version.Text) is newer than the versions this build was checked with ($($testedObsMajors -join ', ')); continuing."
+    }
+    $binary = [IO.Path]::Combine($Obs, 'bin', '64bit')
     $missing = @($requiredFfmpeg | Where-Object { -not (Test-Path -LiteralPath ([IO.Path]::Combine($binary, $_))) })
     if ($missing.Count -gt 0) {
-        throw "OBS $version lacks $($missing -join ', '), which this build decodes video with."
+        throw "OBS $($version.Text) lacks $($missing -join ', '), which this build decodes video and audio with."
     }
-    return $version
+    return $version.Text
+}
+
+# A portable OBS keeps its plugins in its own folder and ignores ProgramData.
+function Test-ObsPortable {
+    param([Parameter(Mandatory)][string]$Obs)
+    $markers = @('obs_portable_mode.txt', 'portable_mode.txt')
+    return @($markers | Where-Object { Test-Path -LiteralPath ([IO.Path]::Combine($Obs, $_)) }).Count -gt 0
 }
 
 function Test-VcRuntime {
@@ -138,31 +250,76 @@ function Wait-ObsClosed {
     }
 }
 
-function Test-DirectoryWritable {
+# True when the current user can create files in Path, or in its nearest existing parent when
+# Path does not exist yet.
+function Test-PathWritable {
     param([Parameter(Mandatory)][string]$Path)
-    $probe = [IO.Path]::Combine($Path, '.mgl-write-test')
+    $directory = $Path
+    while ($directory -and -not (Test-Path -LiteralPath $directory -PathType Container)) {
+        $directory = Split-Path -Parent $directory
+    }
+    if (-not $directory) {
+        return $false
+    }
+    # The probe file is removed directly so that -WhatIf cannot leave it behind.
+    $probe = [IO.Path]::Combine($directory, '.mgl-write-test')
     try {
         [IO.File]::Create($probe).Dispose()
-        Remove-Item -LiteralPath $probe -Force
+        [IO.File]::Delete($probe)
         return $true
     } catch [UnauthorizedAccessException] {
         return $false
     }
 }
 
-function Get-PluginTarget {
+# Where this OBS loads the plugin from, and every other place an earlier install of this plugin
+# may have left a copy.
+function Get-PluginLayout {
     param([Parameter(Mandatory)][string]$Obs)
-    [PSCustomObject]@{
-        Binary = [IO.Path]::Combine($Obs, 'obs-plugins', '64bit')
-        Locale = [IO.Path]::Combine($Obs, 'data', 'obs-plugins', $moduleName, 'locale')
-        Data = [IO.Path]::Combine($Obs, 'data', 'obs-plugins', $moduleName)
+    $major = (Get-ObsVersion -Obs $Obs).Major
+    $portable = Test-ObsPortable -Obs $Obs
+    $legacyDll = [IO.Path]::Combine($Obs, 'obs-plugins', '64bit', "$moduleName.dll")
+    $legacyData = [IO.Path]::Combine($Obs, 'data', 'obs-plugins', $moduleName)
+    $root = if ($portable) { [IO.Path]::Combine($Obs, 'plugins', $moduleName) }
+    else { [IO.Path]::Combine($programDataPlugins, $moduleName) }
+    $flatDll = [IO.Path]::Combine($root, "$moduleName.dll")
+    $binFolder = [IO.Path]::Combine($root, 'bin')
+    $binDll = [IO.Path]::Combine($binFolder, '64bit', "$moduleName.dll")
+    $rootData = [IO.Path]::Combine($root, 'data')
+    if (-not $portable) {
+        # ProgramData is shared by every OBS on the PC, so it gets both layouts: OBS 32 reads
+        # bin\64bit and OBS 33 and later prefer the flat copy and skip the other. An OBS upgrade
+        # then needs no reinstall, and OBS 32 and 33 can both be installed.
+        $layout = @{ Name = 'the ProgramData plugin folder (for OBS 32 and for OBS 33 and later)'
+            Dlls = @($flatDll, $binDll); Data = $rootData; Stale = @($legacyDll, $legacyData) }
+    } elseif ($major -ge $flatLayoutObsMajor) {
+        $layout = @{ Name = "portable OBS's plugin folder"; Dlls = @($flatDll); Data = $rootData
+            Stale = @($binFolder, $legacyDll, $legacyData) }
+    } else {
+        $layout = @{ Name = "portable OBS's legacy plugin folder"; Dlls = @($legacyDll); Data = $legacyData
+            Stale = @($flatDll, $binFolder) }
     }
+    $layout.Root = $root
+    [PSCustomObject]$layout
+}
+
+# Every place this plugin may be installed. The ProgramData folder does not depend on OBS, so it
+# is removed even when OBS itself is already gone.
+function Get-PluginRemovalPath {
+    param([string]$Obs)
+    $paths = @([IO.Path]::Combine($programDataPlugins, $moduleName))
+    if ($Obs) {
+        $paths += @([IO.Path]::Combine($Obs, 'plugins', $moduleName),
+            [IO.Path]::Combine($Obs, 'obs-plugins', '64bit', "$moduleName.dll"),
+            [IO.Path]::Combine($Obs, 'data', 'obs-plugins', $moduleName))
+    }
+    return $paths
 }
 
 function Install-PluginFile {
     [CmdletBinding(SupportsShouldProcess)]
     param([Parameter(Mandatory)][string]$Obs)
-    $target = Get-PluginTarget -Obs $Obs
+    $layout = Get-PluginLayout -Obs $Obs
     $dll = [IO.Path]::Combine($bundleRoot, 'plugin', "$moduleName.dll")
     $locale = [IO.Path]::Combine($bundleRoot, 'plugin', 'locale', 'en-US.ini')
     foreach ($source in @($dll, $locale)) {
@@ -170,40 +327,62 @@ function Install-PluginFile {
             throw "Bundle file missing: $source"
         }
     }
-    if ($PSCmdlet.ShouldProcess($target.Binary, "Copy $moduleName.dll")) {
-        New-Item -ItemType Directory -Path $target.Binary -Force | Out-Null
-        Copy-Item -LiteralPath $dll -Destination $target.Binary -Force
-        Unblock-File -LiteralPath ([IO.Path]::Combine($target.Binary, "$moduleName.dll"))
+    foreach ($target in $layout.Dlls) {
+        $dllFolder = Split-Path -Parent $target
+        if ($PSCmdlet.ShouldProcess($dllFolder, "Copy $moduleName.dll")) {
+            New-Item -ItemType Directory -Path $dllFolder -Force | Out-Null
+            Copy-Item -LiteralPath $dll -Destination $dllFolder -Force
+            Unblock-File -LiteralPath $target
+        }
     }
-    if ($PSCmdlet.ShouldProcess($target.Locale, 'Copy en-US.ini')) {
-        New-Item -ItemType Directory -Path $target.Locale -Force | Out-Null
-        Copy-Item -LiteralPath $locale -Destination $target.Locale -Force
+    $localeFolder = [IO.Path]::Combine($layout.Data, 'locale')
+    if ($PSCmdlet.ShouldProcess($localeFolder, 'Copy en-US.ini')) {
+        New-Item -ItemType Directory -Path $localeFolder -Force | Out-Null
+        Copy-Item -LiteralPath $locale -Destination $localeFolder -Force
+    }
+    # A copy in another layout would load instead of, or as well as, this one.
+    foreach ($path in $layout.Stale) {
+        if ((Test-Path -LiteralPath $path) -and $PSCmdlet.ShouldProcess($path, 'Remove an older copy')) {
+            Remove-Item -LiteralPath $path -Recurse -Force
+        }
     }
 }
 
 function Remove-PluginFile {
     [CmdletBinding(SupportsShouldProcess)]
-    param([Parameter(Mandatory)][string]$Obs)
-    $target = Get-PluginTarget -Obs $Obs
-    foreach ($path in @([IO.Path]::Combine($target.Binary, "$moduleName.dll"), $target.Data)) {
+    param([string]$Obs)
+    foreach ($path in (Get-PluginRemovalPath -Obs $Obs)) {
         if ((Test-Path -LiteralPath $path) -and $PSCmdlet.ShouldProcess($path, 'Remove')) {
             Remove-Item -LiteralPath $path -Recurse -Force
         }
     }
 }
 
-# Copies or removes the plugin files, elevating only that step when OBS lives in a protected
-# folder such as Program Files (the default OBS installer location).
+# Copies or removes the plugin files, elevating only that step when a folder it must change is
+# protected, such as an older copy under Program Files.
 function Invoke-PluginFileStep {
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [Parameter(Mandatory)][string]$Obs,
+        [string]$Obs,
         [Parameter(Mandatory)][ValidateSet('Copy', 'Remove')][string]$Mode
     )
-    $binary = (Get-PluginTarget -Obs $Obs).Binary
+    if ($Mode -eq 'Copy') {
+        $layout = Get-PluginLayout -Obs $Obs
+        Write-Step "Installing into $($layout.Name): $($layout.Root)"
+        $stale = @($layout.Stale | Where-Object { Test-Path -LiteralPath $_ })
+        $folders = @($layout.Dlls | ForEach-Object { Split-Path -Parent $_ })
+        $touched = $folders + @($layout.Data) + $stale
+    } else {
+        $touched = @(Get-PluginRemovalPath -Obs $Obs | Where-Object { Test-Path -LiteralPath $_ })
+    }
     $elevated = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
         [Security.Principal.WindowsBuiltInRole]::Administrator)
-    if ($WhatIfPreference -or $elevated -or (Test-DirectoryWritable -Path $binary)) {
+    # A dry run writes nothing, not even the permission probe.
+    # @() around the whole if keeps an empty result an array in Windows PowerShell 5.1.
+    $blocked = @(if (-not ($WhatIfPreference -or $elevated)) {
+            $touched | Where-Object { -not (Test-PathWritable -Path $_) }
+        })
+    if ($WhatIfPreference -or $elevated -or $blocked.Count -eq 0) {
         if ($Mode -eq 'Copy') { Install-PluginFile -Obs $Obs } else { Remove-PluginFile -Obs $Obs }
         return
     }
@@ -213,11 +392,13 @@ function Invoke-PluginFileStep {
     }
     # Only the plugin file step runs elevated; the token import and setup stay in this user's
     # context because DPAPI seals the store to the account that runs it.
-    Write-Step "OBS is in a protected folder; Windows will ask for permission to $verb the plugin."
+    Write-Step "A plugin folder is protected; Windows will ask for permission to $verb the plugin."
     $hostPath = (Get-Process -Id $PID).Path
     $childSwitch = if ($Mode -eq 'Copy') { '-CopyOnly' } else { '-RemoveOnly' }
-    $arguments = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', "`"$PSCommandPath`"",
-        $childSwitch, '-ObsPath', "`"$Obs`"")
+    $arguments = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', "`"$PSCommandPath`"", $childSwitch)
+    if ($Obs) {
+        $arguments += @('-ObsPath', "`"$Obs`"")
+    }
     $child = Start-Process -FilePath $hostPath -ArgumentList $arguments -Verb RunAs -Wait -PassThru
     if ($child.ExitCode -ne 0) {
         throw "The elevated plugin $verb step failed (exit $($child.ExitCode))."
@@ -293,41 +474,45 @@ function Invoke-GlassesSetup {
     Write-Step 'This PC now owns the glasses.'
 }
 
-# Removes the plugin from OBS (when OBS is still installed) and the setup tool. The sealed
-# identity is kept.
+# The OBS folder, or an empty string when OBS cannot be found; uninstalling still works then.
+function Find-ObsInstallationOrNone {
+    param([string]$Requested)
+    try {
+        return Find-ObsInstallation -Requested $Requested
+    } catch {
+        Write-Step "$($_.Exception.Message) Copies inside an OBS folder cannot be removed."
+        return ''
+    }
+}
+
+# Removes the plugin and the setup tool. The sealed identity is kept.
 function Uninstall-Plugin {
     [CmdletBinding(SupportsShouldProcess)]
     param([string]$Requested)
-    $obs = $null
-    try {
-        $obs = Find-ObsInstallation -Requested $Requested
-    } catch {
-        Write-Step "$($_.Exception.Message) Only the setup tool will be removed."
-    }
+    $obs = Find-ObsInstallationOrNone -Requested $Requested
     if ($obs) {
         Write-Step "OBS: $obs"
         Wait-ObsClosed
-        Invoke-PluginFileStep -Obs $obs -Mode Remove
     }
+    Invoke-PluginFileStep -Obs $obs -Mode Remove
     if ((Test-Path -LiteralPath $toolRoot) -and $PSCmdlet.ShouldProcess($toolRoot, 'Remove')) {
         Remove-Item -LiteralPath $toolRoot -Recurse -Force
     }
-    $removed = if ($obs) { 'the plugin and setup tool' } else { 'the setup tool' }
-    Write-Step "Removed $removed. The sealed identity in %LOCALAPPDATA%\MetaGLinkDirect was kept."
+    Write-Step 'Removed the plugin and the setup tool. The sealed identity in %LOCALAPPDATA%\MetaGLinkDirect was kept.'
 }
 
 try {
-    if ($Uninstall -and -not $RemoveOnly) {
+    if ($RemoveOnly) {
+        Remove-PluginFile -Obs (Find-ObsInstallationOrNone -Requested $ObsPath)
+        exit 0
+    }
+    if ($Uninstall) {
         Uninstall-Plugin -Requested $ObsPath
         exit 0
     }
     $obs = Find-ObsInstallation -Requested $ObsPath
     if ($CopyOnly) {
         Install-PluginFile -Obs $obs
-        exit 0
-    }
-    if ($RemoveOnly) {
-        Remove-PluginFile -Obs $obs
         exit 0
     }
     Write-Step "OBS: $obs"
