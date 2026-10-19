@@ -4,6 +4,10 @@ All notable changes are recorded here. The project follows [semantic versioning]
 
 ## [Unreleased]
 
+### Changed
+
+- `quality` reruns only the red drills whose inputs (the file the drill mutates, the task runner and the gate's configuration) changed since their recorded pass, and lists the others as unchanged; `package` and `test:red` still run all of them. `reports/red-drills.json` records each drill's inputs and their SHA-256. A new drill (22 in total) proves that a changed input forces a rerun.
+
 ## [0.2.0] - 2026-10-19 (beta)
 
 ### Added

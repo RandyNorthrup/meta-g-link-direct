@@ -49,9 +49,11 @@ The runner enters the Visual Studio developer environment only when needed. Ever
 | `test` | CTest (frame prefix, private address, protocol, OBS module ABI) and Pester (runner, CLI and installer contracts) |
 | `test:asan` | All CTest suites in a separate AddressSanitizer build |
 | `test:live` | A live uncached Bluetooth service query (needs a Bluetooth radio) |
-| `test:red` | 21 green → red → exact-restoration → green drills over the gates |
-| `quality` | `configure`, `build`, `format:check`, `lint`, `deadcode`, `security:audit`, `test`, `test:live`, `test:red` |
-| `package` | `quality`, then `dist/meta-g-link-direct-<version>-windows-x64.zip` and its `.sha256` file |
+| `test:red` | All 22 green → red → exact-restoration → green drills over the gates; `-Drill changed` runs only the drills whose inputs changed, `-Drill <id>` one drill |
+| `quality` | `configure`, `build`, `format:check`, `lint`, `deadcode`, `security:audit`, `test`, `test:live`, then the drills whose inputs changed |
+| `package` | `quality` with every drill, then `dist/meta-g-link-direct-<version>-windows-x64.zip` and its `.sha256` file |
+
+A drill proves that its gate still fails on a planted defect, so it only needs to run again when something that decides that gate's result changed. Each drill's inputs are the file it mutates, `scripts/Invoke-Project.ps1` and its gate's configuration (`$drillGateInputs` in the runner, for example `.clang-tidy` for `lint:cpp` or the CMake files and `tests/` for `test`). `reports/red-drills.json` records each passing drill with a SHA-256 over those inputs. `quality` reruns a drill when that fingerprint differs or no passing result is recorded, and prints `UNCHANGED drill <id>` for each of the others, then a run/unchanged count. Tool versions installed on the PC are not part of the fingerprint; `package` reruns every drill before a release.
 
 `package` stages the user bundle: `Install.cmd`, `Uninstall.cmd`, `Install-MetaGLinkDirect.ps1`, `plugin\meta-g-link-direct.dll`, `plugin\locale\en-US.ini`, `tools\meta-g-link-probe.exe`, `README.txt`, `LICENSE` and `THIRD_PARTY_NOTICES.md`. `Install-MetaGLinkDirect.ps1 -WhatIf` lists the installer's actions without changing anything (it does not show the elevation prompt, which it skips). The installer takes every system folder from Windows (`Get-KnownFolder`) and never assumes a drive letter; `tests/installer.Tests.ps1` fails on a drive-letter path in it. To try an OBS on another drive, map a spare letter to a folder with a portable OBS (`subst M: <folder>`, removed with `subst M: /D`).
 

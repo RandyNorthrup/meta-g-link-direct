@@ -20,13 +20,13 @@ MUTATED EXIT 1
 [9/9] Linking CXX executable mgl-protocol-tests.exe
 Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
     Start 2: private-address
-1/1 Test #2: private-address ..................***Failed    0.01 sec
+1/1 Test #2: private-address ..................***Failed    0.02 sec
 Malformed/reserved Bluetooth address accepted
 
 
 0% tests passed, 1 tests failed out of 1
 
-Total Test time (real) =   0.02 sec
+Total Test time (real) =   0.03 sec
 
 The following tests FAILED:
 	  2 - private-address (Failed)
@@ -38,17 +38,17 @@ RESTORED EXIT 0
 [2/16] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
 [3/9] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\address.cpp.obj
 [4/9] Linking CXX static library mgl_protocol.lib
-[5/9] Linking CXX executable meta-g-link-probe.exe
-[6/9] Linking CXX shared module meta-g-link-direct.dll
+[5/9] Linking CXX shared module meta-g-link-direct.dll
+[6/9] Linking CXX executable meta-g-link-probe.exe
 [7/9] Linking CXX executable mgl-sdu-tests.exe
 [8/9] Linking CXX executable mgl-address-tests.exe
 [9/9] Linking CXX executable mgl-protocol-tests.exe
 Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
     Start 2: private-address
-1/1 Test #2: private-address ..................   Passed    0.04 sec
+1/1 Test #2: private-address ..................   Passed    0.02 sec
 
 100% tests passed, 0 tests failed out of 1
 
-Total Test time (real) =   0.05 sec
+Total Test time (real) =   0.02 sec
 
 RESTORATION SHA256 c3004bc33bb615eee1e285a7666fb28bff020a22f412f366381be8aa065d5eaf

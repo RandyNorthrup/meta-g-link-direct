@@ -9,11 +9,11 @@ param(
         'test:probe', 'test:installer', 'test:address', 'test:live', 'discover', 'discover:classic', 'connect:classic',
         'discover:classic:live', 'connect:classic:live', 'pair:classic')]
     [string]$Task = 'quality',
-    [ValidateSet('all', 'parser-length', 'module-metadata', 'format', 'owned-header',
+    [ValidateSet('all', 'changed', 'parser-length', 'module-metadata', 'format', 'owned-header',
         'compiler-types', 'unused-code', 'script-analysis', 'workflow-security', 'secret-scanner',
         'unsafe-copy', 'duplicated-code', 'address-sanitizer', 'dependency-npm', 'dependency-osv',
         'whatif-guard', 'native-exit-propagation', 'probe-arguments', 'classic-connection-claim',
-        'private-address-validation', 'uncached-query-loop', 'installer-drive-letter')]
+        'private-address-validation', 'uncached-query-loop', 'installer-drive-letter', 'drill-reuse')]
     [string]$Drill = 'all'
 )
 
@@ -26,6 +26,34 @@ $toolRoot = Join-Path $projectRoot '.tools'
 $buildRoot = Join-Path $projectRoot 'out/windows'
 $dependencyLock = Get-Content -LiteralPath (Join-Path $projectRoot 'dependencies.lock.json') -Raw |
     ConvertFrom-Json
+$drillEvidencePath = Join-Path $projectRoot 'reports/red-drills.json'
+# The drills test:red runs: 'all', 'changed' (only drills whose inputs changed since their recorded
+# pass) or one drill id. quality narrows 'all' to 'changed'; package keeps 'all'.
+$script:DrillSelection = $Drill
+$script:ReleaseGate = $false
+# Besides the file a drill mutates and this runner, the files whose content decides that drill's
+# gate result. A folder stands for every file in it. A drill whose gate is not listed cannot run.
+$cmakeInputs = @('CMakeLists.txt', 'CMakePresets.json', 'dependencies.lock.json')
+$nodeInputs = @('package.json', 'package-lock.json')
+$drillGateInputs = @{
+    'build' = $cmakeInputs
+    'test' = $cmakeInputs + 'tests'
+    'test:address' = $cmakeInputs + 'tests'
+    'test:asan' = $cmakeInputs + 'tests'
+    'test:live' = $cmakeInputs + 'tests/live.Tests.ps1'
+    'test:runner' = @('tests/runner.Tests.ps1')
+    'test:installer' = @('tests/installer.Tests.ps1')
+    'format:check' = @('.clang-format')
+    'lint:cpp' = $cmakeInputs + '.clang-tidy'
+    'lint:powershell' = @('PSScriptAnalyzerSettings.psd1')
+    'lint:workflow' = @('.github/workflows')
+    'deadcode:cpp' = $cmakeInputs + '.cppcheck-obs.cfg'
+    'deadcode:copies' = $nodeInputs + '.jscpd.json'
+    'security:secrets' = @('.gitleaks.toml')
+    'security:sast' = @('.semgrep.yml')
+    'security:npm' = $nodeInputs
+    'security:osv' = $nodeInputs
+}
 
 function Invoke-Native {
     [CmdletBinding()]
@@ -233,13 +261,82 @@ function Invoke-DrillCheck {
     [PSCustomObject]@{ Code = $LASTEXITCODE; Output = $output }
 }
 
+# SHA-256 over the relative paths and contents of a drill's inputs. A folder stands for every file in
+# it, and a missing input still counts, so creating or deleting an input changes the result.
+function Get-InputFingerprint {
+    [CmdletBinding()]
+    param([Parameter(Mandatory)][string]$Root, [Parameter(Mandatory)][string[]]$Path)
+    $entries = [Collections.Generic.List[string]]::new()
+    foreach ($relative in @($Path | Select-Object -Unique)) {
+        $full = Join-Path $Root $relative
+        if (Test-Path -LiteralPath $full -PathType Container) {
+            $files = @(Get-ChildItem -LiteralPath $full -Recurse -File)
+        } elseif (Test-Path -LiteralPath $full -PathType Leaf) {
+            $files = @(Get-Item -LiteralPath $full)
+        } else {
+            $entries.Add("$relative`tmissing")
+            continue
+        }
+        foreach ($file in $files) {
+            $name = [IO.Path]::GetRelativePath($Root, $file.FullName).Replace('\', '/')
+            $entries.Add("$name`t" + (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant())
+        }
+    }
+    $sorted = $entries.ToArray()
+    [Array]::Sort($sorted, [StringComparer]::Ordinal)
+    $bytes = [Text.Encoding]::UTF8.GetBytes(($sorted -join "`n"))
+    return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes)).ToLowerInvariant()
+}
+
+# The recorded result of a drill that passed with exactly these inputs, or $null when it must run.
+function Get-ReusableDrillResult {
+    [CmdletBinding()]
+    param([AllowEmptyCollection()][object[]]$Recorded = @(), [Parameter(Mandatory)][string]$Id,
+        [Parameter(Mandatory)][string]$Fingerprint)
+    $previous = @($Recorded | Where-Object { $_.id -eq $Id }) | Select-Object -First 1
+    if ($null -eq $previous -or -not $previous.PSObject.Properties['inputs_sha256']) {
+        return $null
+    }
+    $passed = $previous.baseline_exit -eq 0 -and $previous.mutated_exit -ne 0 -and $previous.restored_exit -eq 0
+    if ($passed -and $previous.inputs_sha256 -eq $Fingerprint) {
+        return $previous
+    }
+    return $null
+}
+
+# Writes this run's drill results. A single-drill run keeps the other drills' recorded results.
+function Save-DrillEvidence {
+    $handled = @($script:DrillEvidence | ForEach-Object { $_.id })
+    $kept = @(if ($script:DrillSelection -notin @('all', 'changed')) {
+            $script:RecordedDrills | Where-Object { $_.id -notin $handled }
+        })
+    ConvertTo-Json -InputObject @($kept + $script:DrillEvidence) -Depth 5 |
+        Set-Content -LiteralPath $drillEvidencePath -Encoding utf8
+}
+
 function Invoke-RestoredDrill {
     [CmdletBinding()]
     param([Parameter(Mandatory)][string]$Id, [Parameter(Mandatory)][string]$Path,
         [Parameter(Mandatory)][scriptblock]$Mutate, [Parameter(Mandatory)][string]$Gate,
         [Parameter(Mandatory)][string]$ExpectedDiagnostic)
-    if ($Drill -ne 'all' -and $Drill -ne $Id) {
+    if ($script:DrillSelection -notin @('all', 'changed') -and $script:DrillSelection -ne $Id) {
         return
+    }
+    if (-not $drillGateInputs.ContainsKey($Gate)) {
+        throw "Red drill $Id uses gate $Gate, which declares no drill inputs"
+    }
+    $relative = [IO.Path]::GetRelativePath($projectRoot, $Path).Replace('\', '/')
+    $runner = [IO.Path]::GetRelativePath($projectRoot, $PSCommandPath).Replace('\', '/')
+    $inputs = @($relative, $runner) + $drillGateInputs[$Gate]
+    $fingerprint = Get-InputFingerprint -Root $projectRoot -Path $inputs
+    if ($script:DrillSelection -eq 'changed') {
+        $previous = Get-ReusableDrillResult -Recorded $script:RecordedDrills -Id $Id -Fingerprint $fingerprint
+        if ($previous) {
+            $script:DrillEvidence.Add($previous)
+            $script:DrillsReused++
+            Write-Output "UNCHANGED drill $Id (inputs match its pass recorded $($previous.recorded_at))"
+            return
+        }
     }
     $before = [IO.File]::ReadAllBytes($Path)
     $beforeHash = (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -277,20 +374,24 @@ function Invoke-RestoredDrill {
     }
     $observed = ($mutated.Output -split "`n" | Where-Object { $_ -match $ExpectedDiagnostic } |
             Select-Object -First 1).Trim()
-    $relative = [IO.Path]::GetRelativePath($projectRoot, $Path).Replace('\', '/')
     $script:DrillEvidence.Add([PSCustomObject]@{
             id = $Id; gate = $Gate; baseline_exit = $baseline.Code; mutated_exit = $mutated.Code
             restored_exit = $restored.Code; expected_diagnostic = $ExpectedDiagnostic
             observed_diagnostic = $observed; path = $relative; before = $beforeHash
             mutated = $mutatedHash; after = $afterHash; log = "reports/red/$Id.txt"
+            inputs = @($inputs | Select-Object -Unique); inputs_sha256 = $fingerprint
+            recorded_at = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
         })
-    $script:DrillEvidence | ConvertTo-Json -Depth 5 |
-        Set-Content -LiteralPath (Join-Path $projectRoot 'reports/red-drills.json') -Encoding utf8
+    Save-DrillEvidence
     Write-Output "PASS drill $Id (green 0, intended red $($mutated.Code), restored 0)"
 }
 
 function Invoke-RedDrillSet {
     $script:DrillEvidence = [Collections.Generic.List[object]]::new()
+    $script:DrillsReused = 0
+    $script:RecordedDrills = @(if (Test-Path -LiteralPath $drillEvidencePath) {
+            Get-Content -LiteralPath $drillEvidencePath -Raw | ConvertFrom-Json
+        })
     New-Item -ItemType Directory -Path (Join-Path $projectRoot 'reports/red') -Force | Out-Null
     Invoke-RestoredDrill -Id parser-length -Path (Join-Path $projectRoot 'src/protocol/sdu.cpp') -Mutate {
         param($text)
@@ -420,10 +521,18 @@ function Invoke-RedDrillSet {
         param($text)
         $text.Replace('(Get-KnownFolder -Folder CommonApplicationData)', "'C:\ProgramData'")
     } -Gate 'test:installer' -ExpectedDiagnostic 'because the installer must not assume a drive letter'
-    $expectedDrillCount = if ($Drill -eq 'all') { 21 } else { 1 }
+
+    Invoke-RestoredDrill -Id drill-reuse -Path $PSCommandPath -Mutate {
+        param($text)
+        $text.Replace('$passed -and $previous.inputs_sha256 -eq $Fingerprint', '$passed')
+    } -Gate 'test:runner' -ExpectedDiagnostic 'because a drill whose inputs changed must run again'
+    $expectedDrillCount = if ($script:DrillSelection -in @('all', 'changed')) { 22 } else { 1 }
     if ($script:DrillEvidence.Count -ne $expectedDrillCount) {
         throw 'Red-drill discovery did not match the requested scope'
     }
+    Save-DrillEvidence
+    $ran = $script:DrillEvidence.Count - $script:DrillsReused
+    Write-Output "Red drills: $ran run, $($script:DrillsReused) unchanged since their recorded pass"
 }
 
 function Invoke-Task {
@@ -444,7 +553,7 @@ function Invoke-Task {
         'test:runner' {
             $result = Invoke-Pester -Path (Join-Path $projectRoot 'tests/runner.Tests.ps1') `
                 -PassThru -Output Detailed
-            if ($result.TotalCount -eq 0 -or $result.FailedCount -ne 0 -or $result.PassedCount -ne 3) {
+            if ($result.TotalCount -eq 0 -or $result.FailedCount -ne 0 -or $result.PassedCount -ne 5) {
                 throw 'Pester runner tests failed or discovery count changed'
             }
         }
@@ -522,6 +631,11 @@ function Invoke-Task {
         'security:audit' { Invoke-SecurityAnalysis }
         'test:red' { Invoke-RedDrillSet }
         quality {
+            # Every gate runs on the whole tree. Day to day, only the drills whose inputs changed
+            # since their recorded pass run again; a release reruns all of them.
+            if (-not $script:ReleaseGate) {
+                $script:DrillSelection = 'changed'
+            }
             foreach ($gate in @('configure', 'build', 'format:check', 'lint', 'deadcode',
                     'security:audit', 'test', 'test:live', 'test:red')) {
                 Write-Output "Gate: $gate"
@@ -529,6 +643,7 @@ function Invoke-Task {
             }
         }
         package {
+            $script:ReleaseGate = $true
             Invoke-Task -Name quality
             Build-ReleaseBundle
         }
@@ -556,7 +671,7 @@ function Invoke-Task {
 }
 
 if ($Drill -ne 'all' -and $Task -ne 'test:red') {
-    throw 'A drill subset is valid only for test:red; quality always runs the full set'
+    throw 'A drill selection is valid only for test:red; quality reruns changed drills and package all of them'
 }
 if (-not $PSCmdlet.ShouldProcess($projectRoot, "Run project task $Task")) {
     return

@@ -3,13 +3,13 @@ ninja: no work to do.
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 1 tests in 155ms.
+Discovery found 1 tests in 240ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\live.Tests.ps1'
 Describing Explicit live Classic service lookup
-  [+] queries available Classic peers without pairing or connecting 28.79s (28.76s|27ms)
-Tests completed in 29.34s
+  [+] queries available Classic peers without pairing or connecting 32.72s (32.69s|29ms)
+Tests completed in 33.44s
 Tests Passed: 1, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
 MUTATED EXIT 1
@@ -22,16 +22,16 @@ MUTATED EXIT 1
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 1 tests in 196ms.
+Discovery found 1 tests in 221ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\live.Tests.ps1'
 Describing Explicit live Classic service lookup
-  [-] queries available Classic peers without pairing or connecting 20.75s (20.71s|44ms)
+  [-] queries available Classic peers without pairing or connecting 20.74s (20.7s|31ms)
    Expected the actual value to be greater than 0, because Live discovery must query available Classic peers, but got 0.
    at $report.uncached_peer_queries | Should -BeGreaterThan 0 -Because 'Live discovery must query available Classic peers', C:\Users\Randy\Coding\meta_g_link_direct\tests\live.Tests.ps1:21
    at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\live.Tests.ps1:21
-Tests completed in 21.45s
+Tests completed in 21.41s
 Tests Passed: 0, Failed: 1, Skipped: 0, Inconclusive: 0, NotRun: 0
 Write-Error: Pester live SDP tests failed or discovery count changed
 
@@ -45,13 +45,13 @@ RESTORED EXIT 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 1 tests in 214ms.
+Discovery found 1 tests in 181ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\live.Tests.ps1'
 Describing Explicit live Classic service lookup
-  [+] queries available Classic peers without pairing or connecting 30.19s (30.16s|34ms)
-Tests completed in 30.81s
+  [+] queries available Classic peers without pairing or connecting 30.95s (30.92s|30ms)
+Tests completed in 31.59s
 Tests Passed: 1, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
 RESTORATION SHA256 7696e4215bb4eae7049f5513449c9d22414050f1448831c7eb7ce84d2033ade1

@@ -8,73 +8,46 @@ Preset CMake variables:
   CMAKE_SYSTEM_VERSION="10.0.26100.0"
   MGL_SANITIZERS:BOOL="TRUE"
 
--- Configuring done (0.3s)
+-- Configuring done (0.4s)
 -- Generating done (0.1s)
 -- Build files have been written to: C:/Users/Randy/Coding/meta_g_link_direct/out/windows-asan
-[1/67] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp for CXX dependencies
-[2/67] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\address.cpp for CXX dependencies
-[3/67] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\stream.cpp for CXX dependencies
-[4/67] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
-[5/62] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp for CXX dependencies
-[6/62] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm.cpp for CXX dependencies
-[7/62] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\windows\session.cpp for CXX dependencies
-[8/62] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\windows\sdu_socket.cpp for CXX dependencies
-[9/62] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\windows\rfcomm_transport.cpp for CXX dependencies
-[10/62] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\windows\tcp_transport.cpp for CXX dependencies
-[11/62] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\windows\provision.cpp for CXX dependencies
-[12/62] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\windows\media_session.cpp for CXX dependencies
-[13/62] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\sdu.cpp.obj
-[14/62] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\address.cpp.obj
-[15/62] Generating CXX dyndep file CMakeFiles\mgl_windows.dir\CXX.dd
-[16/55] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp for CXX dependencies
-[17/55] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\plugin\camera.cpp for CXX dependencies
-[18/55] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\stream.cpp.obj
-[19/55] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\plugin\hevc_decoder.cpp for CXX dependencies
-[20/55] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\plugin\aac_decoder.cpp for CXX dependencies
-[21/55] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp for CXX dependencies
-[22/55] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\protocol_tests.cpp for CXX dependencies
-[23/55] Linking CXX static library mgl_protocol.lib
-[24/55] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\rfcomm.cpp.obj
-[25/55] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\session.cpp.obj
-[26/55] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\classic.cpp.obj
-[27/55] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\sdu_socket.cpp.obj
-[28/55] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\tcp_transport.cpp.obj
-[29/55] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\provision.cpp.obj
-[30/55] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\rfcomm_transport.cpp.obj
-[31/55] Generating CXX dyndep file CMakeFiles\meta-g-link-probe.dir\CXX.dd
-[32/54] Generating CXX dyndep file CMakeFiles\meta-g-link-direct.dir\CXX.dd
-[33/54] Generating CXX dyndep file CMakeFiles\mgl-sdu-tests.dir\CXX.dd
-[34/54] Generating CXX dyndep file CMakeFiles\mgl-address-tests.dir\CXX.dd
-[35/53] Generating CXX dyndep file CMakeFiles\mgl-protocol-tests.dir\CXX.dd
-[36/53] Generating CXX dyndep file CMakeFiles\mgl-module-tests.dir\CXX.dd
-[37/51] Building CXX object CMakeFiles\meta-g-link-probe.dir\src\probe\main.cpp.obj
-[38/51] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\media_session.cpp.obj
-[39/51] Linking CXX static library mgl_windows.lib
-[40/51] Building C object CMakeFiles\meta-g-link-direct.dir\src\plugin\module.c.obj
-[41/51] Building C object CMakeFiles\meta-g-link-direct.dir\src\plugin\source.c.obj
-[42/51] Building CXX object CMakeFiles\meta-g-link-direct.dir\src\plugin\hevc_decoder.cpp.obj
-[43/51] Building CXX object CMakeFiles\meta-g-link-direct.dir\src\plugin\aac_decoder.cpp.obj
-[44/51] Building CXX object CMakeFiles\meta-g-link-direct.dir\src\plugin\camera.cpp.obj
-[45/51] Building CXX object CMakeFiles\mgl-sdu-tests.dir\tests\sdu_tests.cpp.obj
-[46/51] Linking CXX executable meta-g-link-probe.exe
-[47/51] Building CXX object CMakeFiles\mgl-protocol-tests.dir\tests\protocol_tests.cpp.obj
-[48/51] Linking CXX executable mgl-sdu-tests.exe
-[49/51] Linking CXX shared module meta-g-link-direct.dll
-[50/51] Linking CXX executable mgl-address-tests.exe
-[51/51] Linking CXX executable mgl-protocol-tests.exe
+[1/53] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp for CXX dependencies
+[2/53] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\address.cpp for CXX dependencies
+[3/53] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
+[4/47] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\sdu.cpp.obj
+[5/47] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\windows\classic.cpp for CXX dependencies
+[6/47] Generating CXX dyndep file CMakeFiles\mgl_windows.dir\CXX.dd
+[7/33] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp for CXX dependencies
+[8/33] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\address.cpp.obj
+[9/33] Linking CXX static library mgl_protocol.lib
+[10/33] Generating CXX dyndep file CMakeFiles\meta-g-link-probe.dir\CXX.dd
+[11/32] Generating CXX dyndep file CMakeFiles\meta-g-link-direct.dir\CXX.dd
+[12/29] Generating CXX dyndep file CMakeFiles\mgl-sdu-tests.dir\CXX.dd
+[13/28] Generating CXX dyndep file CMakeFiles\mgl-address-tests.dir\CXX.dd
+[14/27] Generating CXX dyndep file CMakeFiles\mgl-protocol-tests.dir\CXX.dd
+[15/26] Generating CXX dyndep file CMakeFiles\mgl-module-tests.dir\CXX.dd
+[16/24] Building CXX object CMakeFiles\meta-g-link-probe.dir\src\probe\main.cpp.obj
+[17/24] Building C object CMakeFiles\meta-g-link-direct.dir\src\plugin\module.c.obj
+[18/24] Linking CXX executable mgl-sdu-tests.exe
+[19/24] Linking CXX executable mgl-address-tests.exe
+[20/24] Linking CXX executable mgl-protocol-tests.exe
+[21/24] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\classic.cpp.obj
+[22/24] Linking CXX static library mgl_windows.lib
+[23/24] Linking CXX shared module meta-g-link-direct.dll
+[24/24] Linking CXX executable meta-g-link-probe.exe
 Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows-asan
     Start 1: protocol-prefix
-1/4 Test #1: protocol-prefix ..................   Passed    0.04 sec
+1/4 Test #1: protocol-prefix ..................   Passed    0.09 sec
     Start 2: private-address
-2/4 Test #2: private-address ..................   Passed    0.03 sec
+2/4 Test #2: private-address ..................   Passed    0.04 sec
     Start 3: protocol-datax
-3/4 Test #3: protocol-datax ...................   Passed    0.03 sec
+3/4 Test #3: protocol-datax ...................   Passed    0.04 sec
     Start 4: module-abi
-4/4 Test #4: module-abi .......................   Passed    0.06 sec
+4/4 Test #4: module-abi .......................   Passed    0.08 sec
 
 100% tests passed, 0 tests failed out of 4
 
-Total Test time (real) =   0.18 sec
+Total Test time (real) =   0.26 sec
 
 MUTATED EXIT 1
 Preset CMake variables:
@@ -86,7 +59,7 @@ Preset CMake variables:
   CMAKE_SYSTEM_VERSION="10.0.26100.0"
   MGL_SANITIZERS:BOOL="TRUE"
 
--- Configuring done (0.3s)
+-- Configuring done (0.4s)
 -- Generating done (0.1s)
 -- Build files have been written to: C:/Users/Randy/Coding/meta_g_link_direct/out/windows-asan
 [1/49] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
@@ -102,39 +75,39 @@ Preset CMake variables:
 [11/11] Linking CXX executable mgl-sdu-tests.exe
 Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows-asan
     Start 1: protocol-prefix
-1/4 Test #1: protocol-prefix ..................***Failed    0.07 sec
+1/4 Test #1: protocol-prefix ..................***Failed    0.05 sec
 =================================================================
-==37828==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x113beb5a0034 at pc 0x7ff64bf453de bp 0x002046f9fea0 sp 0x002046f9fea8
-READ of size 4 at 0x113beb5a0034 thread T0
-    #0 0x7ff64bf453dd in main C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:64
-    #1 0x7ff64bf4768f in invoke_main D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:78
-    #2 0x7ff64bf4768f in __scrt_common_main_seh D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:288
+==31416==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x113b261a0034 at pc 0x7ff77dab53de bp 0x001d411dfdd0 sp 0x001d411dfdd8
+READ of size 4 at 0x113b261a0034 thread T0
+    #0 0x7ff77dab53dd in main C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:64
+    #1 0x7ff77dab768f in invoke_main D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:78
+    #2 0x7ff77dab768f in __scrt_common_main_seh D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:288
     #3 0x7ffae976dda6  (C:\WINDOWS\System32\KERNEL32.DLL+0x18002dda6)
     #4 0x7ffaea7fee4b  (C:\WINDOWS\SYSTEM32\ntdll.dll+0x18007ee4b)
 
-0x113beb5a0034 is located 0 bytes after 4-byte region [0x113beb5a0030,0x113beb5a0034)
+0x113b261a0034 is located 0 bytes after 4-byte region [0x113b261a0030,0x113b261a0034)
 allocated by thread T0 here:
-    #0 0x7ff64bf46b8e in operator new[](unsigned __int64) D:\a\_work\1\s\src\vctools\asan\llvm\compiler-rt\lib\asan\asan_win_new_array_thunk.cpp:41
-    #1 0x7ff64bf4537d in std::make_unique C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\memory:3636
-    #2 0x7ff64bf4537d in main C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:62
-    #3 0x7ff64bf4768f in invoke_main D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:78
-    #4 0x7ff64bf4768f in __scrt_common_main_seh D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:288
+    #0 0x7ff77dab6b8e in operator new[](unsigned __int64) D:\a\_work\1\s\src\vctools\asan\llvm\compiler-rt\lib\asan\asan_win_new_array_thunk.cpp:41
+    #1 0x7ff77dab537d in std::make_unique C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\memory:3636
+    #2 0x7ff77dab537d in main C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:62
+    #3 0x7ff77dab768f in invoke_main D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:78
+    #4 0x7ff77dab768f in __scrt_common_main_seh D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:288
     #5 0x7ffae976dda6  (C:\WINDOWS\System32\KERNEL32.DLL+0x18002dda6)
     #6 0x7ffaea7fee4b  (C:\WINDOWS\SYSTEM32\ntdll.dll+0x18007ee4b)
 
 SUMMARY: AddressSanitizer: heap-buffer-overflow C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp:64 in main
 Shadow bytes around the buggy address:
-  0x113beb59fd80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x113beb59fe00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x113beb59fe80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x113beb59ff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x113beb59ff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-=>0x113beb5a0000: fa fa fd fd fa fa[04]fa fa fa 00 00 fa fa fa fa
-  0x113beb5a0080: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-  0x113beb5a0100: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-  0x113beb5a0180: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-  0x113beb5a0200: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-  0x113beb5a0280: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x113b2619fd80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x113b2619fe00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x113b2619fe80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x113b2619ff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x113b2619ff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+=>0x113b261a0000: fa fa fd fd fa fa[04]fa fa fa 00 00 fa fa fa fa
+  0x113b261a0080: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x113b261a0100: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x113b261a0180: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x113b261a0200: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x113b261a0280: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
 Shadow byte legend (one shadow byte represents 8 application bytes):
   Addressable:           00
   Partially addressable: 01 02 03 04 05 06 07 
@@ -154,18 +127,18 @@ Shadow byte legend (one shadow byte represents 8 application bytes):
   ASan internal:           fe
   Left alloca redzone:     ca
   Right alloca redzone:    cb
-==37828==ABORTING
+==31416==ABORTING
 
     Start 2: private-address
 2/4 Test #2: private-address ..................   Passed    0.03 sec
     Start 3: protocol-datax
-3/4 Test #3: protocol-datax ...................   Passed    0.03 sec
+3/4 Test #3: protocol-datax ...................   Passed    0.04 sec
     Start 4: module-abi
-4/4 Test #4: module-abi .......................   Passed    0.05 sec
+4/4 Test #4: module-abi .......................   Passed    0.10 sec
 
 75% tests passed, 1 tests failed out of 4
 
-Total Test time (real) =   0.20 sec
+Total Test time (real) =   0.24 sec
 
 The following tests FAILED:
 	  1 - protocol-prefix (Failed)
@@ -182,7 +155,7 @@ Preset CMake variables:
   CMAKE_SYSTEM_VERSION="10.0.26100.0"
   MGL_SANITIZERS:BOOL="TRUE"
 
--- Configuring done (0.3s)
+-- Configuring done (0.4s)
 -- Generating done (0.1s)
 -- Build files have been written to: C:/Users/Randy/Coding/meta_g_link_direct/out/windows-asan
 [1/49] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
@@ -191,23 +164,23 @@ Preset CMake variables:
 [4/21] Generating CXX dyndep file CMakeFiles\meta-g-link-direct.dir\CXX.dd
 [5/17] Generating CXX dyndep file CMakeFiles\mgl-address-tests.dir\CXX.dd
 [6/15] Generating CXX dyndep file CMakeFiles\mgl-protocol-tests.dir\CXX.dd
-[7/13] Generating CXX dyndep file CMakeFiles\mgl-module-tests.dir\CXX.dd
-[8/11] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp for CXX dependencies
+[7/13] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp for CXX dependencies
+[8/13] Generating CXX dyndep file CMakeFiles\mgl-module-tests.dir\CXX.dd
 [9/11] Generating CXX dyndep file CMakeFiles\mgl-sdu-tests.dir\CXX.dd
 [10/11] Building CXX object CMakeFiles\mgl-sdu-tests.dir\tests\sdu_tests.cpp.obj
 [11/11] Linking CXX executable mgl-sdu-tests.exe
 Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows-asan
     Start 1: protocol-prefix
-1/4 Test #1: protocol-prefix ..................   Passed    0.03 sec
+1/4 Test #1: protocol-prefix ..................   Passed    0.05 sec
     Start 2: private-address
-2/4 Test #2: private-address ..................   Passed    0.03 sec
+2/4 Test #2: private-address ..................   Passed    0.04 sec
     Start 3: protocol-datax
-3/4 Test #3: protocol-datax ...................   Passed    0.03 sec
+3/4 Test #3: protocol-datax ...................   Passed    0.04 sec
     Start 4: module-abi
-4/4 Test #4: module-abi .......................   Passed    0.06 sec
+4/4 Test #4: module-abi .......................   Passed    0.09 sec
 
 100% tests passed, 0 tests failed out of 4
 
-Total Test time (real) =   0.16 sec
+Total Test time (real) =   0.23 sec
 
 RESTORATION SHA256 ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd

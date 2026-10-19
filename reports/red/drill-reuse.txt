@@ -1,0 +1,62 @@
+BASELINE EXIT 0
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 5 tests in 177ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
+Describing Project task runner
+  [+] does not modify files with WhatIf 538ms (506ms|32ms)
+  [+] formats a disposable source when effects are requested 580ms (578ms|2ms)
+  [+] propagates native formatter errors 674ms (673ms|1ms)
+
+Describing Red-drill reuse
+  [+] changes the fingerprint when an input file or folder changes 119ms (114ms|4ms)
+  [+] reuses only a passing result recorded with the same inputs 26ms (25ms|1ms)
+Tests completed in 2.64s
+Tests Passed: 5, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+
+MUTATED EXIT 1
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 5 tests in 179ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
+Describing Project task runner
+  [+] does not modify files with WhatIf 525ms (495ms|30ms)
+  [+] formats a disposable source when effects are requested 578ms (576ms|2ms)
+  [+] propagates native formatter errors 644ms (643ms|1ms)
+
+Describing Red-drill reuse
+  [+] changes the fingerprint when an input file or folder changes 115ms (113ms|2ms)
+  [-] reuses only a passing result recorded with the same inputs 55ms (54ms|2ms)
+   Expected $null or empty, because a drill whose inputs changed must run again, but got @{id=passing; baseline_exit=0; mutated_exit=1; restored_exit=0; inputs_sha256=abc}.
+   at Should -BeNullOrEmpty -Because 'a drill whose inputs changed must run again', C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1:92
+   at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1:91
+Tests completed in 2.65s
+Tests Passed: 4, Failed: 1, Skipped: 0, Inconclusive: 0, NotRun: 0
+Write-Error: Pester runner tests failed or discovery count changed
+
+RESTORED EXIT 0
+Pester v5.7.1
+
+Starting discovery in 1 files.
+Discovery found 5 tests in 214ms.
+Running tests.
+
+Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
+Describing Project task runner
+  [+] does not modify files with WhatIf 576ms (532ms|44ms)
+  [+] formats a disposable source when effects are requested 572ms (569ms|3ms)
+  [+] propagates native formatter errors 623ms (622ms|1ms)
+
+Describing Red-drill reuse
+  [+] changes the fingerprint when an input file or folder changes 123ms (120ms|3ms)
+  [+] reuses only a passing result recorded with the same inputs 32ms (31ms|1ms)
+Tests completed in 2.64s
+Tests Passed: 5, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
+
+RESTORATION SHA256 1eb78959600aadb276f60914a3981e23023c0b0633e0bf917e06fa69d2edc05d

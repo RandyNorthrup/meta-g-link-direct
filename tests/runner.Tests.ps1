@@ -43,3 +43,58 @@ Describe 'Project task runner' {
         [IO.File]::ReadAllText($samplePath) | Should -BeExactly $originalSample
     }
 }
+
+Describe 'Red-drill reuse' {
+    BeforeAll {
+        $tokens = $null
+        $errors = $null
+        $runnerAst = [Management.Automation.Language.Parser]::ParseFile($script:RunnerSource, [ref]$tokens,
+            [ref]$errors)
+        if ($errors.Count -gt 0) {
+            throw "The runner does not parse: $($errors[0].Message)"
+        }
+        # Load only the functions under test, without running the task runner.
+        foreach ($name in @('Get-InputFingerprint', 'Get-ReusableDrillResult')) {
+            $definition = $runnerAst.Find({
+                    param($node)
+                    $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq $name
+                }, $false)
+            . ([scriptblock]::Create($definition.Extent.Text))
+        }
+    }
+
+    It 'changes the fingerprint when an input file or folder changes' {
+        $root = Join-Path $TestDrive 'inputs'
+        New-Item -ItemType Directory -Path (Join-Path $root 'folder') -Force | Out-Null
+        Set-Content -LiteralPath (Join-Path $root 'config.txt') -Value 'one'
+        Set-Content -LiteralPath (Join-Path $root 'folder/a.txt') -Value 'a'
+        $paths = @('config.txt', 'folder', 'absent.txt')
+        $first = Get-InputFingerprint -Root $root -Path $paths
+        Get-InputFingerprint -Root $root -Path $paths | Should -BeExactly $first
+        Set-Content -LiteralPath (Join-Path $root 'folder/b.txt') -Value 'b'
+        Get-InputFingerprint -Root $root -Path $paths | Should -Not -Be $first
+        Remove-Item -LiteralPath (Join-Path $root 'folder/b.txt')
+        Get-InputFingerprint -Root $root -Path $paths | Should -BeExactly $first
+        Set-Content -LiteralPath (Join-Path $root 'config.txt') -Value 'two'
+        Get-InputFingerprint -Root $root -Path $paths | Should -Not -Be $first
+        Set-Content -LiteralPath (Join-Path $root 'config.txt') -Value 'one'
+        Set-Content -LiteralPath (Join-Path $root 'absent.txt') -Value 'now present'
+        Get-InputFingerprint -Root $root -Path $paths | Should -Not -Be $first
+    }
+
+    It 'reuses only a passing result recorded with the same inputs' {
+        $recorded = @(
+            [PSCustomObject]@{ id = 'passing'; baseline_exit = 0; mutated_exit = 1; restored_exit = 0; inputs_sha256 = 'abc' },
+            [PSCustomObject]@{ id = 'survived'; baseline_exit = 0; mutated_exit = 0; restored_exit = 0; inputs_sha256 = 'abc' },
+            [PSCustomObject]@{ id = 'unfingerprinted'; baseline_exit = 0; mutated_exit = 1; restored_exit = 0 })
+        (Get-ReusableDrillResult -Recorded $recorded -Id 'passing' -Fingerprint 'abc').id | Should -BeExactly 'passing'
+        Get-ReusableDrillResult -Recorded $recorded -Id 'passing' -Fingerprint 'def' |
+            Should -BeNullOrEmpty -Because 'a drill whose inputs changed must run again'
+        Get-ReusableDrillResult -Recorded $recorded -Id 'survived' -Fingerprint 'abc' |
+            Should -BeNullOrEmpty -Because 'a drill whose mutation survived never passed'
+        Get-ReusableDrillResult -Recorded $recorded -Id 'unfingerprinted' -Fingerprint 'abc' |
+            Should -BeNullOrEmpty -Because 'a result recorded without inputs proves nothing about them'
+        Get-ReusableDrillResult -Recorded @() -Id 'passing' -Fingerprint 'abc' |
+            Should -BeNullOrEmpty -Because 'a drill with no recorded pass must run'
+    }
+}
