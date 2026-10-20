@@ -65,8 +65,8 @@ struct Message {
     Bytes payload;
 };
 
-// Splits decrypted AirShield frames into DataX messages. One message may continue into the next
-// frame; that fragment is always finished before any other message starts.
+// Splits decrypted AirShield frames into DataX messages. A frame may end anywhere in a message,
+// inside its header too; the message is finished from the next frame before any other starts.
 class Decoder {
   public:
     // Appends complete messages to out. False when framing is malformed; the link must close.
@@ -79,6 +79,7 @@ class Decoder {
         std::size_t needed = 0;
     };
     std::optional<Fragment> fragment_;
+    Bytes head_; // the start of a header the previous frame ended in
     std::unordered_map<std::uint16_t, std::uint16_t> last_type_;
 
     void emit(Header header, ByteView payload, std::vector<Message>& out);

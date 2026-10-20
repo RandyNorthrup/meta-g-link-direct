@@ -49,7 +49,7 @@ The runner enters the Visual Studio developer environment only when needed. Ever
 | `test` | CTest (frame prefix, private address, protocol, OBS module ABI) and Pester (runner, CLI and installer contracts) |
 | `test:asan` | All CTest suites in a separate AddressSanitizer build |
 | `test:live` | A live uncached Bluetooth service query (needs a Bluetooth radio) |
-| `test:red` | All 23 green → red → exact-restoration → green drills over the gates; `-Drill changed` runs only the drills whose inputs changed, `-Drill <id>` one drill |
+| `test:red` | All 24 green → red → exact-restoration → green drills over the gates; `-Drill changed` runs only the drills whose inputs changed, `-Drill <id>` one drill |
 | `quality` | `configure`, `build`, `format:check`, `lint`, `deadcode`, `security:audit`, `test`, `test:live`, then the drills whose inputs changed |
 | `package` | `quality` with every drill, then `dist/meta-g-link-direct-<version>-windows-x64.zip` and its `.sha256` file |
 
@@ -82,6 +82,7 @@ The glasses' radio delivers 30 fps in bursts of four or five frames ([report](..
 
 ## Protocol overview
 
+0. **Framing, both links**: each AirShield frame's plaintext is padded with 1–16 bytes of (0xC0 + count). `datax::Decoder` strips the pad and splits DataX messages; the glasses fill frames without regard to message boundaries, so a frame may end inside a payload or a header, and the decoder finishes either from the next frame.
 1. **Bluetooth**: `openBondedMetaRfcomm` connects to the paired glasses' Meta RFCOMM service. `GlassesSession` runs the AirShield handshake (ECDH P-256, HKDF-SHA256, AES-256-CBC with HMAC-SHA256 per frame), proves the owner key (svc36 trust) and ends link setup.
 2. **Wi-Fi**: svc10 `CreateSoftApNetwork` (0x1000) asks the glasses to host a 2.4 GHz / 20 MHz network; `SoftApNetworkInfo` (0x1001) returns its address and port. `connectWifiStation` joins it with the adapter chosen in the source properties (`listWifiAdapters`; empty means the first adapter) and a temporary Native Wi-Fi profile, then waits for a DHCP address. If this step or the media connection fails, the glasses' network is closed over Bluetooth.
 3. **Media**: a second `GlassesSession` over TCP; svc28 starts the livestream app; svc51350 configures and starts the stream from the current `MediaDemand`, and stops, reconfigures and restarts it when the demand changes. svc28 device-status pushes (types 2005–2044) carry the battery report (`stream::parseBatteryState`). Video arrives as HEVC chunks (types 10 and 12) and audio as AAC chunks (types 9 and 11); each reassembled unit starts with an 8-byte little-endian presentation time (`stream::splitTimedUnit`). The glasses send raw AAC-LC with no AudioSpecificConfig, so `MediaSession` hands the decoder `stream::requestedAudioSpecificConfig()` for the format it asked for. svc100 serves as a keepalive.
@@ -111,7 +112,7 @@ Setting `MGL_HTTP_DEBUG` (to any value) traces the Meta setup requests by URL, f
 ## Analysis decisions
 
 - clang-tidy uses the strict preset with one style conflict disabled (`llvm-prefer-static-over-anonymous-namespace`, which contradicts the retained `misc-use-anonymous-namespace`). Line-scoped annotations cover the C++/WinRT projection headers that LLVM cannot map back to the public SDK, and each unavoidable C ABI cast at a Windows API boundary.
-- Cppcheck runs on an analysis copy of the compilation database with MSVC `-external:I` paths normalized and the compiler builtins added. `.cppcheck-obs.cfg` models the ten entry points OBS loads dynamically (seven module functions and three locale functions). Suppressed: system-header and third-party `.deps/` notices, and three inline `constParameterCallback` findings in `src/plugin/source.c` (two `obs_source_info` callbacks and one `obs_property_clicked_t` button callback), whose `void *data` parameter type OBS fixes.
+- Cppcheck runs on an analysis copy of the compilation database with MSVC `-external:I` paths normalized and the compiler builtins added. `.cppcheck-obs.cfg` models the ten entry points OBS loads dynamically (seven module functions and three locale functions). Suppressed: system-header and third-party `.deps/` notices, and four inline `constParameterCallback` findings in `src/plugin/source.c` (three `obs_source_info` callbacks and one `obs_property_clicked_t` button callback), whose `void *data` parameter type OBS fixes.
 - Two line-scoped `gitleaks:allow` markers in `include/mgl/provision.hpp` cover the Meta AI app's public client tokens (AGENTS.md revision 3).
 
 ## Releasing

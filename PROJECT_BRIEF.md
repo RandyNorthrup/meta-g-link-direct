@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Confirmed contract; public beta releases (0.3.0 adds the microphone source, the shared link, keep-connected and the setup window; 0.3.1 shows the full 30 fps in OBS) |
+| Status | Confirmed contract; public beta releases (0.3.0 adds the microphone source, the shared link, keep-connected and the setup window; 0.3.1 shows the full 30 fps in OBS; 0.3.2 fixes old sources' audio tracks and messages split inside their header) |
 | Product owner | Randy |
 | Technical work | Coding agent under Randy's direction |
 | Created / last updated | 2026-10-15 / 2026-10-19 |
@@ -29,11 +29,11 @@ Meta is contacted only during the one-time setup that makes the PC the glasses' 
 |---|---|---|
 | Video | 720 × 1280 portrait at a nominal 30 fps, plus at least one lower profile | 720 × 1280 and 504 × 896 proven in OBS, switching in 1.4 s; since 0.3.1 OBS shows 29.6 distinct pictures per second (12.8 before, D24); 1080 × 1920 and 360 × 640 untested |
 | Endurance | One full glasses battery charge with no drop or reconnect, recorded in measured minutes (D16) | Open; longest run so far 3 minutes |
-| Latency | 95th percentile glass-to-OBS ≤ 500 ms | Not measured; the presentation delay alone is about 190 ms (D24) |
+| Latency | 95th percentile glass-to-OBS ≤ 500 ms | About 0.4 s (0.36–0.45 s in five readings, with a 295 ms presentation delay, D24); no long-run percentile yet |
 | Startup | First frame ≤ 15 s after a ready connection | About 13 s from the scene going live, including the Wi-Fi setup; about 1 s with keep-connected on (D20) |
-| Reconnect | ≤ 30 s after the glasses become available again | Implemented, not exercised on hardware |
+| Reconnect | ≤ 30 s after the glasses become available again | 21.5 s from a lost media session to video; connects by itself after a power-on; walking out of range untested |
 | Stability | No growing media queue or memory; no OBS stall | Two-minute OBS run: flat memory, no render frames skipped by the source |
-| Audio | Optional glasses audio, off by default | 48 kHz stereo AAC decoded into the OBS mixer, from the camera source or the microphone source with the camera off (D18); sync offset not measured |
+| Audio | Optional glasses audio, off by default | 48 kHz stereo AAC decoded into the OBS mixer, from the camera source or the microphone source with the camera off (D18); in sync with the video within one frame |
 
 No 1080p, latency, battery or uptime claim is made without measurement.
 

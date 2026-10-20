@@ -65,7 +65,7 @@ Do this once, before installing. The glasses must be paired with Windows itself,
 3. On the PC, open **Settings → Bluetooth & devices**, make sure Bluetooth is **On**, then choose **Add device → Bluetooth**.
 4. **Put the glasses in pairing mode**: fold both arms, then press and hold the **capture button** (the button you press to take a photo) for about **12 seconds**, until the light inside the frame blinks **blue**. Let go as soon as it blinks.
 5. In the Windows list, choose the glasses. They appear as **RB Meta** followed by four characters (for example "RB Meta 12AB"). Accept any prompt to connect or pair.
-6. Check that **RB Meta …** now appears under *Bluetooth & devices*. "Paired" is enough; it doesn't need to say "Connected".
+6. Check that **RB Meta …** now appears under *Bluetooth & devices*. "Paired" is enough; it doesn't need to say "Connected". After you power the glasses on later, you don't need to press Connect in Windows either: the plugin connects them itself when a glasses source goes live. The glasses must be awake (out of the case, unfolded).
 
 If the glasses don't show up:
 
@@ -148,10 +148,10 @@ Monitored audio keeps playing while the glasses camera streams, and the video is
 
 - **Battery**: streaming video drains the glasses quickly. One reading suggests about 35–40 minutes from a full charge (not yet confirmed). With only the microphone source live the camera is off; how much longer the battery lasts that way hasn't been measured yet.
 - **Quality**: 720 × 1280 and 504 × 896 at 30 fps have been verified in OBS; 1080 × 1920 and 360 × 640 haven't.
-- **A short delay**: the glasses' radio sends video in bursts (several frames at once, then a pause of about 0.15 s). To show every frame at a steady 30 fps, the plugin holds each one briefly and plays it at its own time, so the picture runs about 0.2 s behind, more on an uneven link. The delay adapts to the link, between 0.02 and 0.5 s.
-- **Audio sync**: audio is timed on the same clock as the video, but the offset hasn't been measured; use the source's *Sync Offset* in OBS's Advanced Audio Properties if you need to adjust it.
+- **A short delay**: the glasses' radio sends video in bursts (several frames at once, then a pause of about 0.15 s). To show every frame at a steady 30 fps, the plugin holds each one briefly and plays it at its own time, so the picture runs about 0.2 s behind, more on an uneven link. The delay adapts to the link, between 0.02 and 0.5 s. Measured from the glasses' camera to OBS, the picture was about 0.4 s behind in total.
+- **Audio sync**: audio is timed on the same clock as the video; in a clap test the two matched within one frame, so no *Sync Offset* is needed.
 - **OBS 33** is verified with the 33.0.0 release candidate (rc2): installed, loaded from the new layout, video and audio streamed. The final 33.0 release hasn't been tested yet.
-- **Reconnecting** after a dropped link is implemented but hasn't been exercised on real hardware yet.
+- **Reconnecting**: after a lost connection, video came back about 20 s later in a test. Walking out of range and back hasn't been tested yet.
 - **Security**: the PC doesn't yet verify the glasses' identity signature during the handshake.
 - **Coverage**: one PC, one Bluetooth adapter, one Wi-Fi adapter and one pair of glasses. The glasses' firmware build hasn't been recorded yet.
 
@@ -190,6 +190,7 @@ The OBS log (*Help → Log Files*) lists each connection step under `[meta-g-lin
 | *The glasses did not start their Wi-Fi network* | Their Wi-Fi may still be busy with an earlier session. The source retries; if it keeps failing, power-cycle the glasses. |
 | Internet drops while the camera runs | The camera's Wi-Fi adapter is on the glasses' network (see [What you need](#what-you-need)). Use Ethernet, or try a second Wi-Fi adapter chosen in **Wi-Fi adapter** (untested). |
 | *Waiting* | An earlier connection to the glasses in this OBS is still closing. The source continues on its own when it has. |
+| Glasses audio moves the mixer meter but is missing from recordings or the stream | Check the source's tracks: *Edit → Advanced Audio Properties → Tracks*. 0.3.2 turns them on once for camera sources created with 0.1.0, which OBS had saved with every track off. |
 | Internet stays off while OBS is open | *Keep the glasses connected while OBS is open* is on, so the Wi-Fi adapter stays on the glasses' network. Turn it off, or give the glasses a second adapter. |
 | After OBS crashed mid-stream | The glasses close their network on their own within about 15 seconds. Delete any leftover `mgl-…` network in Windows Wi-Fi settings if one remains. |
 

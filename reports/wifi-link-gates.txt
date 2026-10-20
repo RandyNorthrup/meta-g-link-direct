@@ -1,7 +1,7 @@
-Release gate run for 0.3.1, 2026-10-20, Windows 11 x64 build 26200 (scripts/Invoke-Project.ps1 package).
+Release gate run for 0.3.2, 2026-10-20, Windows 11 x64 build 26200 (scripts/Invoke-Project.ps1 package).
 quality stages, each exited 0: configure, build, format:check, lint, deadcode, security:audit, test, test:live, test:red.
-CTest: 4/4 passed (protocol-prefix, private-address, protocol-datax with 142 cases, module-abi).
+CTest: 4/4 passed (protocol-prefix, private-address, protocol-datax with 144 cases, module-abi).
 Pester: runner, CLI, installer and live SDP suites passed (5, 21, 4, 1; 31 in total); 0 failed, 0 skipped.
-Red drills: 23 passed (green, intended red, exact restoration, green), 0 failed.
-Release zip: dist/meta-g-link-direct-0.3.1-windows-x64.zip, SHA-256 bc1186609246d754971e50a5b3cc2faf94347c32873b57ffb494a5750580a543.
+Red drills: 24 passed (green, intended red, exact restoration, green), 0 failed.
+Release zip: dist/meta-g-link-direct-0.3.2-windows-x64.zip, SHA-256 25f6f040171eb942506cd2ba09cb11802852a8e685fe577e2bf810e0d7c47a06.
 Full logs stayed local.

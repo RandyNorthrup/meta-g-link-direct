@@ -14,7 +14,7 @@ param(
         'unsafe-copy', 'duplicated-code', 'address-sanitizer', 'dependency-npm', 'dependency-osv',
         'whatif-guard', 'native-exit-propagation', 'probe-arguments', 'classic-connection-claim',
         'private-address-validation', 'uncached-query-loop', 'installer-drive-letter', 'drill-reuse',
-        'playout-cadence')]
+        'playout-cadence', 'datax-frame-boundary')]
     [string]$Drill = 'all'
 )
 
@@ -415,6 +415,13 @@ function Invoke-RedDrillSet {
         $text.Replace('return std::max(capture + base_, arrival_us);', 'return arrival_us;')
     } -Gate test -ExpectedDiagnostic 'burst presentations follow the capture cadence'
 
+    # Dropping the header bytes a frame ended in is the defect that garbled the glasses' messages
+    # until the decoder happened to realign.
+    Invoke-RestoredDrill -Id datax-frame-boundary -Path (Join-Path $projectRoot 'src/protocol/datax.cpp') -Mutate {
+        param($text)
+        $text.Replace('joined = std::exchange(head_, Bytes{});', 'head_.clear();')
+    } -Gate test -ExpectedDiagnostic 'messages split at any byte across frames decode intact'
+
     Invoke-RestoredDrill -Id module-metadata -Path (Join-Path $projectRoot 'src/plugin/module.c') -Mutate {
         param($text)
         $text.Replace('return "Meta G Link Direct";', 'return "Broken module name";')
@@ -544,7 +551,7 @@ function Invoke-RedDrillSet {
         param($text)
         $text.Replace('$passed -and $previous.inputs_sha256 -eq $Fingerprint', '$passed')
     } -Gate 'test:runner' -ExpectedDiagnostic 'because a drill whose inputs changed must run again'
-    $expectedDrillCount = if ($script:DrillSelection -in @('all', 'changed')) { 23 } else { 1 }
+    $expectedDrillCount = if ($script:DrillSelection -in @('all', 'changed')) { 24 } else { 1 }
     if ($script:DrillEvidence.Count -ne $expectedDrillCount) {
         throw 'Red-drill discovery did not match the requested scope'
     }

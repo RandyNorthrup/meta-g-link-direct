@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28...3.31)
-project(meta_g_link_direct VERSION 0.3.1 LANGUAGES C CXX)
+project(meta_g_link_direct VERSION 0.3.2 LANGUAGES C CXX)
 
 include(CTest)
 set(CMAKE_CXX_STANDARD 20)

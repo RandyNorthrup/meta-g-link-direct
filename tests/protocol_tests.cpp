@@ -169,6 +169,86 @@ void testDecoder(Checks& check) {
           "reassembled bytes in order");
 }
 
+// AirShield pads every frame's plaintext with 1-16 bytes of (0xC0 + count) before encrypting.
+mgl::Bytes airshieldPadded(mgl::ByteView data) {
+    constexpr std::size_t Block = 16;
+    constexpr std::uint8_t PadMarker = 0xC0;
+    const std::size_t pad = Block - (data.size() % Block);
+    mgl::Bytes out(data.begin(), data.end());
+    out.insert(out.end(), pad, static_cast<std::uint8_t>(PadMarker + pad));
+    return out;
+}
+
+std::vector<mgl::datax::Message> decodeFrames(const mgl::Bytes& stream, std::size_t frame_size,
+                                              bool& ok) {
+    mgl::datax::Decoder decoder;
+    std::vector<mgl::datax::Message> out;
+    ok = true;
+    for (std::size_t at = 0; at < stream.size() && ok; at += frame_size) {
+        const std::size_t size = std::min(frame_size, stream.size() - at);
+        const auto frame = airshieldPadded({stream.data() + at, size});
+        ok = decoder.decode(view(frame), out);
+    }
+    return out;
+}
+
+bool sameMessages(const std::vector<mgl::datax::Message>& left,
+                  const std::vector<mgl::datax::Message>& right) {
+    return std::ranges::equal(left, right, [](const auto& a, const auto& b) {
+        return a.header.channel == b.header.channel && a.header.service == b.header.service &&
+               a.header.type == b.header.type && a.header.error == b.header.error &&
+               a.payload == b.payload;
+    });
+}
+
+void testDecoderEveryBoundary(Checks& check) {
+    // A sender packs messages into frames without regard to message boundaries, so a frame may end
+    // anywhere: inside a payload, inside the tags, or inside the four-byte fixed header. Every
+    // split must give back exactly the messages of the unsplit stream.
+    mgl::Bytes stream;
+    const auto add = [&stream](std::uint16_t channel, std::optional<std::uint16_t> service,
+                               std::optional<std::uint16_t> type, std::size_t payload_size) {
+        mgl::datax::Tags tags;
+        tags.service = service;
+        tags.type = type;
+        mgl::Bytes payload(payload_size);
+        for (std::size_t i = 0; i < payload_size; ++i) {
+            payload.at(i) = static_cast<std::uint8_t>((i * 37U) + payload_size);
+        }
+        mgl::append(stream, *mgl::datax::buildMessage(channel, tags, view(payload)));
+    };
+    constexpr std::uint16_t Media = 51350;
+    constexpr std::uint16_t Status = 28;
+    constexpr std::uint16_t VideoChunk = 10;
+    constexpr std::uint16_t AudioChunk = 11;
+    constexpr std::uint16_t VideoEnd = 12;
+    constexpr std::uint16_t Battery = 2007;
+    add(0x8001, Media, VideoChunk, 300);        // service and type tags
+    add(0x8001, std::nullopt, VideoChunk, 17);  // type tag only
+    add(0x8001, std::nullopt, std::nullopt, 3); // no tags: continues the channel's type
+    add(0x8002, Status, Battery, 0);            // tags and no data
+    add(0x8001, std::nullopt, VideoEnd, 1);
+    add(0x8001, Media, AudioChunk, 260);
+    bool whole_ok = false;
+    const auto reference = decodeFrames(stream, stream.size(), whole_ok);
+    check(whole_ok && reference.size() == 6, "the unsplit stream decodes to six messages");
+    std::vector<std::size_t> failed;
+    for (std::size_t frame_size = 1; frame_size <= stream.size(); ++frame_size) {
+        bool ok = false;
+        if (!sameMessages(decodeFrames(stream, frame_size, ok), reference) || !ok) {
+            failed.push_back(frame_size);
+        }
+    }
+    if (!failed.empty()) {
+        std::cerr << failed.size() << " of " << stream.size() << " frame sizes fail, e.g.";
+        for (std::size_t i = 0; i < failed.size() && i < 12; ++i) {
+            std::cerr << ' ' << failed.at(i);
+        }
+        std::cerr << " ... " << failed.back() << '\n';
+    }
+    check(failed.empty(), "messages split at any byte across frames decode intact");
+}
+
 void testRegistry(Checks& check) {
     mgl::datax::ChannelRegistry registry;
     const auto channel = registry.openLocal(36);
@@ -544,6 +624,7 @@ int main() {
         testProtobuf(check);
         testDataxHeader(check);
         testDecoder(check);
+        testDecoderEveryBoundary(check);
         testRegistry(check);
         testEncoding(check);
         testCreateSoftAp(check);

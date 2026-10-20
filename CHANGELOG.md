@@ -2,6 +2,21 @@
 
 All notable changes are recorded here. The project follows [semantic versioning](https://semver.org/); versions below 1.0 are beta releases.
 
+## [0.3.2] - 2026-10-20 (beta)
+
+### Fixed
+
+- **Glasses audio was never recorded or streamed from camera sources created with 0.1.0.** The camera source had no audio in 0.1.0, so OBS saved it with every audio track switched off and restores that on each load: glasses audio moved the mixer meter but reached no recording or stream. When OBS loads such a source, the plugin now turns on OBS's default tracks once and logs it; later track choices are kept. Verified in OBS 33.0.0-rc2 on a source from 0.1.0.
+- **A frame boundary inside a message header garbled the stream.** The glasses pack messages into encrypted frames without regard to message boundaries. When a frame ended inside a message's header, the decoder lost its place until it happened to realign: the log filled with messages of nonsense types and the video nearly froze (4.5 pictures per second for several seconds in one recording). The decoder now carries the start of a header into the next frame. A new test splits a message stream at every byte position (194 of 637 positions failed before the fix), and a new red drill (24 in total) guards it. The decoder followed Visor's splitter at the revision this project ported; Visor's current splitter treats the frames as one stream in the same way.
+
+### Measured
+
+- **Glass-to-OBS latency: about 0.4 s** (0.36–0.45 s in five readings of an on-screen timer the glasses filmed), within the 0.5 s target. About 0.3 s of it is the playout delay of that run.
+- **Audio/video sync: within one frame** (about ±33 ms) in a clap test, so no Sync Offset is needed.
+- **Reconnecting:** after the glasses are powered on, the plugin connects them itself, without pressing Connect in Windows, and Windows' audio devices for the glasses come up with it. After a lost media session, video returned 21.5 s later.
+
+See [the latency and sync report](reports/LATENCY_AND_SYNC_VERIFICATION.md).
+
 ## [0.3.1] - 2026-10-20 (beta)
 
 ### Fixed

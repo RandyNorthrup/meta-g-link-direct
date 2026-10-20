@@ -120,8 +120,45 @@ static void* glasses_create(obs_data_t* settings, obs_source_t* source, bool cam
     return glasses;
 }
 
+// The camera source had no audio in 0.1.0, so OBS saved its audio tracks ("mixers") as none, and
+// restores none on every load since: glasses audio then moves the mixer meter but reaches no
+// recording or stream. OBS's own default for a new source is tracks 1-6.
+#define MGL_DEFAULT_AUDIO_TRACKS 0x3Fu
+// Private setting marking a camera source whose saved tracks have been checked once.
+#define MGL_PRIVATE_TRACKS_CHECKED "audio_tracks_checked"
+
 static void* camera_create(obs_data_t* settings, obs_source_t* source) {
-    return glasses_create(settings, source, true);
+    struct glasses_source* glasses = glasses_create(settings, source, true);
+    if (glasses != NULL) {
+        // A new source starts with OBS's default tracks, so it never needs the repair below. When
+        // OBS loads a saved source it replaces these private settings with the saved ones
+        // afterwards, so this marks only sources created now.
+        obs_data_t* private_settings = obs_source_get_private_settings(source);
+        obs_data_set_bool(private_settings, MGL_PRIVATE_TRACKS_CHECKED, true);
+        obs_data_release(private_settings);
+    }
+    return glasses;
+}
+
+// OBS calls this after it has restored a saved source's tracks and private settings. A camera
+// source from before the check, with every track off, gets OBS's default tracks once; whatever
+// the user chooses afterwards is kept.
+// cppcheck-suppress constParameterCallback ; obs_source_info fixes this signature as (void *data).
+static void camera_load(void* data, obs_data_t* settings) {
+    (void)settings;
+    const struct glasses_source* glasses = data;
+    obs_data_t* private_settings = obs_source_get_private_settings(glasses->source);
+    if (!obs_data_get_bool(private_settings, MGL_PRIVATE_TRACKS_CHECKED)) {
+        if (obs_source_get_audio_mixers(glasses->source) == 0) {
+            obs_source_set_audio_mixers(glasses->source, MGL_DEFAULT_AUDIO_TRACKS);
+            blog(LOG_INFO,
+                 "[meta-g-link-direct] Turned on the audio tracks of '%s': it was saved by 0.1.0, "
+                 "before the source had audio, with every track off.",
+                 obs_source_get_name(glasses->source));
+        }
+        obs_data_set_bool(private_settings, MGL_PRIVATE_TRACKS_CHECKED, true);
+    }
+    obs_data_release(private_settings);
 }
 
 static void* microphone_create(obs_data_t* settings, obs_source_t* source) {
@@ -310,6 +347,7 @@ void mgl_register_sources(void) {
         .output_flags = OBS_SOURCE_ASYNC_VIDEO | OBS_SOURCE_AUDIO | OBS_SOURCE_DO_NOT_DUPLICATE,
         .get_name = camera_get_name,
         .create = camera_create,
+        .load = camera_load,
         .destroy = glasses_destroy,
         .activate = glasses_activate,
         .deactivate = glasses_deactivate,

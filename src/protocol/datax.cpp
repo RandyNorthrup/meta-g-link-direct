@@ -161,9 +161,18 @@ void Decoder::emit(Header header, ByteView payload, std::vector<Message>& out) {
 }
 
 bool Decoder::decode(ByteView plaintext, std::vector<Message>& out) {
+    // AirShield pads every frame with 1-16 bytes, so the messages end where the pad begins. A
+    // frame may end anywhere in a message, its header included: header bytes left over from the
+    // previous frame go in front of this one.
+    Bytes joined;
+    ByteView body = withoutPad(plaintext);
+    if (!head_.empty()) {
+        joined = std::exchange(head_, Bytes{});
+        append(joined, body);
+        body = ByteView(joined.data(), joined.size());
+    }
     std::size_t position = 0;
     if (fragment_) {
-        const auto body = withoutPad(plaintext);
         const auto take = std::min(fragment_->needed - fragment_->data.size(), body.size());
         append(fragment_->data, body.first(take));
         position = take;
@@ -174,34 +183,33 @@ bool Decoder::decode(ByteView plaintext, std::vector<Message>& out) {
         fragment_.reset();
         emit(finished.header, finished.data, out);
     }
-    while (plaintext.size() - position >= FixedHeaderSize) {
-        const auto rest = plaintext.subspan(position);
+    while (position < body.size()) {
+        const auto rest = body.subspan(position);
+        if (rest.size() < FixedHeaderSize) {
+            head_.assign(rest.begin(), rest.end()); // the fixed header continues in the next frame
+            return true;
+        }
         const auto wire_size = FixedHeaderSize + payloadLength(rest);
-        if (rest.size() >= wire_size) {
-            const auto header = parseHeader(rest.first(wire_size));
-            if (!header) {
-                return false;
+        const auto header = parseHeader(rest.first(std::min(wire_size, rest.size())));
+        if (!header) {
+            if (rest.size() >= wire_size) {
+                return false; // malformed tags, with the whole message present
             }
+            head_.assign(rest.begin(), rest.end()); // the tags continue in the next frame
+            return true;
+        }
+        if (rest.size() >= wire_size) {
             emit(*header, rest.subspan(header->header_size, header->dataSize()), out);
             position += wire_size;
             continue;
         }
-        // Either the padded tail of the frame or a message that continues in the next frame.
-        const auto body = withoutPad(plaintext);
-        if (body.size() <= position || body.size() - position < FixedHeaderSize) {
-            return true;
-        }
-        const auto head = body.subspan(position);
-        const auto header = parseHeader(head);
-        if (!header || header->header_size > head.size()) {
-            return false;
-        }
+        // The payload continues in the next frame.
         fragment_ =
             Fragment{.header = *header,
-                     .data = Bytes(head.begin() + static_cast<std::ptrdiff_t>(header->header_size),
-                                   head.end()),
+                     .data = Bytes(rest.begin() + static_cast<std::ptrdiff_t>(header->header_size),
+                                   rest.end()),
                      .needed = header->dataSize()};
-        return fragment_->data.size() < fragment_->needed;
+        return true;
     }
     return true;
 }
