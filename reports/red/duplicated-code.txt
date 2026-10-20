@@ -11,7 +11,7 @@ Using config from .jscpd.json
 [90m│[39m [1mTotal:[22m [90m│[39m 38             [90m│[39m 10097       [90m│[39m 73431        [90m│[39m 0            [90m│[39m 0 (0.00%)        [90m│[39m 0 (0.00%)         [90m│[39m
 [90m└────────┴────────────────┴─────────────┴──────────────┴──────────────┴──────────────────┴───────────────────┘[39m
 [90mFound 0 clones.[39m
-[90mtime: 37.681ms[39m
+[90mtime: 52.794ms[39m
 
 MUTATED EXIT 1
 Using config from .jscpd.json
@@ -29,7 +29,7 @@ Using config from .jscpd.json
 [90m└────────┴────────────────┴─────────────┴──────────────┴──────────────┴──────────────────┴───────────────────┘[39m
 [90mFound 1 clones.[39m
 ERROR: jscpd found too many duplicates (0.2%) over threshold (0.0%)
-[90mtime: 33.176ms[39m
+[90mtime: 34.892ms[39m
 Write-Error: Native command failed (1): npx
 
 RESTORED EXIT 0
@@ -45,6 +45,6 @@ Using config from .jscpd.json
 [90m│[39m [1mTotal:[22m [90m│[39m 38             [90m│[39m 10097       [90m│[39m 73431        [90m│[39m 0            [90m│[39m 0 (0.00%)        [90m│[39m 0 (0.00%)         [90m│[39m
 [90m└────────┴────────────────┴─────────────┴──────────────┴──────────────┴──────────────────┴───────────────────┘[39m
 [90mFound 0 clones.[39m
-[90mtime: 36.310ms[39m
+[90mtime: 34.088ms[39m
 
 RESTORATION SHA256 23f81a1e6ccdf6122fdb9414b839a7e2ca96f3564b1608f35ffa807579178ca0

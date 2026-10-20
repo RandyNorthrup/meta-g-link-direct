@@ -12,8 +12,8 @@ BASELINE EXIT 0
 [11/50] Generating CXX dyndep file CMakeFiles\mgl_windows.dir\CXX.dd
 [12/41] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\probe\main.cpp for CXX dependencies
 [13/41] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\sdu.cpp.obj
-[14/41] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp for CXX dependencies
-[15/41] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\setup\main.cpp for CXX dependencies
+[14/41] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\setup\main.cpp for CXX dependencies
+[15/41] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp for CXX dependencies
 [16/41] Linking CXX static library mgl_protocol.lib
 [17/41] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\protocol_tests.cpp for CXX dependencies
 [18/41] Building CXX object CMakeFiles\mgl_windows.dir\src\windows\rfcomm.cpp.obj
@@ -31,12 +31,12 @@ BASELINE EXIT 0
 [30/40] Linking CXX static library mgl_windows.lib
 [31/40] Building CXX object CMakeFiles\meta-g-link-probe.dir\src\probe\main.cpp.obj
 [32/40] Building CXX object CMakeFiles\mgl-sdu-tests.dir\tests\sdu_tests.cpp.obj
-[33/40] Building CXX object CMakeFiles\meta-g-link-setup.dir\src\setup\main.cpp.obj
-[34/40] Linking CXX executable meta-g-link-probe.exe
-[35/40] Building CXX object CMakeFiles\mgl-protocol-tests.dir\tests\protocol_tests.cpp.obj
+[33/40] Building CXX object CMakeFiles\mgl-protocol-tests.dir\tests\protocol_tests.cpp.obj
+[34/40] Building CXX object CMakeFiles\meta-g-link-setup.dir\src\setup\main.cpp.obj
+[35/40] Linking CXX executable meta-g-link-probe.exe
 [36/40] Linking CXX executable meta-g-link-setup.exe
-[37/40] Linking CXX executable mgl-sdu-tests.exe
-[38/40] Linking CXX shared module meta-g-link-direct.dll
+[37/40] Linking CXX shared module meta-g-link-direct.dll
+[38/40] Linking CXX executable mgl-sdu-tests.exe
 [39/40] Linking CXX executable mgl-address-tests.exe
 [40/40] Linking CXX executable mgl-protocol-tests.exe
 

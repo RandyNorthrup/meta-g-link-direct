@@ -459,7 +459,8 @@ function Invoke-RedDrillSet {
 
     Invoke-RestoredDrill -Id workflow-security -Path (Join-Path $projectRoot '.github/workflows/quality.yml') -Mutate {
         param($text)
-        $text.Replace('actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803', 'actions/checkout@v6')
+        # Any pinned commit, so a Dependabot bump of the pin does not leave the drill without a target.
+        $text -replace 'actions/checkout@[0-9a-f]{40}', 'actions/checkout@v7'
     } -Gate 'lint:workflow' -ExpectedDiagnostic 'unpinned-uses'
 
     Invoke-RestoredDrill -Id secret-scanner -Path (Join-Path $projectRoot 'src/protocol/sdu.cpp') -Mutate {

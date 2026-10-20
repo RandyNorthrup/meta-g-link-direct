@@ -257,11 +257,11 @@ C:\Users\Randy\Coding\meta_g_link_direct\include\mgl/sdu.hpp:37:12: note: unguar
    37 | inline int red_drill_global = 7;
       |            ^
 C:\Users\Randy\Coding\meta_g_link_direct\include\mgl/sdu.hpp:37:12: error: variable 'red_drill_global' is non-const and globally accessible, consider making it const [cppcoreguidelines-avoid-non-const-global-variables,-warnings-as-errors]
-   37 | inline int red_drill_global = 7;
-      |            ^
 Suppressed 5187 warnings (5187 in non-user code).
 Use -header-filter=.* or leave it as default to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
 1 warning treated as error
+   37 | inline int red_drill_global = 7;
+      |            ^
 5221 warnings generated.
 C:\Users\Randy\Coding\meta_g_link_direct\include\mgl/sdu.hpp:37:12: error: variable 'red_drill_global' is non-const and globally accessible, consider making it const [cppcoreguidelines-avoid-non-const-global-variables,-warnings-as-errors]
    37 | inline int red_drill_global = 7;

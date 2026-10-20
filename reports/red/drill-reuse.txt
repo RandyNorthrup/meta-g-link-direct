@@ -2,41 +2,41 @@ BASELINE EXIT 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 5 tests in 168ms.
+Discovery found 5 tests in 163ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 532ms (503ms|29ms)
-  [+] formats a disposable source when effects are requested 563ms (560ms|2ms)
-  [+] propagates native formatter errors 621ms (620ms|1ms)
+  [+] does not modify files with WhatIf 592ms (560ms|32ms)
+  [+] formats a disposable source when effects are requested 549ms (547ms|2ms)
+  [+] propagates native formatter errors 666ms (665ms|1ms)
 
 Describing Red-drill reuse
-  [+] changes the fingerprint when an input file or folder changes 122ms (119ms|3ms)
-  [+] reuses only a passing result recorded with the same inputs 28ms (27ms|1ms)
-Tests completed in 2.47s
+  [+] changes the fingerprint when an input file or folder changes 114ms (111ms|3ms)
+  [+] reuses only a passing result recorded with the same inputs 32ms (30ms|1ms)
+Tests completed in 2.59s
 Tests Passed: 5, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
 MUTATED EXIT 1
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 5 tests in 231ms.
+Discovery found 5 tests in 175ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 557ms (527ms|30ms)
-  [+] formats a disposable source when effects are requested 529ms (526ms|3ms)
-  [+] propagates native formatter errors 615ms (614ms|1ms)
+  [+] does not modify files with WhatIf 549ms (516ms|32ms)
+  [+] formats a disposable source when effects are requested 537ms (535ms|2ms)
+  [+] propagates native formatter errors 643ms (642ms|1ms)
 
 Describing Red-drill reuse
-  [+] changes the fingerprint when an input file or folder changes 128ms (125ms|3ms)
-  [-] reuses only a passing result recorded with the same inputs 81ms (79ms|3ms)
+  [+] changes the fingerprint when an input file or folder changes 105ms (103ms|2ms)
+  [-] reuses only a passing result recorded with the same inputs 63ms (61ms|2ms)
    Expected $null or empty, because a drill whose inputs changed must run again, but got @{id=passing; baseline_exit=0; mutated_exit=1; restored_exit=0; inputs_sha256=abc}.
    at Should -BeNullOrEmpty -Because 'a drill whose inputs changed must run again', C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1:92
    at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1:91
-Tests completed in 2.7s
+Tests completed in 2.61s
 Tests Passed: 4, Failed: 1, Skipped: 0, Inconclusive: 0, NotRun: 0
 Write-Error: Pester runner tests failed or discovery count changed
 
@@ -44,19 +44,19 @@ RESTORED EXIT 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 5 tests in 158ms.
+Discovery found 5 tests in 162ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 530ms (499ms|31ms)
-  [+] formats a disposable source when effects are requested 532ms (530ms|2ms)
-  [+] propagates native formatter errors 630ms (629ms|1ms)
+  [+] does not modify files with WhatIf 525ms (493ms|32ms)
+  [+] formats a disposable source when effects are requested 535ms (532ms|2ms)
+  [+] propagates native formatter errors 682ms (681ms|1ms)
 
 Describing Red-drill reuse
-  [+] changes the fingerprint when an input file or folder changes 109ms (107ms|3ms)
-  [+] reuses only a passing result recorded with the same inputs 28ms (27ms|1ms)
-Tests completed in 2.45s
+  [+] changes the fingerprint when an input file or folder changes 119ms (117ms|2ms)
+  [+] reuses only a passing result recorded with the same inputs 32ms (31ms|1ms)
+Tests completed in 2.52s
 Tests Passed: 5, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
-RESTORATION SHA256 9161e49c6eca3655a50c77dc4a1cfbb946b74e18d59dafe353453b884f9f49b0
+RESTORATION SHA256 983aa2d6fbe6a21a7f17848457c30749b97eea16811d6716cc39c795068faca5

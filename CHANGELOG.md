@@ -2,6 +2,16 @@
 
 All notable changes are recorded here. The project follows [semantic versioning](https://semver.org/); versions below 1.0 are beta releases.
 
+## [Unreleased]
+
+### Added
+
+- README: **Hear OBS in your glasses**. OBS's audio monitor can use the glasses' speakers (the *Headphones* Bluetooth device) while their camera streams. Verified in OBS 33.0.0-rc2 with 0.3.0: a *Monitor Only* source played steadily in the glasses, not from the PC speakers, while OBS held 30 fps with 0 of 2,689 frames skipped; a plain player's tone stayed continuous and the stream check got its full 30 fps. Media apps playing through the glasses are paused by the glasses while their camera streams. No plugin change.
+
+### Changed
+
+- CI: `actions/checkout` 7.0.1 and `actions/setup-node` 7.1.0 (Dependabot #1 and #2), still pinned by commit SHA; both SHAs match the official release tags. The `workflow-security` red drill now unpins whichever commit `actions/checkout` is pinned to, instead of one hard-coded SHA, so a pin bump no longer leaves it without a target (it refused to run after #1, as designed).
+
 ## [0.3.0] - 2026-10-19 (beta)
 
 ### Added

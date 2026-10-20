@@ -30,6 +30,7 @@ Use your **Ray-Ban Meta (Gen 2)** glasses as a first-person camera and microphon
 - **Direct link**: Bluetooth for control and the glasses' own 2.4 GHz Wi-Fi network for video and audio. Your home network isn't involved.
 - **Hands-off**: the glasses connect when a glasses source goes live and disconnect when none is live. Quality and audio changes apply in 1–1.5 seconds without reconnecting. Starting and stopping never stall OBS.
 - **Optional fast start**: with *Keep the glasses connected while OBS is open*, a source going live starts in about a second instead of about 13.
+- **Hear OBS in your glasses**: OBS's audio monitor can play through the glasses' speakers while the camera streams ([how](#hear-obs-in-your-glasses)).
 - **Settings in one place**: every glasses source shows the shared connection settings, the battery level, *Set up glasses* and *Forget*. **Tools → Ray-Ban Meta Glasses (Direct)** opens them.
 - **One-window setup**: you log in to Meta inside the setup window. Nothing to copy or paste.
 - **Private**: Meta is contacted only during setup. The owner key is sealed to your Windows account. No telemetry, no update checks, no recordings.
@@ -129,6 +130,18 @@ Every glasses source's **Properties** show:
 - **Glasses setup**: **Set up glasses…** opens the setup window. **Forget these glasses** deletes this PC's owner key after you tick the confirmation above it.
 
 Several glasses sources can be live at once. They share one connection to the glasses and show the same video; the camera source that went live first sets the quality.
+
+### Hear OBS in your glasses
+
+The glasses' speakers are an ordinary Bluetooth audio device in Windows, so OBS can play its monitored audio there: alerts, a music bed, or a browser source reading chat aloud, in your ear while you stream. This uses OBS's own settings; the plugin isn't involved.
+
+1. In OBS, open **Settings → Audio → Advanced → Monitoring Device** and choose **Headphones (RB Meta …)**. Choose *Headphones*, not *Headset (… Hands-Free)*: the hands-free device is phone-call quality and can take over the glasses' microphone.
+2. In the **Audio Mixer**, open a source's **Advanced Audio Properties** and set **Audio Monitoring** to *Monitor Only* (only you hear it) or *Monitor and Output* (you and the stream).
+
+Monitored audio keeps playing while the glasses camera streams, and the video isn't affected: in a test, OBS held 30 fps with no skipped frames. Two things to know:
+
+- **Media players pause.** While the glasses camera streams, the glasses send pause commands to Windows, so YouTube, Spotify and other media apps playing through the glasses keep pausing. OBS's monitor ignores those commands.
+- **Bluetooth delay.** Bluetooth audio arrives a moment late. That's fine for alerts and music, but distracting for monitoring your own voice.
 
 ## Known limits
 

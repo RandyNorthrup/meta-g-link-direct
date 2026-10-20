@@ -20,8 +20,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "5e134de7a5caf9ed302d9ef08918b4a770efc94ea5ed3871bd0a44532d535d93",
-    "recorded_at": "2026-10-19T21:52:32Z"
+    "inputs_sha256": "8c4a4d103c7e93eae3be37ea26a2cee004362946ea03d76cc18ead8d42fa7c76",
+    "recorded_at": "2026-10-20T00:39:44Z"
   },
   {
     "id": "module-metadata",
@@ -44,8 +44,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "8b111a1612463dbbafc4f73784d82c7ee47e6846bfb1459893af914a563526e7",
-    "recorded_at": "2026-10-19T21:53:16Z"
+    "inputs_sha256": "18ab29bb00691fc800182a505d3f925b51f57bf8fa426ef3c25626067fba88c4",
+    "recorded_at": "2026-10-20T00:40:30Z"
   },
   {
     "id": "probe-arguments",
@@ -68,8 +68,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "61f4afe89cdab9e28f6b15ba9608e8908bad7998bed1c834c3ee22caddf61b53",
-    "recorded_at": "2026-10-19T21:54:23Z"
+    "inputs_sha256": "2c7295da709fd808312382a66f2fc823385cc428680a77da1314da981be649c6",
+    "recorded_at": "2026-10-20T00:41:39Z"
   },
   {
     "id": "classic-connection-claim",
@@ -92,8 +92,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "53f81ad3f1f44840e13ea62d80d1fd24c4324e2ceda40c2567da9463594a147f",
-    "recorded_at": "2026-10-19T21:55:39Z"
+    "inputs_sha256": "21a5f1965f92f47a523d85dcf3689a8da5e1dd2c75ecd938b33a872595c0ad66",
+    "recorded_at": "2026-10-20T00:42:56Z"
   },
   {
     "id": "private-address-validation",
@@ -116,8 +116,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "940c5935989f49c29d1bd6d4f224ea20f58173c8802fb268df60c98210c9ebf2",
-    "recorded_at": "2026-10-19T21:55:44Z"
+    "inputs_sha256": "6a3e27713085f211ef3dbb836e2a5011cfcdaff7ead47d5e7f5426db88ab00a9",
+    "recorded_at": "2026-10-20T00:43:01Z"
   },
   {
     "id": "uncached-query-loop",
@@ -140,8 +140,8 @@
       "dependencies.lock.json",
       "tests/live.Tests.ps1"
     ],
-    "inputs_sha256": "76c09fc532f5baba991682b5f1ef5d821929735f94dce7ddc75f6e1756e257bc",
-    "recorded_at": "2026-10-19T21:57:37Z"
+    "inputs_sha256": "918b84d67ef5867d4117e9c637d84679c28c4b6db808250f2c10c527f15666e9",
+    "recorded_at": "2026-10-20T00:44:27Z"
   },
   {
     "id": "format",
@@ -161,8 +161,8 @@
       "scripts/Invoke-Project.ps1",
       ".clang-format"
     ],
-    "inputs_sha256": "7f8ab72784733cffec306be3e71088f895a27aa7781fcdf052a880103bc83a80",
-    "recorded_at": "2026-10-19T21:57:40Z"
+    "inputs_sha256": "7e694405652dbf32278d035945baae770361f82ce7f834aaf2703db70e3d662c",
+    "recorded_at": "2026-10-20T00:44:30Z"
   },
   {
     "id": "owned-header",
@@ -185,8 +185,8 @@
       "dependencies.lock.json",
       ".clang-tidy"
     ],
-    "inputs_sha256": "25b8a5ce154f09e3278ce30ac6164adcc9ab901266cea296ee7964bfb6c1d4e7",
-    "recorded_at": "2026-10-19T22:07:37Z"
+    "inputs_sha256": "e6e9bf5d31eba44f336464cb0651ebb283ec78b83289f921833e9f9ee6f1b445",
+    "recorded_at": "2026-10-20T00:55:44Z"
   },
   {
     "id": "compiler-types",
@@ -208,8 +208,8 @@
       "CMakePresets.json",
       "dependencies.lock.json"
     ],
-    "inputs_sha256": "8b4f684bdca94af2eaa695f78f38d238bf88a2aee23c402975ff0b111221dafb",
-    "recorded_at": "2026-10-19T22:07:56Z"
+    "inputs_sha256": "29cc541f358542505925b894d84194ca20ec2fcbcfa5e280f25067d3d3791879",
+    "recorded_at": "2026-10-20T00:56:06Z"
   },
   {
     "id": "unused-code",
@@ -232,8 +232,8 @@
       "dependencies.lock.json",
       ".cppcheck-obs.cfg"
     ],
-    "inputs_sha256": "1b9fb63e2ea15f81abc3f27f3f337731844ad25de32ce5456082856d8298334b",
-    "recorded_at": "2026-10-19T22:08:14Z"
+    "inputs_sha256": "f91b5ab02c7b20ab4230da63f61e898e3847b8cbe2def81bd7d987f348d1868f",
+    "recorded_at": "2026-10-20T00:56:28Z"
   },
   {
     "id": "script-analysis",
@@ -242,18 +242,18 @@
     "mutated_exit": 1,
     "restored_exit": 0,
     "expected_diagnostic": "PSUseApprovedVerbs",
-    "observed_diagnostic": "PSUseApprovedVerbs Warning  Invoke-Project.ps1 702  The cmdlet 'Badverb-RedDrill' uses an unapproved verb.",
+    "observed_diagnostic": "PSUseApprovedVerbs Warning  Invoke-Project.ps1 703  The cmdlet 'Badverb-RedDrill' uses an unapproved verb.",
     "path": "scripts/Invoke-Project.ps1",
-    "before": "9161e49c6eca3655a50c77dc4a1cfbb946b74e18d59dafe353453b884f9f49b0",
-    "mutated": "feb1a5c386e768ecb8bd42e022ceb4669c06ee865539150a497e0b28993892b0",
-    "after": "9161e49c6eca3655a50c77dc4a1cfbb946b74e18d59dafe353453b884f9f49b0",
+    "before": "983aa2d6fbe6a21a7f17848457c30749b97eea16811d6716cc39c795068faca5",
+    "mutated": "c867c07100b234c0f3ff6250bcb5e24015ff7c9798898ca07f920ee5549ee089",
+    "after": "983aa2d6fbe6a21a7f17848457c30749b97eea16811d6716cc39c795068faca5",
     "log": "reports/red/script-analysis.txt",
     "inputs": [
       "scripts/Invoke-Project.ps1",
       "PSScriptAnalyzerSettings.psd1"
     ],
-    "inputs_sha256": "faf1922c61fdd57808169a378e5ac46b7ca7f79f448462943384178e923f9715",
-    "recorded_at": "2026-10-19T22:08:28Z"
+    "inputs_sha256": "20dda2da068d00a1d1f6a2f9b77e98a477e8e251ed43f949985f0501044e6247",
+    "recorded_at": "2026-10-20T00:56:45Z"
   },
   {
     "id": "workflow-security",
@@ -264,17 +264,17 @@
     "expected_diagnostic": "unpinned-uses",
     "observed_diagnostic": "error[unpinned-uses]: unpinned action reference",
     "path": ".github/workflows/quality.yml",
-    "before": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca",
-    "mutated": "a151bb006b4d7e858647ffe9c81521c98e2e2d9a3c12cfa60555e229a57afd76",
-    "after": "ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca",
+    "before": "abd47729b8ae4cea2b48858276c922d9d5bdfc219919056cb39dfe0671758274",
+    "mutated": "aa6cb370e496b336e1b213e6569993f2f3bcf1116c443b636b342b751006a834",
+    "after": "abd47729b8ae4cea2b48858276c922d9d5bdfc219919056cb39dfe0671758274",
     "log": "reports/red/workflow-security.txt",
     "inputs": [
       ".github/workflows/quality.yml",
       "scripts/Invoke-Project.ps1",
       ".github/workflows"
     ],
-    "inputs_sha256": "16ad3d1435b0be6008cae498fb9bd0b03d900fd6d6d8d234a1f7b3976b27973f",
-    "recorded_at": "2026-10-19T22:08:30Z"
+    "inputs_sha256": "541e62592c8514e5db3d686c43ad4137843b5f8033f82c41233efa422afe9e02",
+    "recorded_at": "2026-10-20T00:33:22Z"
   },
   {
     "id": "secret-scanner",
@@ -283,10 +283,10 @@
     "mutated_exit": 1,
     "restored_exit": 0,
     "expected_diagnostic": "leaks found",
-    "observed_diagnostic": "3:08PM WRN leaks found: 1",
+    "observed_diagnostic": "5:56PM WRN leaks found: 1",
     "path": "src/protocol/sdu.cpp",
     "before": "23f81a1e6ccdf6122fdb9414b839a7e2ca96f3564b1608f35ffa807579178ca0",
-    "mutated": "36a5d113346b5524fa33b684f0dde4836888a7b6eddb035959909f2bdf21998f",
+    "mutated": "95414841813a8b00267f085d896a850614f8f4a8e1e7536010785cb769734ced",
     "after": "23f81a1e6ccdf6122fdb9414b839a7e2ca96f3564b1608f35ffa807579178ca0",
     "log": "reports/red/secret-scanner.txt",
     "inputs": [
@@ -294,8 +294,8 @@
       "scripts/Invoke-Project.ps1",
       ".gitleaks.toml"
     ],
-    "inputs_sha256": "4b0401f9694fb76bcd76b56bee49c91e3bdb691552fd647cced4f26a5ac52dec",
-    "recorded_at": "2026-10-19T22:08:34Z"
+    "inputs_sha256": "e7731bc18ce1976d351bd538b47c22313ae39be4548488618b10f7e323ee2d9e",
+    "recorded_at": "2026-10-20T00:56:49Z"
   },
   {
     "id": "unsafe-copy",
@@ -315,8 +315,8 @@
       "scripts/Invoke-Project.ps1",
       ".semgrep.yml"
     ],
-    "inputs_sha256": "6fd6a77e0235fdca31d136520b0d39c671fa10faf17b4781a7ff38a2121e663a",
-    "recorded_at": "2026-10-19T22:08:51Z"
+    "inputs_sha256": "d012f3f2899bf92ebff3f3d24a4e53d9f1b92370ba9e78b0928986cd308f41be",
+    "recorded_at": "2026-10-20T00:57:08Z"
   },
   {
     "id": "duplicated-code",
@@ -338,8 +338,8 @@
       "package-lock.json",
       ".jscpd.json"
     ],
-    "inputs_sha256": "614da481d835ff3989587e93bec276a7cca1cbb31b6fd7e7a3f7581d3d0f80be",
-    "recorded_at": "2026-10-19T22:08:55Z"
+    "inputs_sha256": "fe0f572b0485ccf3decbc5642b8247211c42d6863b5321618dccae1b53a165fd",
+    "recorded_at": "2026-10-20T00:57:12Z"
   },
   {
     "id": "address-sanitizer",
@@ -348,7 +348,7 @@
     "mutated_exit": 1,
     "restored_exit": 0,
     "expected_diagnostic": "AddressSanitizer: heap-buffer-overflow",
-    "observed_diagnostic": "==33004==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x1205712a0034 at pc 0x7ff71fb153de bp 0x0055e759fb40 sp 0x0055e759fb48",
+    "observed_diagnostic": "==11576==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x11ee760a0034 at pc 0x7ff7d18153de bp 0x0013fddefa00 sp 0x0013fddefa08",
     "path": "tests/sdu_tests.cpp",
     "before": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd",
     "mutated": "f0b8a6f71a8f96f071d86024029c536756dd654d9beaea73b9a22d9535147d2e",
@@ -362,8 +362,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "26e556b4c2f5481d05ec21f49722c23b5f0f6fb148ffd66e1122b7557c1c0033",
-    "recorded_at": "2026-10-19T22:09:29Z"
+    "inputs_sha256": "2c3ff898db1a21ae29d93839d962eadf4d2b6b8177240af505666e6acc003070",
+    "recorded_at": "2026-10-20T00:57:39Z"
   },
   {
     "id": "dependency-npm",
@@ -375,7 +375,7 @@
     "observed_diagnostic": "Command Injection in lodash - https://github.com/advisories/GHSA-35jh-r3h4-6jhm",
     "path": "package-lock.json",
     "before": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16",
-    "mutated": "6a8ac83ba32bfab0ef10d655e7876e7f6f9fbb9af541d70949ade015ab5a15ae",
+    "mutated": "d3034a0eb45accff9071e2b9a41df728ed27090644eebcafce1c2c03bb6682ba",
     "after": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16",
     "log": "reports/red/dependency-npm.txt",
     "inputs": [
@@ -383,8 +383,8 @@
       "scripts/Invoke-Project.ps1",
       "package.json"
     ],
-    "inputs_sha256": "38190257836ce7a058e9b8fceda22d7ce6d8ed894c0700a6e10ac19f82cf49ba",
-    "recorded_at": "2026-10-19T22:09:33Z"
+    "inputs_sha256": "75721da8cc36048955e260dd5be310a07bb2f180f071305f64c07798842f774b",
+    "recorded_at": "2026-10-20T00:57:43Z"
   },
   {
     "id": "dependency-osv",
@@ -396,7 +396,7 @@
     "observed_diagnostic": "| https://osv.dev/GHSA-35jh-r3h4-6jhm | 7.2  | npm       | lodash (dev) | 4.17.20 | 4.17.21       | package-lock.json |",
     "path": "package-lock.json",
     "before": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16",
-    "mutated": "6a8ac83ba32bfab0ef10d655e7876e7f6f9fbb9af541d70949ade015ab5a15ae",
+    "mutated": "d3034a0eb45accff9071e2b9a41df728ed27090644eebcafce1c2c03bb6682ba",
     "after": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16",
     "log": "reports/red/dependency-osv.txt",
     "inputs": [
@@ -404,8 +404,8 @@
       "scripts/Invoke-Project.ps1",
       "package.json"
     ],
-    "inputs_sha256": "38190257836ce7a058e9b8fceda22d7ce6d8ed894c0700a6e10ac19f82cf49ba",
-    "recorded_at": "2026-10-19T22:09:37Z"
+    "inputs_sha256": "75721da8cc36048955e260dd5be310a07bb2f180f071305f64c07798842f774b",
+    "recorded_at": "2026-10-20T00:57:47Z"
   },
   {
     "id": "whatif-guard",
@@ -416,16 +416,16 @@
     "expected_diagnostic": "Expected strings to be the same",
     "observed_diagnostic": "Expected strings to be the same, but they were different.",
     "path": "scripts/Invoke-Project.ps1",
-    "before": "9161e49c6eca3655a50c77dc4a1cfbb946b74e18d59dafe353453b884f9f49b0",
-    "mutated": "2e6d22b0f1bfa0f3d5b879f550ac0f1fb6033f0bbb50117e29c023629b3c81cb",
-    "after": "9161e49c6eca3655a50c77dc4a1cfbb946b74e18d59dafe353453b884f9f49b0",
+    "before": "983aa2d6fbe6a21a7f17848457c30749b97eea16811d6716cc39c795068faca5",
+    "mutated": "07df7edc13de8990b01441b794c5b527676b967e16bc963314f38f3da036a21a",
+    "after": "983aa2d6fbe6a21a7f17848457c30749b97eea16811d6716cc39c795068faca5",
     "log": "reports/red/whatif-guard.txt",
     "inputs": [
       "scripts/Invoke-Project.ps1",
       "tests/runner.Tests.ps1"
     ],
-    "inputs_sha256": "651325181a10297820f188cccc35c507cd76a5130da2fb227929a449bbe19359",
-    "recorded_at": "2026-10-19T22:09:49Z"
+    "inputs_sha256": "b370ad14d1877e7cc5e1339a163c89a5b8277d170554acb2a2452150584faa4d",
+    "recorded_at": "2026-10-20T00:58:03Z"
   },
   {
     "id": "native-exit-propagation",
@@ -436,16 +436,16 @@
     "expected_diagnostic": "Expected 0 to be different from the actual value",
     "observed_diagnostic": "Expected 0 to be different from the actual value, but got the same value.",
     "path": "scripts/Invoke-Project.ps1",
-    "before": "9161e49c6eca3655a50c77dc4a1cfbb946b74e18d59dafe353453b884f9f49b0",
-    "mutated": "f053a728ee56219847b1de79583a9c93130ca25e2f7a4c379234029a43bc98ae",
-    "after": "9161e49c6eca3655a50c77dc4a1cfbb946b74e18d59dafe353453b884f9f49b0",
+    "before": "983aa2d6fbe6a21a7f17848457c30749b97eea16811d6716cc39c795068faca5",
+    "mutated": "5eaa3fe95dbc130aaeb13867fe8cc0a393f4638fda02855b90b75f3fe307a9f4",
+    "after": "983aa2d6fbe6a21a7f17848457c30749b97eea16811d6716cc39c795068faca5",
     "log": "reports/red/native-exit-propagation.txt",
     "inputs": [
       "scripts/Invoke-Project.ps1",
       "tests/runner.Tests.ps1"
     ],
-    "inputs_sha256": "651325181a10297820f188cccc35c507cd76a5130da2fb227929a449bbe19359",
-    "recorded_at": "2026-10-19T22:10:01Z"
+    "inputs_sha256": "b370ad14d1877e7cc5e1339a163c89a5b8277d170554acb2a2452150584faa4d",
+    "recorded_at": "2026-10-20T00:58:16Z"
   },
   {
     "id": "installer-drive-letter",
@@ -465,8 +465,8 @@
       "scripts/Invoke-Project.ps1",
       "tests/installer.Tests.ps1"
     ],
-    "inputs_sha256": "8e97888ccdfd190b22175689acdb038f39a473acaf27801fec825efa7d312332",
-    "recorded_at": "2026-10-19T22:10:08Z"
+    "inputs_sha256": "a24420359377dd602412b4f78d70205927319b91581f9c39044e85889fcf004f",
+    "recorded_at": "2026-10-20T00:58:23Z"
   },
   {
     "id": "drill-reuse",
@@ -477,15 +477,15 @@
     "expected_diagnostic": "because a drill whose inputs changed must run again",
     "observed_diagnostic": "Expected $null or empty, because a drill whose inputs changed must run again, but got @{id=passing; baseline_exit=0; mutated_exit=1; restored_exit=0; inputs_sha256=abc}.",
     "path": "scripts/Invoke-Project.ps1",
-    "before": "9161e49c6eca3655a50c77dc4a1cfbb946b74e18d59dafe353453b884f9f49b0",
-    "mutated": "195a35bf7c956ea5d454daedc35a9c5682d3271dab63f9effce94a65c9e66d93",
-    "after": "9161e49c6eca3655a50c77dc4a1cfbb946b74e18d59dafe353453b884f9f49b0",
+    "before": "983aa2d6fbe6a21a7f17848457c30749b97eea16811d6716cc39c795068faca5",
+    "mutated": "ce190c85cde9e63d8fa9d86760cdbaafb384eea76910a2b42fb21ae626f72e8e",
+    "after": "983aa2d6fbe6a21a7f17848457c30749b97eea16811d6716cc39c795068faca5",
     "log": "reports/red/drill-reuse.txt",
     "inputs": [
       "scripts/Invoke-Project.ps1",
       "tests/runner.Tests.ps1"
     ],
-    "inputs_sha256": "651325181a10297820f188cccc35c507cd76a5130da2fb227929a449bbe19359",
-    "recorded_at": "2026-10-19T22:10:20Z"
+    "inputs_sha256": "b370ad14d1877e7cc5e1339a163c89a5b8277d170554acb2a2452150584faa4d",
+    "recorded_at": "2026-10-20T00:58:35Z"
   }
 ]

@@ -88,6 +88,7 @@ No 1080p, latency, battery or uptime claim is made without measurement.
 | D20 | Keep connected | Confirmed, proven | An opt-in setting, off by default, that connects when OBS loads and keeps the link up with the camera off, so a source starts in about a second. The battery and Wi-Fi-adapter cost is stated beside it | Randy | 2026-10-19 |
 | D21 | Setup experience | Confirmed, proven | One setup window (`meta-g-link-setup.exe`, WebView2) that explains the change of owner, hosts Meta's login and finishes by itself, opened by the installer and from OBS; no console copy and paste. Replaces the console flow because Randy found it too complicated | Randy | 2026-10-19 |
 | D22 | Settings access | Confirmed, proven | Every glasses source carries the shared connection and setup settings; a Tools menu entry opens them; Forget is a button behind a confirmation tick | Randy | 2026-10-19 |
+| D23 | Glasses speakers and controls | Confirmed, proven (speakers) | Audio into the glasses uses OBS's own audio monitoring device (the glasses' *Headphones* Bluetooth device), documented rather than built into the plugin. Glasses-button hotkeys and a wear-sensor privacy action are parked: the touchpad never reaches this PC, only a long press of the capture button appeared on the link, and taking the glasses off sent nothing | Randy | 2026-10-19 |
 
 ## Research references
 

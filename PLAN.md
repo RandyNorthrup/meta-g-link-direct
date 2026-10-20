@@ -31,6 +31,7 @@ Reuse Visor's protocol and session behaviour at commit `e7077b4051b1e3e605c667aa
 - Setup window (2026-10-19): `src/windows/setup.cpp` (`setup::changeOwner`) is the one ownership-change path, extracted from the probe's `--provision`, which now calls it; the window is a new program only because a GUI needs its own subsystem and the WebView2 loader. The login redirect address moved from `provision.cpp` into `provision.hpp` (`LoginRedirectUri`) so the window and the provisioning request share it; the code extraction reuses `encoding.cpp` (`queryParameter`). The installer and the OBS button open the same window (D21).
 - Text conversion (2026-10-19): the three UTF-8 → UTF-16 and two UTF-16 → UTF-8 copies in `http.cpp`, `identity.cpp` and `wifi_station.cpp` were replaced by `win_text` (`widenUtf8`, `narrowUtf8`), which the setup window also uses; jscpd found the copies.
 - Trust signature (2026-10-19): an attempt to verify the glasses' svc36 trust signature as P-256 r||s was removed before release. On this firmware the glasses send a 32-byte value (SHA-256-sized) with a 512-byte (RSA-4096-sized) signature and their device certificate carries an RSA key, so the expected key and signed bytes are unknown; the Meta app's check is in native code. The gap stays open rather than shipping a check that cannot pass.
+- Glasses speakers (2026-10-19): OBS's own audio monitoring device already routes audio to any Windows output, and the glasses are one (*Headphones*), so the feature is a verified README how-to, not a plugin setting; a plugin control would duplicate OBS's and change a global OBS setting from a source (brief D23). Button hotkeys and a wear-sensor privacy action are parked until the Bluetooth control link and the status messages' fields have been examined ([report](reports/GLASSES_CONTROLS_AND_SPEAKERS.md)).
 - Release packaging (2026-10-19): `package` stages exactly the bundle layout that `Install-MetaGLinkDirect.ps1` already installs from (`Build-ReleaseBundle`), instead of the CMake install layout that no installer consumed. The installer's copy and remove steps share one elevation path (`Invoke-PluginFileStep`), which also fixes uninstall for OBS under Program Files.
 
 ## Architecture and inputs
@@ -45,7 +46,7 @@ Detailed logs belong under `reports/` (indexed in `reports/README.md`). Requirem
 
 ## Open verification
 
-Reconnection after a real drop; the final OBS 33.0 release once it is out; trust-signature verification; the 1080p and 360p profiles; latency, CPU, memory and thermal measurement; audio/video sync and long-run audio; battery drain with video and with audio only; the keyboard, Narrator, theme and scaling pass, including the setup window; the setup window without WebView2 (browser fallback); the firmware build; and the full-charge endurance run. While streaming, the PC's Wi-Fi adapter has no internet (brief D15).
+Reconnection after a real drop; the final OBS 33.0 release once it is out; trust-signature verification; the 1080p and 360p profiles; latency, CPU, memory and thermal measurement; audio/video sync and long-run audio; battery drain with video and with audio only; the keyboard, Narrator, theme and scaling pass, including the setup window; the setup window without WebView2 (browser fallback); the firmware build; the full-charge endurance run; and, parked (D23), the Bluetooth control link's messages and the status messages' fields for button and wear events, and the Bluetooth audio delay through the glasses' speakers. While streaming, the PC's Wi-Fi adapter has no internet (brief D15).
 
 Deferred: code signing and provenance, a published SBOM and native advisory assessment, Windows jobs in hosted CI, and other platforms or glasses generations.
 
@@ -679,7 +680,8 @@ Deferred: code signing and provenance, a published SBOM and native advisory asse
         "EV-AUDIO-HARDWARE",
         "EV-OBS33-LOAD",
         "EV-INSTALLER-DRIVES",
-        "EV-SHARED-LINK-OBS"
+        "EV-SHARED-LINK-OBS",
+        "EV-GLASSES-SPEAKERS"
       ],
       "blocker": null,
       "superseded_by": null
@@ -20445,6 +20447,75 @@ Deferred: code signing and provenance, a published SBOM and native advisory asse
       "scope_sha256": null,
       "red": null,
       "reason": "The scope fingerprint tool behind earlier entries is not available in this session; inputs carry their own hashes (null = deleted file)."
+    },
+    {
+      "id": "EV-GLASSES-SPEAKERS",
+      "acceptance": [
+        "AC-OBS"
+      ],
+      "kind": "manual",
+      "status": "pass",
+      "command": [
+        "meta-g-link-probe.exe",
+        "--stream"
+      ],
+      "method": "Real glasses, 0.3.0: OBS 33.0.0-rc2 monitoring device set to the glasses Headphones endpoint (profile backed up first); a Monitor Only beep source played steadily in the glasses and not from the PC speakers while the glasses camera streamed; OBS 30 fps, 0 of 2,689 render frames skipped. A plain player tone stayed continuous through a stream check (1,805 frames). Media apps were paused by the glasses while their camera streamed. Touchpad gestures reached neither the media link nor Windows as keys; a capture-button long press appeared as svc28 type 2032; taking the glasses off sent nothing on the media link. Bluetooth audio delay not measured.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/GLASSES_CONTROLS_AND_SPEAKERS.md",
+        "sha256": "59e4b5f28fa667684317c6749b263854092955728b93086d49fa288286f8a156"
+      },
+      "inputs": [
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "d32bea00a090453f2b66bc328cba8a351e5a1fbbff10b26f89a3b98ce5811572"
+        },
+        {
+          "path": "src/windows/media_session.cpp",
+          "sha256": "ae989edbb09ac87a55c84ce946252540b839f6a35dbbc9172e52f12861aafb35"
+        },
+        {
+          "path": "src/plugin/glasses_link.cpp",
+          "sha256": "9c51760ad1eb0fa71015bc7a95f00c692a27a702facbd7195db64a20f791908f"
+        },
+        {
+          "path": "src/plugin/source.c",
+          "sha256": "95e0ac9e1ec5601c7d15e0c0e195bc44bddd46de6a7e03e795a2bfb087f0539d"
+        },
+        {
+          "path": "src/probe/main.cpp",
+          "sha256": "020894fd4653b3f4ca01bece4e5d8e1f37c9852689b82fb3c79363321e610482"
+        },
+        {
+          "path": "README.md",
+          "sha256": "f12d80b3618cc49ddb788ced272593bf676efd3715b46f1636354cb7fbe7af8d"
+        }
+      ],
+      "scope_sha256": null,
+      "red": null,
+      "reason": "The scope fingerprint tool behind earlier entries is not available in this session; inputs carry their own hashes (null = deleted file)."
     }
   ],
   "checkpoint": {
@@ -20713,7 +20784,7 @@ Deferred: code signing and provenance, a published SBOM and native advisory asse
       "TASK-SETUP"
     ],
     "pending_operations": [],
-    "next_action": "After 0.3.0: battery drain with video and with audio only, the full-charge endurance run, the final OBS 33.0 release once out, audio/video sync, reconnection after a real drop, the 1080p and 360p profiles, two Wi-Fi adapters, the accessibility pass (properties and setup window), the setup window without WebView2, and trust-signature verification (RSA-sized signature; the Meta app check is native).",
+    "next_action": "After 0.3.0: battery drain with video and with audio only, the full-charge endurance run, the final OBS 33.0 release once out, audio/video sync, reconnection after a real drop, the 1080p and 360p profiles, two Wi-Fi adapters, the accessibility pass (properties and setup window), the setup window without WebView2, and trust-signature verification (RSA-sized signature; the Meta app check is native). Parked (D23): button and wear events need the Bluetooth control link and the status-message fields examined.",
     "source_revision": "b7776ececebc1a93c46fe4e6e71517a4d84c1282"
   }
 }

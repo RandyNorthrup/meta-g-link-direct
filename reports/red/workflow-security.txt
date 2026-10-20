@@ -9,7 +9,7 @@ MUTATED EXIT 1
 error[unpinned-uses]: unpinned action reference
   --> C:\Users\Randy\Coding\meta_g_link_direct\.github\workflows\quality.yml:17:15
    |
-17 |       - uses: actions/checkout@v6 # v6
+17 |       - uses: actions/checkout@v7 # v7.0.1
    |               ^^^^^^^^^^^^^^^^^^^ action is not pinned to a hash (required by blanket policy)
    |
    = note: audit confidence → High
@@ -23,4 +23,4 @@ RESTORED EXIT 0
  INFO audit: zizmor: 🌈 completed C:\Users\Randy\Coding\meta_g_link_direct\.github\workflows\quality.yml
 No findings to report. Good job!
 
-RESTORATION SHA256 ce7867c76f0755790a8df94a77fb782a6fb6c52c2802fc332e2ef9958132a3ca
+RESTORATION SHA256 abd47729b8ae4cea2b48858276c922d9d5bdfc219919056cb39dfe0671758274
