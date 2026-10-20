@@ -3,10 +3,12 @@
 #include "mgl/bytes.hpp"
 #include "mgl/datax.hpp"
 #include "mgl/encoding.hpp"
+#include "mgl/playout.hpp"
 #include "mgl/protobuf.hpp"
 #include "mgl/sdu.hpp"
 #include "mgl/stream.hpp"
 
+#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <cstdint>
@@ -383,6 +385,156 @@ void testBatteryState(Checks& check) {
     check(!mgl::stream::parseBatteryState(view(without)).has_value(),
           "a DeviceState without a battery gives none");
 }
+
+// 30 fps capture times, as the glasses stamp them.
+constexpr std::int64_t FramesPerSecond = 30;
+constexpr std::int64_t FrameUs = 33'333;
+constexpr std::int64_t CaptureStartUs = 916'000'000;
+
+std::uint64_t captureOf(std::int64_t index) {
+    return static_cast<std::uint64_t>(CaptureStartUs + (index * FrameUs));
+}
+
+// The smallest and largest gap between consecutive presentations from index first on.
+struct Spacing {
+    std::int64_t smallest = INT64_MAX;
+    std::int64_t largest = 0;
+};
+
+Spacing spacingFrom(const std::vector<std::int64_t>& presented, std::size_t first) {
+    Spacing spacing;
+    for (std::size_t i = first + 1; i < presented.size(); ++i) {
+        const std::int64_t gap = presented.at(i) - presented.at(i - 1);
+        spacing.smallest = std::min(spacing.smallest, gap);
+        spacing.largest = std::max(spacing.largest, gap);
+    }
+    return spacing;
+}
+
+void testPlayoutSteady(Checks& check) {
+    // Every frame arrives 5 ms after capture: the delay falls from its start to the minimum,
+    // slowly enough that the cadence barely changes.
+    constexpr std::int64_t TransitUs = 5'000;
+    constexpr std::int64_t Frames = FramesPerSecond * 40;
+    mgl::playout::PlayoutClock clock;
+    std::vector<std::int64_t> presented;
+    bool never_early = true;
+    for (std::int64_t i = 0; i < Frames; ++i) {
+        const std::int64_t arrival = CaptureStartUs + (i * FrameUs) + TransitUs;
+        const std::int64_t at = clock.presentAt(captureOf(i), arrival);
+        never_early = never_early && at >= arrival;
+        presented.push_back(at);
+    }
+    const auto spacing = spacingFrom(presented, 0);
+    check(never_early, "a unit is never presented before it arrives");
+    check(spacing.smallest >= FrameUs - (FrameUs / 100) - 1 && spacing.largest <= FrameUs + 1,
+          "a falling delay plays at most 1% fast");
+    check(clock.delayUs() <= 25'000, "a steady link settles at the minimum delay");
+    check(clock.lateUnits() == 0, "a steady link has no late units");
+}
+
+void testPlayoutBursts(Checks& check) {
+    // The Gen 2 pattern: frames leave in bursts of five, all arriving within about a millisecond
+    // just after the last of them was captured.
+    constexpr std::int64_t Burst = 5;
+    constexpr std::int64_t Frames = FramesPerSecond * 60;
+    constexpr std::int64_t WarmUpFrames = FramesPerSecond * 20;
+    mgl::playout::PlayoutClock clock;
+    std::vector<std::int64_t> presented;
+    std::vector<std::int64_t> arrived;
+    for (std::int64_t i = 0; i < Frames; ++i) {
+        const std::int64_t last_in_burst = ((i / Burst) * Burst) + (Burst - 1);
+        const std::int64_t arrival =
+            CaptureStartUs + (last_in_burst * FrameUs) + 2'000 + ((i % Burst) * 200);
+        arrived.push_back(arrival);
+        presented.push_back(clock.presentAt(captureOf(i), arrival));
+    }
+    const auto arrivals = spacingFrom(arrived, WarmUpFrames);
+    check(arrivals.smallest < 1'000 && arrivals.largest > 4 * FrameUs,
+          "the test feeds bursts: sub-millisecond gaps and gaps of four frames");
+    const auto spacing = spacingFrom(presented, WarmUpFrames);
+    check(spacing.smallest >= FrameUs - (FrameUs / 100) - 1 && spacing.largest <= FrameUs + 1,
+          "burst presentations follow the capture cadence");
+    check(clock.lateUnits() == 0, "the starting delay already covers a burst gap");
+    const std::int64_t delay = clock.delayUs();
+    check(delay >= (Burst - 1) * FrameUs && delay <= ((Burst - 1) * FrameUs) + 30'000,
+          "the delay settles just above the burst gap");
+}
+
+void testPlayoutLateUnit(Checks& check) {
+    // One frame 300 ms late raises the delay at once; the frames after it are on time again.
+    constexpr std::int64_t Frames = FramesPerSecond * 20;
+    constexpr std::int64_t LateIndex = FramesPerSecond * 10;
+    constexpr std::int64_t LateUs = 300'000;
+    mgl::playout::PlayoutClock clock;
+    std::uint64_t late_after_spike = 0;
+    for (std::int64_t i = 0; i < Frames; ++i) {
+        const std::int64_t arrival =
+            CaptureStartUs + (i * FrameUs) + 5'000 + (i == LateIndex ? LateUs : 0);
+        (void)clock.presentAt(captureOf(i), arrival);
+        if (i == LateIndex) {
+            late_after_spike = clock.lateUnits();
+            check(clock.delayUs() >= LateUs, "a late unit raises the delay past its lateness");
+        }
+    }
+    check(late_after_spike == 1 && clock.lateUnits() == 1,
+          "only the late unit counts as late; the raised delay covers the rest");
+}
+
+void testPlayoutStall(Checks& check) {
+    // A two-second stall is longer than the largest delay: those frames are presented on arrival
+    // and the delay stops at its maximum.
+    const mgl::playout::Settings settings;
+    mgl::playout::PlayoutClock clock(settings);
+    std::int64_t at_stall = 0;
+    std::int64_t arrival_at_stall = 0;
+    for (std::int64_t i = 0; i < FramesPerSecond * 5; ++i) {
+        const std::int64_t stall = i >= 60 && i < 120 ? 2'000'000 - ((i - 60) * FrameUs) : 0;
+        const std::int64_t arrival = CaptureStartUs + (i * FrameUs) + 5'000 + stall;
+        const std::int64_t at = clock.presentAt(captureOf(i), arrival);
+        if (i == 60) {
+            at_stall = at;
+            arrival_at_stall = arrival;
+        }
+    }
+    check(at_stall == arrival_at_stall, "a unit later than the largest delay plays on arrival");
+    check(clock.delayUs() <= settings.max_delay_us, "the delay never passes its maximum");
+    check(clock.lateUnits() >= 1, "units past the largest delay count as late");
+}
+
+void testPlayoutRestart(Checks& check) {
+    // A new stream with a new time base: the clock restarts instead of presenting 100 s late.
+    mgl::playout::PlayoutClock clock;
+    std::int64_t arrival = CaptureStartUs + 5'000;
+    for (std::int64_t i = 0; i < 90; ++i) {
+        arrival = CaptureStartUs + (i * FrameUs) + 5'000;
+        (void)clock.presentAt(captureOf(i), arrival);
+    }
+    const std::int64_t delay_before = clock.delayUs();
+    const std::int64_t next_arrival = arrival + FrameUs;
+    const std::uint64_t jumped = captureOf(90) + 100'000'000ULL;
+    const std::int64_t at = clock.presentAt(jumped, next_arrival);
+    check(clock.restarts() == 1, "a capture time 100 s off restarts the clock");
+    check(at - next_arrival == delay_before && clock.lateUnits() == 0,
+          "a restart keeps the delay it had");
+}
+
+void testPlayoutSharedClock(Checks& check) {
+    // Video and audio share the glasses' clock, so units captured together are presented
+    // together.
+    constexpr std::int64_t AudioUs = 21'333;
+    mgl::playout::PlayoutClock clock;
+    std::int64_t video_at = 0;
+    std::int64_t audio_at = 0;
+    for (std::int64_t i = 0; i < 300; ++i) {
+        const std::int64_t capture = CaptureStartUs + (i * AudioUs);
+        audio_at = clock.presentAt(static_cast<std::uint64_t>(capture), capture + 3'000);
+        video_at = clock.presentAt(static_cast<std::uint64_t>(capture), capture + 9'000);
+    }
+    // Within a millisecond: between their arrivals the delay may shrink by 1% of the gap.
+    check(std::abs(video_at - audio_at) <= 1'000,
+          "audio and video captured together are presented together");
+}
 } // namespace
 
 int main() {
@@ -400,6 +552,12 @@ int main() {
         testConfigureAudio(check);
         testConfigureVideo(check);
         testBatteryState(check);
+        testPlayoutSteady(check);
+        testPlayoutBursts(check);
+        testPlayoutLateUnit(check);
+        testPlayoutStall(check);
+        testPlayoutRestart(check);
+        testPlayoutSharedClock(check);
         std::cout << check.count() << " protocol/datax/protobuf/encoding/stream cases passed\n";
         return EXIT_SUCCESS;
     } catch (const std::exception& error) {

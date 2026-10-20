@@ -20,7 +20,7 @@ Write-Error: Native command failed (14): zizmor
 
 RESTORED EXIT 0
  INFO zizmor: 🌈 zizmor v1.25.2
- INFO audit: zizmor: 🌈 completed C:\Users\Randy\Coding\meta_g_link_direct\.github\workflows\quality.yml
 No findings to report. Good job!
+ INFO audit: zizmor: 🌈 completed C:\Users\Randy\Coding\meta_g_link_direct\.github\workflows\quality.yml
 
 RESTORATION SHA256 abd47729b8ae4cea2b48858276c922d9d5bdfc219919056cb39dfe0671758274

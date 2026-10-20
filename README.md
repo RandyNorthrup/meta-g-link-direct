@@ -17,7 +17,8 @@
 Use your **Ray-Ban Meta (Gen 2)** glasses as a first-person camera and microphone in **OBS Studio** on Windows. Video and audio come straight from the glasses over a short-range Wi-Fi network that the glasses create for your PC. No phone, no companion app, and no router or hotspot setup.
 
 <p align="center">
-  <img src="assets/glasses-demo.webp" alt="First-person video from the glasses in OBS: hands typing on a keyboard in front of a curved monitor" width="300">
+  <img src="assets/glasses-demo.webp" alt="First-person video from the glasses in OBS at 30 fps: hands typing and waving in front of a curved monitor and a laptop" width="300"><br>
+  <sub>Recorded in OBS with 0.3.1: 30 fps, 920 distinct pictures in 30.8 s. <a href="assets/glasses-30fps.mp4">Watch the full 30-second clip (MP4)</a>.</sub>
 </p>
 
 > [!WARNING]
@@ -147,7 +148,8 @@ Monitored audio keeps playing while the glasses camera streams, and the video is
 
 - **Battery**: streaming video drains the glasses quickly. One reading suggests about 35–40 minutes from a full charge (not yet confirmed). With only the microphone source live the camera is off; how much longer the battery lasts that way hasn't been measured yet.
 - **Quality**: 720 × 1280 and 504 × 896 at 30 fps have been verified in OBS; 1080 × 1920 and 360 × 640 haven't.
-- **Audio sync**: video is shown as it arrives and audio goes through OBS's audio buffer, so they can be slightly apart. The offset hasn't been measured; use the source's *Sync Offset* in OBS's Advanced Audio Properties if you need to adjust it.
+- **A short delay**: the glasses' radio sends video in bursts (several frames at once, then a pause of about 0.15 s). To show every frame at a steady 30 fps, the plugin holds each one briefly and plays it at its own time, so the picture runs about 0.2 s behind, more on an uneven link. The delay adapts to the link, between 0.02 and 0.5 s.
+- **Audio sync**: audio is timed on the same clock as the video, but the offset hasn't been measured; use the source's *Sync Offset* in OBS's Advanced Audio Properties if you need to adjust it.
 - **OBS 33** is verified with the 33.0.0 release candidate (rc2): installed, loaded from the new layout, video and audio streamed. The final 33.0 release hasn't been tested yet.
 - **Reconnecting** after a dropped link is implemented but hasn't been exercised on real hardware yet.
 - **Security**: the PC doesn't yet verify the glasses' identity signature during the handshake.
@@ -168,7 +170,7 @@ flowchart LR
 2. It asks the glasses to start their own 2.4 GHz / 20 MHz Wi-Fi network, with a fresh random name and password each time.
 3. The PC joins that network with the chosen Wi-Fi adapter and a temporary Windows Wi-Fi profile.
 4. A second encrypted session runs over TCP on that network. The glasses send what the live sources need: HEVC video, raw AAC audio, or both.
-5. The plugin decodes both with the FFmpeg libraries that ship with OBS and hands each frame and each block of samples to the glasses sources that are live.
+5. The glasses' radio delivers the frames in bursts, so the plugin times each frame and block of sound by its capture time plus a short delay. It decodes both with the FFmpeg libraries that ship with OBS and hands each frame to the live glasses sources when it is due, so OBS shows all 30 frames a second.
 
 One connection serves every glasses source in OBS. When what the live sources need changes (quality, audio, camera on or off), the plugin stops the stream, configures it again and restarts it inside the same session, which takes 1–1.5 seconds. When no glasses source needs the glasses, the PC leaves the network and deletes the profile, and the glasses close the network within about 15 seconds.
 
@@ -176,7 +178,7 @@ Why do the glasses host the network? When the glasses instead joined a network (
 
 ## Troubleshooting
 
-The OBS log (*Help → Log Files*) lists each connection step under `[meta-g-link-direct]`.
+The OBS log (*Help → Log Files*) lists each connection step under `[meta-g-link-direct]`. While video flows it adds a line once a minute, for example *Video over the last 60 s: 30.0 fps from the glasses, 30.0 fps shown, presentation delay 188 ms, 2 late, 0 undecodable, 0 skipped.* A low "from the glasses" rate points at the Wi-Fi link; many "late" frames mean the link is uneven, and the delay grows to cover it.
 
 | Symptom | What to do |
 |---|---|

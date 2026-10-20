@@ -2,15 +2,28 @@
 
 All notable changes are recorded here. The project follows [semantic versioning](https://semver.org/); versions below 1.0 are beta releases.
 
-## [Unreleased]
+## [0.3.1] - 2026-10-20 (beta)
+
+### Fixed
+
+- **OBS showed the glasses' video at about 13 fps instead of 30**, at every quality setting. The glasses encode a true 30 fps, but their radio delivers the frames in bursts: four or five at once, then 110–160 ms of nothing, whatever the bitrate and whatever Wi-Fi setting was tried on the PC or the glasses. The plugin handed each frame to OBS as it arrived, in OBS's unbuffered mode, which keeps only the newest frame per rendered frame and dropped most of every burst. The plugin now presents each frame at its own capture cadence after a short delay that covers the bursts, as the Meta AI app's own player does. That delay adapts to the link, between 20 and 500 ms, and was 188 ms in the test. Audio uses the same clock, so the two stay in step. Measured in OBS 33.0.0-rc2: 12.8 distinct glasses pictures per second in a recording before, 29.6 after. See [the frame-rate report](reports/FRAME_RATE_VERIFICATION.md).
+- Video and audio units the decoders reject are now counted and logged; they were silently dropped before.
 
 ### Added
 
+- Once a minute while video flows, the OBS log reports the frame rate received from the glasses and shown, the presentation delay, late frames, and undecodable or skipped frames, for example "Video over the last 60 s: 30.0 fps from the glasses, 30.0 fps shown, presentation delay 188 ms, 2 late, 0 undecodable, 0 skipped."
+
+- README: a new 30 fps clip recorded in OBS with 0.3.1 (920 distinct pictures in 30.8 s), and the full 30-second clip as an MP4, both with the audio removed.
 - README: **Hear OBS in your glasses**. OBS's audio monitor can use the glasses' speakers (the *Headphones* Bluetooth device) while their camera streams. Verified in OBS 33.0.0-rc2 with 0.3.0: a *Monitor Only* source played steadily in the glasses, not from the PC speakers, while OBS held 30 fps with 0 of 2,689 frames skipped; a plain player's tone stayed continuous and the stream check got its full 30 fps. Media apps playing through the glasses are paused by the glasses while their camera streams. No plugin change.
 
 ### Changed
 
 - CI: `actions/checkout` 7.0.1 and `actions/setup-node` 7.1.0 (Dependabot #1 and #2), still pinned by commit SHA; both SHAs match the official release tags. The `workflow-security` red drill now unpins whichever commit `actions/checkout` is pinned to, instead of one hard-coded SHA, so a pin bump no longer leaves it without a target (it refused to run after #1, as designed).
+- A new red drill (`playout-cadence`, 23 in total) proves that the tests fail if frames are presented on arrival again.
+
+### Known issues
+
+- The presentation delay adds about 0.2 s of latency; glass-to-OBS latency and audio/video sync have not been measured.
 
 ## [0.3.0] - 2026-10-19 (beta)
 

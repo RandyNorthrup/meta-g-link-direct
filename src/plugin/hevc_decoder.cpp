@@ -58,7 +58,7 @@ void HevcDecoder::setParameters(ByteView annex_b_parameter_sets) {
     impl_->parameters.assign(annex_b_parameter_sets.begin(), annex_b_parameter_sets.end());
 }
 
-void HevcDecoder::decode(std::uint64_t pts_us, ByteView annex_b, bool keyframe,
+bool HevcDecoder::decode(std::uint64_t pts_us, ByteView annex_b, bool keyframe,
                          const std::function<void(const DecodedFrame&)>& sink) {
     // Prepend the stored parameter sets to keyframes so an IDR access unit carries its SPS/PPS.
     const std::uint8_t* data = annex_b.data();
@@ -78,7 +78,7 @@ void HevcDecoder::decode(std::uint64_t pts_us, ByteView annex_b, bool keyframe,
     impl_->packet->pts = static_cast<std::int64_t>(pts_us);
     impl_->packet->dts = static_cast<std::int64_t>(pts_us);
     if (avcodec_send_packet(impl_->context.get(), impl_->packet.get()) < 0) {
-        return;
+        return false;
     }
     while (avcodec_receive_frame(impl_->context.get(), impl_->frame.get()) == 0) {
         const AVFrame& frame = *impl_->frame;
@@ -98,5 +98,6 @@ void HevcDecoder::decode(std::uint64_t pts_us, ByteView annex_b, bool keyframe,
         }
         av_frame_unref(impl_->frame.get());
     }
+    return true;
 }
 } // namespace mgl::plugin

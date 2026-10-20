@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Confirmed contract; public beta releases (0.3.0 adds the microphone source, the shared link, keep-connected and the setup window) |
+| Status | Confirmed contract; public beta releases (0.3.0 adds the microphone source, the shared link, keep-connected and the setup window; 0.3.1 shows the full 30 fps in OBS) |
 | Product owner | Randy |
 | Technical work | Coding agent under Randy's direction |
 | Created / last updated | 2026-10-15 / 2026-10-19 |
@@ -27,9 +27,9 @@ Meta is contacted only during the one-time setup that makes the PC the glasses' 
 
 | Area | Target | Status (see PLAN.md) |
 |---|---|---|
-| Video | 720 × 1280 portrait at a nominal 30 fps, plus at least one lower profile | 720 × 1280 and 504 × 896 at 30 fps proven in OBS, switching in 1.4 s; 1080 × 1920 and 360 × 640 untested |
+| Video | 720 × 1280 portrait at a nominal 30 fps, plus at least one lower profile | 720 × 1280 and 504 × 896 proven in OBS, switching in 1.4 s; since 0.3.1 OBS shows 29.6 distinct pictures per second (12.8 before, D24); 1080 × 1920 and 360 × 640 untested |
 | Endurance | One full glasses battery charge with no drop or reconnect, recorded in measured minutes (D16) | Open; longest run so far 3 minutes |
-| Latency | 95th percentile glass-to-OBS ≤ 500 ms | Not measured |
+| Latency | 95th percentile glass-to-OBS ≤ 500 ms | Not measured; the presentation delay alone is about 190 ms (D24) |
 | Startup | First frame ≤ 15 s after a ready connection | About 13 s from the scene going live, including the Wi-Fi setup; about 1 s with keep-connected on (D20) |
 | Reconnect | ≤ 30 s after the glasses become available again | Implemented, not exercised on hardware |
 | Stability | No growing media queue or memory; no OBS stall | Two-minute OBS run: flat memory, no render frames skipped by the source |
@@ -89,6 +89,7 @@ No 1080p, latency, battery or uptime claim is made without measurement.
 | D21 | Setup experience | Confirmed, proven | One setup window (`meta-g-link-setup.exe`, WebView2) that explains the change of owner, hosts Meta's login and finishes by itself, opened by the installer and from OBS; no console copy and paste. Replaces the console flow because Randy found it too complicated | Randy | 2026-10-19 |
 | D22 | Settings access | Confirmed, proven | Every glasses source carries the shared connection and setup settings; a Tools menu entry opens them; Forget is a button behind a confirmation tick | Randy | 2026-10-19 |
 | D23 | Glasses speakers and controls | Confirmed, proven (speakers) | Audio into the glasses uses OBS's own audio monitoring device (the glasses' *Headphones* Bluetooth device), documented rather than built into the plugin. Glasses-button hotkeys and a wear-sensor privacy action are parked: the touchpad never reaches this PC, only a long press of the capture button appeared on the link, and taking the glasses off sent nothing | Randy | 2026-10-19 |
+| D24 | Smooth presentation | Confirmed, proven | Present every frame and block of sound at its capture time plus an adaptive delay (20–500 ms, about 190 ms measured) instead of on arrival, because the glasses' radio delivers 30 fps in bursts that OBS thinned to about 13 fps; the Meta AI app's player paces the same way. A little latency is traded for the full frame rate | Randy / technical verification | 2026-10-20 |
 
 ## Research references
 

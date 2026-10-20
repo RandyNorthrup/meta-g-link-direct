@@ -11,10 +11,12 @@
 
 #include "aac_decoder.hpp"
 #include "hevc_decoder.hpp"
+#include "video_pacer.hpp"
 
 #include "mgl/bytes.hpp"
 #include "mgl/identity.hpp"
 #include "mgl/media_session.hpp"
+#include "mgl/playout.hpp"
 #include "mgl/stream.hpp"
 #include "mgl/wifi_station.hpp"
 #include "mgl/win_text.hpp"
@@ -52,8 +54,6 @@
 #include <vector>
 
 namespace {
-constexpr std::uint64_t NanosPerMicro = 1000;
-
 // Selectable quality profiles, best first. 720x1280 is the confirmed target; lower profiles ease a
 // struggling link. Labels come from the locale file.
 struct QualityPreset {
@@ -178,15 +178,36 @@ class StatusCell {
     std::optional<mgl::stream::BatteryState> battery_;
 };
 
-// The decoders of one session, used only on that session's worker thread.
-struct Decoders {
-    mgl::plugin::HevcDecoder video;
-    bool video_open = false;
-    std::uint32_t width = 0;
-    std::uint32_t height = 0;
+using PacerClock = mgl::plugin::VideoPacer::Clock;
+
+std::int64_t microsNow() {
+    return std::chrono::duration_cast<std::chrono::microseconds>(
+               PacerClock::now().time_since_epoch())
+        .count();
+}
+
+PacerClock::time_point atMicros(std::int64_t micros) {
+    return PacerClock::time_point(
+        std::chrono::duration_cast<PacerClock::duration>(std::chrono::microseconds(micros)));
+}
+
+std::int64_t nanosUntil(PacerClock::time_point at) {
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(at - PacerClock::now()).count();
+}
+
+// The media of one session. The playout clock and the audio decoder are used on the session's
+// worker thread; the video pacer decodes and presents on its own thread, which alone touches
+// width and height.
+struct SessionMedia {
+    mgl::playout::PlayoutClock clock; // one clock for both media: the glasses stamp both alike
     mgl::plugin::AacDecoder audio;
     std::uint64_t audio_blocks = 0;
+    std::uint64_t audio_rejected = 0;
     bool audio_layout_reported = false;
+    std::uint32_t width = 0;
+    std::uint32_t height = 0;
+    bool video_open = false;
+    std::unique_ptr<mgl::plugin::VideoPacer> video; // last: its thread stops before the rest goes
 };
 
 const char* stateKey(mgl::MediaState state) {
@@ -483,37 +504,62 @@ class Link {
     }
 
     std::unique_ptr<mgl::MediaSession> makeSession() {
-        auto decoders = std::make_shared<Decoders>();
-        decoders->video_open = decoders->video.open();
-        if (!decoders->video_open) {
+        auto media = std::make_shared<SessionMedia>();
+        media->video = std::make_unique<mgl::plugin::VideoPacer>(
+            [this, target = media.get()](const mgl::plugin::DecodedFrame& picture,
+                                         PacerClock::time_point present_at) {
+                deliverPicture(*target, picture, present_at);
+            },
+            [this](std::string_view message) { logView(message); });
+        media->video_open = media->video->open();
+        if (!media->video_open) {
             log("The HEVC decoder could not be opened; the glasses' video cannot be shown.");
         }
         const std::uint64_t generation = status_.beginSession();
         mgl::MediaCallbacks callbacks;
-        callbacks.on_parameters = [decoders](mgl::ByteView parameters) {
-            decoders->video.setParameters(parameters);
-        };
-        callbacks.on_frame = [this, decoders](std::uint64_t pts, mgl::ByteView annex,
-                                              bool keyframe) {
-            if (decoders->video_open) {
-                decoders->video.decode(
-                    pts, annex, keyframe,
-                    [this, &target = *decoders](const mgl::plugin::DecodedFrame& decoded) {
-                        deliverPicture(target, decoded);
-                    });
+        callbacks.on_parameters = [media](mgl::ByteView parameters) {
+            if (media->video_open) {
+                media->video->parameters(parameters);
             }
         };
-        callbacks.on_audio_config = [this, decoders](mgl::ByteView config) {
-            if (!decoders->audio.configure(config)) {
+        // Each unit is scheduled at its capture time plus the playout delay, then decoded and
+        // presented on the pacer's thread when due.
+        callbacks.on_frame = [media](std::uint64_t pts, mgl::ByteView annex, bool keyframe) {
+            if (!media->video_open) {
+                return;
+            }
+            const std::int64_t present = media->clock.presentAt(pts, microsNow());
+            media->video->unit(
+                pts, annex, keyframe, atMicros(present),
+                {.delay_us = media->clock.delayUs(), .late_units = media->clock.lateUnits()});
+        };
+        callbacks.on_audio_config = [this, media](mgl::ByteView config) {
+            if (!media->audio.configure(config)) {
                 log("The AAC decoder could not open the glasses' audio format; glasses audio is "
                     "unavailable.");
             }
         };
-        callbacks.on_audio = [this, decoders](std::uint64_t pts, mgl::ByteView aac) {
-            decoders->audio.decode(
-                pts, aac, [this, &target = *decoders](const mgl::plugin::DecodedAudio& decoded) {
-                    deliverSound(target, decoded);
+        // Audio is handed to OBS as it decodes, stamped with its presentation time on the same
+        // clock as the video, so OBS keeps the two in sync.
+        callbacks.on_audio = [this, media](std::uint64_t pts, mgl::ByteView aac) {
+            const auto present_at = atMicros(media->clock.presentAt(pts, microsNow()));
+            const bool decoded = media->audio.decode(
+                pts, aac,
+                [this, &target = *media, pts, present_at](const mgl::plugin::DecodedAudio& block) {
+                    // A block the decoder emits late keeps its own capture
+                    // time.
+                    const auto shift = std::chrono::microseconds(
+                        static_cast<std::int64_t>(block.pts_us) - static_cast<std::int64_t>(pts));
+                    deliverSound(target, block, present_at + shift);
                 });
+            if (!decoded) {
+                constexpr std::uint64_t ReportEvery = 100;
+                if (media->audio_rejected++ % ReportEvery == 0) {
+                    log(std::format("The AAC decoder could not decode {} glasses audio unit(s) "
+                                    "so far.",
+                                    media->audio_rejected));
+                }
+            }
         };
         callbacks.on_log = [this](const std::string& message) { log(message); };
         callbacks.on_state = [this, generation](mgl::MediaState state) {
@@ -525,11 +571,13 @@ class Link {
         return std::make_unique<mgl::MediaSession>(std::move(callbacks));
     }
 
-    // Worker thread: hands one decoded picture to every live source that shows video.
-    void deliverPicture(Decoders& decoders, const mgl::plugin::DecodedFrame& decoded) {
-        if (decoded.width != decoders.width || decoded.height != decoders.height) {
-            decoders.width = decoded.width;
-            decoders.height = decoded.height;
+    // Pacer thread: hands one decoded picture, due at present_at, to every live source that shows
+    // video.
+    void deliverPicture(SessionMedia& media, const mgl::plugin::DecodedFrame& decoded,
+                        PacerClock::time_point present_at) {
+        if (decoded.width != media.width || decoded.height != media.height) {
+            media.width = decoded.width;
+            media.height = decoded.height;
             log(std::format("receiving video {}x{}", decoded.width, decoded.height));
         }
         const MglVideoFrame frame{.plane_y = std::get<0>(decoded.plane),
@@ -540,7 +588,7 @@ class Link {
                                   .stride_v = std::get<2>(decoded.linesize),
                                   .width = decoded.width,
                                   .height = decoded.height,
-                                  .timestamp_ns = decoded.pts_us * NanosPerMicro,
+                                  .present_in_ns = nanosUntil(present_at),
                                   .full_range = decoded.full_range};
         const std::scoped_lock lock(output_mutex_);
         for (const auto& source : sources_) {
@@ -550,20 +598,21 @@ class Link {
         }
     }
 
-    // Worker thread: hands one block of decoded audio to every live source that shows audio.
-    // Mono and stereo are handed on; the glasses are asked for stereo.
-    void deliverSound(Decoders& decoders, const mgl::plugin::DecodedAudio& decoded) {
+    // Worker thread: hands one block of decoded audio, due at present_at, to every live source
+    // that shows audio. Mono and stereo are handed on; the glasses are asked for stereo.
+    void deliverSound(SessionMedia& media, const mgl::plugin::DecodedAudio& decoded,
+                      PacerClock::time_point present_at) {
         constexpr std::uint32_t MaxDeliveredChannels = 2;
         if (decoded.channels > MaxDeliveredChannels) {
-            if (!decoders.audio_layout_reported) {
-                decoders.audio_layout_reported = true;
+            if (!media.audio_layout_reported) {
+                media.audio_layout_reported = true;
                 log(std::format("The glasses sent {}-channel audio; only mono and stereo are "
                                 "supported.",
                                 decoded.channels));
             }
             return;
         }
-        if (decoders.audio_blocks++ == 0) {
+        if (media.audio_blocks++ == 0) {
             log(std::format("receiving audio {} Hz, {} channel(s)", decoded.sample_rate,
                             decoded.channels));
         }
@@ -572,7 +621,7 @@ class Link {
         sound.channels = decoded.channels;
         sound.frames = decoded.frames;
         sound.sample_rate = decoded.sample_rate;
-        sound.timestamp_ns = decoded.pts_us * NanosPerMicro;
+        sound.present_in_ns = nanosUntil(present_at);
         const std::scoped_lock lock(output_mutex_);
         for (const auto& source : sources_) {
             if (source->live && source->audio && source->on_audio != nullptr) {
@@ -615,6 +664,16 @@ class Link {
     void logFixed(const char* message) const noexcept {
         if (const LogFn on_log = on_log_.load(); on_log != nullptr) {
             on_log(message);
+        }
+    }
+
+    // Logs a message for a caller that may be handling an error itself (the video pacer): never
+    // throws.
+    void logView(std::string_view message) const noexcept {
+        try {
+            log(std::string(message));
+        } catch (...) {
+            logFixed("A video pacer message could not be logged.");
         }
     }
 

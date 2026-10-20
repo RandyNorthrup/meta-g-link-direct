@@ -21,7 +21,14 @@ extern "C" {
 #include <stdint.h>
 #endif
 
-// One decoded I420 picture. The planes are valid only for the duration of the callback.
+// The glasses release media in bursts, so the link schedules every picture and block of sound at
+// its capture cadence plus a presentation delay. present_in_ns is how far from the moment of the
+// callback the media should be presented: positive when handed over early, negative when already
+// due. The OBS side adds it to OBS's clock (os_gettime_ns) for the timestamp, so both media keep
+// one time base and stay in sync.
+
+// One decoded I420 picture, handed over shortly before it is due. The planes are valid only for
+// the duration of the callback.
 struct MglVideoFrame {
     const uint8_t* plane_y;
     const uint8_t* plane_u;
@@ -31,18 +38,19 @@ struct MglVideoFrame {
     uint32_t stride_v;
     uint32_t width;
     uint32_t height;
-    uint64_t timestamp_ns;
+    int64_t present_in_ns;
     bool full_range;
 };
 
-// A block of decoded glasses audio as 32-bit float planar samples, one plane per channel. The
-// planes are valid only for the duration of the callback.
+// A block of decoded glasses audio as 32-bit float planar samples, one plane per channel, handed
+// over as it is decoded, ahead of its presentation. The planes are valid only for the duration of
+// the callback.
 struct MglAudioBlock {
     const float* planes[8]; // NOLINT(modernize-avoid-c-arrays) — C ABI; OBS takes up to 8 planes
     uint32_t channels;
     uint32_t frames; // samples per channel
     uint32_t sample_rate;
-    uint64_t timestamp_ns;
+    int64_t present_in_ns;
 };
 
 struct MglSource;
@@ -54,8 +62,8 @@ void mglLinkInit(void (*on_log)(const char* message));
 bool mglLinkShutdown(uint32_t timeout_ms);
 
 // Registers an OBS source with the link. on_frame or on_audio may be NULL for a medium the source
-// never shows. Both run on the link's worker thread with context passed back unchanged. NULL if the
-// source cannot be allocated.
+// never shows. on_frame runs on the link's video pacer thread and on_audio on its worker thread,
+// with context passed back unchanged. NULL if the source cannot be allocated.
 struct MglSource* mglSourceCreate(void (*on_frame)(void* context, const struct MglVideoFrame* frame),
                                   void (*on_audio)(void* context, const struct MglAudioBlock* audio),
                                   void* context);

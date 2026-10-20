@@ -10,7 +10,9 @@
 #include <media-io/video-io.h>
 #include <obs-module.h>
 #include <util/bmem.h>
+#include <util/platform.h>
 
+#include <stdint.h>
 #include <stdio.h>
 
 #define MGL_SETTING_QUALITY "quality"
@@ -26,14 +28,24 @@ struct glasses_source {
     bool camera; // the camera source; otherwise the microphone source
 };
 
-// Runs on the link's worker thread for each decoded picture.
+// OBS's clock at a presentation present_in_ns from now (negative: already due).
+static uint64_t presentation_time(int64_t present_in_ns) {
+    const uint64_t now = os_gettime_ns();
+    if (present_in_ns >= 0) {
+        return now + (uint64_t)present_in_ns;
+    }
+    const uint64_t overdue = (uint64_t)(-(present_in_ns + 1)) + 1;
+    return overdue < now ? now - overdue : 0;
+}
+
+// Runs on the link's video pacer thread for each decoded picture, shortly before it is due.
 static void output_frame(void* context, const struct MglVideoFrame* picture) {
     obs_source_t* source = context;
     struct obs_source_frame frame = {0};
     frame.format = VIDEO_FORMAT_I420;
     frame.width = picture->width;
     frame.height = picture->height;
-    frame.timestamp = picture->timestamp_ns;
+    frame.timestamp = presentation_time(picture->present_in_ns);
     frame.full_range = picture->full_range;
     // obs_source_frame takes mutable plane pointers but only reads them: OBS copies the planes
     // into its async cache during obs_source_output_video.
@@ -60,7 +72,7 @@ static void output_audio(void* context, const struct MglAudioBlock* sound) {
     audio.speakers = sound->channels == 1 ? SPEAKERS_MONO : SPEAKERS_STEREO;
     audio.format = AUDIO_FORMAT_FLOAT_PLANAR;
     audio.samples_per_sec = sound->sample_rate;
-    audio.timestamp = sound->timestamp_ns;
+    audio.timestamp = presentation_time(sound->present_in_ns);
     obs_source_output_audio(source, &audio);
 }
 
@@ -99,11 +111,10 @@ static void* glasses_create(obs_data_t* settings, obs_source_t* source, bool cam
     obs_data_set_bool(settings, MGL_SETTING_FORGET_CONFIRM, false);
     mgl_link_settings_adopt(settings);
     apply_source_settings(glasses, settings);
-    if (camera) {
-        // Present frames as they arrive: the glasses' presentation clock is unrelated to OBS's,
-        // so the default timestamp-buffered path would schedule them far in the future.
-        obs_source_set_async_unbuffered(source, true);
-    }
+    // OBS's default buffered path presents each picture at its timestamp. The link hands pictures
+    // over at their capture cadence with timestamps on OBS's clock (see presentation_time), so no
+    // picture is thinned out. (Unbuffered mode, used before 0.3.1, kept only the newest picture
+    // per rendered frame and lost most of every burst the glasses' radio delivers.)
     // Nothing streams yet: OBS makes transient instances at create time. A source starts the
     // stream when it goes live in the program output (see glasses_activate).
     return glasses;

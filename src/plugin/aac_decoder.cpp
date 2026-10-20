@@ -84,10 +84,10 @@ bool AacDecoder::configure(ByteView audio_specific_config) {
     return true;
 }
 
-void AacDecoder::decode(std::uint64_t pts_us, ByteView aac,
+bool AacDecoder::decode(std::uint64_t pts_us, ByteView aac,
                         const std::function<void(const DecodedAudio&)>& sink) {
     if (!ready() || aac.empty()) {
-        return;
+        return false;
     }
     // Reference the caller's bytes without copying; FFmpeg copies into a padded buffer on send.
     impl_->packet->data =
@@ -96,7 +96,7 @@ void AacDecoder::decode(std::uint64_t pts_us, ByteView aac,
     impl_->packet->pts = static_cast<std::int64_t>(pts_us);
     impl_->packet->dts = static_cast<std::int64_t>(pts_us);
     if (avcodec_send_packet(impl_->context.get(), impl_->packet.get()) < 0) {
-        return;
+        return false;
     }
     while (avcodec_receive_frame(impl_->context.get(), impl_->frame.get()) == 0) {
         const AVFrame& frame = *impl_->frame;
@@ -118,5 +118,6 @@ void AacDecoder::decode(std::uint64_t pts_us, ByteView aac,
         }
         av_frame_unref(impl_->frame.get());
     }
+    return true;
 }
 } // namespace mgl::plugin

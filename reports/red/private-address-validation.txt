@@ -9,25 +9,25 @@ Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
 Total Test time (real) =   0.02 sec
 
 MUTATED EXIT 1
-[1/17] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\address.cpp for CXX dependencies
-[2/17] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
+[1/18] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\address.cpp for CXX dependencies
+[2/18] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
 [3/10] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\address.cpp.obj
 [4/10] Linking CXX static library mgl_protocol.lib
-[5/10] Linking CXX executable meta-g-link-setup.exe
-[6/10] Linking CXX executable meta-g-link-probe.exe
+[5/10] Linking CXX executable meta-g-link-probe.exe
+[6/10] Linking CXX executable meta-g-link-setup.exe
 [7/10] Linking CXX executable mgl-sdu-tests.exe
 [8/10] Linking CXX shared module meta-g-link-direct.dll
 [9/10] Linking CXX executable mgl-address-tests.exe
 [10/10] Linking CXX executable mgl-protocol-tests.exe
 Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
     Start 2: private-address
-1/1 Test #2: private-address ..................***Failed    0.01 sec
+1/1 Test #2: private-address ..................***Failed    0.05 sec
 Malformed/reserved Bluetooth address accepted
 
 
 0% tests passed, 1 tests failed out of 1
 
-Total Test time (real) =   0.01 sec
+Total Test time (real) =   0.06 sec
 
 The following tests FAILED:
 	  2 - private-address (Failed)
@@ -35,8 +35,8 @@ Errors while running CTest
 Write-Error: Native command failed (8): ctest
 
 RESTORED EXIT 0
-[1/17] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\address.cpp for CXX dependencies
-[2/17] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
+[1/18] Scanning C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\address.cpp for CXX dependencies
+[2/18] Generating CXX dyndep file CMakeFiles\mgl_protocol.dir\CXX.dd
 [3/10] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\address.cpp.obj
 [4/10] Linking CXX static library mgl_protocol.lib
 [5/10] Linking CXX executable meta-g-link-setup.exe
@@ -47,7 +47,7 @@ RESTORED EXIT 0
 [10/10] Linking CXX executable mgl-protocol-tests.exe
 Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
     Start 2: private-address
-1/1 Test #2: private-address ..................   Passed    0.01 sec
+1/1 Test #2: private-address ..................   Passed    0.02 sec
 
 100% tests passed, 0 tests failed out of 1
 

@@ -9,6 +9,7 @@ Evidence referenced by the ledger in [`PLAN.md`](../PLAN.md). Ledger entries bin
 | [`WIFI_LINK_VERIFICATION.md`](WIFI_LINK_VERIFICATION.md) | Why the glasses host the Wi-Fi network, every hardware run on that link, and the OBS run |
 | [`AUDIO_AND_OBS33_VERIFICATION.md`](AUDIO_AND_OBS33_VERIFICATION.md) | Glasses audio (raw AAC, no AudioSpecificConfig), OBS 33 installed and streaming, the ProgramData plugin location and installing on other drives |
 | [`SHARED_LINK_AND_SETUP_VERIFICATION.md`](SHARED_LINK_AND_SETUP_VERIFICATION.md) | Stream changes inside one session, audio only with the camera off, the battery report, the shared link and keep-connected in OBS 33, the setup window, and the trust-signature finding |
+| [`FRAME_RATE_VERIFICATION.md`](FRAME_RATE_VERIFICATION.md) | Why OBS showed about 13 fps of the glasses' 30: burst delivery from the glasses' radio, what the Meta app does, the playout fix, and 12.8 → 29.6 distinct pictures per second in OBS |
 | [`GLASSES_CONTROLS_AND_SPEAKERS.md`](GLASSES_CONTROLS_AND_SPEAKERS.md) | Which glasses controls reach this PC, the wear sensor, and OBS audio monitoring through the glasses' speakers |
 | [`wifi-link-gates.txt`](wifi-link-gates.txt) | Gate results for the release gate (`package`) |
 | [`red/softap-port.txt`](red/softap-port.txt) | Recorded red drill for the `SoftApNetworkInfo` port field |

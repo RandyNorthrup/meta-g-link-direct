@@ -39,9 +39,10 @@ class AacDecoder {
     [[nodiscard]] bool configure(ByteView audio_specific_config);
     [[nodiscard]] bool ready() const noexcept;
     // Decodes one raw AAC access unit; the sink is called for each block of samples produced.
-    // Units that arrive before a successful configure are dropped.
-    void decode(std::uint64_t pts_us, ByteView aac,
-                const std::function<void(const DecodedAudio&)>& sink);
+    // False when the unit could not be decoded: before a successful configure, empty, or rejected
+    // by FFmpeg.
+    [[nodiscard]] bool decode(std::uint64_t pts_us, ByteView aac,
+                              const std::function<void(const DecodedAudio&)>& sink);
 
   private:
     struct Impl;

@@ -13,7 +13,8 @@ param(
         'compiler-types', 'unused-code', 'script-analysis', 'workflow-security', 'secret-scanner',
         'unsafe-copy', 'duplicated-code', 'address-sanitizer', 'dependency-npm', 'dependency-osv',
         'whatif-guard', 'native-exit-propagation', 'probe-arguments', 'classic-connection-claim',
-        'private-address-validation', 'uncached-query-loop', 'installer-drive-letter', 'drill-reuse')]
+        'private-address-validation', 'uncached-query-loop', 'installer-drive-letter', 'drill-reuse',
+        'playout-cadence')]
     [string]$Drill = 'all'
 )
 
@@ -407,6 +408,13 @@ function Invoke-RedDrillSet {
         $text.Replace('DataxHeader = 4;', 'DataxHeader = 5;')
     } -Gate test -ExpectedDiagnostic 'DataX empty has 4 bytes'
 
+    # Presenting each unit on arrival is the defect that showed 30 fps of bursty glasses video at
+    # about 13 fps in OBS.
+    Invoke-RestoredDrill -Id playout-cadence -Path (Join-Path $projectRoot 'src/protocol/playout.cpp') -Mutate {
+        param($text)
+        $text.Replace('return std::max(capture + base_, arrival_us);', 'return arrival_us;')
+    } -Gate test -ExpectedDiagnostic 'burst presentations follow the capture cadence'
+
     Invoke-RestoredDrill -Id module-metadata -Path (Join-Path $projectRoot 'src/plugin/module.c') -Mutate {
         param($text)
         $text.Replace('return "Meta G Link Direct";', 'return "Broken module name";')
@@ -536,7 +544,7 @@ function Invoke-RedDrillSet {
         param($text)
         $text.Replace('$passed -and $previous.inputs_sha256 -eq $Fingerprint', '$passed')
     } -Gate 'test:runner' -ExpectedDiagnostic 'because a drill whose inputs changed must run again'
-    $expectedDrillCount = if ($script:DrillSelection -in @('all', 'changed')) { 22 } else { 1 }
+    $expectedDrillCount = if ($script:DrillSelection -in @('all', 'changed')) { 23 } else { 1 }
     if ($script:DrillEvidence.Count -ne $expectedDrillCount) {
         throw 'Red-drill discovery did not match the requested scope'
     }

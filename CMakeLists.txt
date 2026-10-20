@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28...3.31)
-project(meta_g_link_direct VERSION 0.3.0 LANGUAGES C CXX)
+project(meta_g_link_direct VERSION 0.3.1 LANGUAGES C CXX)
 
 include(CTest)
 set(CMAKE_CXX_STANDARD 20)
@@ -21,7 +21,8 @@ add_library(mgl_protocol STATIC
   src/protocol/json.cpp
   src/protocol/encoding.cpp
   src/protocol/stream.cpp
-  src/protocol/hevc.cpp)
+  src/protocol/hevc.cpp
+  src/protocol/playout.cpp)
 target_include_directories(mgl_protocol PUBLIC include)
 
 function(mgl_owned_target target)
@@ -109,6 +110,7 @@ if(MGL_BUILD_OBS_PLUGIN)
     src/plugin/source.c
     src/plugin/link_settings.c
     src/plugin/glasses_link.cpp
+    src/plugin/video_pacer.cpp
     src/plugin/hevc_decoder.cpp
     src/plugin/aac_decoder.cpp)
   target_include_directories(meta-g-link-direct PRIVATE "${obs_deps_root}/include")

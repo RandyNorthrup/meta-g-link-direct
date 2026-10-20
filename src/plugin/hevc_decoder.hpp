@@ -25,7 +25,7 @@ struct DecodedFrame {
     bool full_range = false;
 };
 
-// Not thread-safe; drive it from one thread (the media worker).
+// Not thread-safe; drive it from one thread (the video pacer's).
 class HevcDecoder {
   public:
     HevcDecoder();
@@ -38,9 +38,10 @@ class HevcDecoder {
     [[nodiscard]] bool open();
     // Remember the latest VPS/SPS/PPS; they are prepended to keyframes so IDR frames decode.
     void setParameters(ByteView annex_b_parameter_sets);
-    // Decode one access unit; the sink is called for each frame produced (usually one).
-    void decode(std::uint64_t pts_us, ByteView annex_b, bool keyframe,
-                const std::function<void(const DecodedFrame&)>& sink);
+    // Decode one access unit; the sink is called for each frame produced (usually one). False when
+    // FFmpeg rejected the unit, so the caller can report it.
+    [[nodiscard]] bool decode(std::uint64_t pts_us, ByteView annex_b, bool keyframe,
+                              const std::function<void(const DecodedFrame&)>& sink);
 
   private:
     struct Impl;

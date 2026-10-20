@@ -2,35 +2,35 @@ BASELINE EXIT 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 4 tests in 221ms.
+Discovery found 4 tests in 187ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\installer.Tests.ps1'
 Describing Installer locations
-  [+] takes system folders from Windows rather than from drive letters 100ms (71ms|29ms)
-  [+] puts the shared plugin folder in the ProgramData folder that Windows reports 227ms (227ms|1ms)
+  [+] takes system folders from Windows rather than from drive letters 130ms (102ms|29ms)
+  [+] puts the shared plugin folder in the ProgramData folder that Windows reports 203ms (202ms|1ms)
   [+] derives the OBS folder from obs64.exe on any drive 5ms (2ms|3ms)
-  [+] reads Steam library folders on other drives 24ms (23ms|1ms)
-Tests completed in 1.02s
+  [+] reads Steam library folders on other drives 26ms (25ms|0ms)
+Tests completed in 1000ms
 Tests Passed: 4, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
 MUTATED EXIT 1
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 4 tests in 173ms.
+Discovery found 4 tests in 185ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\installer.Tests.ps1'
 Describing Installer locations
-  [-] takes system folders from Windows rather than from drive letters 128ms (96ms|31ms)
+  [-] takes system folders from Windows rather than from drive letters 156ms (128ms|27ms)
    Expected $null or empty, because the installer must not assume a drive letter, but got ''C:\ProgramData''.
    at $literals | Should -BeNullOrEmpty -Because 'the installer must not assume a drive letter', C:\Users\Randy\Coding\meta_g_link_direct\tests\installer.Tests.ps1:28
    at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\installer.Tests.ps1:28
-  [+] puts the shared plugin folder in the ProgramData folder that Windows reports 196ms (195ms|1ms)
-  [+] derives the OBS folder from obs64.exe on any drive 4ms (2ms|3ms)
-  [+] reads Steam library folders on other drives 29ms (28ms|1ms)
-Tests completed in 1.05s
+  [+] puts the shared plugin folder in the ProgramData folder that Windows reports 223ms (221ms|2ms)
+  [+] derives the OBS folder from obs64.exe on any drive 6ms (2ms|3ms)
+  [+] reads Steam library folders on other drives 27ms (26ms|1ms)
+Tests completed in 1.11s
 Tests Passed: 3, Failed: 1, Skipped: 0, Inconclusive: 0, NotRun: 0
 Write-Error: Pester installer tests failed or discovery count changed
 
@@ -38,16 +38,16 @@ RESTORED EXIT 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 4 tests in 171ms.
+Discovery found 4 tests in 185ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\installer.Tests.ps1'
 Describing Installer locations
-  [+] takes system folders from Windows rather than from drive letters 109ms (79ms|30ms)
-  [+] puts the shared plugin folder in the ProgramData folder that Windows reports 204ms (202ms|1ms)
-  [+] derives the OBS folder from obs64.exe on any drive 5ms (2ms|3ms)
-  [+] reads Steam library folders on other drives 29ms (28ms|1ms)
-Tests completed in 955ms
+  [+] takes system folders from Windows rather than from drive letters 120ms (89ms|32ms)
+  [+] puts the shared plugin folder in the ProgramData folder that Windows reports 225ms (224ms|1ms)
+  [+] derives the OBS folder from obs64.exe on any drive 6ms (3ms|3ms)
+  [+] reads Steam library folders on other drives 25ms (24ms|1ms)
+Tests completed in 1.12s
 Tests Passed: 4, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
 RESTORATION SHA256 cf4be3d407cbfc15aa006f10444f7b97047021877354abc51a320db9521e8357
