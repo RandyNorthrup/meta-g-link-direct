@@ -13,6 +13,7 @@
 #include "hevc_decoder.hpp"
 #include "video_pacer.hpp"
 
+#include "mgl/battery.hpp"
 #include "mgl/bytes.hpp"
 #include "mgl/identity.hpp"
 #include "mgl/media_session.hpp"
@@ -135,32 +136,43 @@ Retirement& retirement() {
 }
 
 // The state the OBS properties show. A session reports only while it is the link's current one, so
-// a session that is still tearing down cannot overwrite a newer state.
+// a session that is still tearing down cannot overwrite a newer state. Every change of the battery
+// shown is also published, outside the state lock, to the battery listener.
 class StatusCell {
   public:
     std::uint64_t beginSession() {
-        const std::scoped_lock lock(mutex_);
-        ++generation_;
-        state_ = mgl::MediaState::Idle;
-        battery_.reset();
-        return generation_;
+        std::uint64_t generation = 0;
+        {
+            const std::scoped_lock lock(mutex_);
+            generation = ++generation_;
+            state_ = mgl::MediaState::Idle;
+            battery_.reset();
+        }
+        publishBattery();
+        return generation;
     }
     void report(std::uint64_t session, mgl::MediaState state) {
-        const std::scoped_lock lock(mutex_);
-        if (session == generation_) {
-            state_ = state;
-            // A battery report is only as current as the link that carried it.
-            if (state == mgl::MediaState::Idle || state == mgl::MediaState::Failed ||
-                state == mgl::MediaState::Stopped || state == mgl::MediaState::Reconnecting) {
-                battery_.reset();
+        {
+            const std::scoped_lock lock(mutex_);
+            if (session == generation_) {
+                state_ = state;
+                // A battery report is only as current as the link that carried it.
+                if (state == mgl::MediaState::Idle || state == mgl::MediaState::Failed ||
+                    state == mgl::MediaState::Stopped || state == mgl::MediaState::Reconnecting) {
+                    battery_.reset();
+                }
             }
         }
+        publishBattery();
     }
     void reportBattery(std::uint64_t session, const mgl::stream::BatteryState& reported) {
-        const std::scoped_lock lock(mutex_);
-        if (session == generation_) {
-            battery_ = reported;
+        {
+            const std::scoped_lock lock(mutex_);
+            if (session == generation_) {
+                battery_ = reported;
+            }
         }
+        publishBattery();
     }
     [[nodiscard]] mgl::MediaState current() const {
         const std::scoped_lock lock(mutex_);
@@ -170,12 +182,26 @@ class StatusCell {
         const std::scoped_lock lock(mutex_);
         return battery_;
     }
+    void setBatteryListener(mgl::battery::Publisher::Listener listener) {
+        publisher_.setListener(std::move(listener));
+    }
 
   private:
+    void publishBattery() {
+        publisher_.refresh([this]() -> std::optional<mgl::battery::Reading> {
+            const auto shown = battery();
+            if (!shown) {
+                return std::nullopt;
+            }
+            return mgl::battery::readingOf(*shown);
+        });
+    }
+
     mutable std::mutex mutex_;
     std::uint64_t generation_ = 0;
     mgl::MediaState state_ = mgl::MediaState::Idle;
     std::optional<mgl::stream::BatteryState> battery_;
+    mgl::battery::Publisher publisher_;
 };
 
 using PacerClock = mgl::plugin::VideoPacer::Clock;
@@ -374,6 +400,10 @@ class Link {
 
     [[nodiscard]] std::optional<mgl::stream::BatteryState> battery() const {
         return status_.battery();
+    }
+
+    void setBatteryListener(mgl::battery::Publisher::Listener listener) {
+        status_.setBatteryListener(std::move(listener));
     }
 
     const char* startSetup() {
@@ -832,6 +862,30 @@ int mglLinkBattery(bool* charging) {
     } catch (const std::exception&) {
         return -1; // a status line must not fail; the next refresh retries
     }
+}
+
+void mglLinkSetBatteryListener(void (*on_change)(void* context, const MglBattery* battery),
+                               void* context) {
+    guarded("battery listener choice", [on_change, context] {
+        if (on_change == nullptr) {
+            link().setBatteryListener({});
+            return;
+        }
+        link().setBatteryListener([on_change,
+                                   context](const std::optional<mgl::battery::Reading>& reading) {
+            // The listener runs on the link's threads; nothing may unwind into the C side.
+            try {
+                const std::string text = mgl::battery::overlayText(reading);
+                const MglBattery battery{.known = reading.has_value(),
+                                         .percent = reading ? reading->percent : 0,
+                                         .charging = reading && reading->charging,
+                                         .text = text.c_str()};
+                on_change(context, &battery);
+            } catch (const std::exception& error) {
+                link().log(std::string("Reporting the glasses' battery failed: ") + error.what());
+            }
+        });
+    });
 }
 
 bool mglWifiAdapterList(MglWifiAdapter* adapters, std::size_t capacity, std::size_t* count) {

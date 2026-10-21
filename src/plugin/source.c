@@ -218,9 +218,9 @@ static void add_wifi_adapter_list(obs_properties_t* props) {
     obs_property_set_long_description(list, obs_module_text("WifiAdapter.Desc"));
 }
 
-// Shows the outcome of a setup button in the result line, for sighted and Narrator users alike.
-static void show_result(obs_properties_t* props, const char* key) {
-    obs_property_t* result = obs_properties_get(props, "setup_result");
+// Shows the outcome of a button in its group's result line, for sighted and Narrator users alike.
+static void show_result(obs_properties_t* props, const char* line, const char* key) {
+    obs_property_t* result = obs_properties_get(props, line);
     obs_property_set_description(result, obs_module_text(key));
     obs_property_set_visible(result, true);
 }
@@ -228,7 +228,7 @@ static void show_result(obs_properties_t* props, const char* key) {
 static bool setup_clicked(obs_properties_t* props, obs_property_t* property, void* data) {
     (void)property;
     (void)data;
-    show_result(props, mglSetupStart());
+    show_result(props, "setup_result", mglSetupStart());
     return true;
 }
 
@@ -240,10 +240,10 @@ static bool forget_clicked(obs_properties_t* props, obs_property_t* property, vo
     const bool confirmed = obs_data_get_bool(settings, MGL_SETTING_FORGET_CONFIRM);
     obs_data_release(settings);
     if (!confirmed) {
-        show_result(props, "Forget.NeedsConfirm");
+        show_result(props, "forget_result", "Forget.NeedsConfirm");
         return true;
     }
-    show_result(props, mglForgetGlasses() ? "Forget.Done" : "Forget.Failed");
+    show_result(props, "forget_result", mglForgetGlasses() ? "Forget.Done" : "Forget.Failed");
     obs_data_t* patch = obs_data_create();
     obs_data_set_bool(patch, MGL_SETTING_FORGET_CONFIRM, false);
     obs_source_update(glasses->source, patch);
@@ -261,7 +261,13 @@ static bool forget_confirm_changed(void* data, obs_properties_t* props, obs_prop
     return true;
 }
 
-// The shared connection settings and the setup controls, the same in every glasses source.
+// A group's result line, hidden until one of its buttons reports.
+static void add_result_line(obs_properties_t* group, const char* name) {
+    obs_property_t* result = obs_properties_add_text(group, name, "", OBS_TEXT_INFO);
+    obs_property_set_visible(result, false);
+}
+
+// The shared connection settings, the setup and forget controls, the same in every glasses source.
 static void add_link_groups(obs_properties_t* props, struct glasses_source* glasses) {
     obs_properties_t* connection = obs_properties_create();
     add_wifi_adapter_list(connection);
@@ -288,17 +294,23 @@ static void add_link_groups(obs_properties_t* props, struct glasses_source* glas
     obs_property_t* start = obs_properties_add_button2(setup, "setup", obs_module_text("Setup"),
                                                        setup_clicked, glasses);
     obs_property_set_long_description(start, obs_module_text("Setup.Desc"));
-    obs_property_t* confirm = obs_properties_add_bool(setup, MGL_SETTING_FORGET_CONFIRM,
-                                                      obs_module_text("Forget.Confirm"));
-    obs_property_set_modified_callback2(confirm, forget_confirm_changed, glasses);
-    obs_property_t* forget = obs_properties_add_button2(setup, "forget", obs_module_text("Forget"),
-                                                        forget_clicked, glasses);
-    obs_property_set_long_description(forget, obs_module_text("Forget.Desc"));
-    obs_property_set_enabled(forget, false);
-    obs_property_t* result = obs_properties_add_text(setup, "setup_result", "", OBS_TEXT_INFO);
-    obs_property_set_visible(result, false);
+    add_result_line(setup, "setup_result");
     obs_properties_add_group(props, "setup_group", obs_module_text("Group.Setup"), OBS_GROUP_NORMAL,
                              setup);
+
+    // Forget in a group of its own, set apart from the setup, with the confirmation that enables
+    // it underneath.
+    obs_properties_t* forgetting = obs_properties_create();
+    obs_property_t* forget = obs_properties_add_button2(
+        forgetting, "forget", obs_module_text("Forget"), forget_clicked, glasses);
+    obs_property_set_long_description(forget, obs_module_text("Forget.Desc"));
+    obs_property_set_enabled(forget, false);
+    obs_property_t* confirm = obs_properties_add_bool(forgetting, MGL_SETTING_FORGET_CONFIRM,
+                                                      obs_module_text("Forget.Confirm"));
+    obs_property_set_modified_callback2(confirm, forget_confirm_changed, glasses);
+    add_result_line(forgetting, "forget_result");
+    obs_properties_add_group(props, "forget_group", obs_module_text("Group.Forget"),
+                             OBS_GROUP_NORMAL, forgetting);
 }
 
 static obs_properties_t* camera_get_properties(void* data) {

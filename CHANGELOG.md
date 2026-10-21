@@ -2,6 +2,35 @@
 
 All notable changes are recorded here. The project follows [semantic versioning](https://semver.org/); versions below 1.0 are beta releases.
 
+## [0.4.0] - 2026-10-20 (beta)
+
+### Added
+
+- **The glasses' battery for overlays and stream controllers.** While the glasses are connected, the plugin keeps `battery.txt` in its OBS settings folder (`plugin_config\meta-g-link-direct`) up to date with `87%`, `87% charging`, or nothing while the battery is unknown. It replaces the file in one step, so readers never see half a value. An OBS **Text (GDI+)** source with *Read from file* shows it on screen, and any tool that shows a text file can use it too. Verified in OBS 33.0.0-rc2: a text source showed "66%" while the glasses streamed, and the file was empty again after the scene left.
+- **obs-websocket vendor `meta-g-link-direct`**: the request `GetBattery` returns `{"available": true, "percent": 87, "charging": false}` or `{"available": false}`, and the event `BatteryChanged` carries the same data on every change. Verified with obs-websocket 5.7.6: `{"available": false}` while idle, four `BatteryChanged` events from 68% down to 65% while streaming, then `{"available": false}` when the scene left. The API header comes from the pinned OBS 32.2.2 sources.
+- A new red drill (`battery-change`, 25 in total) proves that the tests fail if a battery reading is published again without a change.
+
+### Changed
+
+- **Forget the glasses** is now a group of its own under *Glasses setup*, and its confirmation tick sits under the **Forget these glasses** button. Randy asked for both. Each group shows its own result line.
+- README: a new properties screenshot without the preview, and a section on showing the battery.
+
+### Fixed
+
+- **The setup window could open taller than a laptop screen.** It opened 640 × 760 logical pixels at the cascade position, so at 150% scaling on a 1080p screen (1,140 physical pixels tall) its Continue and Cancel buttons fell below the bottom edge. It now opens centred on its monitor, and its opening and minimum sizes are cut down to the monitor's free area.
+- **The setup window lost its keyboard focus when you switched away and back.** It came back with the focus on the window itself, so nothing showed focus and Tab started over. It now returns to the control that had the focus (checked through UI Automation: 0.3.2 came back on the window, 0.4.0 on the address box).
+- **The browser fallback's address box was named after the whole instructions paragraph** for screen readers, and Tab reached it before the browser button above it. The box now has its own label, *Address after the login:*, which screen readers use as its name; Tab follows the screen from top to bottom, and the screen opens with the focus on its first step, **Open the login in your browser**.
+- **A checkbox label was cut off at 480 pixels wide.** In OBS's properties at the narrowest width the brief requires, *Keep the glasses connected while OBS is open* showed as "…while OBS is ope". It is now **Keep connected while OBS is open** and fits beside its help icon.
+
+### Verified
+
+- **The setup window without WebView2.** With WebView2 pointed at a folder that doesn't exist, Continue leads to the browser screen: **Open the login in your browser**, the address box, Continue and Cancel. Cancel exits with code 8 and leaves no browser folder behind. Nothing was uninstalled.
+- **Keyboard and screen-reader pass** on the properties and the setup window, through Windows UI Automation: every control takes keyboard focus and has a name; tooltips reach screen readers as descriptions; the setup window works with Tab, Shift+Tab, Enter and Esc; both lay out without overlap at their narrowest (the properties at 480 pixels, the setup window at its 480 × 520 minimum). OBS names the *Video quality* and *Wi-Fi adapter* lists after their group, because its properties view never links a label to its control; that is outside the plugin. High contrast and 150–200% scaling were reviewed in the code (system colours, standard controls, per-monitor DPI) but not tried on a display.
+- **All four quality profiles in OBS.** 1080 × 1920 streamed for 3 min 14 s at 30.0 fps from the glasses and 29.9–30.1 fps shown (presentation delay 198–295 ms, 1–3 late frames a minute, none undecodable or skipped). 360 × 640 streamed for 3 minutes at 24.0 fps, the rate that profile asks the glasses for, and took effect 1.6 s after the change. An earlier one-minute run of each gave the same rates.
+- **Battery drain by profile, from the glasses' own reports:** 92% to 78% in about 3 minutes at 1080 × 1920, then 78% to 69% in about 3 minutes at 360 × 640. The glasses report their battery every 10–20 seconds while connected.
+
+See [the accessibility and quality report](reports/ACCESSIBILITY_AND_QUALITY_VERIFICATION.md).
+
 ## [0.3.2] - 2026-10-20 (beta)
 
 ### Fixed

@@ -51,9 +51,11 @@ int runModuleTests(int argument_count, char** arguments) {
         std::cerr << "Plugin DLL could not load; Windows error " << GetLastError() << '\n';
         return EXIT_FAILURE;
     }
-    constexpr std::array RequiredExports{"obs_module_load",        "obs_module_set_pointer",
-                                         "obs_module_ver",         "obs_module_name",
-                                         "obs_module_description", "obs_module_author"};
+    // obs_module_post_load is optional for OBS, but the battery's obs-websocket vendor registers
+    // there.
+    constexpr std::array RequiredExports{
+        "obs_module_load", "obs_module_post_load",   "obs_module_set_pointer", "obs_module_ver",
+        "obs_module_name", "obs_module_description", "obs_module_author"};
     const auto missing = std::ranges::find_if(RequiredExports, [&plugin](const char* name) {
         return GetProcAddress(plugin.get(), name) == nullptr;
     });
@@ -73,7 +75,7 @@ int runModuleTests(int argument_count, char** arguments) {
         std::cerr << "OBS module metadata does not match the camera-source contract\n";
         return EXIT_FAILURE;
     }
-    std::cout << "Real OBS runtime, module DLL and six required exports verified\n";
+    std::cout << "Real OBS runtime, module DLL and seven required exports verified\n";
     return EXIT_SUCCESS;
 }
 

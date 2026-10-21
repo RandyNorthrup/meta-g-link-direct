@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Independent vectors for the portable DataX/protobuf/SDU/encoding layers.
+#include "mgl/battery.hpp"
 #include "mgl/bytes.hpp"
 #include "mgl/datax.hpp"
 #include "mgl/encoding.hpp"
@@ -615,6 +616,50 @@ void testPlayoutSharedClock(Checks& check) {
     check(std::abs(video_at - audio_at) <= 1'000,
           "audio and video captured together are presented together");
 }
+
+void testBatteryOverlay(Checks& check) {
+    using mgl::battery::Reading;
+    check(mgl::battery::overlayText(std::nullopt).empty(), "an unknown battery shows nothing");
+    check(mgl::battery::overlayText(Reading{.percent = 87, .charging = false}) == "87%",
+          "a battery shows its percentage");
+    check(mgl::battery::overlayText(Reading{.percent = 100, .charging = true}) == "100% charging",
+          "a charging battery says so");
+    // Charge states 1-3 are charging, 4 is not; voltage and temperature are not shown.
+    const mgl::stream::BatteryState draining{
+        .percent = 64, .charge_state = 4, .millivolts = 3'810, .millicelsius = 31'100};
+    const mgl::stream::BatteryState topping_up{
+        .percent = 64, .charge_state = 2, .millivolts = 4'120, .millicelsius = 29'000};
+    check(mgl::battery::readingOf(draining) == Reading{.percent = 64, .charging = false},
+          "a draining report reads as not charging");
+    check(mgl::battery::readingOf(topping_up) == Reading{.percent = 64, .charging = true},
+          "a charging report reads as charging");
+}
+
+void testBatteryPublisher(Checks& check) {
+    using mgl::battery::Reading;
+    mgl::battery::Publisher publisher;
+    std::vector<std::string> shown;
+    publisher.setListener([&shown](const std::optional<Reading>& reading) {
+        shown.push_back(mgl::battery::overlayText(reading));
+    });
+    std::optional<Reading> current;
+    const auto publish = [&publisher, &current](std::optional<Reading> next) {
+        current = next;
+        publisher.refresh([&current] { return current; });
+    };
+    publish(std::nullopt); // a session starts: still unknown
+    publish(Reading{.percent = 92, .charging = false});
+    publish(Reading{.percent = 92, .charging = false}); // a report with a new voltage only
+    publish(Reading{.percent = 91, .charging = false});
+    publish(Reading{.percent = 91, .charging = true});
+    publish(std::nullopt); // the link went down
+    publish(std::nullopt);
+    const std::vector<std::string> expected{"92%", "91%", "91% charging", ""};
+    check(shown == expected, "each change of the battery is published once, in order");
+    publisher.setListener({});
+    publish(Reading{.percent = 50, .charging = false});
+    check(shown.size() == expected.size(), "a removed listener is not called again");
+}
 } // namespace
 
 int main() {
@@ -639,6 +684,8 @@ int main() {
         testPlayoutStall(check);
         testPlayoutRestart(check);
         testPlayoutSharedClock(check);
+        testBatteryOverlay(check);
+        testBatteryPublisher(check);
         std::cout << check.count() << " protocol/datax/protobuf/encoding/stream cases passed\n";
         return EXIT_SUCCESS;
     } catch (const std::exception& error) {

@@ -93,6 +93,20 @@ const char* mglLinkStatusKey(void);
 // no report has arrived or the link is down. charging may be NULL.
 int mglLinkBattery(bool* charging);
 
+// One change of the battery that mglLinkBattery returns. text is what a battery overlay shows
+// ("87%", "87% charging", or "" while unknown), valid only for the duration of the callback.
+struct MglBattery {
+    bool known; // false without a link or before the glasses' first report
+    uint32_t percent;
+    bool charging;
+    const char* text;
+};
+// Calls on_change, on the link's threads and one call at a time, whenever the battery shown
+// changes, including to unknown; the battery starts unknown. NULL stops the calls: once this
+// returns, the previous on_change is not running and is not called again.
+void mglLinkSetBatteryListener(void (*on_change)(void* context, const struct MglBattery* battery),
+                               void* context);
+
 // One Wi-Fi adapter that can join the glasses' network. Both strings are NUL-terminated UTF-8;
 // a description too long for name is cut at a character boundary.
 struct MglWifiAdapter {

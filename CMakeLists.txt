@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28...3.31)
-project(meta_g_link_direct VERSION 0.3.2 LANGUAGES C CXX)
+project(meta_g_link_direct VERSION 0.4.0 LANGUAGES C CXX)
 
 include(CTest)
 set(CMAKE_CXX_STANDARD 20)
@@ -22,7 +22,8 @@ add_library(mgl_protocol STATIC
   src/protocol/encoding.cpp
   src/protocol/stream.cpp
   src/protocol/hevc.cpp
-  src/protocol/playout.cpp)
+  src/protocol/playout.cpp
+  src/protocol/battery.cpp)
 target_include_directories(mgl_protocol PUBLIC include)
 
 function(mgl_owned_target target)
@@ -102,22 +103,26 @@ if(MGL_BUILD_OBS_PLUGIN)
   find_library(MGL_AVCODEC NAMES avcodec PATHS "${obs_deps_root}/lib" REQUIRED)
   find_library(MGL_AVUTIL NAMES avutil PATHS "${obs_deps_root}/lib" REQUIRED)
   # libobs's _udiv128 header requires the MSVC C compiler; LLVM issue #59168. Every file that
-  # includes OBS headers (module.c, source.c, link_settings.c) is C17 with /analyze. The glasses
-  # link core and the decoders are C++20 behind src/plugin/glasses_link.h, include no OBS headers,
-  # and are checked by clang-tidy instead.
+  # includes OBS headers (module.c, source.c, link_settings.c, battery_status.c) is C17 with
+  # /analyze. The glasses link core and the decoders are C++20 behind src/plugin/glasses_link.h,
+  # include no OBS headers, and are checked by clang-tidy instead.
   add_library(meta-g-link-direct MODULE
     src/plugin/module.c
     src/plugin/source.c
     src/plugin/link_settings.c
+    src/plugin/battery_status.c
     src/plugin/glasses_link.cpp
     src/plugin/video_pacer.cpp
     src/plugin/hevc_decoder.cpp
     src/plugin/aac_decoder.cpp)
   target_include_directories(meta-g-link-direct PRIVATE "${obs_deps_root}/include")
+  # obs-websocket's header-only plugin API, from the pinned OBS sources (GPL-2.0-or-later).
+  target_include_directories(meta-g-link-direct SYSTEM PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/.deps/${obs_source_directory}/plugins/obs-websocket/lib")
   target_link_libraries(meta-g-link-direct PRIVATE OBS::libobs OBS::obs-frontend-api mgl_windows
     "${MGL_AVCODEC}" "${MGL_AVUTIL}")
   set_source_files_properties(src/plugin/module.c src/plugin/source.c src/plugin/link_settings.c
-    PROPERTIES COMPILE_OPTIONS "/analyze")
+    src/plugin/battery_status.c PROPERTIES COMPILE_OPTIONS "/analyze")
   target_compile_definitions(meta-g-link-direct PRIVATE MGL_VERSION="${PROJECT_VERSION}"
     WIN32_LEAN_AND_MEAN NOMINMAX)
   set_target_properties(meta-g-link-direct PROPERTIES PREFIX "")

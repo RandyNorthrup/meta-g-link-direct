@@ -30,6 +30,7 @@
 #include <wrl/client.h>
 #include <wrl/event.h>
 
+#include <algorithm>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -60,6 +61,7 @@ constexpr int IdAddress = 101;
 // Layout in 96-DPI pixels.
 constexpr int Margin = 20;
 constexpr int Gap = 12;
+constexpr int LabelGap = 4;
 constexpr int ButtonWidth = 130;
 constexpr int ButtonHeight = 32;
 constexpr int EditHeight = 28;
@@ -145,8 +147,13 @@ class SetupWindow {
             return ExitFailed;
         }
         dpi_ = GetDpiForWindow(window_);
-        SetWindowPos(window_, nullptr, 0, 0, scaled(StartWidth), scaled(StartHeight),
-                     SWP_NOMOVE | SWP_NOZORDER);
+        // Centred on its monitor: at 150% scaling the full start height is taller than a 1080p
+        // screen, and the buttons at the bottom must stay on it.
+        const RECT work = workArea();
+        const SIZE start = fitted(StartWidth, StartHeight);
+        SetWindowPos(window_, nullptr, work.left + ((work.right - work.left - start.cx) / 2),
+                     work.top + ((work.bottom - work.top - start.cy) / 2), start.cx, start.cy,
+                     SWP_NOZORDER);
         createControls();
         showScreen(Screen::Intro);
         ShowWindow(window_, show);
@@ -193,9 +200,21 @@ class SetupWindow {
         case WM_SIZE:
             layout();
             return 0;
+        case WM_ACTIVATE:
+            // Unlike a dialog, a plain window does not keep its focused control while another
+            // window is active: it would come back with the focus on itself, invisibly.
+            if (LOWORD(wparam) == WA_INACTIVE) {
+                auto* const focused = GetFocus();
+                focused_ = IsChild(window_, focused) != FALSE ? focused : nullptr;
+            } else if (focused_ != nullptr && IsWindowVisible(focused_) != FALSE) {
+                SetFocus(focused_);
+                return 0;
+            }
+            return DefWindowProcW(window_, message, wparam, lparam);
         case WM_GETMINMAXINFO: {
             auto* const limits = pointerFrom<MINMAXINFO>(lparam);
-            limits->ptMinTrackSize = {.x = scaled(MinimumWidth), .y = scaled(MinimumHeight)};
+            const SIZE minimum = fitted(MinimumWidth, MinimumHeight);
+            limits->ptMinTrackSize = {.x = minimum.cx, .y = minimum.cy};
             return 0;
         }
         case WM_DPICHANGED: {
@@ -239,6 +258,21 @@ class SetupWindow {
         return MulDiv(value, static_cast<int>(dpi_), BaseDpi);
     }
 
+    // The part of the window's monitor that the taskbar leaves free.
+    [[nodiscard]] RECT workArea() const {
+        MONITORINFO monitor{};
+        monitor.cbSize = sizeof(monitor);
+        GetMonitorInfoW(MonitorFromWindow(window_, MONITOR_DEFAULTTONEAREST), &monitor);
+        return monitor.rcWork;
+    }
+
+    // A window size in 96-DPI pixels, scaled, and cut down to fit the work area.
+    [[nodiscard]] SIZE fitted(int width, int height) const {
+        const RECT work = workArea();
+        return {.cx = std::min(scaled(width), static_cast<int>(work.right - work.left)),
+                .cy = std::min(scaled(height), static_cast<int>(work.bottom - work.top))};
+    }
+
     HWND addControl(const wchar_t* kind, DWORD style, int id) {
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,performance-no-int-to-ptr) —
         // Win32 ABI.
@@ -248,16 +282,20 @@ class SetupWindow {
                                instance, nullptr);
     }
 
-    // Created in tab order: the address box, then the browser button, then the main buttons.
+    // Created in tab order, which is also the order on screen: the browser button, the address
+    // box, then the main buttons. The address label comes just before the box, so screen readers
+    // name the box after it.
     void createControls() {
         heading_ = addControl(WC_STATICW, WS_VISIBLE | SS_LEFT | SS_NOPREFIX, 0);
         body_ = addControl(WC_STATICW, WS_VISIBLE | SS_LEFT | SS_NOPREFIX, 0);
-        address_ = addControl(WC_EDITW, WS_TABSTOP | WS_BORDER | ES_AUTOHSCROLL, IdAddress);
         browser_ = addControl(WC_BUTTONW, WS_TABSTOP | BS_PUSHBUTTON, IdBrowser);
+        address_label_ = addControl(WC_STATICW, SS_LEFT | SS_NOPREFIX, 0);
+        address_ = addControl(WC_EDITW, WS_TABSTOP | WS_BORDER | ES_AUTOHSCROLL, IdAddress);
         progress_ = addControl(PROGRESS_CLASSW, PBS_MARQUEE, 0);
         primary_ = addControl(WC_BUTTONW, WS_TABSTOP | BS_DEFPUSHBUTTON, IDOK);
         secondary_ = addControl(WC_BUTTONW, WS_TABSTOP | BS_PUSHBUTTON, IDCANCEL);
         SetWindowTextW(browser_, L"Open the login in your browser");
+        SetWindowTextW(address_label_, L"Address after the login:");
         applyFonts();
     }
 
@@ -274,7 +312,7 @@ class SetupWindow {
         heading.lfWeight = FW_SEMIBOLD;
         font_.reset(CreateFontIndirectW(&body));
         heading_font_.reset(CreateFontIndirectW(&heading));
-        for (HWND control : {body_, address_, browser_, primary_, secondary_}) {
+        for (HWND control : {body_, browser_, address_label_, address_, primary_, secondary_}) {
             SendMessageW(control, WM_SETFONT, wparamFrom(font_.get()), TRUE);
         }
         SendMessageW(heading_, WM_SETFONT, wparamFrom(heading_font_.get()), TRUE);
@@ -313,6 +351,9 @@ class SetupWindow {
         if (screen_ == Screen::Paste) {
             MoveWindow(browser_, margin, top, scaled(ButtonWidth * 2), scaled(ButtonHeight), TRUE);
             top += scaled(ButtonHeight) + gap;
+            const int label_height = textHeight(address_label_, font_.get(), width);
+            MoveWindow(address_label_, margin, top, width, label_height, TRUE);
+            top += label_height + scaled(LabelGap);
             MoveWindow(address_, margin, top, width, scaled(EditHeight), TRUE);
             top += scaled(EditHeight) + gap;
         }
@@ -349,8 +390,9 @@ class SetupWindow {
 
     void showScreen(Screen screen, const std::wstring& detail = {}) {
         screen_ = screen;
-        ShowWindow(address_, screen == Screen::Paste ? SW_SHOW : SW_HIDE);
-        ShowWindow(browser_, screen == Screen::Paste ? SW_SHOW : SW_HIDE);
+        for (HWND control : {browser_, address_label_, address_}) {
+            ShowWindow(control, screen == Screen::Paste ? SW_SHOW : SW_HIDE);
+        }
         ShowWindow(progress_, screen == Screen::Working ? SW_SHOW : SW_HIDE);
         SendMessageW(progress_, PBM_SETMARQUEE, screen == Screen::Working ? TRUE : FALSE, 0);
         switch (screen) {
@@ -404,8 +446,13 @@ class SetupWindow {
             break;
         }
         layout();
-        // Narrator reads the new screen from its heading.
-        SetFocus(IsWindowVisible(primary_) != FALSE ? primary_ : secondary_);
+        // Narrator reads the new screen from its heading. The browser screen starts at its first
+        // step, the browser button.
+        if (screen == Screen::Paste) {
+            SetFocus(browser_);
+        } else {
+            SetFocus(IsWindowVisible(primary_) != FALSE ? primary_ : secondary_);
+        }
     }
 
     void onCommand(int id) {
@@ -640,8 +687,10 @@ class SetupWindow {
     HWND window_ = nullptr;
     HWND heading_ = nullptr;
     HWND body_ = nullptr;
-    HWND address_ = nullptr;
     HWND browser_ = nullptr;
+    HWND address_label_ = nullptr;
+    HWND address_ = nullptr;
+    HWND focused_ = nullptr;
     HWND progress_ = nullptr;
     HWND primary_ = nullptr;
     HWND secondary_ = nullptr;

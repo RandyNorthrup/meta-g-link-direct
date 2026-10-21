@@ -30,8 +30,9 @@ Use your **Ray-Ban Meta (Gen 2)** glasses as a first-person camera and microphon
 - **Glasses microphones**: 48 kHz stereo, either as the camera source's own audio or as a separate microphone source that works with the camera off. Both are off unless you add or turn them on.
 - **Direct link**: Bluetooth for control and the glasses' own 2.4 GHz Wi-Fi network for video and audio. Your home network isn't involved.
 - **Hands-off**: the glasses connect when a glasses source goes live and disconnect when none is live. Quality and audio changes apply in 1–1.5 seconds without reconnecting. Starting and stopping never stall OBS.
-- **Optional fast start**: with *Keep the glasses connected while OBS is open*, a source going live starts in about a second instead of about 13.
+- **Optional fast start**: with *Keep connected while OBS is open*, a source going live starts in about a second instead of about 13.
 - **Hear OBS in your glasses**: OBS's audio monitor can play through the glasses' speakers while the camera streams ([how](#hear-obs-in-your-glasses)).
+- **Battery on screen**: the glasses' battery level goes to a text file that an OBS text source or a Stream Deck key can show, and to obs-websocket clients ([how](#show-the-glasses-battery)).
 - **Settings in one place**: every glasses source shows the shared connection settings, the battery level, *Set up glasses* and *Forget*. **Tools → Ray-Ban Meta Glasses (Direct)** opens them.
 - **One-window setup**: you log in to Meta inside the setup window. Nothing to copy or paste.
 - **Private**: Meta is contacted only during setup. The owner key is sealed to your Windows account. No telemetry, no update checks, no recordings.
@@ -116,19 +117,20 @@ The window shows the login with Microsoft Edge WebView2, which is part of Window
 3. Switch away from the scene. When no glasses source is live, the glasses disconnect and your Wi-Fi adapter is free again.
 
 <p align="center">
-  <img src="assets/obs-properties.png" alt="The glasses source's properties in OBS: a live preview, then the Video, Audio, Glasses connection and Glasses setup groups" width="420">
+  <img src="assets/obs-properties.png" alt="The glasses source's properties in OBS: the Video, Audio, Glasses connection, Glasses setup and Forget the glasses groups" width="480">
 </p>
 
 Every glasses source's **Properties** show:
 
-- **Video quality** (camera source): 720 × 1280 (recommended), 1080 × 1920 (experimental), 504 × 896 or 360 × 640. Changes apply in about 1.5 seconds. 720 × 1280 and 504 × 896 have been checked in OBS; the other two haven't been tested yet.
+- **Video quality** (camera source): 720 × 1280 (recommended), 1080 × 1920 (experimental), 504 × 896 or 360 × 640. Changes apply in about 1.5 seconds. All four have been checked in OBS; 360 × 640 runs at 24 fps, the others at 30.
 - **Include the glasses' microphones in this source** (camera source): off by default. When on, the glasses' microphones become this source's audio in the OBS audio mixer (48 kHz stereo), where you can mute, adjust or route it like any source. The source always appears in the mixer and stays silent while this is off.
 - The **microphone source** always sends the glasses' microphones. While only microphone sources are live, the camera stays off, and so does its light.
 - **Glasses connection**, shared by all glasses sources (changing it in one changes it in all):
   - **Wi-Fi adapter**: *Automatic (first adapter)*, or a specific adapter by name. Pick the one you don't need online. If the chosen adapter is unplugged, the log says so and no other adapter is used. Changing it reconnects.
-  - **Keep the glasses connected while OBS is open**: off by default. When on, the glasses connect as soon as OBS starts and stay connected with the camera off, so a glasses source starts in about a second. This uses the glasses' battery the whole time, and the Wi-Fi adapter stays on the glasses' network, with no internet, until OBS closes.
+  - **Keep connected while OBS is open**: off by default. When on, the glasses connect as soon as OBS starts and stay connected with the camera off, so a glasses source starts in about a second. This uses the glasses' battery the whole time, and the Wi-Fi adapter stays on the glasses' network, with no internet, until OBS closes.
   - **Status** (Idle, Connecting, Connected with the camera off, Streaming, Reconnecting, Waiting, Failed or Stopped) and the **glasses' battery** level once the glasses report it.
-- **Glasses setup**: **Set up glasses…** opens the setup window. **Forget these glasses** deletes this PC's owner key after you tick the confirmation above it.
+- **Glasses setup**: **Set up glasses…** opens the setup window.
+- **Forget the glasses**: **Forget these glasses** deletes this PC's owner key after you tick the confirmation under it.
 
 Several glasses sources can be live at once. They share one connection to the glasses and show the same video; the camera source that went live first sets the quality.
 
@@ -144,14 +146,34 @@ Monitored audio keeps playing while the glasses camera streams, and the video is
 - **Media players pause.** While the glasses camera streams, the glasses send pause commands to Windows, so YouTube, Spotify and other media apps playing through the glasses keep pausing. OBS's monitor ignores those commands.
 - **Bluetooth delay.** Bluetooth audio arrives a moment late. That's fine for alerts and music, but distracting for monitoring your own voice.
 
+### Show the glasses' battery
+
+While the glasses are connected they report their battery every 10–20 seconds. The plugin passes it on two ways. Without a connection the battery is unknown, so both show nothing rather than an old level.
+
+**On screen, with a text file.** The plugin keeps `battery.txt` in its OBS settings folder: `%APPDATA%\obs-studio\plugin_config\meta-g-link-direct\battery.txt` (a portable OBS keeps it under its own `config` folder). It holds `87%`, `87% charging`, or nothing.
+
+1. In OBS, add a **Text (GDI+)** source to the scene.
+2. Tick **Read from file** and choose `battery.txt`. Paste the path above into the file dialog's name box; Windows fills in `%APPDATA%`.
+3. Style it as you like. Put a second text source beside it if you want a label such as "Glasses".
+
+The same file works for other tools that show a text file. For a **Stream Deck** key, a plugin that displays a file's contents can show it. For example, BarRaider's Text File Tools has a *Regex Display* action; the pattern `\d+%` shows just the percentage. This project hasn't tested any Stream Deck plugin.
+
+**Through obs-websocket.** Tools that talk to OBS over obs-websocket, such as Streamer.bot (it has a *Vendor Event* trigger) or your own scripts, can use the vendor **`meta-g-link-direct`**:
+
+- Request **`GetBattery`** (send it with `CallVendorRequest`) returns `{"available": true, "percent": 87, "charging": false}`, or `{"available": false}` when the battery is unknown.
+- Event **`BatteryChanged`** (a `VendorEvent`) carries the same data each time the level, the charging state or the availability changes.
+
+A tool can use these, for example, to warn you when the battery drops below 20%.
+
 ## Known limits
 
-- **Battery**: streaming video drains the glasses quickly. One reading suggests about 35–40 minutes from a full charge (not yet confirmed). With only the microphone source live the camera is off; how much longer the battery lasts that way hasn't been measured yet.
-- **Quality**: 720 × 1280 and 504 × 896 at 30 fps have been verified in OBS; 1080 × 1920 and 360 × 640 haven't.
+- **Battery**: streaming video drains the glasses quickly. One reading suggests about 35–40 minutes from a full charge at 720 × 1280 (not yet confirmed). Higher quality drains faster: in one test the battery fell 14% in about 3 minutes at 1080 × 1920 and 9% in about 3 minutes at 360 × 640. With only the microphone source live the camera is off; how much longer the battery lasts that way hasn't been measured yet.
+- **Quality**: all four profiles have been verified in OBS: 720 × 1280, 1080 × 1920 and 504 × 896 at 30 fps, and 360 × 640 at 24 fps.
 - **A short delay**: the glasses' radio sends video in bursts (several frames at once, then a pause of about 0.15 s). To show every frame at a steady 30 fps, the plugin holds each one briefly and plays it at its own time, so the picture runs about 0.2 s behind, more on an uneven link. The delay adapts to the link, between 0.02 and 0.5 s. Measured from the glasses' camera to OBS, the picture was about 0.4 s behind in total.
 - **Audio sync**: audio is timed on the same clock as the video; in a clap test the two matched within one frame, so no *Sync Offset* is needed.
 - **OBS 33** is verified with the 33.0.0 release candidate (rc2): installed, loaded from the new layout, video and audio streamed. The final 33.0 release hasn't been tested yet.
 - **Reconnecting**: after a lost connection, video came back about 20 s later in a test. Walking out of range and back hasn't been tested yet.
+- **Keyboard and screen readers**: every control in the properties and the setup window takes keyboard focus and has a name for screen readers. One exception comes from OBS itself: it names the **Video quality** and **Wi-Fi adapter** lists after their group (*Video*, *Glasses connection*), because OBS doesn't link a property's label to its control; each list still carries its description. High-contrast themes and 150–200% display scaling haven't been checked on a real display yet.
 - **Security**: the PC doesn't yet verify the glasses' identity signature during the handshake.
 - **Coverage**: one PC, one Bluetooth adapter, one Wi-Fi adapter and one pair of glasses. The glasses' firmware build hasn't been recorded yet.
 
@@ -191,7 +213,7 @@ The OBS log (*Help → Log Files*) lists each connection step under `[meta-g-lin
 | Internet drops while the camera runs | The camera's Wi-Fi adapter is on the glasses' network (see [What you need](#what-you-need)). Use Ethernet, or try a second Wi-Fi adapter chosen in **Wi-Fi adapter** (untested). |
 | *Waiting* | An earlier connection to the glasses in this OBS is still closing. The source continues on its own when it has. |
 | Glasses audio moves the mixer meter but is missing from recordings or the stream | Check the source's tracks: *Edit → Advanced Audio Properties → Tracks*. 0.3.2 turns them on once for camera sources created with 0.1.0, which OBS had saved with every track off. |
-| Internet stays off while OBS is open | *Keep the glasses connected while OBS is open* is on, so the Wi-Fi adapter stays on the glasses' network. Turn it off, or give the glasses a second adapter. |
+| Internet stays off while OBS is open | *Keep connected while OBS is open* is on, so the Wi-Fi adapter stays on the glasses' network. Turn it off, or give the glasses a second adapter. |
 | After OBS crashed mid-stream | The glasses close their network on their own within about 15 seconds. Delete any leftover `mgl-…` network in Windows Wi-Fi settings if one remains. |
 
 To test the camera outside OBS, close OBS (or make sure it isn't connected to the glasses) and run the setup tool's 60-second stream check. It prints status lines and a frame count:
@@ -208,6 +230,7 @@ To test the camera outside OBS, close OBS (or make sure it isn't connected to th
 - The glasses' Wi-Fi network gets a new random name and 20-character password for every session.
 - The glasses' microphones are used only while a live source asks for them: the microphone source, or a camera source with *Include the glasses' microphones* turned on.
 - No telemetry, update checks or recordings. OBS's own recording stays under your control. Logs contain status lines only: no payloads, addresses or credentials.
+- The battery file and the obs-websocket battery request stay on this PC. obs-websocket's own settings, including its password, decide who can connect.
 - The setup window and setup tool have the Meta AI app's two public client tokens built in. They identify the app, not a person, and were already public.
 
 ## Uninstall and forget

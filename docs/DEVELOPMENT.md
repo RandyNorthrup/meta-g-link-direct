@@ -49,7 +49,7 @@ The runner enters the Visual Studio developer environment only when needed. Ever
 | `test` | CTest (frame prefix, private address, protocol, OBS module ABI) and Pester (runner, CLI and installer contracts) |
 | `test:asan` | All CTest suites in a separate AddressSanitizer build |
 | `test:live` | A live uncached Bluetooth service query (needs a Bluetooth radio) |
-| `test:red` | All 24 green → red → exact-restoration → green drills over the gates; `-Drill changed` runs only the drills whose inputs changed, `-Drill <id>` one drill |
+| `test:red` | All 25 green → red → exact-restoration → green drills over the gates; `-Drill changed` runs only the drills whose inputs changed, `-Drill <id>` one drill |
 | `quality` | `configure`, `build`, `format:check`, `lint`, `deadcode`, `security:audit`, `test`, `test:live`, then the drills whose inputs changed |
 | `package` | `quality` with every drill, then `dist/meta-g-link-direct-<version>-windows-x64.zip` and its `.sha256` file |
 
@@ -65,7 +65,7 @@ The GitHub workflow (`.github/workflows/quality.yml`) builds the portable protoc
 |---|---|
 | `include/mgl/`, `src/protocol/` | Protocol: SDU framing, protobuf, DataX, stream and Wi-Fi link messages, HEVC helpers, JSON, encodings and the playout clock that times bursty media (portable, built on Linux in CI), and AirShield (`airshield.cpp`, built with the Windows library because it uses CNG) |
 | `src/windows/` | CNG crypto, DPAPI identity and token storage, Meta setup over WinHTTP and the ownership change shared by both setup programs (`setup.cpp`), RFCOMM and TCP transports, the Wi-Fi client connection, the demand-driven media session, UTF-8/UTF-16 conversion (`win_text.cpp`), radio diagnostics |
-| `src/plugin/` | OBS glue in C17 (`module.c` with the Tools menu entry, `source.c` with the camera and microphone sources, `link_settings.c` for the settings shared by all glasses sources), the C++20 process-wide glasses link (`glasses_link.cpp`, `glasses_link.h`), the video pacer that decodes and presents each picture on time (`video_pacer.cpp`), and the FFmpeg HEVC and AAC decoders (`hevc_decoder.cpp`, `aac_decoder.cpp`, with shared handles in `ffmpeg_handles.hpp`) |
+| `src/plugin/` | OBS glue in C17 (`module.c` with the Tools menu entry, `source.c` with the camera and microphone sources, `link_settings.c` for the settings shared by all glasses sources, `battery_status.c` for the battery file and the obs-websocket vendor), the C++20 process-wide glasses link (`glasses_link.cpp`, `glasses_link.h`), the video pacer that decodes and presents each picture on time (`video_pacer.cpp`), and the FFmpeg HEVC and AAC decoders (`hevc_decoder.cpp`, `aac_decoder.cpp`, with shared handles in `ffmpeg_handles.hpp`) |
 | `src/setup/` | `meta-g-link-setup.exe`: the setup window (Win32 and WebView2) |
 | `src/probe/` | `meta-g-link-probe.exe`: `--provision`, stream check and diagnostics |
 | `tests/` | Native test executables and Pester suites |
@@ -112,7 +112,7 @@ Setting `MGL_HTTP_DEBUG` (to any value) traces the Meta setup requests by URL, f
 ## Analysis decisions
 
 - clang-tidy uses the strict preset with one style conflict disabled (`llvm-prefer-static-over-anonymous-namespace`, which contradicts the retained `misc-use-anonymous-namespace`). Line-scoped annotations cover the C++/WinRT projection headers that LLVM cannot map back to the public SDK, and each unavoidable C ABI cast at a Windows API boundary.
-- Cppcheck runs on an analysis copy of the compilation database with MSVC `-external:I` paths normalized and the compiler builtins added. `.cppcheck-obs.cfg` models the ten entry points OBS loads dynamically (seven module functions and three locale functions). Suppressed: system-header and third-party `.deps/` notices, and four inline `constParameterCallback` findings in `src/plugin/source.c` (three `obs_source_info` callbacks and one `obs_property_clicked_t` button callback), whose `void *data` parameter type OBS fixes.
+- Cppcheck runs on an analysis copy of the compilation database with MSVC `-external:I` paths normalized and the compiler builtins added. `.cppcheck-obs.cfg` models the eleven entry points OBS loads dynamically (eight module functions and three locale functions). Suppressed: system-header and third-party `.deps/` notices, and four inline `constParameterCallback` findings in `src/plugin/source.c` (three `obs_source_info` callbacks and one `obs_property_clicked_t` button callback), whose `void *data` parameter type OBS fixes.
 - Two line-scoped `gitleaks:allow` markers in `include/mgl/provision.hpp` cover the Meta AI app's public client tokens (AGENTS.md revision 3).
 
 ## Releasing

@@ -2,31 +2,31 @@ BASELINE EXIT 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 5 tests in 234ms.
+Discovery found 5 tests in 233ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 651ms (611ms|40ms)
-  [+] formats a disposable source when effects are requested 713ms (711ms|3ms)
-  [+] propagates native formatter errors 710ms (706ms|3ms)
+  [+] does not modify files with WhatIf 818ms (778ms|40ms)
+  [+] formats a disposable source when effects are requested 878ms (875ms|3ms)
+  [+] propagates native formatter errors 862ms (859ms|2ms)
 
 Describing Red-drill reuse
-  [+] changes the fingerprint when an input file or folder changes 146ms (143ms|3ms)
-  [+] reuses only a passing result recorded with the same inputs 36ms (34ms|1ms)
-Tests completed in 3.08s
+  [+] changes the fingerprint when an input file or folder changes 209ms (206ms|4ms)
+  [+] reuses only a passing result recorded with the same inputs 63ms (60ms|3ms)
+Tests completed in 3.83s
 Tests Passed: 5, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
 MUTATED EXIT 1
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 5 tests in 241ms.
+Discovery found 5 tests in 265ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [-] does not modify files with WhatIf 872ms (831ms|41ms)
+  [-] does not modify files with WhatIf 901ms (850ms|51ms)
    Expected strings to be the same, but they were different.
    Expected length: 23
    Actual length:   25
@@ -36,13 +36,13 @@ Describing Project task runner
               ---------^
    at [IO.File]::ReadAllText($samplePath) | Should -BeExactly $originalSample, C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1:26
    at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1:26
-  [+] formats a disposable source when effects are requested 684ms (682ms|2ms)
-  [+] propagates native formatter errors 892ms (891ms|1ms)
+  [+] formats a disposable source when effects are requested 633ms (631ms|2ms)
+  [+] propagates native formatter errors 744ms (742ms|2ms)
 
 Describing Red-drill reuse
-  [+] changes the fingerprint when an input file or folder changes 129ms (112ms|18ms)
-  [+] reuses only a passing result recorded with the same inputs 46ms (44ms|2ms)
-Tests completed in 3.49s
+  [+] changes the fingerprint when an input file or folder changes 158ms (153ms|5ms)
+  [+] reuses only a passing result recorded with the same inputs 35ms (32ms|2ms)
+Tests completed in 3.61s
 Tests Passed: 4, Failed: 1, Skipped: 0, Inconclusive: 0, NotRun: 0
 Write-Error: Pester runner tests failed or discovery count changed
 
@@ -50,19 +50,19 @@ RESTORED EXIT 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 5 tests in 194ms.
+Discovery found 5 tests in 228ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 644ms (607ms|38ms)
-  [+] formats a disposable source when effects are requested 641ms (639ms|2ms)
-  [+] propagates native formatter errors 729ms (728ms|2ms)
+  [+] does not modify files with WhatIf 741ms (707ms|34ms)
+  [+] formats a disposable source when effects are requested 742ms (739ms|3ms)
+  [+] propagates native formatter errors 694ms (691ms|3ms)
 
 Describing Red-drill reuse
-  [+] changes the fingerprint when an input file or folder changes 144ms (141ms|4ms)
-  [+] reuses only a passing result recorded with the same inputs 33ms (31ms|1ms)
-Tests completed in 2.92s
+  [+] changes the fingerprint when an input file or folder changes 191ms (185ms|6ms)
+  [+] reuses only a passing result recorded with the same inputs 64ms (62ms|2ms)
+Tests completed in 3.37s
 Tests Passed: 5, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
-RESTORATION SHA256 884533a1259ca13ae678fc5d700cde10aca47be26c65eb6e0e5ac5df16708f83
+RESTORATION SHA256 7337e50aeaac4ac0f39874055a6b834bc1c805b5cffda4fe3ae0a6902216c920

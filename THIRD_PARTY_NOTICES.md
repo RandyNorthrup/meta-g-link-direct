@@ -34,6 +34,7 @@ The setup tool contains the Meta AI app's two client tokens (see `AGENTS.md` rev
 
 - Upstream: https://github.com/obsproject/obs-studio, version `32.2.2`, revision `ba2f32bdf791005443988a4955e963663e16b1ed`.
 - The plugin builds against OBS's public module and frontend API headers and import libraries (`libobs` and `obs-frontend-api`, GPL-2.0-or-later in OBS's source notices) and follows the documented module API. No private ABI declaration is copied.
+- The battery request and event use obs-websocket's header-only plugin API, `plugins/obs-websocket/lib/obs-websocket-api.h` from the same pinned OBS sources (obs-websocket, copyright Stephane Lepin and Kyle Manning, GPL-2.0-or-later). It is included from `.deps/` at build time, not copied into this repository; its inline functions are compiled into the plugin.
 - Source and dependency archives are downloaded to the ignored `.deps/` and verified against pinned hashes. Their licenses stay with the original packages. Release zips do not redistribute them.
 
 OBS Studio 33.0.0-rc2 (the official Windows zip, SHA-256 `33d5fab2e23ffbcd0e32a4a33ee11c26ebe7b99276a2e550445b27feb75a4127`) was used only as a test runtime for loading the plugin. Nothing from it is copied into this repository or the release zip.

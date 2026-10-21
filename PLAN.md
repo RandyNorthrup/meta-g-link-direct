@@ -10,8 +10,8 @@ The [project brief](PROJECT_BRIEF.md) is authoritative for the product. This pla
 |---|---|---|---|
 | M0 · TASK-SETUP | Verified | Native build and quality foundation, portable frame-prefix parser, OBS module ABI test, gate drills | — |
 | M1 · TASK-AUTH | In progress | AirShield session over Bluetooth with trust success; Meta owner change, also from the setup window with the login inside it; DPAPI-sealed identity; Forget | Trust-signature verification (the glasses sign with RSA-4096; the Meta app's check is native code); return-to-phone behaviour |
-| M2 · TASK-MEDIA | In progress | Glasses-hosted 2.4 GHz / 20 MHz link; live 720 × 1280 HEVC at 30 fps; runs of about 179 s and 120 s with no stall; stop/start cycles; optional glasses audio (raw AAC-LC 48 kHz stereo, decoded); stream changes inside one session (720p → 504p → 504p with audio → audio only → 720p, first frame about 0.3 s after each restart); audio only with the camera off; battery report decoded; the glasses encode a true 30 fps but deliver it in bursts | 1080p and 360p profiles; latency, CPU, memory and thermal measurement; audio/video sync; battery drain per mode; firmware build |
-| M3 · TASK-OBS | In progress | Installed source live in OBS 32.2.2 for two minutes at 30 fps with no render frames skipped by the source; non-blocking start and stop; installer; Wi-Fi adapter choice, including the explicit failure and Bluetooth close for a missing adapter; glasses audio in the OBS mixer (peak −15 dBFS); installed from the ProgramData plugin folder in both layouts; OBS 33.0.0-rc2 installed, loading the new layout, streaming video and audio; installer finds and installs into an OBS on another drive letter; in OBS 33.0.0-rc2: the shared link, the microphone source with the camera off, keep-connected starts, shared settings mirrored to every glasses source, grouped properties, Set up glasses opening and cancelling the window, battery line; quality changes in OBS (720p ↔ 504p in 1.4 s); 0.3.1 paced presentation: 29.6 distinct pictures per second in an OBS recording, up from 12.8, audio playing in both glasses sources | Reconnection after a real drop; the final OBS 33.0 release; the owner-key refusal path; two Wi-Fi adapters at once; keyboard, Narrator, theme and scaling (properties and setup window); the full-charge endurance run |
+| M2 · TASK-MEDIA | In progress | Glasses-hosted 2.4 GHz / 20 MHz link; live 720 × 1280 HEVC at 30 fps; runs of about 179 s and 120 s with no stall; stop/start cycles; optional glasses audio (raw AAC-LC 48 kHz stereo, decoded); stream changes inside one session (720p → 504p → 504p with audio → audio only → 720p, first frame about 0.3 s after each restart); audio only with the camera off; battery report decoded; the glasses encode a true 30 fps but deliver it in bursts; 1080 × 1920 at 30 fps and 360 × 640 at its 24 fps for 3 minutes each, battery 14% and 9% in those 3 minutes | CPU, memory and thermal measurement; a long-run latency percentile; battery drain with audio only; firmware build |
+| M3 · TASK-OBS | In progress | Installed source live in OBS 32.2.2 for two minutes at 30 fps with no render frames skipped by the source; non-blocking start and stop; installer; Wi-Fi adapter choice, including the explicit failure and Bluetooth close for a missing adapter; glasses audio in the OBS mixer (peak −15 dBFS); installed from the ProgramData plugin folder in both layouts; OBS 33.0.0-rc2 installed, loading the new layout, streaming video and audio; installer finds and installs into an OBS on another drive letter; in OBS 33.0.0-rc2: the shared link, the microphone source with the camera off, keep-connected starts, shared settings mirrored to every glasses source, grouped properties, Set up glasses opening and cancelling the window, battery line; quality changes in OBS (720p ↔ 504p in 1.4 s); 0.3.1 paced presentation: 29.6 distinct pictures per second in an OBS recording, up from 12.8, audio playing in both glasses sources; all four quality profiles; the setup window without WebView2; keyboard and screen-reader pass through UI Automation (0.4.0 setup-window fixes); the battery file shown by an OBS text source and the obs-websocket GetBattery request and BatteryChanged event | Walking out of range; the final OBS 33.0 release; the owner-key refusal path; two Wi-Fi adapters at once; high contrast and 150–200% scaling on a display; the full-charge endurance run |
 
 Endurance (brief D16): stream from a full glasses battery to the low-battery shutdown with no drop or reconnect and record the measured minutes. This replaced the 120-minute minimum on 2026-10-19 because a glasses health reading that looks like battery fell about 4 points in 90 s (unconfirmed), which suggests about 35–40 minutes per charge.
 
@@ -33,13 +33,15 @@ Reuse Visor's protocol and session behaviour at commit `e7077b4051b1e3e605c667aa
 - Trust signature (2026-10-19): an attempt to verify the glasses' svc36 trust signature as P-256 r||s was removed before release. On this firmware the glasses send a 32-byte value (SHA-256-sized) with a 512-byte (RSA-4096-sized) signature and their device certificate carries an RSA key, so the expected key and signed bytes are unknown; the Meta app's check is in native code. The gap stays open rather than shipping a check that cannot pass.
 - Message splitting (2026-10-20): the frame-boundary fix stays inside the existing `datax::Decoder`, which gains the carried start of a header next to its payload fragment; no second parser. Stripping each frame's pad once replaces the two late pad checks, because AirShield always pads 1–16 bytes, as this project's own `FrameCrypto::seal` does ([report](reports/LATENCY_AND_SYNC_VERIFICATION.md)).
 - Audio tracks of old sources (2026-10-20): OBS's own `load` callback and private settings carry the one-time repair, so no plugin state file or settings key is added; the camera source alone needs it, because the microphone source had audio from its first version.
+- Battery outputs (2026-10-20): the battery the properties already show (`StatusCell` in `glasses_link.cpp`, fed by `stream::parseBatteryState`) is the one source; a portable `mgl::battery::Publisher` (`src/protocol/battery.cpp`, unit-tested) hands each change to one listener, and one C file (`battery_status.c`) serves both outputs from it: the file through OBS's own `os_quick_write_utf8_file_safe` in the plugin's existing config folder (beside `link.json`), and obs-websocket through its header-only vendor API from the pinned OBS sources. No second battery parser, poller or settings key.
+- Accessibility fixes (2026-10-20): the setup window's fixes stay in `src/setup/main.cpp` (one `workArea`/`fitted` pair for the opening and minimum sizes, `WM_ACTIVATE` for focus). In the properties, OBS names grouped lists after the group because its properties view sets no label buddy; dropping the long descriptions did not change that and was reverted, so it is recorded as an OBS limitation rather than worked around.
 - Smooth presentation (2026-10-20): the timing logic is one portable component, `mgl::playout::PlayoutClock` (`src/protocol/playout.cpp`), so it is unit-tested and built on Linux in CI; the plugin's new `VideoPacer` (`src/plugin/video_pacer.cpp`) takes over video decoding from the media worker, using the existing `HevcDecoder`, and the media session, Wi-Fi and protocol code are unchanged. One clock serves both media because the glasses stamp both alike (measured). The C boundary's per-medium timestamp becomes a presentation offset that the C side adds to OBS's clock, instead of the glasses' capture time, and the camera source returns to OBS's default buffered async mode (brief D24, [report](reports/FRAME_RATE_VERIFICATION.md)). The decoders' silently ignored rejections now return a status the callers count and log.
 - Glasses speakers (2026-10-19): OBS's own audio monitoring device already routes audio to any Windows output, and the glasses are one (*Headphones*), so the feature is a verified README how-to, not a plugin setting; a plugin control would duplicate OBS's and change a global OBS setting from a source (brief D23). Button hotkeys and a wear-sensor privacy action are parked until the Bluetooth control link and the status messages' fields have been examined ([report](reports/GLASSES_CONTROLS_AND_SPEAKERS.md)).
 - Release packaging (2026-10-19): `package` stages exactly the bundle layout that `Install-MetaGLinkDirect.ps1` already installs from (`Build-ReleaseBundle`), instead of the CMake install layout that no installer consumed. The installer's copy and remove steps share one elevation path (`Invoke-PluginFileStep`), which also fixes uninstall for OBS under Program Files.
 
 ## Architecture and inputs
 
-C++20 owned code; C17 for the three files that include OBS headers (`module.c`, `source.c`, `link_settings.c`); CMake 3.31.3; MSVC 19.44.35222.0 (toolset 14.44.35207) with Windows SDK 10.0.26100.0; LLVM 22.1.1 for formatting and C++ analysis. The protocol core stays portable; transports, identity, Wi-Fi, the ownership change and the media session live under `src/windows/`; OBS is a thin consumer behind `src/plugin/glasses_link.h`; the setup window (`src/setup/`) links the pinned WebView2 SDK's static loader. `dependencies.lock.json` pins the downloadable inputs; the OBS 32.2.2 source tar SHA-256 is `ec81fb66b03e75ddb3076b576f62679c39262e0e9960cef3e17a40dc5d68e6b4`. References: [OBS template](https://github.com/obsproject/obs-plugintemplate/tree/3e7d7ac3b5342cd7d9b88890b9c70b472d1520fc), [OBS 32.2.2](https://github.com/obsproject/obs-studio/tree/ba2f32bdf791005443988a4955e963663e16b1ed), [source API](https://docs.obsproject.com/reference-sources).
+C++20 owned code; C17 for the four files that include OBS headers (`module.c`, `source.c`, `link_settings.c`, `battery_status.c`); CMake 3.31.3; MSVC 19.44.35222.0 (toolset 14.44.35207) with Windows SDK 10.0.26100.0; LLVM 22.1.1 for formatting and C++ analysis. The protocol core stays portable; transports, identity, Wi-Fi, the ownership change and the media session live under `src/windows/`; OBS is a thin consumer behind `src/plugin/glasses_link.h`; the setup window (`src/setup/`) links the pinned WebView2 SDK's static loader. `dependencies.lock.json` pins the downloadable inputs; the OBS 32.2.2 source tar SHA-256 is `ec81fb66b03e75ddb3076b576f62679c39262e0e9960cef3e17a40dc5d68e6b4`. References: [OBS template](https://github.com/obsproject/obs-plugintemplate/tree/3e7d7ac3b5342cd7d9b88890b9c70b472d1520fc), [OBS 32.2.2](https://github.com/obsproject/obs-studio/tree/ba2f32bdf791005443988a4955e963663e16b1ed), [source API](https://docs.obsproject.com/reference-sources).
 
 ## Gate policy and evidence
 
@@ -49,7 +51,7 @@ Detailed logs belong under `reports/` (indexed in `reports/README.md`). Requirem
 
 ## Open verification
 
-Reconnection after walking out of range (a lost media session recovered in 21.5 s); the final OBS 33.0 release once it is out; trust-signature verification; the 1080p and 360p profiles; a long-run latency percentile (single readings 0.36–0.45 s), CPU, memory and thermal measurement; long-run audio; a long stream without stray messages after the frame-boundary fix; an automated check for the audio-track repair (OBS loading only); battery drain with video and with audio only; the keyboard, Narrator, theme and scaling pass, including the setup window; the setup window without WebView2 (browser fallback); the firmware build; the full-charge endurance run; and, parked (D23), the Bluetooth control link's messages and the status messages' fields for button and wear events, and the Bluetooth audio delay through the glasses' speakers. While streaming, the PC's Wi-Fi adapter has no internet (brief D15).
+Reconnection after walking out of range (a lost media session recovered in 21.5 s); the final OBS 33.0 release once it is out; trust-signature verification; a long-run latency percentile (single readings 0.36–0.45 s), CPU, memory and thermal measurement; long-run audio; a long stream without stray messages after the frame-boundary fix; an automated check for the audio-track repair (OBS loading only); battery drain with audio only (with video: 14% in 3 minutes at 1080 × 1920, 9% at 360 × 640); high contrast and 150–200% scaling on a real display, a full keyboard walk of the OBS properties and Narrator by ear (the UI Automation pass is done); a Stream Deck plugin reading the battery file; the firmware build; the full-charge endurance run; and, parked (D23), the Bluetooth control link's messages and the status messages' fields for button and wear events, and the Bluetooth audio delay through the glasses' speakers. While streaming, the PC's Wi-Fi adapter has no internet (brief D15).
 
 Deferred: code signing and provenance, a published SBOM and native advisory assessment, Windows jobs in hosted CI, and other platforms or glasses generations.
 
@@ -57,7 +59,7 @@ Deferred: code signing and provenance, a published SBOM and native advisory asse
 
 - Both languages build with MSVC because CMake rejects a mixed clang-cl/MSVC project and OBS's `util_uint64.h` needs `_udiv128`, which clang-cl does not implement ([LLVM issue 59168](https://github.com/llvm/llvm-project/issues/59168)). No compiler macro is spoofed and no private OBS declaration is introduced.
 - clang-tidy disables only `llvm-prefer-static-over-anonymous-namespace`, which contradicts the retained `misc-use-anonymous-namespace`. Line-scoped `misc-include-cleaner` annotations cover C++/WinRT projection headers that LLVM 22 cannot map back to the public SDK (in `src/windows/discovery.cpp` and `src/windows/classic.cpp`). Line-scoped cast annotations cover exact-signature `GetProcAddress` conversions in `tests/module_tests.cpp` and each unavoidable C ABI cast at a Windows API boundary. Revisit when the SDK or LLVM changes.
-- Cppcheck runs on an analysis copy of the compilation database with MSVC `-external:I` paths normalized and the compiler builtins added. `.cppcheck-obs.cfg` models the ten entry points OBS loads dynamically (seven module functions and three locale functions). Only `missingIncludeSystem` notices, findings under `.deps/` and four inline `constParameterCallback` findings in `src/plugin/source.c` are suppressed; those four are OBS callbacks (`obs_source_info` and `obs_property_clicked_t`) whose `void *data` parameter type OBS fixes. Owned header and unused-function findings fail.
+- Cppcheck runs on an analysis copy of the compilation database with MSVC `-external:I` paths normalized and the compiler builtins added. `.cppcheck-obs.cfg` models the eleven entry points OBS loads dynamically (eight module functions and three locale functions). Only `missingIncludeSystem` notices, findings under `.deps/` and four inline `constParameterCallback` findings in `src/plugin/source.c` are suppressed; those four are OBS callbacks (`obs_source_info` and `obs_property_clicked_t`) whose `void *data` parameter type OBS fixes. Owned header and unused-function findings fail.
 - The first synthetic secret canary used the wrong alphabet; its miss is preserved in `reports/red-secret-canary-initial.txt` and the generator was corrected without changing scanner rules.
 - The GitHub workflow builds the portable protocol core on Linux with clang under ASan and UBSan; Windows ASan runs locally (`test:asan`). TSan, fuzzing and a coverage floor are not established.
 - OSV and npm audit cover the locked npm development packages only. The pinned native OBS archives have integrity and version evidence, not an advisory assessment.
@@ -586,7 +588,8 @@ Deferred: code signing and provenance, a published SBOM and native advisory asse
         "EV-EXISTING-ADAPTER-RED-PRIVATE-ADDRESS-VALIDATION",
         "EV-EXISTING-ADAPTER-RED-UNCACHED-QUERY-LOOP",
         "EV-EXISTING-ADAPTER-HARDWARE-DEFERRED",
-        "EV-SETUP-WINDOW"
+        "EV-SETUP-WINDOW",
+        "EV-ACCESSIBILITY-QUALITY"
       ],
       "blocker": "Owner change and authenticated session are proven on hardware; glasses trust-signature verification is not built, so AC-AUTH stays open.",
       "superseded_by": null
@@ -646,7 +649,8 @@ Deferred: code signing and provenance, a published SBOM and native advisory asse
         "EV-AUDIO-HARDWARE",
         "EV-SHARED-LINK-OBS",
         "EV-FRAME-RATE",
-        "EV-LATENCY-SYNC"
+        "EV-LATENCY-SYNC",
+        "EV-ACCESSIBILITY-QUALITY"
       ],
       "blocker": null,
       "superseded_by": null
@@ -688,7 +692,9 @@ Deferred: code signing and provenance, a published SBOM and native advisory asse
         "EV-SHARED-LINK-OBS",
         "EV-GLASSES-SPEAKERS",
         "EV-FRAME-RATE",
-        "EV-LATENCY-SYNC"
+        "EV-LATENCY-SYNC",
+        "EV-ACCESSIBILITY-QUALITY",
+        "EV-BATTERY-OUTPUTS"
       ],
       "blocker": null,
       "superseded_by": null
@@ -19281,7 +19287,7 @@ Deferred: code signing and provenance, a published SBOM and native advisory asse
         "scripts/Invoke-Project.ps1",
         "package"
       ],
-      "method": "The 0.3.2 release gate (package): configure, build, format:check, lint, deadcode, security:audit, test, test:live, test:red each exited 0; 4 CTest suites (144 protocol cases), 31 Pester cases and 24 red drills passed; release zip SHA-256 25f6f040171eb942506cd2ba09cb11802852a8e685fe577e2bf810e0d7c47a06.",
+      "method": "The 0.4.0 release gate (package): configure, build, format:check, lint, deadcode, security:audit, test, test:live, test:red each exited 0; 4 CTest suites (151 protocol cases), 31 Pester cases and 25 red drills passed; release zip SHA-256 dcf90b9665ad72b2102d38caf409f17a4bfe444b7274ab5c5888884831a8e10a.",
       "environment": {
         "platform": "windows",
         "tools": {
@@ -19307,44 +19313,68 @@ Deferred: code signing and provenance, a published SBOM and native advisory asse
       "exit_code": 0,
       "artifact": {
         "path": "reports/wifi-link-gates.txt",
-        "sha256": "ed3b9296bb4ce2d3a0d9b49fc3a76c62772156c3b078ebff4e0576b5adc8788d"
+        "sha256": "74719e991350ca9cd958e7e2a2973a9de41d3e6247f8dde40e12853bc49b3189"
       },
       "inputs": [
         {
           "path": "CMakeLists.txt",
-          "sha256": "1497b137d9e3f151dcf96114335e196c78436471b32e9966ee00e1092b0a4d6f"
+          "sha256": "64aa078de92309b23eaf3f1e5a955833ba657d575ecbe35cfeef4e3491c3ace2"
         },
         {
-          "path": "include/mgl/datax.hpp",
-          "sha256": "d40fc02b8af6b781bd404e4a5b56349956b7354fb0f79a700c84b23732848ab9"
+          "path": ".cppcheck-obs.cfg",
+          "sha256": "26d2924da72dbe47d6b9f12c3a4e0f324a1e65f6227dff7f1a2a71f8e3043a36"
         },
         {
-          "path": "src/protocol/datax.cpp",
-          "sha256": "8f5cf4c870e06d3b9ed8da6701ebc5a9eb1a7158724d19247e828ab692b8e420"
+          "path": "include/mgl/battery.hpp",
+          "sha256": "d9e9656837ed4170f6849fc3879e4d59f817b16bec5f935b8ed0671306eeeba5"
+        },
+        {
+          "path": "src/protocol/battery.cpp",
+          "sha256": "b0513c4c8ea259b07105d08bc59bc2ca13eb0235aaf59fbe0ffcfc6fefff77ae"
         },
         {
           "path": "tests/protocol_tests.cpp",
-          "sha256": "dac577a2b6486358a7c22871600ad485ef3c00d6885c869bcd3267b9b7f1413b"
+          "sha256": "c9311338c03e3ebdb43770c58154b3cd54c8d862a5e764ca12649e58d9562f58"
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "62bddd1de560374aa5e9e5c008cbf899cd237cb031f69b708d3408248145f2bb"
+        },
+        {
+          "path": "src/plugin/battery_status.h",
+          "sha256": "43fa4fa33f4a104102224491a17a28aff6220f5c514aca80cc6d7313c60f085b"
+        },
+        {
+          "path": "src/plugin/battery_status.c",
+          "sha256": "377719f719b717562a3aa1f45b04cb60ff0be6301d38451ef9829c6883686cfb"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "3c848647107aa81a608c37012c488ce412f14e497403a4cef4f571867141de43"
         },
         {
           "path": "src/plugin/source.c",
-          "sha256": "2046d45ceac3856f2bdd7afe0cbff3a51ad162dfc58b5980e38e0d5e1f6f4dd2"
+          "sha256": "8e264ffbd852ad34817430c796e67e5c33fd9f30f05d316dc73a422922496c0e"
+        },
+        {
+          "path": "src/plugin/glasses_link.h",
+          "sha256": "7b409d9f4a39fd02ac1bbdb250743dadb78cae680932225a1deef0c1da8434b7"
         },
         {
           "path": "src/plugin/glasses_link.cpp",
-          "sha256": "2a952f933bf0303dcc105de23efb8270384ec21493b78510b352e485b746ad3f"
+          "sha256": "7f7148fbb660fffbd7993e80ce769878596aa5d614a8e8ddbc3205ee131ec140"
         },
         {
-          "path": "src/plugin/video_pacer.cpp",
-          "sha256": "3f14638850ddfcc62d5ca9a6bce8d5d530e3ab8a2997e096e060cc6ea36bc6f8"
+          "path": "src/setup/main.cpp",
+          "sha256": "4bf57127114a142d05df56e2dbe648c3b7e17210610e742cd8ed34b421d72e87"
         },
         {
-          "path": "src/protocol/playout.cpp",
-          "sha256": "03034f67c7e58029809f940149bfa3ff30c91704cdc602e6f47f68b66b446e57"
+          "path": "data/locale/en-US.ini",
+          "sha256": "1830b1443149f9adbf3b535c63169997517a16e1a1ab78baf8fde4bf5433d76f"
         },
         {
           "path": "scripts/Invoke-Project.ps1",
-          "sha256": "884533a1259ca13ae678fc5d700cde10aca47be26c65eb6e0e5ac5df16708f83"
+          "sha256": "7337e50aeaac4ac0f39874055a6b834bc1c805b5cffda4fe3ae0a6902216c920"
         },
         {
           "path": "scripts/Install-MetaGLinkDirect.ps1",
@@ -19352,7 +19382,7 @@ Deferred: code signing and provenance, a published SBOM and native advisory asse
         },
         {
           "path": "packaging/README.txt",
-          "sha256": "5d883703162a1dbff58fb42667fb5c4d6886c7d4276b440b06654502c81311ca"
+          "sha256": "f2d5e1462f01f434bdb16b3c6dee6da434f5495e4691c36d856497fec74b4c9d"
         }
       ],
       "scope_sha256": null,
@@ -20631,6 +20661,234 @@ Deferred: code signing and provenance, a published SBOM and native advisory asse
       "scope_sha256": null,
       "red": null,
       "reason": "The scope fingerprint tool behind earlier entries is not available in this session; inputs carry their own hashes (null = deleted file)."
+    },
+    {
+      "id": "EV-ACCESSIBILITY-QUALITY",
+      "acceptance": [
+        "AC-AUTH",
+        "AC-MEDIA",
+        "AC-OBS"
+      ],
+      "kind": "behavior",
+      "status": "pass",
+      "command": [
+        "obs64.exe",
+        "UI Automation"
+      ],
+      "method": "Real glasses, OBS 33.0.0-rc2: 1080x1920 for 3 min 14 s at 30.0 fps received and 29.9-30.1 shown (delay 198-295 ms, 0 undecodable, 0 skipped); 360x640 for 3 min at its 24.0 fps, change applied in 1.6 s; battery 92->78% (1080) and 78->69% (360) in about 3 minutes each. Setup window with WEBVIEW2_BROWSER_EXECUTABLE_FOLDER at a missing folder: the browser screen with Open the login in your browser and the address box; Cancel exit 8, no browser folder left. UI Automation pass at 100% scaling: every properties and setup-window control focusable and named, tooltips exposed as descriptions; OBS names grouped lists after the group (no label buddy in OBS properties-view, outside the plugin). Fixed in 0.4.0 and checked: setup window focus restored after reactivation (0.3.2 returned on the window), address box named by its own label, tab order browser button -> box -> Continue -> Cancel, centred and fitted to the work area (code review; 150% on a 1080p screen not available), keep-connected label fits at 480 px. High contrast and 150-200% scaling on a display, a full keyboard walk of the OBS dialog and Narrator by ear were not done.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/ACCESSIBILITY_AND_QUALITY_VERIFICATION.md",
+        "sha256": "1d28952e9b91fa1663bb0c72b8f3a0182ca1ee4ac4aff15cf67394eb9a8ae42e"
+      },
+      "inputs": [
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "64aa078de92309b23eaf3f1e5a955833ba657d575ecbe35cfeef4e3491c3ace2"
+        },
+        {
+          "path": ".cppcheck-obs.cfg",
+          "sha256": "26d2924da72dbe47d6b9f12c3a4e0f324a1e65f6227dff7f1a2a71f8e3043a36"
+        },
+        {
+          "path": "include/mgl/battery.hpp",
+          "sha256": "d9e9656837ed4170f6849fc3879e4d59f817b16bec5f935b8ed0671306eeeba5"
+        },
+        {
+          "path": "src/protocol/battery.cpp",
+          "sha256": "b0513c4c8ea259b07105d08bc59bc2ca13eb0235aaf59fbe0ffcfc6fefff77ae"
+        },
+        {
+          "path": "tests/protocol_tests.cpp",
+          "sha256": "c9311338c03e3ebdb43770c58154b3cd54c8d862a5e764ca12649e58d9562f58"
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "62bddd1de560374aa5e9e5c008cbf899cd237cb031f69b708d3408248145f2bb"
+        },
+        {
+          "path": "src/plugin/battery_status.h",
+          "sha256": "43fa4fa33f4a104102224491a17a28aff6220f5c514aca80cc6d7313c60f085b"
+        },
+        {
+          "path": "src/plugin/battery_status.c",
+          "sha256": "377719f719b717562a3aa1f45b04cb60ff0be6301d38451ef9829c6883686cfb"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "3c848647107aa81a608c37012c488ce412f14e497403a4cef4f571867141de43"
+        },
+        {
+          "path": "src/plugin/source.c",
+          "sha256": "8e264ffbd852ad34817430c796e67e5c33fd9f30f05d316dc73a422922496c0e"
+        },
+        {
+          "path": "src/plugin/glasses_link.h",
+          "sha256": "7b409d9f4a39fd02ac1bbdb250743dadb78cae680932225a1deef0c1da8434b7"
+        },
+        {
+          "path": "src/plugin/glasses_link.cpp",
+          "sha256": "7f7148fbb660fffbd7993e80ce769878596aa5d614a8e8ddbc3205ee131ec140"
+        },
+        {
+          "path": "src/setup/main.cpp",
+          "sha256": "4bf57127114a142d05df56e2dbe648c3b7e17210610e742cd8ed34b421d72e87"
+        },
+        {
+          "path": "data/locale/en-US.ini",
+          "sha256": "1830b1443149f9adbf3b535c63169997517a16e1a1ab78baf8fde4bf5433d76f"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "7337e50aeaac4ac0f39874055a6b834bc1c805b5cffda4fe3ae0a6902216c920"
+        },
+        {
+          "path": "scripts/Install-MetaGLinkDirect.ps1",
+          "sha256": "cf4be3d407cbfc15aa006f10444f7b97047021877354abc51a320db9521e8357"
+        },
+        {
+          "path": "packaging/README.txt",
+          "sha256": "f2d5e1462f01f434bdb16b3c6dee6da434f5495e4691c36d856497fec74b4c9d"
+        }
+      ],
+      "scope_sha256": null,
+      "red": null,
+      "reason": "The scope fingerprint tool behind earlier entries is not available in this session; inputs carry their own hashes (null = deleted file)."
+    },
+    {
+      "id": "EV-BATTERY-OUTPUTS",
+      "acceptance": [
+        "AC-OBS"
+      ],
+      "kind": "behavior",
+      "status": "pass",
+      "command": [
+        "obs64.exe",
+        "obs-websocket CallVendorRequest"
+      ],
+      "method": "Real glasses, OBS 33.0.0-rc2 with obs-websocket 5.7.6, 0.4.0 build: GetBattery {\"available\": false} and an empty battery.txt while idle; with the test scene live, BatteryChanged events 68, 67, 66, 65% in order, GetBattery 66%, battery.txt 65%, and an OBS Text (GDI+) source reading the file showed 66%; after the scene left, GetBattery and a BatteryChanged event {\"available\": false} and an empty file. Unit tests: overlay text and the publisher (each change once and in order, unknown on link loss, none after the listener is removed); red drill battery-change. A Stream Deck plugin reading the file was not tested.",
+      "environment": {
+        "platform": "windows",
+        "tools": {
+          "python": "3.14.0",
+          "cmake": "3.31.3",
+          "llvm": "22.1.1",
+          "powershell": "7.6.6",
+          "gitleaks": "8.30.1",
+          "node": "24.20.0",
+          "npm": "11.19.0",
+          "semgrep": "1.177.0",
+          "actionlint": "1.7.12",
+          "zizmor": "1.25.2",
+          "osv_scanner": "2.6.0",
+          "pester": "5.7.1",
+          "psscriptanalyzer": "1.25.0",
+          "jscpd": "5.4.1",
+          "precommit": "4.5.1",
+          "cppcheck": "2.22.0",
+          "msvc": "19.44.35222.0"
+        }
+      },
+      "exit_code": 0,
+      "artifact": {
+        "path": "reports/ACCESSIBILITY_AND_QUALITY_VERIFICATION.md",
+        "sha256": "1d28952e9b91fa1663bb0c72b8f3a0182ca1ee4ac4aff15cf67394eb9a8ae42e"
+      },
+      "inputs": [
+        {
+          "path": "CMakeLists.txt",
+          "sha256": "64aa078de92309b23eaf3f1e5a955833ba657d575ecbe35cfeef4e3491c3ace2"
+        },
+        {
+          "path": ".cppcheck-obs.cfg",
+          "sha256": "26d2924da72dbe47d6b9f12c3a4e0f324a1e65f6227dff7f1a2a71f8e3043a36"
+        },
+        {
+          "path": "include/mgl/battery.hpp",
+          "sha256": "d9e9656837ed4170f6849fc3879e4d59f817b16bec5f935b8ed0671306eeeba5"
+        },
+        {
+          "path": "src/protocol/battery.cpp",
+          "sha256": "b0513c4c8ea259b07105d08bc59bc2ca13eb0235aaf59fbe0ffcfc6fefff77ae"
+        },
+        {
+          "path": "tests/protocol_tests.cpp",
+          "sha256": "c9311338c03e3ebdb43770c58154b3cd54c8d862a5e764ca12649e58d9562f58"
+        },
+        {
+          "path": "tests/module_tests.cpp",
+          "sha256": "62bddd1de560374aa5e9e5c008cbf899cd237cb031f69b708d3408248145f2bb"
+        },
+        {
+          "path": "src/plugin/battery_status.h",
+          "sha256": "43fa4fa33f4a104102224491a17a28aff6220f5c514aca80cc6d7313c60f085b"
+        },
+        {
+          "path": "src/plugin/battery_status.c",
+          "sha256": "377719f719b717562a3aa1f45b04cb60ff0be6301d38451ef9829c6883686cfb"
+        },
+        {
+          "path": "src/plugin/module.c",
+          "sha256": "3c848647107aa81a608c37012c488ce412f14e497403a4cef4f571867141de43"
+        },
+        {
+          "path": "src/plugin/source.c",
+          "sha256": "8e264ffbd852ad34817430c796e67e5c33fd9f30f05d316dc73a422922496c0e"
+        },
+        {
+          "path": "src/plugin/glasses_link.h",
+          "sha256": "7b409d9f4a39fd02ac1bbdb250743dadb78cae680932225a1deef0c1da8434b7"
+        },
+        {
+          "path": "src/plugin/glasses_link.cpp",
+          "sha256": "7f7148fbb660fffbd7993e80ce769878596aa5d614a8e8ddbc3205ee131ec140"
+        },
+        {
+          "path": "src/setup/main.cpp",
+          "sha256": "4bf57127114a142d05df56e2dbe648c3b7e17210610e742cd8ed34b421d72e87"
+        },
+        {
+          "path": "data/locale/en-US.ini",
+          "sha256": "1830b1443149f9adbf3b535c63169997517a16e1a1ab78baf8fde4bf5433d76f"
+        },
+        {
+          "path": "scripts/Invoke-Project.ps1",
+          "sha256": "7337e50aeaac4ac0f39874055a6b834bc1c805b5cffda4fe3ae0a6902216c920"
+        },
+        {
+          "path": "scripts/Install-MetaGLinkDirect.ps1",
+          "sha256": "cf4be3d407cbfc15aa006f10444f7b97047021877354abc51a320db9521e8357"
+        },
+        {
+          "path": "packaging/README.txt",
+          "sha256": "f2d5e1462f01f434bdb16b3c6dee6da434f5495e4691c36d856497fec74b4c9d"
+        }
+      ],
+      "scope_sha256": null,
+      "red": null,
+      "reason": "The scope fingerprint tool behind earlier entries is not available in this session; inputs carry their own hashes (null = deleted file)."
     }
   ],
   "checkpoint": {
@@ -20899,8 +21157,8 @@ Deferred: code signing and provenance, a published SBOM and native advisory asse
       "TASK-SETUP"
     ],
     "pending_operations": [],
-    "next_action": "After 0.3.2: a long stream without stray messages, an out-of-range drop, a long-run latency percentile, battery drain with video and with audio only, the full-charge endurance run, the final OBS 33.0 release once out, the 1080p and 360p profiles, two Wi-Fi adapters, the accessibility pass (properties and setup window), the setup window without WebView2, and trust-signature verification. Parked (D23): button and wear events.",
-    "source_revision": "65971ad9bd86a682bb2566b396077f3b879ee79a"
+    "next_action": "After 0.4.0: walking out of range, a long-run latency percentile, battery drain with audio only, the full-charge endurance run, high contrast and 150-200% scaling on a display, a full keyboard walk of the OBS properties and Narrator by ear, a Stream Deck plugin reading battery.txt, the final OBS 33.0 release once out, two Wi-Fi adapters, and trust-signature verification. Parked (D23): button and wear events.",
+    "source_revision": "e64a37d705b66fc734ee4ed1af8956da59ac2549"
   }
 }
 ```

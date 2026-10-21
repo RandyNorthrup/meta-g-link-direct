@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
+#include "battery_status.h"
 #include "glasses_link.h"
 #include "link_settings.h"
 #include "source_ids.h"
@@ -66,6 +67,7 @@ static void open_glasses_settings(void* data) {
 bool obs_module_load(void) {
     mglLinkInit(log_line);
     mgl_link_settings_load();
+    mgl_battery_status_load();
     mgl_register_sources();
     obs_frontend_add_tools_menu_item(obs_module_text("ToolsMenu"), open_glasses_settings, NULL);
     blog(LOG_INFO, "[meta-g-link-direct] %s loaded; camera and microphone sources registered",
@@ -73,7 +75,10 @@ bool obs_module_load(void) {
     return true;
 }
 
+void obs_module_post_load(void) { mgl_battery_status_post_load(); }
+
 void obs_module_unload(void) {
+    mgl_battery_status_free();
     if (!mglLinkShutdown(MGL_TEARDOWN_TIMEOUT_MS)) {
         blog(LOG_WARNING, "[meta-g-link-direct] glasses teardown did not finish before unload");
     }

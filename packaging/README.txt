@@ -38,9 +38,14 @@ scene live. The first frame takes about 15 seconds. For the glasses'
 microphones without the camera, add "Ray-Ban Meta Glasses Microphone (Direct)"
 instead. Tools > Ray-Ban Meta Glasses (Direct) opens the settings: video
 quality, the glasses' microphones (off by default), the Wi-Fi adapter, and
-"Keep the glasses connected while OBS is open", which makes a source start in
+"Keep connected while OBS is open", which makes a source start in
 about a second but uses the glasses' battery and keeps the Wi-Fi adapter
 offline until OBS closes.
+
+While the glasses are connected, their battery level is in
+%APPDATA%\obs-studio\plugin_config\meta-g-link-direct\battery.txt for an OBS
+Text (GDI+) source with "Read from file", and obs-websocket clients can ask
+the vendor "meta-g-link-direct" for it (GetBattery, event BatteryChanged).
 
 Works with OBS Studio 32 and 33, on any drive. The plugin is installed to
 %ProgramData%\obs-studio\plugins\meta-g-link-direct (usually C:\ProgramData),

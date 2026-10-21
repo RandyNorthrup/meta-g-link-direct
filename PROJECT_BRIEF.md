@@ -2,10 +2,10 @@
 
 | Field | Value |
 |---|---|
-| Status | Confirmed contract; public beta releases (0.3.0 adds the microphone source, the shared link, keep-connected and the setup window; 0.3.1 shows the full 30 fps in OBS; 0.3.2 fixes old sources' audio tracks and messages split inside their header) |
+| Status | Confirmed contract; public beta releases (0.3.0 adds the microphone source, the shared link, keep-connected and the setup window; 0.3.1 shows the full 30 fps in OBS; 0.3.2 fixes old sources' audio tracks and messages split inside their header; 0.4.0 passes the battery to overlays and obs-websocket, and fixes the setup window's size, focus and labels after the accessibility pass) |
 | Product owner | Randy |
 | Technical work | Coding agent under Randy's direction |
-| Created / last updated | 2026-10-15 / 2026-10-19 |
+| Created / last updated | 2026-10-15 / 2026-10-20 |
 | Decision authority | Randy for scope, acceptance, releases and support |
 
 This brief owns the product contract. [`PLAN.md`](PLAN.md) owns delivery tasks, evidence and open gates. [`README.md`](README.md) describes what is implemented and verified.
@@ -27,7 +27,7 @@ Meta is contacted only during the one-time setup that makes the PC the glasses' 
 
 | Area | Target | Status (see PLAN.md) |
 |---|---|---|
-| Video | 720 × 1280 portrait at a nominal 30 fps, plus at least one lower profile | 720 × 1280 and 504 × 896 proven in OBS, switching in 1.4 s; since 0.3.1 OBS shows 29.6 distinct pictures per second (12.8 before, D24); 1080 × 1920 and 360 × 640 untested |
+| Video | 720 × 1280 portrait at a nominal 30 fps, plus at least one lower profile | All four profiles proven in OBS: 720 × 1280, 1080 × 1920 and 504 × 896 at 30 fps, 360 × 640 at its 24 fps; switching in 1.4–1.6 s; since 0.3.1 OBS shows 29.6 distinct pictures per second (12.8 before, D24) |
 | Endurance | One full glasses battery charge with no drop or reconnect, recorded in measured minutes (D16) | Open; longest run so far 3 minutes |
 | Latency | 95th percentile glass-to-OBS ≤ 500 ms | About 0.4 s (0.36–0.45 s in five readings, with a 295 ms presentation delay, D24); no long-run percentile yet |
 | Startup | First frame ≤ 15 s after a ready connection | About 13 s from the scene going live, including the Wi-Fi setup; about 1 s with keep-connected on (D20) |
@@ -47,9 +47,10 @@ No 1080p, latency, battery or uptime claim is made without measurement.
 
 ## Experience and accessibility
 
-- Native OBS source properties in four groups: *Video* (quality list), *Audio* (glasses-audio checkbox, or a note on the microphone source), *Glasses connection*, shared by all glasses sources (Wi-Fi adapter list, keep-connected checkbox, status and battery), and *Glasses setup* (Set up glasses, Forget behind a confirmation). A Tools menu entry opens them (D22). English only.
-- The setup window (D21) is a plain Win32 window with standard controls, Windows visual styles and per-monitor DPI scaling. Its keyboard, Narrator, high-contrast and scaling checks are pending with the rest of D08.
-- Keyboard access, Narrator labels, visible focus, light/dark/high-contrast themes, properties usable from 480 logical pixels wide and at 100–200% display scaling (D08). Not yet verified.
+- Native OBS source properties in five groups: *Video* (quality list), *Audio* (glasses-audio checkbox, or a note on the microphone source), *Glasses connection*, shared by all glasses sources (Wi-Fi adapter list, keep-connected checkbox, status and battery), *Glasses setup* (Set up glasses) and *Forget the glasses* (Forget, with its confirmation tick under it). A Tools menu entry opens them (D22). English only.
+- The battery also goes to a text file in the plugin's OBS settings folder and to obs-websocket clients (D25).
+- The setup window (D21) is a plain Win32 window with standard controls, system colours, Windows visual styles and per-monitor DPI scaling. It opens centred and never larger than its monitor's free area, and it keeps its focused control while another window is active.
+- Keyboard access, Narrator labels, visible focus, light/dark/high-contrast themes, properties usable from 480 logical pixels wide and at 100–200% display scaling (D08). Verified through UI Automation at 100%: every control takes focus and has a name, and both UIs lay out at their narrowest. OBS names the two lists in the properties after their group, because its properties view links no label to its control (outside the plugin). High contrast and 150–200% scaling are reviewed in the code only.
 - Errors are actionable and the OBS log names each connection step.
 - No logos or brand assets of Meta, Ray-Ban, Apple or OBS. Product names identify compatibility only and imply no endorsement or affiliation.
 
@@ -59,6 +60,7 @@ No 1080p, latency, battery or uptime claim is made without measurement.
 - Wi-Fi credentials for the glasses' network are random per session and live only in memory and in a temporary Windows profile that is deleted when the camera stops.
 - The only credentials in the repository are the Meta AI app's two public client tokens (AGENTS.md revision 3). No user tokens, owner keys, passwords, Wi-Fi passphrases, raw captures or raw media may enter the repository, logs or diagnostics.
 - No telemetry, update checks or plugin-managed recordings. OBS recording stays under the user's control. Logs carry status lines only.
+- The battery file and the obs-websocket vendor request hold only the battery level and charging state, stay on the PC, and are reachable only as far as the user's own obs-websocket settings allow.
 - The setup window shows Meta's login in a private WebView2 session whose browser data is deleted when the window closes. It reads only the login code from Meta's final redirect.
 - Known gap: the PC does not yet verify the glasses' trust signature. The glasses send a 32-byte value with a 512-byte (RSA-4096-sized) signature and their certificate holds an RSA key; the exact check the Meta app performs runs in native code and is not known yet.
 
@@ -73,7 +75,7 @@ No 1080p, latency, battery or uptime claim is made without measurement.
 | D05 | Supported machine | Revised | Windows 11 x64, OBS 32 and newer, tracking the latest OBS release; latest stable glasses firmware, build to be recorded | Randy | 2026-10-19 |
 | D06 | Source reuse and license | Confirmed | Visor-derived AGPL-3.0 source with attribution | Randy | 2026-10-15 |
 | D07 | Performance targets | Revised | The targets table above; the 120-minute minimum is replaced by D16 | Randy | 2026-10-19 |
-| D08 | UI and accessibility | Confirmed, unverified | OBS-native English controls, keyboard and Narrator, 480 px width, 100–200% scaling, no custom assets in the UI | Randy | 2026-10-15 |
+| D08 | UI and accessibility | Confirmed, partly verified | OBS-native English controls, keyboard and Narrator, 480 px width, 100–200% scaling, no custom assets in the UI | Randy | 2026-10-15 |
 | D09 | Privacy and identity | Confirmed | DPAPI-sealed local identity; no telemetry, update checks or media retention; Forget deletes the identity | Randy | 2026-10-15 |
 | D10 | Distribution | Revised | Public GitHub releases marked Latest, labelled beta while the version is below 1.0 (GitHub's sidebar shows only a Latest release, never a pre-release): an unsigned zip with a double-click installer and a SHA-256 file; manual updates; no automatic OBS restart | Randy | 2026-10-19 |
 | D11 | Delivery constraints | Revised | Public repository `RandyNorthrup/meta-g-link-direct`; push, tag and release once the `package` gate passes (AGENTS.md revision 5); no SLA, deadline or spending | Randy | 2026-10-19 |
@@ -90,6 +92,7 @@ No 1080p, latency, battery or uptime claim is made without measurement.
 | D22 | Settings access | Confirmed, proven | Every glasses source carries the shared connection and setup settings; a Tools menu entry opens them; Forget is a button behind a confirmation tick | Randy | 2026-10-19 |
 | D23 | Glasses speakers and controls | Confirmed, proven (speakers) | Audio into the glasses uses OBS's own audio monitoring device (the glasses' *Headphones* Bluetooth device), documented rather than built into the plugin. Glasses-button hotkeys and a wear-sensor privacy action are parked: the touchpad never reaches this PC, only a long press of the capture button appeared on the link, and taking the glasses off sent nothing | Randy | 2026-10-19 |
 | D24 | Smooth presentation | Confirmed, proven | Present every frame and block of sound at its capture time plus an adaptive delay (20–500 ms, about 190 ms measured) instead of on arrival, because the glasses' radio delivers 30 fps in bursts that OBS thinned to about 13 fps; the Meta AI app's player paces the same way. A little latency is traded for the full frame rate | Randy / technical verification | 2026-10-20 |
+| D25 | Battery outside OBS's properties | Confirmed, proven | Both ways Randy chose: a text file (`battery.txt` in the plugin's OBS settings folder) for OBS text sources and tools such as Stream Deck plugins, and an obs-websocket vendor (`meta-g-link-direct`: request `GetBattery`, event `BatteryChanged`). Both show the battery as unknown without a link rather than its last value | Randy | 2026-10-20 |
 
 ## Research references
 
