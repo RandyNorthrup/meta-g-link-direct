@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-// Cryptographic primitives the glasses protocol needs. The Windows implementation uses CNG;
-// failures of the platform provider throw CryptoError rather than producing partial output.
+// Cryptographic primitives the glasses protocol needs. Windows uses CNG and the other platforms the
+// pinned mbedTLS; failures of the provider throw CryptoError rather than producing partial output.
 #ifndef MGL_CRYPTO_HPP
 #define MGL_CRYPTO_HPP
 

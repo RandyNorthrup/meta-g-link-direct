@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-// Credentials for the short-lived access point the glasses host for this PC.
-#ifndef MGL_WINDOWS_WIFI_CREDENTIALS_HPP
-#define MGL_WINDOWS_WIFI_CREDENTIALS_HPP
+// Credentials for the short-lived access point the glasses host for this computer.
+#ifndef MGL_CORE_WIFI_CREDENTIALS_HPP
+#define MGL_CORE_WIFI_CREDENTIALS_HPP
 
 #include "mgl/crypto.hpp"
 
@@ -10,7 +10,7 @@
 #include <string_view>
 
 namespace mgl {
-// Names of the access point the glasses host for this PC.
+// Names of the access point the glasses host for this computer.
 inline constexpr std::string_view GlassesAccessPointPrefix = "mgl-";
 
 struct WifiCredentials {
@@ -26,9 +26,10 @@ struct WifiCredentials {
         "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     constexpr std::size_t SuffixLength = 6;
     constexpr std::size_t PassphraseLength = 20;
-    return {.ssid =
-                std::string(GlassesAccessPointPrefix) + crypto::randomText(Alphabet, SuffixLength),
-            .passphrase = crypto::randomText(Alphabet, PassphraseLength)};
+    return {
+        .ssid = std::string(GlassesAccessPointPrefix) + crypto::randomText(Alphabet, SuffixLength),
+        .passphrase = crypto::randomText(Alphabet, PassphraseLength),
+    };
 }
 } // namespace mgl
 #endif

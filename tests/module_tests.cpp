@@ -19,7 +19,7 @@ namespace {
 struct LibraryCloser {
     void operator()(HINSTANCE__* library) const noexcept { FreeLibrary(library); }
 };
-int runModuleTests(int argument_count, char** arguments) {
+int runModuleTests(int argument_count, char* const* arguments) {
     constexpr int ExpectedArguments = 3;
     if (argument_count != ExpectedArguments || arguments[2][0] == '\0') {
         std::cerr << "Module ABI test requires plugin path and MGL_OBS_RUNTIME directory\n";
@@ -55,7 +55,8 @@ int runModuleTests(int argument_count, char** arguments) {
     // there.
     constexpr std::array RequiredExports{
         "obs_module_load", "obs_module_post_load",   "obs_module_set_pointer", "obs_module_ver",
-        "obs_module_name", "obs_module_description", "obs_module_author"};
+        "obs_module_name", "obs_module_description", "obs_module_author",
+    };
     const auto missing = std::ranges::find_if(RequiredExports, [&plugin](const char* name) {
         return GetProcAddress(plugin.get(), name) == nullptr;
     });
@@ -81,6 +82,7 @@ int runModuleTests(int argument_count, char** arguments) {
 
 } // namespace
 
+// NOLINTNEXTLINE(misc-const-correctness) - The C++ standard fixes main's parameter as char**.
 int main(int argument_count, char** arguments) {
     try {
         return runModuleTests(argument_count, arguments);

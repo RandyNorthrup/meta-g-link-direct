@@ -226,8 +226,9 @@ std::string formUrlEncode(const std::vector<std::pair<std::string, std::string>>
 Bytes gzip(ByteView data) {
     Bytes out;
     // Fixed 10-byte gzip header: magic, DEFLATE, no flags, no mtime, no extra, unknown OS.
-    const std::array<std::uint8_t, 10> header{0x1F, 0x8B, 0x08, 0x00, 0x00,
-                                              0x00, 0x00, 0x00, 0x00, 0xFF};
+    const std::array<std::uint8_t, 10> header{
+        0x1F, 0x8B, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF,
+    };
     append(out, {header.data(), header.size()});
     // Stored DEFLATE blocks: each carries up to 65535 bytes as [BFINAL|BTYPE=00][LEN][~LEN][data].
     constexpr std::size_t MaxBlock = 0xFFFF;

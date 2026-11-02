@@ -13,9 +13,9 @@
 namespace mgl {
 enum class TransportStatus : std::uint8_t {
     Ok,
-    Closed,     // the peer or the stack closed the link
-    TimedOut,   // the deadline passed before a whole SDU arrived
-    Unframeable // a first byte that neither framing can describe
+    Closed,      // the peer or the stack closed the link
+    TimedOut,    // the deadline passed before a whole SDU arrived
+    Unframeable, // a first byte that neither framing can describe
 };
 
 struct SduResult {

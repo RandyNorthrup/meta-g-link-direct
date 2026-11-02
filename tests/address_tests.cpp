@@ -19,21 +19,23 @@ int runAddressTests() {
             return EXIT_FAILURE;
         }
     }
-    constexpr std::array Invalid{"",
-                                 "123456789ab",
-                                 "123456789abcd",
-                                 "123456789abz",
-                                 "12:34:56:78:9A",
-                                 "12:34:56:78:9A:BC:DE",
-                                 "12:34-56:78:9A:BC",
-                                 "12.34.56.78.9A.BC",
-                                 " 123456789ABC",
-                                 "123456789ABC ",
-                                 "00:00:00:00:00:00",
-                                 "FF:FF:FF:FF:FF:FF",
-                                 "00-00-00-00-00-00",
-                                 "ffffffffffff",
-                                 "12:34:56:78:9A:BG"};
+    constexpr std::array Invalid{
+        "",
+        "123456789ab",
+        "123456789abcd",
+        "123456789abz",
+        "12:34:56:78:9A",
+        "12:34:56:78:9A:BC:DE",
+        "12:34-56:78:9A:BC",
+        "12.34.56.78.9A.BC",
+        " 123456789ABC",
+        "123456789ABC ",
+        "00:00:00:00:00:00",
+        "FF:FF:FF:FF:FF:FF",
+        "00-00-00-00-00-00",
+        "ffffffffffff",
+        "12:34:56:78:9A:BG",
+    };
     if (std::ranges::any_of(Invalid, [](std::string_view input) {
             return mgl::parseBluetoothAddress(input).has_value();
         })) {

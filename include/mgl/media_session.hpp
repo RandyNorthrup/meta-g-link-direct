@@ -40,7 +40,7 @@ enum class MediaState : std::uint8_t {
     Streaming,
     Reconnecting,
     Failed,
-    Stopped
+    Stopped,
 };
 
 struct MediaCallbacks {
@@ -68,7 +68,7 @@ struct MediaDemand {
     bool audio = false;     // the glasses' microphones, 48 kHz stereo AAC
     bool keep_link = false; // stay connected with the camera off while nothing streams
     stream::VideoConfig video_config;
-    // The WifiAdapter::id that joins the glasses' network; empty uses the first adapter Windows
+    // The WifiAdapter::id that joins the glasses' network; empty uses the first adapter the system
     // lists. Changing it reconnects.
     std::string wifi_adapter;
 

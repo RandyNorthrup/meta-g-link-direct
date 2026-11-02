@@ -13,7 +13,7 @@
 namespace mgl {
 struct TcpOpen {
     bool ok = false;
-    std::uint32_t detail = 0; // Winsock error when not ok
+    std::uint32_t detail = 0; // the system's error code when not ok
     std::unique_ptr<Transport> transport;
 };
 

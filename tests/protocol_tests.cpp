@@ -59,10 +59,10 @@ void testSduPhases(Checks& check) {
     using enum mgl::PrefixStatus;
     // Encrypted phase: 0x80 is a two-byte COMMAND frame, not a DataX message.
     const std::array<std::uint8_t, 2> command{0x80, 0x01};
-    auto c = mgl::inspectFramePrefix(command, mgl::LinkPhase::Encrypted);
+    const auto c = mgl::inspectFramePrefix(command, mgl::LinkPhase::Encrypted);
     check(c.status == Ready && c.frame_size == 2, "encrypted COMMAND is two bytes");
     // Plaintext phase: the same first byte is a DataX message.
-    auto p = mgl::inspectFramePrefix(command, mgl::LinkPhase::Plaintext);
+    const auto p = mgl::inspectFramePrefix(command, mgl::LinkPhase::Plaintext);
     check(p.status == Ready && p.frame_size == 5, "plaintext 0x80 is DataX length");
     // A DATA frame measures the same in both phases.
     const std::array<std::uint8_t, 10> data{0x40, 0, 0, 0, 0, 0, 0, 0, 0, 0x00};
@@ -70,7 +70,7 @@ void testSduPhases(Checks& check) {
           "encrypted DATA one block");
     // Long-form ADVERTISEMENT command: 0x80 code | 0x80, then big-endian length.
     const std::array<std::uint8_t, 4> advert{0x80, 0x80, 0x00, 0x05};
-    auto a = mgl::inspectFramePrefix(advert, mgl::LinkPhase::Encrypted);
+    const auto a = mgl::inspectFramePrefix(advert, mgl::LinkPhase::Encrypted);
     check(a.status == Ready && a.frame_size == 9, "encrypted long COMMAND carries its length");
     // An unframeable first byte in the encrypted phase is rejected, not skipped.
     const std::array<std::uint8_t, 2> bad{0x00, 0x00};
@@ -119,7 +119,8 @@ void testDataxHeader(Checks& check) {
     mgl::datax::Tags close;
     close.service = static_cast<std::uint16_t>(0);
     const auto closing = mgl::datax::buildMessage(0x0002, close, {});
-    const auto closed = mgl::datax::parseHeader(view(*closing));
+    const auto closed =
+        mgl::datax::parseHeader(view(check.present(closing, "closing message builds")));
     check(closed && closed->closed, "service 0 marks the channel closed");
     // A header short of four bytes does not parse.
     const std::array<std::uint8_t, 3> too_short{0x80, 0x00, 0x00};
@@ -133,11 +134,14 @@ void testDecoder(Checks& check) {
     first.service = static_cast<std::uint16_t>(36);
     first.type = static_cast<std::uint16_t>(0x1000);
     const std::array<std::uint8_t, 2> p1{0xAA, 0xBB};
-    auto buffer = *mgl::datax::buildMessage(0x8002, first, {p1.data(), p1.size()});
+    auto buffer = check.present(mgl::datax::buildMessage(0x8002, first, {p1.data(), p1.size()}),
+                                "first message builds");
     mgl::datax::Tags second;
     second.type = static_cast<std::uint16_t>(0x1001);
     const std::array<std::uint8_t, 1> p2{0xCC};
-    mgl::append(buffer, *mgl::datax::buildMessage(0x8002, second, {p2.data(), p2.size()}));
+    mgl::append(buffer,
+                check.present(mgl::datax::buildMessage(0x8002, second, {p2.data(), p2.size()}),
+                              "second message builds"));
     mgl::datax::Decoder decoder;
     std::vector<mgl::datax::Message> out;
     check(decoder.decode(view(buffer), out), "decode succeeds");
@@ -252,10 +256,9 @@ void testDecoderEveryBoundary(Checks& check) {
 
 void testRegistry(Checks& check) {
     mgl::datax::ChannelRegistry registry;
-    const auto channel = registry.openLocal(36);
-    check(channel.has_value() && (*channel & mgl::datax::OriginatorBit) != 0,
-          "local channels carry the originator bit");
-    check(registry.serviceForInbound(mgl::datax::mirror(*channel)) == 36,
+    const auto channel = check.present(registry.openLocal(36), "a local channel opens");
+    check((channel & mgl::datax::OriginatorBit) != 0, "local channels carry the originator bit");
+    check(registry.serviceForInbound(mgl::datax::mirror(channel)) == 36,
           "a reply on the mirror resolves to the service");
     registry.bindInbound(0x8005, 51350);
     check(registry.serviceForInbound(0x8005) == 51350, "a peer channel binds its service");
@@ -408,7 +411,12 @@ void testConfigureAudio(Checks& check) {
 
 void testConfigureVideo(Checks& check) {
     const mgl::stream::VideoConfig low{
-        .width = 504, .height = 896, .bitrate = 1'500'000, .frame_rate = 30, .iframe_interval = 1};
+        .width = 504,
+        .height = 896,
+        .bitrate = 1'500'000,
+        .frame_rate = 30,
+        .iframe_interval = 1,
+    };
     for (const bool enabled : {false, true}) {
         const auto request = mgl::stream::buildConfigureVideo(9, low, enabled);
         const auto parsed =
@@ -425,11 +433,14 @@ void testConfigureVideo(Checks& check) {
         check(config.varint(4) == 1'500'000U && config.varint(5) == 30U,
               "bitrate and frame rate are fields 4 and 5");
     }
-    check(low == mgl::stream::VideoConfig{.width = 504,
-                                          .height = 896,
-                                          .bitrate = 1'500'000,
-                                          .frame_rate = 30,
-                                          .iframe_interval = 1},
+    check(low ==
+              mgl::stream::VideoConfig{
+                  .width = 504,
+                  .height = 896,
+                  .bitrate = 1'500'000,
+                  .frame_rate = 30,
+                  .iframe_interval = 1,
+              },
           "equal profiles compare equal");
     check(!(low == mgl::stream::VideoConfig{}), "a different profile compares unequal");
 }
@@ -626,9 +637,17 @@ void testBatteryOverlay(Checks& check) {
           "a charging battery says so");
     // Charge states 1-3 are charging, 4 is not; voltage and temperature are not shown.
     const mgl::stream::BatteryState draining{
-        .percent = 64, .charge_state = 4, .millivolts = 3'810, .millicelsius = 31'100};
+        .percent = 64,
+        .charge_state = 4,
+        .millivolts = 3'810,
+        .millicelsius = 31'100,
+    };
     const mgl::stream::BatteryState topping_up{
-        .percent = 64, .charge_state = 2, .millivolts = 4'120, .millicelsius = 29'000};
+        .percent = 64,
+        .charge_state = 2,
+        .millivolts = 4'120,
+        .millicelsius = 29'000,
+    };
     check(mgl::battery::readingOf(draining) == Reading{.percent = 64, .charging = false},
           "a draining report reads as not charging");
     check(mgl::battery::readingOf(topping_up) == Reading{.percent = 64, .charging = true},

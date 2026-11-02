@@ -1,0 +1,120 @@
+name: Platform builds
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  linux-native:
+    name: Linux, native OBS (Ubuntu 26.04)
+    runs-on: ubuntu-24.04
+    container: ubuntu:26.04@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c
+    timeout-minutes: 30
+    steps:
+      - name: Install the build tools and OBS from its project's archive
+        run: |
+          apt-get update
+          apt-get install --yes --no-install-recommends ca-certificates cmake curl g++ git gpg ninja-build pkg-config python3 software-properties-common
+          add-apt-repository --yes ppa:obsproject/obs-studio
+          apt-get install --yes --no-install-recommends obs-studio libavcodec-dev libavutil-dev libbluetooth-dev libcurl4-openssl-dev libglib2.0-dev libgtk-3-dev libsecret-1-dev libwebkit2gtk-4.1-dev
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Build and test
+        run: |
+          cmake -S . -B out/linux -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DMGL_BUILD_LINK=ON -DMGL_BUILD_OBS_PLUGIN=ON
+          cmake --build out/linux
+          ctest --test-dir out/linux --output-on-failure
+      - name: Check that the plugin exports no mbedTLS symbols
+        run: |
+          if nm -D --defined-only out/linux/meta-g-link-direct.so | grep -i mbedtls; then
+            echo "mbedTLS symbols are visible to the OBS process" >&2
+            exit 1
+          fi
+      - name: Pack the bundle
+        run: bash scripts/package-unix.sh out/linux -
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: linux-native
+          path: dist/*.tar.gz*
+          if-no-files-found: error
+
+  linux-flatpak:
+    name: Linux, newest OBS Flatpak
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Deliberately not pinned: this job's purpose is the newest OBS that Flathub offers.
+      - name: Install the OBS Flatpak and its SDK
+        run: |
+          sudo sysctl kernel.apparmor_restrict_unprivileged_userns=0
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends flatpak
+          flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+          flatpak install --user --noninteractive flathub com.obsproject.Studio
+          runtime=$(flatpak info --user --show-sdk com.obsproject.Studio)
+          flatpak install --user --noninteractive flathub "$runtime"
+          flatpak info --user com.obsproject.Studio | grep -E 'Version|Runtime'
+      - name: Build and test inside the Flatpak's SDK
+        run: flatpak run --user --devel --share=network --filesystem="$PWD" --command=bash com.obsproject.Studio scripts/build-flatpak.sh
+      - name: Pack the bundle
+        run: bash scripts/package-unix.sh - out/flatpak
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: linux-flatpak
+          path: dist/*.tar.gz*
+          if-no-files-found: error
+
+  macos:
+    name: macOS, ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Apple Silicon
+            runner: macos-15
+            dmg: OBS-Studio-33.0.1-macOS-Apple.dmg
+            sha256: 3d6b2eedeb56416602af635adaba32327fdf11ff9d2806a4ce7d5b608de73238
+          - name: Intel
+            runner: macos-15-intel
+            dmg: OBS-Studio-33.0.1-macOS-Intel.dmg
+            sha256: 745257d65e06eb0f784af229659223a863ad50d036464bb2b52f8a2d9278c2b1
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install the integrity-pinned OBS.app the build links against
+        env:
+          OBS_DMG: ${{ matrix.dmg }}
+          OBS_SHA256: ${{ matrix.sha256 }}
+        run: |
+          curl --fail --location --output /tmp/obs.dmg "https://github.com/obsproject/obs-studio/releases/download/33.0.1/$OBS_DMG"
+          echo "$OBS_SHA256  /tmp/obs.dmg" | shasum -a 256 --check
+          hdiutil attach -nobrowse -mountpoint /tmp/obs /tmp/obs.dmg
+          cp -R /tmp/obs/OBS.app /Applications/
+          hdiutil detach /tmp/obs
+      - name: Fetch the pinned build inputs
+        run: |
+          brew install ninja
+          bash scripts/bootstrap-macos.sh
+      - name: Build and test
+        run: |
+          cmake -S . -B out/macos -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DMGL_BUILD_LINK=ON -DMGL_BUILD_OBS_PLUGIN=ON
+          cmake --build out/macos
+          ctest --test-dir out/macos --output-on-failure
+      - name: Pack the bundle
+        run: bash scripts/package-unix.sh out/macos
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: macos-${{ matrix.runner }}
+          path: dist/*.tar.gz*
+          if-no-files-found: error

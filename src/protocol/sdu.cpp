@@ -26,8 +26,10 @@ FramePrefix airshieldData(std::span<const std::uint8_t> head) noexcept {
         return {.status = PrefixStatus::NeedMore, .frame_size = 0};
     }
     const auto block_count = static_cast<std::size_t>(head.first(AirshieldHeader).back()) + 1;
-    return {.status = PrefixStatus::Ready,
-            .frame_size = AirshieldHeader + (AesBlock * block_count)};
+    return {
+        .status = PrefixStatus::Ready,
+        .frame_size = AirshieldHeader + (AesBlock * block_count),
+    };
 }
 
 // COMMAND: [0x80 | stream][code]; the ADVERTISEMENT long form sets bit 7 of the code and adds a

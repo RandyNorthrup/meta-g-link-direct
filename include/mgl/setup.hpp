@@ -10,7 +10,10 @@
 #include "mgl/session.hpp"
 
 #include <cstdint>
+#include <functional>
+#include <optional>
 #include <string>
+#include <thread>
 
 namespace mgl::setup {
 // How far a setup run got.
@@ -26,11 +29,44 @@ struct Outcome {
     std::string problem; // for people: where it stopped and what to do; empty on success
 };
 
+// What the address a finished login ended on holds.
+struct LoginAddress {
+    std::optional<std::string> code; // the auth code, when the address belongs to this login
+    std::string problem;             // for people, when it holds no usable code
+};
+
+// Reads the address a login ended on. An address carrying another login's state is refused.
+[[nodiscard]] LoginAddress readLoginAddress(const std::string& address,
+                                            const std::string& expected_state);
+
 // The glasses' Meta RFCOMM service, retried a few times: the glasses accept one session at a time
 // and need a moment between them.
 [[nodiscard]] RfcommOpen openGlassesRfcomm();
 
-// Runs the whole change of owner and seals the new identity. Blocking; it can take a minute.
+// Runs the whole change of owner and seals the new identity. Blocking; it can take a minute. An
+// internal error comes back as a problem in the outcome, so a worker thread can run it as it is.
 [[nodiscard]] Outcome changeOwner(const std::string& auth_code);
+
+// One changeOwner run on its own thread, for a window that must keep answering meanwhile. The
+// destructor waits for a run still going: a change of owner must not be cut off half way.
+class OwnerChange {
+  public:
+    OwnerChange() = default;
+    OwnerChange(const OwnerChange&) = delete;
+    OwnerChange& operator=(const OwnerChange&) = delete;
+    OwnerChange(OwnerChange&&) = delete;
+    OwnerChange& operator=(OwnerChange&&) = delete;
+    ~OwnerChange();
+
+    // Starts a run, after any earlier one has ended. finished is called on the run's thread as it
+    // ends, to tell the window; the window then calls finish on its own thread.
+    void start(std::string auth_code, std::function<void()> finished);
+    // Waits for the run to end and returns its outcome.
+    [[nodiscard]] Outcome finish();
+
+  private:
+    std::thread thread_;
+    Outcome outcome_; // written by the run, read after it is joined
+};
 } // namespace mgl::setup
 #endif

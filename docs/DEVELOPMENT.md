@@ -4,20 +4,20 @@ How to build, check and package Meta G Link Direct from source. Project rules ar
 
 ## Toolchain
 
-The build is verified with this toolchain on Windows 11 Pro x64 build 26200:
+The task runner below is for Windows; see [Linux and macOS](#linux-and-macos) for those. The Windows build is verified with this toolchain on Windows 11 Pro x64 build 26200:
 
 | Tool | Version |
 |---|---|
 | Visual Studio 2022 C++ build tools (MSVC) | 19.44.35222.0, toolset 14.44.35207 |
 | Windows SDK | 10.0.26100.0 |
 | CMake / Ninja | 3.31.3 / the Ninja bundled with Visual Studio |
-| LLVM (clang-format, clang-tidy) | 22.1.1 |
+| LLVM (clang-format, clang-tidy) | 23.1.3 |
 | PowerShell | 7.6.6 (the installer itself runs on Windows PowerShell 5.1) |
 | Python, tar | Python 3.14.0 and the Windows `tar` (used by `bootstrap`) |
 | Pester / PSScriptAnalyzer | 5.7.1 / 1.25.0 |
 | Node / npm | 24.20.0 / 11.19.0 (development tools only; nothing ships) |
 | Gitleaks, Semgrep, actionlint, zizmor, OSV-Scanner, pre-commit | 8.30.1, 1.177.0, 1.7.12, 1.25.2, 2.6.0, 4.5.1 |
-| OBS Studio (runtime for the module test) | 32.2.2 (also checked: 33.0.0-rc2) |
+| OBS Studio (runtime for the module test) | 33.0.1 (also checked: 32.2.2, 33.0.0-rc2) |
 
 `dependencies.lock.json` pins the downloadable inputs. `bootstrap` downloads the OBS source, the Microsoft Edge WebView2 SDK 1.0.2903.40 (NuGet package; headers and the static loader for the setup window) and the Cppcheck 2.22.0 installer into the ignored `.deps/` and `.tools/` and checks each against its SHA-256 hash, builds the OBS development SDK (OBS's own build then fetches its prebuilt dependency package), and restores the locked npm packages. Nothing is installed globally. The other tools must already be on `PATH`; a missing tool fails its gate.
 
@@ -46,10 +46,10 @@ The runner enters the Visual Studio developer environment only when needed. Ever
 | `lint` | `lint:cpp` (clang-tidy over the compilation database), `lint:powershell` (PSScriptAnalyzer), `lint:workflow` (actionlint, zizmor) |
 | `deadcode` | `deadcode:cpp` (Cppcheck) and `deadcode:copies` (jscpd, zero-clone threshold) |
 | `security:audit` | `security:secrets` (Gitleaks over the working tree), `security:sast` (Semgrep), `security:npm`, `security:osv`, then Gitleaks over the full Git history |
-| `test` | CTest (frame prefix, private address, protocol, OBS module ABI) and Pester (runner, CLI and installer contracts) |
+| `test` | CTest (frame prefix, private address, protocol, transport buffer, crypto provider, setup login, OBS module ABI) and Pester (runner, CLI and installer contracts) |
 | `test:asan` | All CTest suites in a separate AddressSanitizer build |
 | `test:live` | A live uncached Bluetooth service query (needs a Bluetooth radio) |
-| `test:red` | All 25 green → red → exact-restoration → green drills over the gates; `-Drill changed` runs only the drills whose inputs changed, `-Drill <id>` one drill |
+| `test:red` | All 27 green → red → exact-restoration → green drills over the gates; `-Drill changed` runs only the drills whose inputs changed, `-Drill <id>` one drill |
 | `quality` | `configure`, `build`, `format:check`, `lint`, `deadcode`, `security:audit`, `test`, `test:live`, then the drills whose inputs changed |
 | `package` | `quality` with every drill, then `dist/meta-g-link-direct-<version>-windows-x64.zip` and its `.sha256` file |
 
@@ -57,24 +57,61 @@ A drill proves that its gate still fails on a planted defect, so it only needs t
 
 `package` stages the user bundle: `Install.cmd`, `Uninstall.cmd`, `Install-MetaGLinkDirect.ps1`, `plugin\meta-g-link-direct.dll`, `plugin\locale\en-US.ini`, `tools\meta-g-link-setup.exe`, `tools\meta-g-link-probe.exe`, `README.txt`, `LICENSE` and `THIRD_PARTY_NOTICES.md`. `Install-MetaGLinkDirect.ps1 -WhatIf` lists the installer's actions without changing anything (it does not show the elevation prompt, which it skips). The installer takes every system folder from Windows (`Get-KnownFolder`) and never assumes a drive letter; `tests/installer.Tests.ps1` fails on a drive-letter path in it. To try an OBS on another drive, map a spare letter to a folder with a portable OBS (`subst M: <folder>`, removed with `subst M: /D`).
 
-The GitHub workflow (`.github/workflows/quality.yml`) builds the portable protocol core on Linux with clang under ASan and UBSan, scans the history with Gitleaks and audits the npm development tools. The Windows, OBS and hardware checks run locally.
+The GitHub workflow `.github/workflows/quality.yml` builds the portable protocol core on Linux with clang under ASan and UBSan, scans the history with Gitleaks and audits the npm development tools. `.github/workflows/platforms.yml` builds, tests and packs on Ubuntu 26.04 with OBS from its project's archive, in the newest OBS Flatpak's SDK, and on Apple Silicon and Intel Macs against the official OBS builds. The Windows and hardware checks run locally.
+
+## Linux and macOS
+
+A build needs the OBS it will run in, and links its libobs and FFmpeg. mbedTLS 3.6 LTS is fetched by hash and linked statically, with its symbols hidden from the OBS process. The Linux and macOS builds treat warnings as errors in owned code.
+
+**Ubuntu 26.04, native OBS.** Add the OBS project's archive, then:
+
+```bash
+sudo add-apt-repository ppa:obsproject/obs-studio
+sudo apt install obs-studio cmake ninja-build g++ pkg-config libavcodec-dev libavutil-dev libbluetooth-dev \
+    libcurl4-openssl-dev libglib2.0-dev libgtk-3-dev libsecret-1-dev libwebkit2gtk-4.1-dev
+cmake -S . -B out/linux -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DMGL_BUILD_LINK=ON -DMGL_BUILD_OBS_PLUGIN=ON
+cmake --build out/linux && ctest --test-dir out/linux --output-on-failure
+```
+
+**OBS Flatpak.** Build inside the Flatpak's own SDK, so the plugin links the runtime's libraries:
+
+```bash
+flatpak install flathub com.obsproject.Studio "$(flatpak info --show-sdk com.obsproject.Studio)"
+flatpak run --devel --share=network --filesystem="$PWD" --command=bash com.obsproject.Studio scripts/build-flatpak.sh
+```
+
+**macOS.** Xcode, CMake, Ninja and `OBS.app` in `/Applications`, whose frameworks the plugin links for that Mac's architecture. `bootstrap-macos.sh` fetches OBS's pinned sources and prebuilt dependency headers:
+
+```bash
+bash scripts/bootstrap-macos.sh
+cmake -S . -B out/macos -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DMGL_BUILD_LINK=ON -DMGL_BUILD_OBS_PLUGIN=ON
+cmake --build out/macos && ctest --test-dir out/macos --output-on-failure
+```
+
+To test a rebuilt plugin on a Mac, copy it into the OBS plugin folder and sign it ad hoc (`codesign --force --deep --sign -`). A rebuilt helper is a new app to macOS: `tccutil reset BluetoothAlways io.github.RandyNorthrup.MetaGLinkDirect.Helper` first, or its Bluetooth question stays hidden. A rebuilt probe asks for the keychain password on each read until you choose Always Allow; OBS doesn't ask. A Mac booted with `amfi_get_out_of_my_way` never shows these questions, so it can build but not test.
+
+`scripts/package-unix.sh` stages `dist/meta-g-link-direct-<version>-<platform>.tar.gz` and its `.sha256` file from finished builds, and `scripts/install-unix.sh` becomes the bundle's `install.sh`.
 
 ## Layout
 
 | Path | Contents |
 |---|---|
-| `include/mgl/`, `src/protocol/` | Protocol: SDU framing, protobuf, DataX, stream and Wi-Fi link messages, HEVC helpers, JSON, encodings and the playout clock that times bursty media (portable, built on Linux in CI), and AirShield (`airshield.cpp`, built with the Windows library because it uses CNG) |
-| `src/windows/` | CNG crypto, DPAPI identity and token storage, Meta setup over WinHTTP and the ownership change shared by both setup programs (`setup.cpp`), RFCOMM and TCP transports, the Wi-Fi client connection, the demand-driven media session, UTF-8/UTF-16 conversion (`win_text.cpp`), radio diagnostics |
+| `include/mgl/`, `src/protocol/` | Protocol: SDU framing, the transport buffer, protobuf, DataX, stream and Wi-Fi link messages, HEVC helpers, JSON, encodings and the playout clock that times bursty media (portable, built on Linux in CI), and AirShield (`airshield.cpp`, built with the link library because it uses the crypto provider) |
+| `src/core/` | Portable session logic: the glasses session, Meta provisioning, the ownership change shared by the setup programs (`setup.cpp`), the identity format over a platform's sealed store, the demand-driven media session |
+| `src/windows/` | CNG crypto, DPAPI storage, WinHTTP, RFCOMM and TCP transports, the Wi-Fi client connection, UTF-8/UTF-16 conversion (`win_text.cpp`), radio diagnostics |
+| `src/posix/` | Shared by Linux and macOS: mbedTLS crypto, libcurl HTTP, the socket transport and TCP |
+| `src/linux/` | BlueZ RFCOMM, NetworkManager Wi-Fi, Secret Service storage |
+| `src/macos/` | Meta G Link Helper (`rfcomm_helper.mm`, `wifi_helper.mm`) and its caller's side (`helper_client.cpp`, `rfcomm_helper_client.cpp`, `wifi_corewlan.mm`), keychain storage |
 | `src/plugin/` | OBS glue in C17 (`module.c` with the Tools menu entry, `source.c` with the camera and microphone sources, `link_settings.c` for the settings shared by all glasses sources, `battery_status.c` for the battery file and the obs-websocket vendor), the C++20 process-wide glasses link (`glasses_link.cpp`, `glasses_link.h`), the video pacer that decodes and presents each picture on time (`video_pacer.cpp`), and the FFmpeg HEVC and AAC decoders (`hevc_decoder.cpp`, `aac_decoder.cpp`, with shared handles in `ffmpeg_handles.hpp`) |
-| `src/setup/` | `meta-g-link-setup.exe`: the setup window (Win32 and WebView2) |
+| `src/setup/` | The setup window: `main.cpp` (Win32 and WebView2), `main_gtk.cpp` (GTK and WebKitGTK), `main_macos.mm` (AppKit and WebKit) |
 | `src/probe/` | `meta-g-link-probe.exe`: `--provision`, stream check and diagnostics |
 | `tests/` | Native test executables and Pester suites |
-| `scripts/` | `Invoke-Project.ps1` (task runner) and `Install-MetaGLinkDirect.ps1` (end-user installer) |
+| `scripts/` | `Invoke-Project.ps1` (task runner), `Install-MetaGLinkDirect.ps1` and `install-unix.sh` (end-user installers), `package-unix.sh`, `build-flatpak.sh` and `bootstrap-macos.sh` |
 | `packaging/` | Files added to the release bundle |
 | `assets/` | README artwork |
-| `reports/` | Hardware observations and gate evidence referenced by `PLAN.md` |
+| `reports/` | Hardware observations and gate evidence referenced by `PLAN.md`; `CERTIFICATION.md` holds the per-platform matrix |
 
-Only the C files include OBS headers: an OBS header needs the MSVC `_udiv128` intrinsic, which clang cannot compile (LLVM issue 59168). The C++ glasses link sits behind the small C interface in `src/plugin/glasses_link.h`, so clang-tidy covers all C++ code. Nothing replaces OBS declarations with a private ABI.
+Only the C files include OBS headers: on Windows, an OBS header needs the MSVC `_udiv128` intrinsic, which clang cannot compile (LLVM issue 59168). The C++ glasses link sits behind the small C interface in `src/plugin/glasses_link.h`, so clang-tidy covers all C++ code. Nothing replaces OBS declarations with a private ABI.
 
 The glasses accept one session, so the plugin holds one `MediaSession` for the whole OBS process. Each glasses source registers with the link and says whether it is live and wants video or audio; the link turns that into a `MediaDemand` (video, audio, keep the link up, video profile from the camera source that went live first, Wi-Fi adapter). The session connects when the demand wants the link and, when the demand changes, stops the stream, configures video and audio again and starts it inside the same session. With video turned off in `ConfigureVideoStreamRequest`, the glasses stream audio alone and keep the camera off. A changed Wi-Fi adapter releases the link and reconnects with the new adapter. The setup window holds the link while it runs, because it needs the glasses' Bluetooth session itself.
 
@@ -84,7 +121,7 @@ The glasses' radio delivers 30 fps in bursts of four or five frames ([report](..
 
 0. **Framing, both links**: each AirShield frame's plaintext is padded with 1–16 bytes of (0xC0 + count). `datax::Decoder` strips the pad and splits DataX messages; the glasses fill frames without regard to message boundaries, so a frame may end inside a payload or a header, and the decoder finishes either from the next frame.
 1. **Bluetooth**: `openBondedMetaRfcomm` connects to the paired glasses' Meta RFCOMM service. `GlassesSession` runs the AirShield handshake (ECDH P-256, HKDF-SHA256, AES-256-CBC with HMAC-SHA256 per frame), proves the owner key (svc36 trust) and ends link setup.
-2. **Wi-Fi**: svc10 `CreateSoftApNetwork` (0x1000) asks the glasses to host a 2.4 GHz / 20 MHz network; `SoftApNetworkInfo` (0x1001) returns its address and port. `connectWifiStation` joins it with the adapter chosen in the source properties (`listWifiAdapters`; empty means the first adapter) and a temporary Native Wi-Fi profile, then waits for a DHCP address. If this step or the media connection fails, the glasses' network is closed over Bluetooth.
+2. **Wi-Fi**: svc10 `CreateSoftApNetwork` (0x1000) asks the glasses to host a 2.4 GHz / 20 MHz network; `SoftApNetworkInfo` (0x1001) returns its address and port. `connectWifiStation` joins it with the adapter chosen in the source properties (`listWifiAdapters`; empty means the first adapter), through a temporary Native Wi-Fi profile, a temporary NetworkManager connection or Meta G Link Helper, then waits for a DHCP address. If this step or the media connection fails, the glasses' network is closed over Bluetooth.
 3. **Media**: a second `GlassesSession` over TCP; svc28 starts the livestream app; svc51350 configures and starts the stream from the current `MediaDemand`, and stops, reconfigures and restarts it when the demand changes. svc28 device-status pushes (types 2005–2044) carry the battery report (`stream::parseBatteryState`). Video arrives as HEVC chunks (types 10 and 12) and audio as AAC chunks (types 9 and 11); each reassembled unit starts with an 8-byte little-endian presentation time (`stream::splitTimedUnit`). The glasses send raw AAC-LC with no AudioSpecificConfig, so `MediaSession` hands the decoder `stream::requestedAudioSpecificConfig()` for the format it asked for. svc100 serves as a keepalive.
 4. **Decode and present**: each unit is timed by `PlayoutClock`. FFmpeg (the `avcodec`/`avutil` that ship with OBS) decodes video on the pacer thread to I420 for `obs_source_output_video`, and audio to float planar samples for `obs_source_output_audio`, both stamped with their presentation time on OBS's clock.
 
@@ -119,6 +156,6 @@ Setting `MGL_HTTP_DEBUG` (to any value) traces the Meta setup requests by URL, f
 
 Releases follow AGENTS.md: they are tagged and published only after `package` passes.
 
-1. Update `CHANGELOG.md` and the version in `CMakeLists.txt`.
-2. Run `package` and check the zip and `.sha256` file under `dist/`.
-3. Tag `v<version>`, push, and create the GitHub release with both files attached, marked Latest. Below 1.0 the release title and notes say beta; it is not flagged as a GitHub pre-release, because the repository page lists only a Latest release.
+1. Update `CHANGELOG.md`, `reports/CERTIFICATION.md` and the version in `CMakeLists.txt`.
+2. Run `package` and check the zip and `.sha256` file under `dist/`. Pack the Linux and macOS bundles with `package-unix.sh` on those systems, or take them from the `platforms.yml` run for the same commit.
+3. Tag `v<version>`, push, and create the GitHub release with every bundle and its `.sha256` file attached, marked Latest. Below 1.0 the release title and notes say beta; it is not flagged as a GitHub pre-release, because the repository page lists only a Latest release.

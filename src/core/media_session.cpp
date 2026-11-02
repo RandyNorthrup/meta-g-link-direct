@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Worker-thread media pipeline. The stream setup order mirrors Visor's LiveStream bring-up at the
 // revision in THIRD_PARTY_NOTICES.md. The Wi-Fi link differs from Visor: the glasses host their
-// own access point (svc10 CreateSoftApNetwork, from the Meta app) and the PC joins it as a client.
-// Every path where the glasses joined an access point stopped sending video within a minute;
-// the glasses-hosted 2.4 GHz / 20 MHz network streamed full resolution without a drop.
+// own access point (svc10 CreateSoftApNetwork, from the Meta app) and the computer joins it as a
+// client. Every path where the glasses joined an access point stopped sending video within a
+// minute; the glasses-hosted 2.4 GHz / 20 MHz network streamed full resolution without a drop.
 #include "mgl/media_session.hpp"
 
 #include "mgl/airshield.hpp"
@@ -11,6 +11,7 @@
 #include "mgl/crypto.hpp"
 #include "mgl/hevc.hpp"
 #include "mgl/identity.hpp"
+#include "mgl/platform.hpp"
 #include "mgl/rfcomm_transport.hpp"
 #include "mgl/session.hpp"
 #include "mgl/stream.hpp"
@@ -18,12 +19,6 @@
 #include "mgl/transport.hpp"
 #include "mgl/wifi_station.hpp"
 #include "wifi_credentials.hpp"
-
-#include <windows.h> // IWYU pragma: keep — SDK umbrella prerequisites.
-
-#include <winnls.h>
-
-#include <winrt/base.h>
 
 #include <algorithm>
 #include <array>
@@ -70,7 +65,7 @@ bool sleepUnlessStopped(std::chrono::milliseconds total, const std::atomic<bool>
     return !stop.load();
 }
 
-// The glasses hold one session at a time and host one network for one PC, so only one media
+// The glasses hold one session at a time and host one network for one computer, so only one media
 // session in the process drives the radio. Later sessions wait their turn instead of fighting over
 // the link, and a session that is still tearing down keeps the lease until its teardown is done.
 class RadioLease {
@@ -137,23 +132,9 @@ inline constexpr std::uint32_t AccessPointChannel = 6;
 // The glasses take a few seconds to start the access point and report it.
 inline constexpr auto AccessPointAnswerWait = 30s;
 
-// The user's region as an ISO 3166 code for the access point's regulatory settings. Falls back to
-// "US" when Windows has no region; channel 6 at 20 MHz is legal in every domain either way.
-std::string regionCode() {
-    constexpr int RegionCodeLength = 3; // two letters and the terminator
-    std::array<wchar_t, RegionCodeLength> name{};
-    if (GetUserDefaultGeoName(name.data(), RegionCodeLength) == RegionCodeLength) {
-        std::string code;
-        for (const wchar_t letter : std::wstring_view(name.data(), RegionCodeLength - 1)) {
-            if (letter < L'A' || letter > L'Z') {
-                return "US";
-            }
-            code.push_back(static_cast<char>(letter));
-        }
-        return code;
-    }
-    return "US";
-}
+// The user's region for the access point's regulatory settings. Falls back to "US" when the system
+// has no region; channel 6 at 20 MHz is legal in every domain either way.
+std::string regionCode() { return platform::userRegion().value_or("US"); }
 
 // Waits for SoftApNetworkInfo after a CreateSoftApNetwork. nullopt on timeout, link loss or stop.
 std::optional<stream::SoftApInfo> awaitAccessPoint(GlassesSession& session,
@@ -189,7 +170,8 @@ std::optional<stream::SoftApInfo> hostAccessPoint(GlassesSession& session,
         if (attempt > 0 && !sleepUnlessStopped(4s, stop)) {
             return std::nullopt;
         }
-        const auto credentials = randomWifiCredentials();
+        auto credentials = randomWifiCredentials();
+        credentials.ssid = wifiNetworkName(credentials.ssid);
         const auto request = stream::buildCreateSoftApNetwork(
             credentials.ssid, credentials.passphrase, stream::Band24GHz, stream::Bw20MHz,
             AccessPointChannel, region, airshield::randomUuid());
@@ -221,17 +203,20 @@ std::optional<stream::SoftApInfo> hostAccessPoint(GlassesSession& session,
     return std::nullopt;
 }
 
+constexpr std::string_view AdapterMissingText =
+    "the Wi-Fi adapter chosen in the source properties is not available";
+
 std::string describeStationFailure(const WifiStation& station) {
-    std::string text = "This PC could not join the glasses' Wi-Fi network: ";
+    std::string text = "This computer could not join the glasses' Wi-Fi network: ";
     switch (station.status) {
     case WifiStationStatus::NoAdapter:
         text += "no Wi-Fi adapter is available";
         break;
     case WifiStationStatus::AdapterMissing:
-        text += "the Wi-Fi adapter chosen in the source properties is not available";
+        text += AdapterMissingText;
         break;
     case WifiStationStatus::ProfileFailed:
-        text += "Windows refused the network profile";
+        text += "the system refused the network profile";
         break;
     case WifiStationStatus::ConnectFailed:
         text += "the adapter did not connect in time";
@@ -242,11 +227,16 @@ std::string describeStationFailure(const WifiStation& station) {
     case WifiStationStatus::BadPeer:
         text += "the glasses reported an address that is not IPv4";
         break;
+    case WifiStationStatus::NoPermission:
+        text += "the system did not allow it";
+        break;
     case WifiStationStatus::Ok:
         text += "unexpected success";
         break;
     }
-    if (station.detail != 0) {
+    if (!station.detail_text.empty()) {
+        text += " (" + station.detail_text + ")";
+    } else if (station.detail != 0) {
         text += std::format(" (error {})", station.detail);
     }
     return text + ".";
@@ -701,11 +691,11 @@ MediaSession::SessionEnd MediaSession::attemptSession() {
     } catch (const std::exception& error) {
         log(std::string("Connection attempt failed: ") + error.what());
         return SessionEnd::Failed;
-    } catch (const winrt::hresult_error& error) {
-        log(std::format("Connection attempt failed with Windows error 0x{:08X}.",
-                        static_cast<std::uint32_t>(error.code().value)));
-        return SessionEnd::Failed;
     } catch (...) {
+        if (const auto described = platform::describeCurrentException()) {
+            log("Connection attempt failed with " + *described + ".");
+            return SessionEnd::Failed;
+        }
         log("Connection attempt failed with an unrecognised error; the camera stops.");
         setState(MediaState::Failed);
         return SessionEnd::Fatal;
@@ -717,7 +707,9 @@ MediaSession::SessionEnd MediaSession::runSession() {
     setState(MediaState::Connecting);
     const auto identity = identity::loadOwnerIdentity();
     if (!identity) {
-        log("No stored glasses identity; run setup first.");
+        const auto problem = identity::lastStorageProblem();
+        log(problem.empty() ? std::string("No stored glasses identity; run setup first.")
+                            : "The stored glasses identity could not be read: " + problem + ".");
         setState(MediaState::Failed);
         return SessionEnd::Fatal;
     }
@@ -731,15 +723,22 @@ MediaSession::SessionEnd MediaSession::runSession() {
 
     // The adapter is fixed for the attempt; choosing another one releases the link and reconnects.
     const std::string wifi_adapter = currentDemand().wifi_adapter;
+    // A chosen adapter that is gone cannot work, so the glasses are not asked to start a network
+    // and spend battery on it; the backoff retries until the adapter returns or the choice changes.
+    if (!wifi_adapter.empty() && !wifiAdapterPresent(wifi_adapter)) {
+        log(std::string("This computer could not join the glasses' Wi-Fi network: ") +
+            std::string(AdapterMissingText) + ".");
+        return SessionEnd::Failed;
+    }
     // The control link outlives the rest of the attempt so it can close the glasses' access point
     // if the attempt fails before the media link opens. Locals unwind in reverse order: the media
-    // link closes, then this PC leaves the glasses' network, then the control link goes.
+    // link closes, then this computer leaves the glasses' network, then the control link goes.
     auto failure = SessionEnd::Failed;
     const auto control = openControlLink(*owner, failure);
     if (!control) {
         return failure;
     }
-    log(std::format("The glasses' Wi-Fi network is up after {}; joining it from this PC.",
+    log(std::format("The glasses' Wi-Fi network is up after {}; joining it from this computer.",
                     elapsed()));
     WifiStation station;
     const auto station_link =
@@ -761,7 +760,7 @@ MediaSession::SessionEnd MediaSession::runSession() {
         return SessionEnd::Failed;
     }
     // From here the glasses have left Bluetooth. They close their network on their own within
-    // about 15 s of this PC leaving (measured); a close sent over the Wi-Fi link was never
+    // about 15 s of this computer leaving (measured); a close sent over the Wi-Fi link was never
     // acknowledged, so none is sent.
     nonce_ = 1;
     if (!prepareMedia(*link->session)) {
@@ -797,9 +796,11 @@ MediaSession::openControlLink(const crypto::OwnerKey& owner, SessionEnd& failure
     // The session reaches Ready even when the glasses refuse the owner key (the ownership setup
     // relies on that), but nothing else works then. Retrying cannot help: the owner changed.
     if (!outcome.trust_tx_ok) {
-        log(std::format("The glasses did not accept this PC as their owner (status 0x{:04X}). "
-                        "Another PC or the phone may have taken ownership; run the setup again.",
-                        outcome.trust_status));
+        log(std::format(
+            "The glasses did not accept this computer as their owner (status 0x{:04X}). "
+            "Another computer or the phone may have taken ownership; run the setup "
+            "again.",
+            outcome.trust_status));
         setState(MediaState::Failed);
         failure = SessionEnd::Fatal;
         return nullptr;
@@ -825,7 +826,7 @@ void MediaSession::abandonAccessPoint(ControlLink& control) {
 
 std::unique_ptr<MediaSession::MediaLink>
 MediaSession::openMediaLink(const crypto::OwnerKey& owner, const stream::SoftApInfo& access_point) {
-    // The glasses host the network, so their TCP server is normally up before this PC has an
+    // The glasses host the network, so their TCP server is normally up before this computer has an
     // address. Connect at once and retry the whole TCP AirShield session on a short, growing delay
     // in case it is not.
     const std::array<std::chrono::milliseconds, 7> delays{0ms, 250ms, 500ms, 1s, 2s, 3s, 4s};
@@ -836,6 +837,7 @@ MediaSession::openMediaLink(const crypto::OwnerKey& owner, const stream::SoftApI
         }
         auto tcp = openTcp(access_point.address, static_cast<std::uint16_t>(access_point.port));
         if (!tcp.transport) {
+            log(std::format("The glasses' media port did not answer (error {}).", tcp.detail));
             continue;
         }
         auto link = std::make_unique<MediaLink>();
@@ -846,6 +848,8 @@ MediaSession::openMediaLink(const crypto::OwnerKey& owner, const stream::SoftApI
             log(std::format("Media session ready after {}; starting the camera.", elapsed()));
             return link;
         }
+        log(std::format("The media connection opened but stopped at stage {}, error {}.",
+                        static_cast<int>(outcome.stage), static_cast<int>(outcome.error)));
         // The failed link drops here, session first, closing its connection.
     }
     log("The media session over Wi-Fi did not reach ready (stage " +
@@ -1029,9 +1033,11 @@ std::optional<Ending> endingFor(StreamWatch::Pump pump, bool flowing) {
     case StreamWatch::Pump::Silent:
         return Ending{.why = "The glasses stopped answering over Wi-Fi.", .stop_stream = true};
     case StreamWatch::Pump::Stalled:
-        return Ending{.why = flowing ? "The stream stalled; the link may have dropped."
-                                     : "The glasses accepted the stream but sent nothing.",
-                      .stop_stream = true};
+        return Ending{
+            .why = flowing ? "The stream stalled; the link may have dropped."
+                           : "The glasses accepted the stream but sent nothing.",
+            .stop_stream = true,
+        };
     case StreamWatch::Pump::StreamEnded:
         return Ending{.why = "The stream ended; reconnecting.", .stop_stream = false};
     }

@@ -1,20 +1,20 @@
 BASELINE EXIT 0
 
 MUTATED EXIT 1
-C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp:80:22: error: code should be clang-formatted [-Wclang-format-violations]
+C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp:82:22: error: code should be clang-formatted [-Wclang-format-violations]
 int red_drill_format( ){return 1;}
                      ^
-C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp:80:24: error: code should be clang-formatted [-Wclang-format-violations]
+C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp:82:24: error: code should be clang-formatted [-Wclang-format-violations]
 int red_drill_format( ){return 1;}
                        ^
-C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp:80:25: error: code should be clang-formatted [-Wclang-format-violations]
+C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp:82:25: error: code should be clang-formatted [-Wclang-format-violations]
 int red_drill_format( ){return 1;}
                         ^
-C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp:80:34: error: code should be clang-formatted [-Wclang-format-violations]
+C:\Users\Randy\Coding\meta_g_link_direct\src\protocol\sdu.cpp:82:34: error: code should be clang-formatted [-Wclang-format-violations]
 int red_drill_format( ){return 1;}
                                  ^
 Write-Error: Native command failed (1): clang-format
 
 RESTORED EXIT 0
 
-RESTORATION SHA256 23f81a1e6ccdf6122fdb9414b839a7e2ca96f3564b1608f35ffa807579178ca0
+RESTORATION SHA256 53d659868e94a518e5fb184fdc191d4906d230a224e9639d3704f0c7468ebf47

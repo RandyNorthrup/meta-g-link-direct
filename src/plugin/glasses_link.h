@@ -69,7 +69,7 @@ struct MglSource* mglSourceCreate(void (*on_frame)(void* context, const struct M
                                   void* context);
 // Unregisters and frees the source. Once it returns no callback reaches the source. NULL is
 // ignored.
-void mglSourceDestroy(struct MglSource* source);
+void mglSourceDestroy(const struct MglSource* source);
 // Whether the source is live in OBS's program output. Returns at once; the link follows within a
 // fraction of a second.
 void mglSourceSetLive(struct MglSource* source, bool live);

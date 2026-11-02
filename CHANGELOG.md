@@ -2,6 +2,36 @@
 
 All notable changes are recorded here. The project follows [semantic versioning](https://semver.org/); versions below 1.0 are beta releases.
 
+## [0.5.0] - 2026-11-01 (beta)
+
+Linux and macOS join Windows. What has and hasn't been checked on each platform is in [`reports/CERTIFICATION.md`](reports/CERTIFICATION.md); how, in [`reports/CROSS_PLATFORM_VERIFICATION.md`](reports/CROSS_PLATFORM_VERIFICATION.md).
+
+### Added
+
+- **Linux**: native OBS and the OBS Flatpak. Bluetooth through BlueZ, a temporary NetworkManager connection for the glasses' network, the identity in the Secret Service, Meta setup over libcurl and a GTK setup window with the login inside it where WebKitGTK is present. Streamed in native OBS 33.0.0 and Flatpak OBS 33.0.1 on Ubuntu 26.04: video in about 15.6 s, 30 fps, quality changes in about 1.2 s, glasses audio, battery. The release's Flatpak build runs on any distribution; its native build needs Ubuntu 26.04's OBS and FFmpeg, and the installer checks that before installing.
+- **macOS**: `Meta G Link Helper`, a small app that holds what OBS can't: Bluetooth and Location, each behind its own macOS question. Streamed in OBS 33.0.1 on an Intel Mac mini with macOS 15: usually 15–23 s to video, 29.9 fps, glasses audio, battery. The identity is in the login keychain; OBS reads it with no prompt. Apple Silicon has automatic build and test checks only; no glasses have been tried on one.
+- `install.sh` for Linux and macOS, with `--setup`, `--uninstall` and `--dry-run`, and `.tar.gz` bundles with SHA-256 files.
+- A CI workflow (`platforms.yml`) that builds, tests and packs on Ubuntu 26.04, in the newest OBS Flatpak, and on Apple Silicon and Intel Macs.
+- Tests for the transport buffer (`buffered-transport`), the crypto providers against published vectors (`crypto-provider`) and the login-address check (`setup-login`), with two new red drills (`buffered-partial-read`, `login-state`; 27 in total).
+
+### Changed
+
+- The portable session, setup and media code moved from `src/windows` to `src/core`; each platform supplies its transport, identity store, Wi-Fi, HTTP and crypto. Windows was checked again on the glasses after the move: video in 11.8 s.
+- Messages say "this computer" instead of "this PC".
+- The media connection's log now gives the reason for each failed attempt, and a keyring or keychain refusal is logged as such instead of as a missing identity.
+- LLVM 23.1.3 for formatting and analysis.
+- The setup windows now share the check of the login's final address and the worker that runs the change of owner, instead of a copy each.
+
+### Verified
+
+- **Two Wi-Fi adapters on Windows with OBS 33.0.1**: each adapter carried the stream with the other left alone, and a chosen adapter that is missing gives an explicit error with no fallback to the other.
+- The final OBS 33 releases: 33.0.1 on Windows, macOS and the Flatpak, 33.0.0 on native Linux.
+
+### Measured
+
+- **Battery**: about 4–5% a minute at 720 × 1280 (62% to 45% in 3 min 33 s; 33% to 25% in about 2 minutes), so about 20–25 minutes from a full charge. This replaces the earlier unconfirmed 35–40 minutes. No full-charge run has been made.
+- The glasses' Bluetooth information reports firmware 20.3.6.
+
 ## [0.4.0] - 2026-10-20 (beta)
 
 ### Added

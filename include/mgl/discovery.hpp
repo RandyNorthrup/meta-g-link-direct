@@ -49,7 +49,7 @@ enum class ClassicMode : std::uint8_t {
     RegisteredConnect,
     LiveDiscovery,
     LiveConnect,
-    PairAndConnect
+    PairAndConnect,
 };
 
 // Live modes query the Meta UUID directly on inquiry peers using Uncached SDP.

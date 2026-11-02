@@ -9,17 +9,15 @@
 #include "mgl/encoding.hpp"
 #include "mgl/http.hpp"
 #include "mgl/json.hpp"
+#include "mgl/platform.hpp"
 #include "mgl/protobuf.hpp"
 #include "mgl/session.hpp"
 
 #include <algorithm>
 #include <array>
 #include <chrono>
-#include <cstddef>
 #include <cstdint>
 #include <cstdio>
-#include <cstdlib>
-#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -57,15 +55,7 @@ ByteView view(std::string_view text) {
     return {reinterpret_cast<const std::uint8_t*>(text.data()), text.size()};
 }
 
-bool httpDebug() {
-    char* raw = nullptr;
-    std::size_t size = 0;
-    // NOLINTNEXTLINE(misc-include-cleaner) - UCRT-only; declared in <stdlib.h>, under <cstdlib>.
-    const auto status = _dupenv_s(&raw, &size, "MGL_HTTP_DEBUG");
-    // _dupenv_s hands back a CRT allocation the caller must release with free.
-    const std::unique_ptr<char, decltype(&std::free)> value(raw, &std::free);
-    return status == 0 && value != nullptr;
-}
+bool httpDebug() { return platform::environmentFlag("MGL_HTTP_DEBUG"); }
 
 std::string toString(ByteView data) { return {data.begin(), data.end()}; }
 
@@ -104,7 +94,7 @@ std::string randomState() {
     std::array<std::uint8_t, 16> raw{};
     crypto::randomBytes(raw);
     // base64url without padding, as secrets.token_urlsafe.
-    auto text = encoding::base64Encode(ByteView(raw.data(), raw.size()));
+    const auto text = encoding::base64Encode(ByteView(raw.data(), raw.size()));
     std::string out;
     for (const char ch : text) {
         if (ch == '+') {
@@ -160,10 +150,12 @@ std::vector<std::pair<std::string, std::string>> commonFields(const std::string&
                                                               const std::string& arae) {
     // user_access_token is the AR-universe user token from the ar.graph login; the glasses'
     // hardware service expects the "ar" universe here.
-    return {{"access_token", hw_token},
-            {"user_access_token", arae},
-            {"user_token_universe", "ar"},
-            {"pair_protocol_version", "4"}};
+    return {
+        {"access_token", hw_token},
+        {"user_access_token", arae},
+        {"user_token_universe", "ar"},
+        {"pair_protocol_version", "4"},
+    };
 }
 
 std::optional<json::Value> postForm(std::string_view url,
@@ -176,7 +168,8 @@ std::optional<json::Value> postForm(std::string_view url,
     const auto body =
         gzip_body ? encoding::gzip(view(encoded)) : Bytes(encoded.begin(), encoded.end());
     std::vector<std::pair<std::string, std::string>> headers{
-        {"Content-Type", std::string(FormUrlEncoded)}};
+        {"Content-Type", std::string(FormUrlEncoded)},
+    };
     if (gzip_body) {
         headers.emplace_back("Content-Encoding", "gzip");
     }
@@ -260,9 +253,12 @@ Authorize authorizeRequest() {
         {"scope", "openid"},
         {"response_type", "code"},
         {"redirect_uri", std::string(LoginRedirectUri)},
-        {"state", state}};
-    return {.url = std::string(AuthorizeUrl) + "?" + encoding::formUrlEncode(query),
-            .state = state};
+        {"state", state},
+    };
+    return {
+        .url = std::string(AuthorizeUrl) + "?" + encoding::formUrlEncode(query),
+        .state = state,
+    };
 }
 
 namespace {
@@ -270,7 +266,8 @@ std::optional<std::string> exchangeCode(const std::string& code, std::string& er
     const std::vector<std::pair<std::string, std::string>> fields{
         {"mt_app_id", std::string(AppId)},
         {"oidc_auth_code", code},
-        {"redirect_uri", std::string(LoginRedirectUri)}};
+        {"redirect_uri", std::string(LoginRedirectUri)},
+    };
     const auto parsed = postForm(ExchangeUrl, fields, false, error);
     if (!parsed) {
         return std::nullopt;
@@ -289,15 +286,15 @@ std::optional<std::string> exchangeCode(const std::string& code, std::string& er
 std::optional<std::string> arLogin(const std::string& frla, const std::string& ar_app_token,
                                    std::string& error) {
     const std::vector<std::pair<std::string, std::string>> fields{
-        {"frl_access_token", frla},
-        {"format", "json"},
-        {"device_id", "meta-g-link-direct"},
-        {"generate_session_cookies", "1"},
-        {"generate_analytics_claim", "1"}};
+        {"frl_access_token", frla},          {"format", "json"},
+        {"device_id", "meta-g-link-direct"}, {"generate_session_cookies", "1"},
+        {"generate_analytics_claim", "1"},
+    };
     const auto encoded = encoding::formUrlEncode(fields);
     const std::vector<std::pair<std::string, std::string>> headers{
         {"Authorization", std::string("OAuth ") + ar_app_token},
-        {"Content-Type", std::string(FormUrlEncoded)}};
+        {"Content-Type", std::string(FormUrlEncoded)},
+    };
     const auto reply = http::post(ArLoginUrl, headers, view(encoded), UserAgent);
     if (httpDebug()) {
         debugReply("[ar-login]", reply.status, reply.body);

@@ -59,11 +59,13 @@ bool VideoPacer::open() {
 }
 
 void VideoPacer::parameters(ByteView annex_b) {
-    push({.parameters = true,
-          .data = Bytes(annex_b.begin(), annex_b.end()),
-          .pts_us = 0,
-          .keyframe = false,
-          .present_at = {}});
+    push({
+        .parameters = true,
+        .data = Bytes(annex_b.begin(), annex_b.end()),
+        .pts_us = 0,
+        .keyframe = false,
+        .present_at = {},
+    });
 }
 
 void VideoPacer::unit(std::uint64_t pts_us, ByteView annex_b, bool keyframe,
@@ -92,11 +94,13 @@ void VideoPacer::unit(std::uint64_t pts_us, ByteView annex_b, bool keyframe,
             }
         }
         if (!skip_to_keyframe_) {
-            queue_.push_back({.parameters = false,
-                              .data = Bytes(annex_b.begin(), annex_b.end()),
-                              .pts_us = pts_us,
-                              .keyframe = keyframe,
-                              .present_at = present_at});
+            queue_.push_back({
+                .parameters = false,
+                .data = Bytes(annex_b.begin(), annex_b.end()),
+                .pts_us = pts_us,
+                .keyframe = keyframe,
+                .present_at = present_at,
+            });
         }
     }
     changed_.notify_one();

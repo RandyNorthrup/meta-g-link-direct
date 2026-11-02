@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 #include "mgl/bytes.hpp"
-#include "mgl/capabilities.hpp"
 #include "mgl/crypto.hpp"
-#include "mgl/discovery.hpp"
 #include "mgl/hevc.hpp"
 #include "mgl/identity.hpp"
 #include "mgl/media_session.hpp"
 #include "mgl/provision.hpp"
-#include "mgl/rfcomm.hpp"
 #include "mgl/rfcomm_transport.hpp"
 #include "mgl/session.hpp"
 #include "mgl/setup.hpp"
 #include "mgl/stream.hpp"
-#include "private_input.hpp"
+
+#ifdef _WIN32
+#include "windows_diagnostics.hpp"
+#endif
 
 #include <chrono>
 #include <condition_variable>
@@ -31,45 +31,6 @@
 #include <utility>
 
 namespace {
-int runDirectProbe(mgl::DirectRfcommRoute route) {
-    const auto input = mgl::readPrivateAddress();
-    mgl::DirectRfcommResult result{};
-    if (input.value && input.error == 0) {
-        result = mgl::probeDirectRfcomm(*input.value, route);
-    }
-    std::ostringstream output;
-    output << R"({"address_input_valid":)" << (input.value ? "true" : "false")
-           << R"(,"input_error":)" << input.error << R"(,"socket_error":)" << result.socket_error
-           << R"(,"cleanup_error":)" << result.cleanup_error << R"(,"connection_attempted":)"
-           << (result.connection_attempted ? "true" : "false") << R"(,"connected":)"
-           << (result.connected ? "true" : "false") << R"(,"timed_out":)"
-           << (result.timed_out ? "true" : "false") << R"(,"received_bytes":)"
-           << result.received_bytes << R"(,"declared_frame_bytes":)" << result.declared_frame_bytes
-           << R"(,"frame_received":)" << (result.frame_received ? "true" : "false")
-           << R"(,"reference_hello_prefix":)" << (result.reference_hello_prefix ? "true" : "false")
-           << R"(,"documented_channel7":)"
-           << (route == mgl::DirectRfcommRoute::DocumentedChannel7 ? "true" : "false")
-           << R"(,"glasses_authenticated":false})" << '\n';
-    const auto json = output.str();
-    std::cout << json;
-    constexpr int DiagnosticIoFailed = 4;
-    constexpr int InvalidInput = 5;
-    constexpr int ProbeFailed = 3;
-    if (!std::cout || !mgl::writeRequestedReport(json)) {
-        return DiagnosticIoFailed;
-    }
-    if (input.error != 0) {
-        return ProbeFailed;
-    }
-    if (!input.value) {
-        return InvalidInput;
-    }
-    return result.socket_error == 0 && result.cleanup_error == 0 && result.connected &&
-                   result.frame_received
-               ? EXIT_SUCCESS
-               : ProbeFailed;
-}
-
 const char* stageWord(mgl::LinkStage stage) {
     switch (stage) {
     case mgl::LinkStage::NotStarted:
@@ -130,7 +91,7 @@ const char* connectWord(mgl::RfcommConnect status) {
 int runHandshakeProbe() {
     constexpr int ProbeFailed = 3;
     constexpr int NoRegisteredMetaService = 6;
-    auto opened = mgl::openBondedMetaRfcomm();
+    const auto opened = mgl::openBondedMetaRfcomm();
     mgl::LinkOutcome outcome;
     if (opened.transport) {
         mgl::GlassesSession session(*opened.transport, nullptr);
@@ -199,8 +160,8 @@ int runAuthUrl() {
     return std::cout ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-// Deletes this PC's sealed glasses identity and imported tokens. The glasses themselves are not
-// contacted: they keep this PC's key as owner until they are set up somewhere else.
+// Deletes this computer's sealed glasses identity and imported tokens. The glasses themselves are
+// not contacted: they keep this computer's key as owner until they are set up somewhere else.
 int runForget() {
     constexpr int ProbeFailed = 3;
     const bool forgotten = mgl::identity::forgetOwnerIdentity();
@@ -249,7 +210,7 @@ std::string trimmedLine(std::string line) {
 }
 
 // Reads the login auth code on stdin and runs the change of owner, reporting each phase as a JSON
-// line. For scripts; people use the setup window (meta-g-link-setup.exe).
+// line. For scripts; people use the setup window (meta-g-link-setup).
 int runProvision() {
     constexpr int ProbeFailed = 3;
     constexpr int InvalidInput = 5;
@@ -285,7 +246,7 @@ int runProvision() {
     return std::cout ? EXIT_SUCCESS : ProbeFailed;
 }
 // Opens a full authenticated link using the stored owner identity: handshake, trust with the
-// owner key, EndLinkSetup. Reaching trust_accepted/ready proves the PC owns the glasses.
+// owner key, EndLinkSetup. Reaching trust_accepted/ready proves this computer owns the glasses.
 int runLink() {
     constexpr int ProbeFailed = 3;
     const auto owner = loadStoredOwner();
@@ -371,11 +332,14 @@ int runStream() {
     };
 
     mgl::MediaSession session(std::move(callbacks));
-    session.setDemand({.video = true,
-                       .audio = false,
-                       .keep_link = false,
-                       .video_config = mgl::stream::VideoConfig{},
-                       .wifi_adapter = {}});
+    const mgl::stream::VideoConfig default_profile{};
+    session.setDemand({
+        .video = true,
+        .audio = false,
+        .keep_link = false,
+        .video_config = default_profile,
+        .wifi_adapter = {},
+    });
     session.start();
     {
         std::unique_lock lock(mutex);
@@ -400,124 +364,6 @@ int runStream() {
     return (stats.frames > 0 && std::cout) ? EXIT_SUCCESS : ProbeFailed;
 }
 
-void writeClassicReport(const mgl::ClassicDiscovery& classic) {
-    std::cout << ",\"classic_devices\":" << classic.classic_devices
-              << ",\"classic_paired_devices\":" << classic.classic_paired_devices
-              << ",\"classic_error\":" << classic.classic_error
-              << ",\"meta_rfcomm_services\":" << classic.meta_rfcomm_services
-              << ",\"rfcomm_hresult\":" << classic.rfcomm_hresult
-              << ",\"inquiry_completed\":" << (classic.inquiry_completed ? "true" : "false")
-              << ",\"rfcomm_timed_out\":" << (classic.rfcomm_timed_out ? "true" : "false")
-              << ",\"rfcomm_ambiguous\":" << (classic.rfcomm_ambiguous ? "true" : "false")
-              << ",\"rfcomm_connection_attempted\":"
-              << (classic.rfcomm_connection_attempted ? "true" : "false")
-              << ",\"rfcomm_connected\":" << (classic.rfcomm_connected ? "true" : "false");
-    std::cout << ",\"uncached_peer_queries\":" << classic.uncached_peer_queries
-              << ",\"uncached_peers_resolved\":" << classic.uncached_peers_resolved
-              << ",\"uncached_service_queries\":" << classic.uncached_service_queries
-              << ",\"uncached_query_failures\":" << classic.uncached_query_failures
-              << ",\"uncached_bluetooth_error\":" << classic.uncached_bluetooth_error
-              << ",\"uncached_requested\":" << (classic.uncached_requested ? "true" : "false")
-              << ",\"uncached_complete\":" << (classic.uncached_complete ? "true" : "false")
-              << ",\"uncached_limit_reached\":"
-              << (classic.uncached_limit_reached ? "true" : "false")
-              << ",\"pairing_error\":" << classic.pairing_error << ",\"pairing_dialog_requested\":"
-              << (classic.pairing_dialog_requested ? "true" : "false")
-              << ",\"windows_bonded\":" << (classic.windows_bonded ? "true" : "false");
-}
-
-std::optional<mgl::ClassicMode> classicMode(std::string_view mode) {
-    if (mode == "--pair-classic") {
-        return mgl::ClassicMode::PairAndConnect;
-    }
-    if (mode == "--discover-classic") {
-        return mgl::ClassicMode::RegisteredDiscovery;
-    }
-    if (mode == "--connect-classic") {
-        return mgl::ClassicMode::RegisteredConnect;
-    }
-    if (mode == "--discover-classic-live") {
-        return mgl::ClassicMode::LiveDiscovery;
-    }
-    if (mode == "--connect-classic-live") {
-        return mgl::ClassicMode::LiveConnect;
-    }
-    return std::nullopt;
-}
-
-int classicExit(const mgl::ClassicDiscovery& classic, bool connect, int baseline_exit) {
-    constexpr int ProbeFailed = 3;
-    constexpr int NoRegisteredMetaService = 6;
-    constexpr int AmbiguousMetaServices = 7;
-    if (classic.classic_error != 0 || classic.rfcomm_hresult != 0 || classic.pairing_error != 0 ||
-        (classic.pairing_dialog_requested && !classic.windows_bonded) ||
-        (classic.uncached_requested && !classic.uncached_complete &&
-         classic.meta_rfcomm_services == 0) ||
-        (!connect && !classic.inquiry_completed) ||
-        (connect && classic.rfcomm_connection_attempted && !classic.rfcomm_connected)) {
-        return ProbeFailed;
-    }
-    if (classic.rfcomm_ambiguous) {
-        return AmbiguousMetaServices;
-    }
-    return baseline_exit == EXIT_SUCCESS && classic.meta_rfcomm_services == 0
-               ? NoRegisteredMetaService
-               : baseline_exit;
-}
-
-int runProbe(std::string_view mode) {
-    const auto capabilities = mgl::inspectWirelessCapabilities();
-    std::cout << "{\"wifi_interfaces\":" << capabilities.wifi_interfaces
-              << ",\"wifi_connected_interfaces\":" << capabilities.wifi_connected_interfaces
-              << ",\"bluetooth_radio\":" << (capabilities.bluetooth_radio ? "true" : "false")
-              << ",\"wifi_error\":" << capabilities.wifi_error
-              << ",\"bluetooth_error\":" << capabilities.bluetooth_error
-              << ",\"bluetooth_features_error\":" << capabilities.bluetooth_features_error
-              << ",\"bluetooth_features_valid\":"
-              << (capabilities.bluetooth_features_valid ? "true" : "false")
-              << ",\"bluetooth_le_supported\":"
-              << (capabilities.bluetooth_le_supported ? "true" : "false")
-              << ",\"bluetooth_classic_supported\":"
-              << (capabilities.bluetooth_classic_supported ? "true" : "false")
-              << ",\"bluetooth_hci_version\":"
-              << static_cast<unsigned>(capabilities.bluetooth_hci_version)
-              << ",\"bluetooth_lmp_version\":"
-              << static_cast<unsigned>(capabilities.bluetooth_lmp_version);
-    constexpr int HardwareUnavailable = 2;
-    constexpr int ProbeFailed = 3;
-    int exit_code = capabilities.wifi_interfaces > 0 && capabilities.bluetooth_radio
-                        ? EXIT_SUCCESS
-                        : HardwareUnavailable;
-    if (capabilities.wifi_error != 0 || capabilities.bluetooth_error != 0) {
-        exit_code = ProbeFailed;
-    }
-    if (mode == "--discover") {
-        const auto discovery = mgl::inspectBluetoothAdvertisements();
-        std::cout << R"(,"scan_duration_seconds":10,"advertisement_reports":)"
-                  << discovery.advertisement_reports
-                  << ",\"meta_advertisement_reports\":" << discovery.meta_advertisement_reports
-                  << ",\"discovery_hresult\":" << discovery.hresult
-                  << ",\"discovery_bluetooth_error\":" << discovery.bluetooth_error
-                  << ",\"scan_completed\":" << (discovery.scan_completed ? "true" : "false");
-        constexpr int NoAdvertisingCandidate = 6;
-        if (discovery.hresult != 0 || discovery.bluetooth_error != 0 || !discovery.scan_completed) {
-            exit_code = ProbeFailed;
-        } else if (exit_code == EXIT_SUCCESS && discovery.meta_advertisement_reports == 0) {
-            exit_code = NoAdvertisingCandidate;
-        }
-    }
-    if (const auto classic_mode = classicMode(mode)) {
-        const bool connect = *classic_mode == mgl::ClassicMode::PairAndConnect ||
-                             *classic_mode == mgl::ClassicMode::RegisteredConnect ||
-                             *classic_mode == mgl::ClassicMode::LiveConnect;
-        const auto classic = mgl::inspectClassicRfcomm(*classic_mode);
-        writeClassicReport(classic);
-        exit_code = classicExit(classic, connect, exit_code);
-    }
-    std::cout << ",\"glasses_connection_tested\":false}\n";
-    return std::cout ? exit_code : ProbeFailed;
-}
-
 } // namespace
 
 int main(int argc, char* argv[]) {
@@ -525,15 +371,20 @@ int main(int argc, char* argv[]) {
         if (argc == 2 && std::string_view(argv[1]) == "--help") {
             std::cout
                 << "Usage: meta-g-link-probe "
-                   "[--auth-url|--provision|--import-tokens|--link|--stream|"
-                   "--forget|--handshake|--discover|--discover-classic|--connect-classic|"
+                   "[--auth-url|--provision|--import-tokens|--link|--stream|--forget|--handshake"
+#ifdef _WIN32
+                   "|--discover|--discover-classic|--connect-classic|"
                    "--discover-classic-live|--connect-classic-live|--pair-classic|"
-                   "--direct-classic-uuid|--direct-classic-channel7|--help]\n"
+                   "--direct-classic-uuid|--direct-classic-channel7"
+#endif
+                   "|--help]\n"
+#ifdef _WIN32
                    "Default: local radio/association counts only.\n"
+#endif
                    "Setup and camera:\n"
-                   "People set up the glasses with the setup window, meta-g-link-setup.exe.\n"
+                   "People set up the glasses with the setup window, meta-g-link-setup.\n"
                    "--auth-url: print the Meta login address used by --provision.\n"
-                   "--provision: read the login code on stdin and make this PC the glasses' "
+                   "--provision: read the login code on stdin and make this computer the glasses' "
                    "owner. The Meta AI phone app loses the glasses until they are added there "
                    "again.\n"
                    "--import-tokens: seal Meta app tokens from stdin; they override the built-in "
@@ -542,15 +393,16 @@ int main(int argc, char* argv[]) {
                    "the stage reached.\n"
                    "--stream: the OBS source's camera path, for sixty seconds of video; status "
                    "on stderr, summary on stdout.\n"
-                   "--forget: delete this PC's stored glasses identity and imported tokens.\n"
+                   "--forget: delete this computer's stored glasses identity and imported tokens.\n"
                    "Only --auth-url and --provision contact Meta. --stream asks the "
                    "glasses to "
-                   "host their own Wi-Fi network and joins this PC's Wi-Fi adapter to it while it "
-                   "runs; the adapter is free for its usual networks afterwards.\n"
+                   "host their own Wi-Fi network and joins this computer's Wi-Fi adapter to it "
+                   "while it runs; the adapter is free for its usual networks afterwards.\n"
                    "Diagnostics:\n"
                    "--handshake: open the bonded Meta RFCOMM service and run the AirShield "
                    "handshake only (no owner key, no trust, no ownership change); reports the "
                    "stage reached.\n"
+#ifdef _WIN32
                    "--discover: active BLE scan for 10 seconds; aggregate report counts only.\n"
                    "--discover-classic: Classic inquiry (5.12s) and registered Meta service "
                    "lookup.\n"
@@ -571,6 +423,7 @@ int main(int argc, char* argv[]) {
                    "Meta marker is a candidate, not verified model or authenticated glasses.\n"
                    "Only --pair-classic requests Windows pairing. The diagnostics make no Meta "
                    "login, record no identifiers and change no network settings.\n"
+#endif
                    "Exit: 0 completed; 2 hardware missing; 3 API/probe failure; 4 report I/O; "
                    "5 invalid arguments/address; "
                    "6 no Meta candidate/service; 7 ambiguous Meta services.\n";
@@ -598,18 +451,14 @@ int main(int argc, char* argv[]) {
         if (mode == "--forget") {
             return runForget();
         }
-        if (mode == "--direct-classic-uuid" || mode == "--direct-classic-channel7") {
-            return runDirectProbe(mode == "--direct-classic-channel7"
-                                      ? mgl::DirectRfcommRoute::DocumentedChannel7
-                                      : mgl::DirectRfcommRoute::ServiceUuid);
+#ifdef _WIN32
+        if (argc <= 2 && mgl::probe::isWindowsDiagnostic(mode)) {
+            return mgl::probe::runWindowsDiagnostic(mode);
         }
-        const bool valid_mode = mode == "--discover" || classicMode(mode).has_value();
-        if (argc != 1 && !valid_mode) {
-            std::cerr << "Invalid arguments; use --help.\n";
-            constexpr int InvalidArguments = 5;
-            return InvalidArguments;
-        }
-        return runProbe(mode);
+#endif
+        std::cerr << "Invalid arguments; use --help.\n";
+        constexpr int InvalidArguments = 5;
+        return InvalidArguments;
     } catch (const std::exception& error) {
         constexpr int DiagnosticWriteFailed = 4;
         if (std::fputs(error.what(), stderr) == EOF || std::fputc('\n', stderr) == EOF) {

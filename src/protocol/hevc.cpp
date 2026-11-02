@@ -167,8 +167,10 @@ std::optional<Dimensions> pictureSize(BitReader& reader) {
     if (width <= 0 || height <= 0 || width > MaxPictureSide || height > MaxPictureSide) {
         return std::nullopt;
     }
-    return Dimensions{.width = static_cast<std::uint32_t>(width),
-                      .height = static_cast<std::uint32_t>(height)};
+    return Dimensions{
+        .width = static_cast<std::uint32_t>(width),
+        .height = static_cast<std::uint32_t>(height),
+    };
 }
 } // namespace
 

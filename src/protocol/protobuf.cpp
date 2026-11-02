@@ -107,10 +107,12 @@ std::optional<Message> Message::parse(ByteView data) {
         if (number == 0 || number > MaximumFieldNumber) {
             return std::nullopt;
         }
-        Field field{.number = static_cast<std::uint32_t>(number),
-                    .length_delimited = false,
-                    .varint = 0,
-                    .bytes = {}};
+        Field field{
+            .number = static_cast<std::uint32_t>(number),
+            .length_delimited = false,
+            .varint = 0,
+            .bytes = {},
+        };
         switch (*key & WireTypeMask) {
         case WireVarint: {
             const auto value = cursor.readVarint();

@@ -2,6 +2,7 @@
 #include "mgl/setup.hpp"
 
 #include "mgl/crypto.hpp"
+#include "mgl/encoding.hpp"
 #include "mgl/identity.hpp"
 #include "mgl/provision.hpp"
 #include "mgl/rfcomm_transport.hpp"
@@ -9,6 +10,8 @@
 
 #include <algorithm>
 #include <chrono>
+#include <exception>
+#include <functional>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -45,23 +48,8 @@ Outcome stopped(Outcome outcome, std::string problem) {
     outcome.problem = std::move(problem);
     return outcome;
 }
-} // namespace
 
-RfcommOpen openGlassesRfcomm() {
-    constexpr int Attempts = 6;
-    constexpr auto Pause = std::chrono::seconds(3);
-    RfcommOpen opened;
-    for (int attempt = 0; attempt < Attempts; ++attempt) {
-        opened = openBondedMetaRfcomm();
-        if (opened.transport) {
-            break;
-        }
-        std::this_thread::sleep_for(Pause);
-    }
-    return opened;
-}
-
-Outcome changeOwner(const std::string& auth_code) {
+Outcome runSetup(const std::string& auth_code) {
     Outcome outcome;
     // Imported tokens come first; the built-in Meta AI app tokens fill whatever the store lacks,
     // so setup works without --import-tokens.
@@ -89,10 +77,11 @@ Outcome changeOwner(const std::string& auth_code) {
     const auto opened = openGlassesRfcomm();
     if (!opened.transport) {
         outcome.rfcomm = opened.status;
-        return stopped(std::move(outcome),
-                       "This PC could not open a Bluetooth connection to the glasses. Check that "
-                       "they are paired with this PC, charged and out of the case, and that your "
-                       "phone's Bluetooth is off.");
+        return stopped(
+            std::move(outcome),
+            "This computer could not open a Bluetooth connection to the glasses. Check that "
+            "they are paired with this computer, charged and out of the case, and that your "
+            "phone's Bluetooth is off.");
     }
 
     outcome.phase = Phase::Handshake;
@@ -118,11 +107,78 @@ Outcome changeOwner(const std::string& auth_code) {
     sealed.serial = outcome.change_owner.serial;
     sealed.user_id = outcome.change_owner.user_id;
     if (!identity::saveOwnerIdentity(sealed)) {
-        return stopped(std::move(outcome), "The glasses now belong to this PC, but the identity "
-                                           "could not be saved on this PC. Run the setup again.");
+        const auto problem = identity::lastStorageProblem();
+        return stopped(std::move(outcome),
+                       "The glasses now belong to this computer, but the identity could not be "
+                       "saved here" +
+                           (problem.empty() ? std::string() : " (" + problem + ")") +
+                           ". Run the setup again.");
     }
     outcome.phase = Phase::Done;
     outcome.ok = true;
     return outcome;
+}
+} // namespace
+
+LoginAddress readLoginAddress(const std::string& address, const std::string& expected_state) {
+    LoginAddress result;
+    const auto state = encoding::queryParameter(address, "state");
+    if (state && *state != expected_state) {
+        result.problem =
+            "That address belongs to a different login. Select Try again and log in again.";
+        return result;
+    }
+    result.code = encoding::queryParameter(address, "code");
+    if (!result.code) {
+        result.problem = "The login did not return a code. Select Try again and log in again.";
+    }
+    return result;
+}
+
+RfcommOpen openGlassesRfcomm() {
+    constexpr int Attempts = 6;
+    constexpr auto Pause = std::chrono::seconds(3);
+    RfcommOpen opened;
+    for (int attempt = 0; attempt < Attempts; ++attempt) {
+        opened = openBondedMetaRfcomm();
+        if (opened.transport) {
+            break;
+        }
+        std::this_thread::sleep_for(Pause);
+    }
+    return opened;
+}
+
+Outcome changeOwner(const std::string& auth_code) {
+    try {
+        return runSetup(auth_code);
+    } catch (const std::exception& error) {
+        Outcome outcome;
+        outcome.problem = std::string("The setup hit an internal error: ") + error.what();
+        return outcome;
+    }
+}
+
+OwnerChange::~OwnerChange() {
+    if (thread_.joinable()) {
+        thread_.join();
+    }
+}
+
+void OwnerChange::start(std::string auth_code, std::function<void()> finished) {
+    if (thread_.joinable()) {
+        thread_.join();
+    }
+    thread_ = std::thread([this, code = std::move(auth_code), done = std::move(finished)] {
+        outcome_ = changeOwner(code);
+        done();
+    });
+}
+
+Outcome OwnerChange::finish() {
+    if (thread_.joinable()) {
+        thread_.join();
+    }
+    return outcome_;
 }
 } // namespace mgl::setup

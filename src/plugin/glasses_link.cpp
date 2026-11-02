@@ -11,6 +11,7 @@
 
 #include "aac_decoder.hpp"
 #include "hevc_decoder.hpp"
+#include "setup_process.hpp"
 #include "video_pacer.hpp"
 
 #include "mgl/battery.hpp"
@@ -20,18 +21,6 @@
 #include "mgl/playout.hpp"
 #include "mgl/stream.hpp"
 #include "mgl/wifi_station.hpp"
-#include "mgl/win_text.hpp"
-
-#include <windows.h> // IWYU pragma: keep — SDK umbrella prerequisites.
-
-#include <errhandlingapi.h>
-#include <fileapi.h>
-#include <handleapi.h>
-#include <minwindef.h>
-#include <processthreadsapi.h>
-#include <synchapi.h>
-#include <winbase.h>
-#include <winnt.h>
 
 #include <algorithm>
 #include <array>
@@ -61,29 +50,54 @@ struct QualityPreset {
     const char* key = nullptr;
     mgl::stream::VideoConfig config;
 };
-constexpr std::array<QualityPreset, 4> QualityPresets{{
-    {.key = "q720",
-     .config = {.width = 720,
-                .height = 1280,
-                .bitrate = 4'000'000,
-                .frame_rate = 30,
-                .iframe_interval = 1}},
-    {.key = "q1080",
-     .config = {.width = 1080,
-                .height = 1920,
-                .bitrate = 4'000'000,
-                .frame_rate = 30,
-                .iframe_interval = 1}},
-    {.key = "q504",
-     .config = {.width = 504,
-                .height = 896,
-                .bitrate = 1'500'000,
-                .frame_rate = 30,
-                .iframe_interval = 1}},
-    {.key = "q360",
-     .config =
-         {.width = 360, .height = 640, .bitrate = 600'000, .frame_rate = 24, .iframe_interval = 1}},
-}};
+constexpr std::array<QualityPreset, 4> QualityPresets{
+    {
+        {
+            .key = "q720",
+            .config =
+                {
+                    .width = 720,
+                    .height = 1280,
+                    .bitrate = 4'000'000,
+                    .frame_rate = 30,
+                    .iframe_interval = 1,
+                },
+        },
+        {
+            .key = "q1080",
+            .config =
+                {
+                    .width = 1080,
+                    .height = 1920,
+                    .bitrate = 4'000'000,
+                    .frame_rate = 30,
+                    .iframe_interval = 1,
+                },
+        },
+        {
+            .key = "q504",
+            .config =
+                {
+                    .width = 504,
+                    .height = 896,
+                    .bitrate = 1'500'000,
+                    .frame_rate = 30,
+                    .iframe_interval = 1,
+                },
+        },
+        {
+            .key = "q360",
+            .config =
+                {
+                    .width = 360,
+                    .height = 640,
+                    .bitrate = 600'000,
+                    .frame_rate = 24,
+                    .iframe_interval = 1,
+                },
+        },
+    },
+};
 
 using LogFn = void (*)(const char* message);
 using FrameFn = void (*)(void* context, const MglVideoFrame* frame);
@@ -258,28 +272,6 @@ const char* stateKey(mgl::MediaState state) {
     return "Status.Idle";
 }
 
-struct HandleCloser {
-    void operator()(HANDLE handle) const noexcept {
-        if (handle != nullptr && handle != INVALID_HANDLE_VALUE) {
-            CloseHandle(handle);
-        }
-    }
-};
-using UniqueHandle = std::unique_ptr<void, HandleCloser>;
-
-// The installed setup window, %LOCALAPPDATA%\MetaGLinkDirect\bin\meta-g-link-setup.exe, when
-// present.
-std::optional<std::wstring> setupToolPath() {
-    const auto directory = mgl::identity::storageDirectory();
-    if (!directory) {
-        return std::nullopt;
-    }
-    std::wstring path = mgl::widenUtf8(*directory) + L"\\bin\\meta-g-link-setup.exe";
-    if (GetFileAttributesW(path.c_str()) == INVALID_FILE_ATTRIBUTES) {
-        return std::nullopt;
-    }
-    return path;
-}
 } // namespace
 
 // One OBS source registered with the link. media, live and live_order are written under both of
@@ -305,26 +297,15 @@ class Link {
     Link& operator=(Link&&) = delete;
     // Unload normally stops the watcher first; this only covers a process ending without it.
     ~Link() {
-        if (shutdown_event_) {
-            SetEvent(shutdown_event_.get());
+        if (setup_) {
+            setup_->requestStop();
         }
         if (setup_watcher_.joinable()) {
             setup_watcher_.join();
         }
     }
 
-    void init(LogFn on_log) {
-        on_log_.store(on_log);
-        const std::scoped_lock lock(mutex_);
-        if (!shutdown_event_) {
-            shutdown_event_.reset(CreateEventW(nullptr, TRUE, FALSE, nullptr));
-            if (!shutdown_event_) {
-                log(std::format("Could not create the setup watch event (error {}); the Set up "
-                                "button will be unavailable.",
-                                GetLastError()));
-            }
-        }
-    }
+    void init(LogFn on_log) { on_log_.store(on_log); }
 
     void log(const std::string& message) const {
         if (const LogFn on_log = on_log_.load(); on_log != nullptr) {
@@ -411,46 +392,43 @@ class Link {
         if (setup_running_) {
             return "Setup.Running";
         }
-        if (shut_down_ || !shutdown_event_) {
+        if (shut_down_) {
             return "Setup.Failed";
-        }
-        const auto tool = setupToolPath();
-        if (!tool) {
-            log("The setup tool is not installed. Run Install.cmd from the release zip, then try "
-                "again.");
-            return "Setup.ToolMissing";
         }
         if (setup_watcher_.joinable()) {
             setup_watcher_.join(); // the previous setup's watcher has already finished
         }
+        auto setup = std::make_shared<mgl::plugin::SetupProcess>();
         // Release the glasses first: the setup needs its own Bluetooth session with them.
         held_ = true;
         refreshLocked();
-        std::wstring command = L"\"" + *tool + L"\"";
-        STARTUPINFOW startup{};
-        startup.cb = sizeof(startup);
-        PROCESS_INFORMATION process{};
-        if (CreateProcessW(tool->c_str(), command.data(), nullptr, nullptr, FALSE, 0, nullptr,
-                           nullptr, &startup, &process) == FALSE) {
-            const DWORD error = GetLastError();
+        std::uint32_t error = 0;
+        switch (setup->start(error)) {
+        case mgl::plugin::SetupProcess::Start::ToolMissing:
             held_ = false;
             refreshLocked();
-            log(std::format("Windows could not start the setup tool (error {}).", error));
+            log("The setup tool is not installed. Run the installer from the release, then try "
+                "again.");
+            return "Setup.ToolMissing";
+        case mgl::plugin::SetupProcess::Start::Failed:
+            held_ = false;
+            refreshLocked();
+            log(std::format("The system could not start the setup tool (error {}).", error));
             return "Setup.Failed";
+        case mgl::plugin::SetupProcess::Start::Started:
+            break;
         }
-        CloseHandle(process.hThread);
-        UniqueHandle watched(process.hProcess);
         try {
-            setup_watcher_ = std::thread(
-                [this, handle = std::move(watched)]() mutable { watchSetup(std::move(handle)); });
-        } catch (const std::system_error& error) {
+            setup_watcher_ = std::thread([this, setup] { watchSetup(*setup); });
+        } catch (const std::system_error& failure) {
             held_ = false;
             refreshLocked();
             log(std::string("The setup window opened, but the glasses link could not watch it, "
                             "so it carries on now: ") +
-                error.what());
+                failure.what());
             return "Setup.Started";
         }
+        setup_ = std::move(setup);
         setup_running_ = true;
         log("The glasses setup window is open. The glasses link waits until it closes.");
         return "Setup.Started";
@@ -462,9 +440,10 @@ class Link {
             retirement().retire(std::exchange(session_, nullptr)); // release the glasses first
         }
         const bool gone = mgl::identity::forgetOwnerIdentity();
-        log(gone ? "Forgot the glasses: this PC's stored identity was deleted. Run the setup to "
+        log(gone ? "Forgot the glasses: this computer's stored identity was deleted. Run the setup "
+                   "to "
                    "use them again."
-                 : "Could not delete all of this PC's stored glasses identity.");
+                 : "Could not delete all of this computer's stored glasses identity.");
         refreshLocked();
         return gone;
     }
@@ -476,8 +455,8 @@ class Link {
             if (session_) {
                 retirement().retire(std::exchange(session_, nullptr));
             }
-            if (shutdown_event_) {
-                SetEvent(shutdown_event_.get());
+            if (setup_) {
+                setup_->requestStop();
             }
         }
         // Outside the lock: the watcher takes it when the setup window closes.
@@ -534,7 +513,7 @@ class Link {
     }
 
     std::unique_ptr<mgl::MediaSession> makeSession() {
-        auto media = std::make_shared<SessionMedia>();
+        const auto media = std::make_shared<SessionMedia>();
         media->video = std::make_unique<mgl::plugin::VideoPacer>(
             [this, target = media.get()](const mgl::plugin::DecodedFrame& picture,
                                          PacerClock::time_point present_at) {
@@ -610,16 +589,18 @@ class Link {
             media.height = decoded.height;
             log(std::format("receiving video {}x{}", decoded.width, decoded.height));
         }
-        const MglVideoFrame frame{.plane_y = std::get<0>(decoded.plane),
-                                  .plane_u = std::get<1>(decoded.plane),
-                                  .plane_v = std::get<2>(decoded.plane),
-                                  .stride_y = std::get<0>(decoded.linesize),
-                                  .stride_u = std::get<1>(decoded.linesize),
-                                  .stride_v = std::get<2>(decoded.linesize),
-                                  .width = decoded.width,
-                                  .height = decoded.height,
-                                  .present_in_ns = nanosUntil(present_at),
-                                  .full_range = decoded.full_range};
+        const MglVideoFrame frame{
+            .plane_y = std::get<0>(decoded.plane),
+            .plane_u = std::get<1>(decoded.plane),
+            .plane_v = std::get<2>(decoded.plane),
+            .stride_y = std::get<0>(decoded.linesize),
+            .stride_u = std::get<1>(decoded.linesize),
+            .stride_v = std::get<2>(decoded.linesize),
+            .width = decoded.width,
+            .height = decoded.height,
+            .present_in_ns = nanosUntil(present_at),
+            .full_range = decoded.full_range,
+        };
         const std::scoped_lock lock(output_mutex_);
         for (const auto& source : sources_) {
             if (source->live && source->video && source->on_frame != nullptr) {
@@ -662,21 +643,17 @@ class Link {
 
     // The setup watcher thread: waits for the setup window to close, then lets the link reconnect
     // with whatever identity the setup left. Unload ends the wait and leaves the window open.
-    void watchSetup(UniqueHandle process) noexcept {
+    void watchSetup(mgl::plugin::SetupProcess& process) noexcept {
         try {
-            const std::array<HANDLE, 2> waits{process.get(), shutdown_event_.get()};
-            const DWORD woke = WaitForMultipleObjects(static_cast<DWORD>(waits.size()),
-                                                      waits.data(), FALSE, INFINITE);
+            const auto code = process.wait();
             const std::scoped_lock lock(mutex_);
             setup_running_ = false;
-            if (woke != WAIT_OBJECT_0) {
-                return; // unload, or the wait failed; the window stays open on its own
+            if (!code) {
+                return; // unload; the window stays open on its own
             }
-            DWORD code = 0;
-            const bool known = GetExitCodeProcess(process.get(), &code) != FALSE;
-            log(known && code == 0
+            log(*code == 0
                     ? "Glasses setup finished; reconnecting with the new identity."
-                    : std::format("The glasses setup closed without finishing (exit {}).", code));
+                    : std::format("The glasses setup closed without finishing (exit {}).", *code));
             held_ = false;
             if (session_) {
                 retirement().retire(
@@ -720,7 +697,7 @@ class Link {
     std::unique_ptr<mgl::MediaSession> session_;
     StatusCell status_;
     std::atomic<LogFn> on_log_{nullptr};
-    UniqueHandle shutdown_event_;
+    std::shared_ptr<mgl::plugin::SetupProcess> setup_; // set while a setup window may be open
     std::thread setup_watcher_;
 };
 
@@ -786,7 +763,7 @@ MglSource* mglSourceCreate(void (*on_frame)(void* context, const MglVideoFrame* 
     }
 }
 
-void mglSourceDestroy(MglSource* source) {
+void mglSourceDestroy(const MglSource* source) {
     if (source != nullptr) {
         guarded("glasses source removal", [source] { link().remove(source); });
     }
@@ -876,10 +853,12 @@ void mglLinkSetBatteryListener(void (*on_change)(void* context, const MglBattery
             // The listener runs on the link's threads; nothing may unwind into the C side.
             try {
                 const std::string text = mgl::battery::overlayText(reading);
-                const MglBattery battery{.known = reading.has_value(),
-                                         .percent = reading ? reading->percent : 0,
-                                         .charging = reading && reading->charging,
-                                         .text = text.c_str()};
+                const MglBattery battery{
+                    .known = reading.has_value(),
+                    .percent = reading ? reading->percent : 0,
+                    .charging = reading && reading->charging,
+                    .text = text.c_str(),
+                };
                 on_change(context, &battery);
             } catch (const std::exception& error) {
                 link().log(std::string("Reporting the glasses' battery failed: ") + error.what());

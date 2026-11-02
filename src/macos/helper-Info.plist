@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
+<key>CFBundleIdentifier</key><string>io.github.RandyNorthrup.MetaGLinkDirect.Helper</string>
+<key>CFBundleName</key><string>Meta G Link Helper</string>
+<key>CFBundleDisplayName</key><string>Meta G Link Helper</string>
+<key>CFBundleExecutable</key><string>meta-g-link-helper</string>
+<key>CFBundlePackageType</key><string>APPL</string>
+<key>CFBundleShortVersionString</key><string>${MACOSX_BUNDLE_SHORT_VERSION_STRING}</string>
+<key>CFBundleVersion</key><string>${MACOSX_BUNDLE_SHORT_VERSION_STRING}</string>
+<key>LSMinimumSystemVersion</key><string>12.0</string>
+<key>LSUIElement</key><true/>
+<key>NSPrincipalClass</key><string>NSApplication</string>
+<key>NSBluetoothAlwaysUsageDescription</key><string>Meta G Link Direct connects to your Ray-Ban Meta glasses over Bluetooth.</string>
+<key>NSLocationUsageDescription</key><string>macOS shows a Wi-Fi network's name only to apps allowed Location. Meta G Link Direct needs the name to join your glasses' network, and never reads where you are.</string>
+<key>NSLocationWhenInUseUsageDescription</key><string>macOS shows a Wi-Fi network's name only to apps allowed Location. Meta G Link Direct needs the name to join your glasses' network, and never reads where you are.</string>
+</dict></plist>

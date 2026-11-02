@@ -111,10 +111,8 @@ LinkOutcome GlassesSession::open() {
     if (outcome.stage != LinkStage::KeysDerived) {
         return outcome;
     }
-    if (owner_ != nullptr) {
-        if (!runTrust(outcome)) {
-            return outcome;
-        }
+    if (owner_ != nullptr && !runTrust(outcome)) {
+        return outcome;
     }
     if (!finishLinkSetup()) {
         outcome.error = LinkError::TransportFailed;
@@ -132,7 +130,7 @@ LinkOutcome GlassesSession::openHandshake() {
     LinkOutcome outcome;
     outcome.stage = LinkStage::Connected;
 
-    auto ephemeral = crypto::EcdhKey::generate();
+    const auto ephemeral = crypto::EcdhKey::generate();
     std::array<std::uint8_t, airshield::ChallengeSize> my_challenge{};
     std::array<std::uint8_t, airshield::SeedSize> my_seed{};
     std::array<std::uint8_t, airshield::IvSize> my_iv{};
@@ -349,7 +347,7 @@ std::optional<RawMessage> GlassesSession::receiveRaw(std::chrono::milliseconds t
         if (!message) {
             return std::nullopt;
         }
-        auto& info = message->header;
+        const auto& info = message->header;
         if (info.service != 0) {
             registry_.bindInbound(info.channel, info.service);
         }
@@ -365,13 +363,15 @@ std::optional<RawMessage> GlassesSession::receiveRaw(std::chrono::milliseconds t
             }
             continue;
         }
-        return RawMessage{.channel = info.channel,
-                          .service = service,
-                          .type = info.type,
-                          .error = info.error,
-                          .has_error = info.has_error,
-                          .closed = info.closed,
-                          .payload = std::move(message->payload)};
+        return RawMessage{
+            .channel = info.channel,
+            .service = service,
+            .type = info.type,
+            .error = info.error,
+            .has_error = info.has_error,
+            .closed = info.closed,
+            .payload = std::move(message->payload),
+        };
     }
     return std::nullopt;
 }
@@ -389,9 +389,11 @@ std::optional<ServiceMessage> GlassesSession::receive(std::chrono::milliseconds 
         if (message->has_error || (message->closed && message->payload.empty())) {
             continue;
         }
-        return ServiceMessage{.service = message->service,
-                              .type = message->type,
-                              .payload = std::move(message->payload)};
+        return ServiceMessage{
+            .service = message->service,
+            .type = message->type,
+            .payload = std::move(message->payload),
+        };
     }
     return std::nullopt;
 }

@@ -204,11 +204,12 @@ bool Decoder::decode(ByteView plaintext, std::vector<Message>& out) {
             continue;
         }
         // The payload continues in the next frame.
-        fragment_ =
-            Fragment{.header = *header,
-                     .data = Bytes(rest.begin() + static_cast<std::ptrdiff_t>(header->header_size),
-                                   rest.end()),
-                     .needed = header->dataSize()};
+        fragment_ = Fragment{
+            .header = *header,
+            .data =
+                Bytes(rest.begin() + static_cast<std::ptrdiff_t>(header->header_size), rest.end()),
+            .needed = header->dataSize(),
+        };
         return true;
     }
     return true;

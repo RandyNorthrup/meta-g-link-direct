@@ -2,24 +2,24 @@
 
 | Field | Value |
 |---|---|
-| Status | Confirmed contract; public beta releases (0.3.0 adds the microphone source, the shared link, keep-connected and the setup window; 0.3.1 shows the full 30 fps in OBS; 0.3.2 fixes old sources' audio tracks and messages split inside their header; 0.4.0 passes the battery to overlays and obs-websocket, and fixes the setup window's size, focus and labels after the accessibility pass) |
+| Status | Confirmed contract; public beta releases (0.3.0 adds the microphone source, the shared link, keep-connected and the setup window; 0.3.1 shows the full 30 fps in OBS; 0.3.2 fixes old sources' audio tracks and messages split inside their header; 0.4.0 passes the battery to overlays and obs-websocket, and fixes the setup window's size, focus and labels after the accessibility pass; 0.5.0 adds Linux and macOS) |
 | Product owner | Randy |
 | Technical work | Coding agent under Randy's direction |
-| Created / last updated | 2026-10-15 / 2026-10-20 |
+| Created / last updated | 2026-10-15 / 2026-11-01 |
 | Decision authority | Randy for scope, acceptance, releases and support |
 
 This brief owns the product contract. [`PLAN.md`](PLAN.md) owns delivery tasks, evidence and open gates. [`README.md`](README.md) describes what is implemented and verified.
 
 ## Product
 
-A native OBS Studio source plugin for Windows that shows the camera of Ray-Ban Meta Gen 2 glasses live in OBS, directly over local wireless links: no phone, no relay, no screen mirroring and no virtual webcam. Video quality must be good and adjustable. Glasses audio is optional and off by default; users normally record audio from their own OBS audio device, and those who want the glasses' microphones can use them with or without the camera (D18).
+A native OBS Studio source plugin for Windows, Linux and macOS that shows the camera of Ray-Ban Meta Gen 2 glasses live in OBS, directly over local wireless links: no phone, no relay, no screen mirroring and no virtual webcam. Video quality must be good and adjustable. Glasses audio is optional and off by default; users normally record audio from their own OBS audio device, and those who want the glasses' microphones can use them with or without the camera (D18).
 
-Meta is contacted only during the one-time setup that makes the PC the glasses' owner. Streaming afterwards is local: Bluetooth for control, and a Wi-Fi network that the glasses host for the PC (see D15). The setup moves ownership away from the Meta AI phone app; users must be told this before it happens.
+Meta is contacted only during the one-time setup that makes the computer the glasses' owner. Streaming afterwards is local: Bluetooth for control, and a Wi-Fi network that the glasses host for the computer (see D15). The setup moves ownership away from the Meta AI phone app; users must be told this before it happens.
 
 ## Users and distribution
 
 - Built for Randy first, then published for other users as beta releases on GitHub (`RandyNorthrup/meta-g-link-direct`, D17).
-- Each release ships one zip built by the `package` task: a double-click installer, the plugin, the setup tool, the license and notices, plus a SHA-256 file. The binaries are unsigned, so Windows SmartScreen may warn.
+- Each release ships a bundle per platform, each with a SHA-256 file: a zip built by the `package` task for Windows (a double-click installer, the plugin, the setup tool, the license and notices), and `.tar.gz` bundles for Linux and macOS with `install.sh`. The binaries are unsigned and not notarized, so Windows SmartScreen may warn.
 - The installer never closes or restarts OBS and copies only this plugin's files. Uninstall removes those files; Forget deletes the stored identity.
 - Support is best effort through GitHub issues (`SUPPORT.md`); vulnerabilities are reported privately (`SECURITY.md`). There is no SLA, telemetry or automatic update check. Sponsorship and donation links are optional and unlock nothing.
 
@@ -28,9 +28,9 @@ Meta is contacted only during the one-time setup that makes the PC the glasses' 
 | Area | Target | Status (see PLAN.md) |
 |---|---|---|
 | Video | 720 × 1280 portrait at a nominal 30 fps, plus at least one lower profile | All four profiles proven in OBS: 720 × 1280, 1080 × 1920 and 504 × 896 at 30 fps, 360 × 640 at its 24 fps; switching in 1.4–1.6 s; since 0.3.1 OBS shows 29.6 distinct pictures per second (12.8 before, D24) |
-| Endurance | One full glasses battery charge with no drop or reconnect, recorded in measured minutes (D16) | Open; longest run so far 3 minutes |
+| Endurance | One full glasses battery charge with no drop or reconnect, recorded in measured minutes (D16) | Open on every platform; longest run so far 3 minutes |
 | Latency | 95th percentile glass-to-OBS ≤ 500 ms | About 0.4 s (0.36–0.45 s in five readings, with a 295 ms presentation delay, D24); no long-run percentile yet |
-| Startup | First frame ≤ 15 s after a ready connection | About 13 s from the scene going live, including the Wi-Fi setup; about 1 s with keep-connected on (D20) |
+| Startup | First frame ≤ 15 s after a ready connection | About 12–13 s on Windows from the scene going live, including the Wi-Fi setup; about 15.6 s on Linux; usually 15–23 s on macOS, where the system limits network scans, up to 36 s; about 1 s with keep-connected on (D20, Windows) |
 | Reconnect | ≤ 30 s after the glasses become available again | 21.5 s from a lost media session to video; connects by itself after a power-on; walking out of range untested |
 | Stability | No growing media queue or memory; no OBS stall | Two-minute OBS run: flat memory, no render frames skipped by the source |
 | Audio | Optional glasses audio, off by default | 48 kHz stereo AAC decoded into the OBS mixer, from the camera source or the microphone source with the camera off (D18); in sync with the video within one frame |
@@ -39,11 +39,14 @@ No 1080p, latency, battery or uptime claim is made without measurement.
 
 ## Supported environment
 
-- Windows 11 x64 and OBS Studio 32 or newer (streamed on Windows 11 Pro build 26200 with OBS 32.2.2 and with OBS 33.0.0-rc2). The plugin goes in the layouts OBS loads (D19).
+- Windows 11 x64 and OBS Studio 32 or newer (streamed on Windows 11 Pro build 26200 with OBS 32.2.2, 33.0.0-rc2 and 33.0.1). The plugin goes in the layouts OBS loads (D19).
+- Linux x86-64 with BlueZ, NetworkManager and a Secret Service keyring (streamed on Ubuntu 26.04 with native OBS 33.0.0 and Flatpak OBS 33.0.1). The Flatpak build runs on any distribution; the native build needs the OBS and FFmpeg of the system it was built on (D26).
+- macOS 13.3 or newer with OBS.app in `/Applications` (streamed on an Intel Mac mini with macOS 15.7.4 and OBS 33.0.1). Apple Silicon: automatic build and test checks only (D27).
+- OBS 33 is the newest generation and is tested first; OBS 32 has been tried on Windows only.
 - A Bluetooth adapter with both Bluetooth LE and Classic (the glasses pair as a dual-mode device; the session runs over Classic RFCOMM) and a Wi-Fi adapter that can join a 2.4 GHz WPA2 network.
-- Ray-Ban Meta Gen 2 glasses. The firmware build used for verification is not yet recorded. Other generations are untested. Firmware downgrades are not a support strategy.
+- Ray-Ban Meta Gen 2 glasses; their Bluetooth information reports firmware 20.3.6. Whether that is the latest firmware isn't known. Other generations are untested. Firmware downgrades are not a support strategy.
 - One glasses connection per OBS instance, shared by every glasses source in it (D18).
-- The setup window needs Microsoft Edge WebView2, which Windows 11 includes; without it the window falls back to the browser and a paste box (D21).
+- The Windows setup window needs Microsoft Edge WebView2, which Windows 11 includes; without it the window falls back to the browser and a paste box (D21). The Linux window does the same without WebKitGTK; the macOS window uses the system's WebKit.
 
 ## Experience and accessibility
 
@@ -56,8 +59,8 @@ No 1080p, latency, battery or uptime claim is made without measurement.
 
 ## Data, security and privacy
 
-- The owner key and any imported Meta app tokens are sealed with Windows DPAPI for the current user under `%LOCALAPPDATA%\MetaGLinkDirect`. Forget deletes them.
-- Wi-Fi credentials for the glasses' network are random per session and live only in memory and in a temporary Windows profile that is deleted when the camera stops.
+- The owner key and any imported Meta app tokens are sealed for the current user: with Windows DPAPI under `%LOCALAPPDATA%\MetaGLinkDirect`, in the Secret Service on Linux (the OBS Flatpak: the app's own file, encrypted through the desktop's Secret portal), and in the login keychain on macOS. There is no plain-file fallback. Forget deletes them.
+- Wi-Fi passwords for the glasses' network are random per session and live only in memory and in a temporary system profile that is removed when the camera stops. On macOS the system keeps one keychain item that a non-administrator can't delete, holding a finished session's password, so the network's name stays the same per computer (D27); elsewhere the name is random per session too.
 - The only credentials in the repository are the Meta AI app's two public client tokens (AGENTS.md revision 3). No user tokens, owner keys, passwords, Wi-Fi passphrases, raw captures or raw media may enter the repository, logs or diagnostics.
 - No telemetry, update checks or plugin-managed recordings. OBS recording stays under the user's control. Logs carry status lines only.
 - The battery file and the obs-websocket vendor request hold only the battery level and charging state, stay on the PC, and are reachable only as far as the user's own obs-websocket settings allow.
@@ -92,6 +95,8 @@ No 1080p, latency, battery or uptime claim is made without measurement.
 | D22 | Settings access | Confirmed, proven | Every glasses source carries the shared connection and setup settings; a Tools menu entry opens them; Forget is a button behind a confirmation tick | Randy | 2026-10-19 |
 | D23 | Glasses speakers and controls | Confirmed, proven (speakers) | Audio into the glasses uses OBS's own audio monitoring device (the glasses' *Headphones* Bluetooth device), documented rather than built into the plugin. Glasses-button hotkeys and a wear-sensor privacy action are parked: the touchpad never reaches this PC, only a long press of the capture button appeared on the link, and taking the glasses off sent nothing | Randy | 2026-10-19 |
 | D24 | Smooth presentation | Confirmed, proven | Present every frame and block of sound at its capture time plus an adaptive delay (20–500 ms, about 190 ms measured) instead of on arrival, because the glasses' radio delivers 30 fps in bursts that OBS thinned to about 13 fps; the Meta AI app's player paces the same way. A little latency is traded for the full frame rate | Randy / technical verification | 2026-10-20 |
+| D26 | Linux | Confirmed, proven | Native OBS and the OBS Flatpak, tested newest first, built against each one's own libobs and FFmpeg. A native binary can't be portable across distributions, so the Flatpak build is the portable one and the installer checks the native one before installing it. The Flatpak keeps its own identity, because libsecret there uses the portal-keyed file | Randy / technical verification | 2026-11-01 |
+| D27 | macOS | Confirmed, proven on Intel | OBS declares neither Bluetooth nor Location and a plugin inherits that, so a small helper app with its own permissions holds the Bluetooth connection and joins the network. CoreWLAN cannot join a network it can't name, and macOS names networks only to apps with Location; `networksetup` waits on a password dialog. macOS keeps a keychain item per network, so the name stays fixed per computer to keep it to one item | Randy / technical verification | 2026-11-01 |
 | D25 | Battery outside OBS's properties | Confirmed, proven | Both ways Randy chose: a text file (`battery.txt` in the plugin's OBS settings folder) for OBS text sources and tools such as Stream Deck plugins, and an obs-websocket vendor (`meta-g-link-direct`: request `GetBattery`, event `BatteryChanged`). Both show the battery as unknown without a link rather than its last value | Randy | 2026-10-20 |
 
 ## Research references

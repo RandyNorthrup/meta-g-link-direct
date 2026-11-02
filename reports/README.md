@@ -6,6 +6,8 @@ Evidence referenced by the ledger in [`PLAN.md`](../PLAN.md). Ledger entries bin
 
 | File | Contents |
 |---|---|
+| [`CERTIFICATION.md`](CERTIFICATION.md) | The per-platform matrix: each gate's evidence or stated gap |
+| [`CROSS_PLATFORM_VERIFICATION.md`](CROSS_PLATFORM_VERIFICATION.md) | Linux and macOS on the glasses, why macOS joins through a helper, the failed runs before charging, builds and packages |
 | [`WIFI_LINK_VERIFICATION.md`](WIFI_LINK_VERIFICATION.md) | Why the glasses host the Wi-Fi network, every hardware run on that link, and the OBS run |
 | [`AUDIO_AND_OBS33_VERIFICATION.md`](AUDIO_AND_OBS33_VERIFICATION.md) | Glasses audio (raw AAC, no AudioSpecificConfig), OBS 33 installed and streaming, the ProgramData plugin location and installing on other drives |
 | [`SHARED_LINK_AND_SETUP_VERIFICATION.md`](SHARED_LINK_AND_SETUP_VERIFICATION.md) | Stream changes inside one session, audio only with the camera off, the battery report, the shared link and keep-connected in OBS 33, the setup window, and the trust-signature finding |

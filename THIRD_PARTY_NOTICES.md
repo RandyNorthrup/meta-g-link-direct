@@ -12,10 +12,10 @@ Meta G Link Direct is licensed under the GNU Affero General Public License versi
   - `core/protocol/Wire.kt` → `src/protocol/protobuf.cpp` (strict protobuf encode and parse).
   - `core/protocol/Header.kt`, `core/session/DataXConnection.kt`, `core/session/ChannelRegistry.kt` → `src/protocol/datax.cpp` (DataX header, fragmenting frame splitter, channel registry).
   - `core/protocol/Kdf.kt`, `Cipher.kt`, `Messages.kt`, `Binding.kt`, `core/identity/Trust.kt` → `src/protocol/airshield.cpp` (AirShield key schedule, per-frame AES-CBC + HMAC, handshake messages, channel binding, trust payload).
-  - `core/session/SecureLink.kt`, `core/session/GlassesSession.kt` → `src/windows/session.cpp` (handshake, trust, EndLinkSetup, DataX receive loop).
+  - `core/session/SecureLink.kt`, `core/session/GlassesSession.kt` → `src/core/session.cpp` (handshake, trust, EndLinkSetup, DataX receive loop).
   - `app/connection/AndroidTransportFactory.kt` and `core/transport` → `src/windows/rfcomm_transport.cpp` (RFCOMM whole-SDU transport over WinRT service resolution and Winsock).
-  - `core/identity/token/WebLogin.kt`, `Frla.kt`, `core/identity/provision/Provision.kt`, `PyJson.kt` → `src/windows/provision.cpp`, `src/protocol/json.cpp` (Meta login, svc36 change of owner, Python-compatible JSON for ownership receipts).
-  - `core/media/StreamProto.kt`, `LiveStream.kt`, `Canary.kt` → `src/protocol/stream.cpp`, `src/protocol/hevc.cpp`, `src/windows/media_session.cpp` (stream configuration and control messages including the audio configuration, HEVC and AAC access-unit reassembly with the presentation-time prefix, codec-configuration routing, stream bring-up order, svc100 keepalive). The fallback AudioSpecificConfig is this project's own: on Gen 2 the glasses sent no audio configuration.
+  - `core/identity/token/WebLogin.kt`, `Frla.kt`, `core/identity/provision/Provision.kt`, `PyJson.kt` → `src/core/provision.cpp`, `src/protocol/json.cpp` (Meta login, svc36 change of owner, Python-compatible JSON for ownership receipts).
+  - `core/media/StreamProto.kt`, `LiveStream.kt`, `Canary.kt` → `src/protocol/stream.cpp`, `src/protocol/hevc.cpp`, `src/core/media_session.cpp` (stream configuration and control messages including the audio configuration, HEVC and AAC access-unit reassembly with the presentation-time prefix, codec-configuration routing, stream bring-up order, svc100 keepalive). The fallback AudioSpecificConfig is this project's own: on Gen 2 the glasses sent no audio configuration.
   - `app/setup/NearbyGlasses.kt` and `core/transport/BluetoothRfcommTransport.kt` → `src/windows/discovery.cpp`, `src/windows/classic.cpp` (the Meta manufacturer and service markers and the RFCOMM service UUID used by the diagnostics).
 - Protocol facts (service ids, message types, framing, channel binding) also follow the Visor GitHub wiki, read 2026-10-15 to 2026-10-18.
 - Not ported: Visor's Wi-Fi group (`Wifi.kt`). This project uses a glasses-hosted network instead (below).
@@ -46,6 +46,15 @@ The plugin decodes video and audio with the FFmpeg libraries `avcodec` and `avut
 ## Microsoft Windows SDK and C++/WinRT
 
 Windows APIs (WinRT Bluetooth, Native Wi-Fi, IP Helper, CNG, DPAPI, WinHTTP, Winsock, Common Controls) are used through the Windows SDK headers and system libraries. Nothing from the SDK is redistributed.
+
+## Mbed TLS
+
+- Upstream: https://github.com/Mbed-TLS/mbedtls, version `3.6.7` (long-term support), pinned with its SHA-256 in `dependencies.lock.json` and fetched at build time.
+- License: Apache-2.0 (copyright The Mbed TLS Contributors). It is linked statically into the Linux and macOS builds for SHA-256, HMAC, AES and P-256, with its symbols hidden from the OBS process. Windows uses CNG instead.
+
+## Libraries of the Linux and macOS systems
+
+The Linux builds use the system's or the OBS Flatpak runtime's BlueZ (`libbluetooth`), GLib, libsecret, libcurl, GTK and, where present, WebKitGTK; the macOS builds use the system's frameworks and libcurl. These are linked dynamically and not included in the release bundles, which also leave out OBS and FFmpeg.
 
 ## Microsoft Edge WebView2 SDK
 

@@ -44,11 +44,11 @@ Reply post(std::string_view url, const std::vector<std::pair<std::string, std::s
     components.lpszUrlPath = path.data();
     components.dwUrlPathLength = static_cast<DWORD>(path.size());
     if (WinHttpCrackUrl(wide_url.c_str(), 0, 0, &components) == FALSE) {
-        reply.transport_error = L"bad url";
+        reply.transport_error = "bad url";
         return reply;
     }
     if (components.nScheme != INTERNET_SCHEME_HTTPS) {
-        reply.transport_error = L"not https";
+        reply.transport_error = "not https";
         return reply;
     }
 
@@ -56,20 +56,20 @@ Reply post(std::string_view url, const std::vector<std::pair<std::string, std::s
                                      WINHTTP_ACCESS_TYPE_AUTOMATIC_PROXY, WINHTTP_NO_PROXY_NAME,
                                      WINHTTP_NO_PROXY_BYPASS, 0));
     if (!session) {
-        reply.transport_error = L"WinHttpOpen failed";
+        reply.transport_error = "WinHttpOpen failed";
         return reply;
     }
     const Handle connect(
         WinHttpConnect(session.get(), std::wstring(host.data()).c_str(), components.nPort, 0));
     if (!connect) {
-        reply.transport_error = L"WinHttpConnect failed";
+        reply.transport_error = "WinHttpConnect failed";
         return reply;
     }
     const Handle request(
         WinHttpOpenRequest(connect.get(), L"POST", std::wstring(path.data()).c_str(), nullptr,
                            WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, WINHTTP_FLAG_SECURE));
     if (!request) {
-        reply.transport_error = L"WinHttpOpenRequest failed";
+        reply.transport_error = "WinHttpOpenRequest failed";
         return reply;
     }
 
@@ -92,11 +92,11 @@ Reply post(std::string_view url, const std::vector<std::pair<std::string, std::s
     if (WinHttpSendRequest(request.get(), WINHTTP_NO_ADDITIONAL_HEADERS, 0, body_ptr,
                            static_cast<DWORD>(body.size()), static_cast<DWORD>(body.size()),
                            0) == FALSE) {
-        reply.transport_error = L"WinHttpSendRequest failed";
+        reply.transport_error = "WinHttpSendRequest failed";
         return reply;
     }
     if (WinHttpReceiveResponse(request.get(), nullptr) == FALSE) {
-        reply.transport_error = L"WinHttpReceiveResponse failed";
+        reply.transport_error = "WinHttpReceiveResponse failed";
         return reply;
     }
 
@@ -110,7 +110,7 @@ Reply post(std::string_view url, const std::vector<std::pair<std::string, std::s
     for (;;) {
         DWORD available = 0;
         if (WinHttpQueryDataAvailable(request.get(), &available) == FALSE) {
-            reply.transport_error = L"WinHttpQueryDataAvailable failed";
+            reply.transport_error = "WinHttpQueryDataAvailable failed";
             return reply;
         }
         if (available == 0) {
@@ -120,7 +120,7 @@ Reply post(std::string_view url, const std::vector<std::pair<std::string, std::s
         reply.body.resize(offset + available);
         DWORD read = 0;
         if (WinHttpReadData(request.get(), reply.body.data() + offset, available, &read) == FALSE) {
-            reply.transport_error = L"WinHttpReadData failed";
+            reply.transport_error = "WinHttpReadData failed";
             return reply;
         }
         reply.body.resize(offset + read);

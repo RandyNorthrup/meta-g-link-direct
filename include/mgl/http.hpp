@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // The one HTTP shape the Meta setup calls use: an HTTPS POST with headers and a body, returning
-// the status and the response bytes. WinHTTP implementation; failures surface as status 0.
+// the status and the response bytes. Failures surface as status 0.
 #ifndef MGL_HTTP_HPP
 #define MGL_HTTP_HPP
 
@@ -15,7 +15,7 @@ namespace mgl::http {
 struct Reply {
     unsigned status = 0; // 0 means the request did not complete
     Bytes body;
-    std::wstring transport_error; // populated when status is 0
+    std::string transport_error; // populated when status is 0
 };
 
 // POST body to an https:// url with the given headers (name,value). The caller sets Content-Type

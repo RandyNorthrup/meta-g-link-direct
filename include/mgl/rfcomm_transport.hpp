@@ -13,14 +13,14 @@ namespace mgl {
 enum class RfcommConnect : std::uint8_t {
     Ok,
     NoRadio,
-    NoMetaService,    // no Windows-registered Meta RFCOMM service on a paired device
+    NoMetaService,    // no paired device offers the Meta RFCOMM service
     AmbiguousService, // more than one paired Meta service; refuse rather than guess
-    ConnectFailed     // the socket did not open
+    ConnectFailed,    // the socket did not open
 };
 
 struct RfcommOpen {
     RfcommConnect status = RfcommConnect::ConnectFailed;
-    std::uint32_t detail = 0; // Winsock/HRESULT error when status is ConnectFailed/NoRadio
+    std::uint32_t detail = 0; // the system's error code when status is ConnectFailed/NoRadio
     std::unique_ptr<Transport> transport;
 };
 

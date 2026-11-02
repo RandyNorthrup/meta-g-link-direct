@@ -14,7 +14,8 @@ param(
         'unsafe-copy', 'duplicated-code', 'address-sanitizer', 'dependency-npm', 'dependency-osv',
         'whatif-guard', 'native-exit-propagation', 'probe-arguments', 'classic-connection-claim',
         'private-address-validation', 'uncached-query-loop', 'installer-drive-letter', 'drill-reuse',
-        'playout-cadence', 'datax-frame-boundary', 'battery-change')]
+        'playout-cadence', 'datax-frame-boundary', 'battery-change', 'buffered-partial-read',
+        'login-state')]
     [string]$Drill = 'all'
 )
 
@@ -167,11 +168,17 @@ function Get-OwnedCppFile {
     param()
     Get-ChildItem -LiteralPath (Join-Path $projectRoot 'src'), (Join-Path $projectRoot 'include'),
     (Join-Path $projectRoot 'tests') -Recurse -File |
-        Where-Object { $_.Extension -in '.c', '.cpp', '.hpp' }
+        Where-Object { $_.Extension -in '.c', '.cpp', '.hpp', '.mm' }
 }
 
 function Invoke-StaticAnalysis {
-    $sources = Get-OwnedCppFile | Where-Object Extension -EQ '.cpp'
+    # The units this platform's build compiles; the other platforms' sources are checked on theirs.
+    $database = Get-Content -LiteralPath (Join-Path $buildRoot 'compile_commands.json') -Raw |
+        ConvertFrom-Json
+    $compiled = @($database | ForEach-Object { $_.file.Replace('/', '\').ToLowerInvariant() })
+    $sources = Get-OwnedCppFile | Where-Object {
+        $_.Extension -EQ '.cpp' -and $compiled -contains $_.FullName.ToLowerInvariant()
+    }
     $failedSources = @()
     foreach ($source in $sources) {
         try {
@@ -429,6 +436,20 @@ function Invoke-RedDrillSet {
         $text.Replace('published_ = current;', 'published_ = std::nullopt;')
     } -Gate test -ExpectedDiagnostic 'each change of the battery is published once, in order'
 
+    # Every platform's byte stream goes through this buffer: dropping what an earlier read left would
+    # lose any frame the socket delivered in pieces.
+    Invoke-RestoredDrill -Id buffered-partial-read -Path (Join-Path $projectRoot 'src/protocol/buffered_transport.cpp') -Mutate {
+        param($text)
+        $text.Replace('buffer_.insert(buffer_.end(), received.begin(), received.end());', 'buffer_.assign(received.begin(), received.end());')
+    } -Gate test -ExpectedDiagnostic 'a split frame arrives'
+
+    # The state ties a login's address to the login this window started; without the check, another
+    # login's code would become this computer's change of owner.
+    Invoke-RestoredDrill -Id login-state -Path (Join-Path $projectRoot 'src/core/setup.cpp') -Mutate {
+        param($text)
+        $text.Replace('if (state && *state != expected_state) {', 'if (state && state->empty() && *state != expected_state) {')
+    } -Gate test -ExpectedDiagnostic 'another login.s address gives no code'
+
     Invoke-RestoredDrill -Id module-metadata -Path (Join-Path $projectRoot 'src/plugin/module.c') -Mutate {
         param($text)
         $text.Replace('return "Meta G Link Direct";', 'return "Broken module name";')
@@ -558,7 +579,7 @@ function Invoke-RedDrillSet {
         param($text)
         $text.Replace('$passed -and $previous.inputs_sha256 -eq $Fingerprint', '$passed')
     } -Gate 'test:runner' -ExpectedDiagnostic 'because a drill whose inputs changed must run again'
-    $expectedDrillCount = if ($script:DrillSelection -in @('all', 'changed')) { 25 } else { 1 }
+    $expectedDrillCount = if ($script:DrillSelection -in @('all', 'changed')) { 27 } else { 1 }
     if ($script:DrillEvidence.Count -ne $expectedDrillCount) {
         throw 'Red-drill discovery did not match the requested scope'
     }

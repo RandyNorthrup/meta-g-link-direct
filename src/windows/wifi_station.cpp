@@ -238,8 +238,10 @@ std::vector<WifiAdapter> listWifiAdapters() {
         // The description is a fixed-size, NUL-terminated array.
         const auto& raw = info.strInterfaceDescription;
         const auto* const end = std::ranges::find(raw, L'\0');
-        adapters.push_back({.id = guidText(info.InterfaceGuid),
-                            .description = narrowUtf8(std::wstring_view(std::begin(raw), end))});
+        adapters.push_back({
+            .id = guidText(info.InterfaceGuid),
+            .description = narrowUtf8(std::wstring_view(std::begin(raw), end)),
+        });
     }
     return adapters;
 }
@@ -299,12 +301,14 @@ std::unique_ptr<WifiStationConnection> connectWifiStation(const std::string& ssi
     DOT11_SSID dot11{};
     dot11.uSSIDLength = static_cast<ULONG>(ssid.size());
     std::copy_n(ssid.begin(), ssid.size(), std::begin(dot11.ucSSID));
-    WLAN_CONNECTION_PARAMETERS params{.wlanConnectionMode = wlan_connection_mode_profile,
-                                      .strProfile = profile_name.c_str(),
-                                      .pDot11Ssid = &dot11,
-                                      .pDesiredBssidList = nullptr,
-                                      .dot11BssType = dot11_BSS_type_infrastructure,
-                                      .dwFlags = 0};
+    WLAN_CONNECTION_PARAMETERS params{
+        .wlanConnectionMode = wlan_connection_mode_profile,
+        .strProfile = profile_name.c_str(),
+        .pDot11Ssid = &dot11,
+        .pDesiredBssidList = nullptr,
+        .dot11BssType = dot11_BSS_type_infrastructure,
+        .dwFlags = 0,
+    };
     if (const DWORD connect = WlanConnect(client.get(), &guid, &params, nullptr);
         connect != ERROR_SUCCESS) {
         WlanDeleteProfile(client.get(), &guid, profile_name.c_str(), nullptr);

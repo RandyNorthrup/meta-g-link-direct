@@ -91,9 +91,11 @@ bool HevcDecoder::decode(std::uint64_t pts_us, ByteView annex_b, bool keyframe,
             out.pts_us = frame.pts >= 0 ? static_cast<std::uint64_t>(frame.pts) : pts_us;
             out.full_range = format == AV_PIX_FMT_YUVJ420P || frame.color_range == AVCOL_RANGE_JPEG;
             out.plane = {frame.data[0], frame.data[1], frame.data[2]};
-            out.linesize = {static_cast<std::uint32_t>(frame.linesize[0]),
-                            static_cast<std::uint32_t>(frame.linesize[1]),
-                            static_cast<std::uint32_t>(frame.linesize[2])};
+            out.linesize = {
+                static_cast<std::uint32_t>(frame.linesize[0]),
+                static_cast<std::uint32_t>(frame.linesize[1]),
+                static_cast<std::uint32_t>(frame.linesize[2]),
+            };
             sink(out);
         }
         av_frame_unref(impl_->frame.get());

@@ -148,8 +148,10 @@ Bytes requestedAudioSpecificConfig() {
     constexpr std::uint32_t Bits = (ObjectTypeAacLc << ObjectTypeShift) |
                                    (SamplingIndex48k << SamplingShift) |
                                    (AudioChannels << ChannelShift);
-    return {static_cast<std::uint8_t>(Bits >> ByteBits),
-            static_cast<std::uint8_t>(Bits & ByteMask)};
+    return {
+        static_cast<std::uint8_t>(Bits >> ByteBits),
+        static_cast<std::uint8_t>(Bits & ByteMask),
+    };
 }
 
 Bytes buildControlStream(std::uint32_t nonce, std::uint8_t action) {
@@ -214,30 +216,32 @@ std::optional<std::uint64_t> parseStreamStopped(ByteView payload) {
 
 std::string_view stopReasonText(std::uint64_t reason) {
     // The firmware's ControlStreamStopped reasons, in enum order (Visor StreamProto.kt).
-    constexpr std::array<std::string_view, 24> Reasons{"unknown",
-                                                       "user initiated",
-                                                       "system preempt",
-                                                       "system shutdown",
-                                                       "battery low",
-                                                       "thermal threshold",
-                                                       "inactivity",
-                                                       "camera failure",
-                                                       "doff",
-                                                       "temples closed",
-                                                       "audio failure",
-                                                       "mobile stream error",
-                                                       "peak power interrupt",
-                                                       "user pause",
-                                                       "tamper detected",
-                                                       "hardware toggle",
-                                                       "shutdown for battery",
-                                                       "frame initiated",
-                                                       "client preempt",
-                                                       "version not supported",
-                                                       "client initiated",
-                                                       "companion requested stop",
-                                                       "weak signal",
-                                                       "service destroyed"};
+    constexpr std::array<std::string_view, 24> Reasons{
+        "unknown",
+        "user initiated",
+        "system preempt",
+        "system shutdown",
+        "battery low",
+        "thermal threshold",
+        "inactivity",
+        "camera failure",
+        "doff",
+        "temples closed",
+        "audio failure",
+        "mobile stream error",
+        "peak power interrupt",
+        "user pause",
+        "tamper detected",
+        "hardware toggle",
+        "shutdown for battery",
+        "frame initiated",
+        "client preempt",
+        "version not supported",
+        "client initiated",
+        "companion requested stop",
+        "weak signal",
+        "service destroyed",
+    };
     return reason < Reasons.size() ? Reasons.at(reason) : Reasons.front();
 }
 
@@ -258,11 +262,13 @@ std::optional<BatteryState> parseBatteryState(ByteView device_state) {
     }
     // Protobuf int32 travels as a varint of its two's-complement value, so the low 32 bits carry
     // a negative temperature intact.
-    return BatteryState{.percent = static_cast<std::uint32_t>(*percent),
-                        .charge_state = static_cast<std::uint32_t>(battery->varintOr(2, 0)),
-                        .millivolts = static_cast<std::uint32_t>(battery->varintOr(5, 0)),
-                        .millicelsius = static_cast<std::int32_t>(
-                            static_cast<std::uint32_t>(battery->varintOr(4, 0)))};
+    return BatteryState{
+        .percent = static_cast<std::uint32_t>(*percent),
+        .charge_state = static_cast<std::uint32_t>(battery->varintOr(2, 0)),
+        .millivolts = static_cast<std::uint32_t>(battery->varintOr(5, 0)),
+        .millicelsius =
+            static_cast<std::int32_t>(static_cast<std::uint32_t>(battery->varintOr(4, 0))),
+    };
 }
 
 std::optional<HealthEvent> parseHealthEvent(ByteView payload) {
@@ -273,8 +279,10 @@ std::optional<HealthEvent> parseHealthEvent(ByteView payload) {
     // Field 3 is a zigzag-coded sint64.
     const auto raw = message->varintOr(3, 0);
     const auto magnitude = static_cast<std::int64_t>(raw >> 1U);
-    return HealthEvent{.status = message->varintOr(1, 0),
-                       .type = message->varintOr(2, 0),
-                       .level = (raw & 1U) != 0 ? -magnitude - 1 : magnitude};
+    return HealthEvent{
+        .status = message->varintOr(1, 0),
+        .type = message->varintOr(2, 0),
+        .level = (raw & 1U) != 0 ? -magnitude - 1 : magnitude,
+    };
 }
 } // namespace mgl::stream

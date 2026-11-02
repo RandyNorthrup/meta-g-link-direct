@@ -2,7 +2,6 @@
 #include "sdu_socket.hpp"
 
 #include "mgl/bytes.hpp"
-#include "mgl/sdu.hpp"
 #include "mgl/transport.hpp"
 
 #include <windows.h> // IWYU pragma: keep — SDK umbrella prerequisites.
@@ -15,7 +14,6 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
-#include <span>
 #include <utility>
 
 namespace mgl {
@@ -64,35 +62,16 @@ bool SduSocket::send(ByteView frame) {
     return true;
 }
 
-SduResult SduSocket::takeFrame(LinkPhase phase) {
-    std::array<std::uint8_t, 10> head{};
-    const auto head_len = std::min(buffer_.size(), head.size());
-    std::copy_n(buffer_.begin(), head_len, head.begin());
-    const auto prefix = inspectFramePrefix(std::span(head).first(head_len), phase);
-    if (prefix.status == PrefixStatus::Invalid) {
-        return {.status = TransportStatus::Unframeable, .frame = {}};
-    }
-    if (prefix.status == PrefixStatus::NeedMore || prefix.frame_size > MaximumSduSize ||
-        buffer_.size() < prefix.frame_size) {
-        if (prefix.status == PrefixStatus::Ready && prefix.frame_size > MaximumSduSize) {
-            return {.status = TransportStatus::Unframeable, .frame = {}};
-        }
-        return {.status = TransportStatus::Ok, .frame = {}}; // need more bytes
-    }
-    Bytes frame(buffer_.begin(), buffer_.begin() + static_cast<std::ptrdiff_t>(prefix.frame_size));
-    buffer_.erase(buffer_.begin(),
-                  buffer_.begin() + static_cast<std::ptrdiff_t>(prefix.frame_size));
-    return {.status = TransportStatus::Ok, .frame = std::move(frame)};
-}
-
 TransportStatus SduSocket::fill(std::chrono::milliseconds timeout) {
     fd_set readable;
     FD_ZERO(&readable);
     FD_SET(socket_, &readable);
     const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(timeout);
     const auto micros = std::chrono::duration_cast<std::chrono::microseconds>(timeout - seconds);
-    const timeval tv{.tv_sec = static_cast<decltype(timeval::tv_sec)>(seconds.count()),
-                     .tv_usec = static_cast<decltype(timeval::tv_usec)>(micros.count())};
+    const timeval tv{
+        .tv_sec = static_cast<decltype(timeval::tv_sec)>(seconds.count()),
+        .tv_usec = static_cast<decltype(timeval::tv_usec)>(micros.count()),
+    };
     const auto ready = select(0, &readable, nullptr, nullptr, &tv);
     if (ready == 0) {
         return TransportStatus::TimedOut;
@@ -108,26 +87,7 @@ TransportStatus SduSocket::fill(std::chrono::milliseconds timeout) {
     // Winsock's C ABI returns the byte buffer as char.
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     const auto* const first = reinterpret_cast<const std::uint8_t*>(chunk.data());
-    buffer_.insert(buffer_.end(), first, first + read);
+    keep(ByteView(first, static_cast<std::size_t>(read)));
     return TransportStatus::Ok;
-}
-
-SduResult SduSocket::receive(LinkPhase phase, std::chrono::milliseconds timeout) {
-    const auto deadline = std::chrono::steady_clock::now() + timeout;
-    for (;;) {
-        auto framed = takeFrame(phase);
-        if (framed.status != TransportStatus::Ok || !framed.frame.empty()) {
-            return framed;
-        }
-        const auto remaining = std::chrono::duration_cast<std::chrono::milliseconds>(
-            deadline - std::chrono::steady_clock::now());
-        if (remaining <= std::chrono::milliseconds::zero()) {
-            return {.status = TransportStatus::TimedOut, .frame = {}};
-        }
-        const auto filled = fill(remaining);
-        if (filled != TransportStatus::Ok) {
-            return {.status = filled, .frame = {}};
-        }
-    }
 }
 } // namespace mgl

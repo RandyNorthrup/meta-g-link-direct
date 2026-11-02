@@ -25,7 +25,7 @@ enum class LinkStage : std::uint8_t {
     HandshakeSent, // our RequestEncryption and EnableEncryption written
     KeysDerived,   // the glasses answered and the per-direction ciphers are installed
     TrustAccepted, // the glasses accepted our owner key (svc36 success both ways)
-    Ready          // EndLinkSetup exchanged; encrypted DataX traffic can flow
+    Ready,         // EndLinkSetup exchanged; encrypted DataX traffic can flow
 };
 
 enum class LinkError : std::uint8_t {
@@ -35,7 +35,7 @@ enum class LinkError : std::uint8_t {
     BadPeerKey,          // their public key is not on P-256
     FrameRejected,       // a MAC or framing failure on an encrypted frame
     TrustRejected,       // the glasses refused our owner key (status reported separately)
-    EndLinkSetupMissing  // no EndLinkSetup came back
+    EndLinkSetupMissing, // no EndLinkSetup came back
 };
 
 struct LinkOutcome {

@@ -59,7 +59,7 @@ enum class ProvisionStage : std::uint8_t {
     StartChangeOwner,
     Pair,
     FinishChangeOwner,
-    Done
+    Done,
 };
 
 struct ProvisionResult {

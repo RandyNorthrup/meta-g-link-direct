@@ -8,9 +8,9 @@
     "expected_diagnostic": "DataX empty has 4 bytes",
     "observed_diagnostic": "DataX empty has 4 bytes: unexpected prefix status or frame length",
     "path": "src/protocol/sdu.cpp",
-    "before": "23f81a1e6ccdf6122fdb9414b839a7e2ca96f3564b1608f35ffa807579178ca0",
-    "mutated": "4eb570160d978094f8e1b5bfcf631e40145db7ba93f2d694d04cee27d18f5229",
-    "after": "23f81a1e6ccdf6122fdb9414b839a7e2ca96f3564b1608f35ffa807579178ca0",
+    "before": "53d659868e94a518e5fb184fdc191d4906d230a224e9639d3704f0c7468ebf47",
+    "mutated": "6add9116d2c253ff412e9645783fe8772325bb2284be3580a7b5daa23b0416ed",
+    "after": "53d659868e94a518e5fb184fdc191d4906d230a224e9639d3704f0c7468ebf47",
     "log": "reports/red/parser-length.txt",
     "inputs": [
       "src/protocol/sdu.cpp",
@@ -20,8 +20,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "24fb3e7c563a3d34dfbcc15c4f08816adf4c218940182629007471d55ace8228",
-    "recorded_at": "2026-10-21T01:38:38Z"
+    "inputs_sha256": "75a4c1a7aca5d93cd2348a5a1b66d9ed8ca5f8a3190b00d12c619f14ba2b9a86",
+    "recorded_at": "2026-11-02T02:51:31Z"
   },
   {
     "id": "playout-cadence",
@@ -44,8 +44,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "f04ebc246aae1cd847c924b179a05e3186f67793912770d485838e2cf9bdce72",
-    "recorded_at": "2026-10-21T01:39:27Z"
+    "inputs_sha256": "bdbbc7b160981c88791a4584730d15d0626f9595b5258839ecd7a94a0be4a181",
+    "recorded_at": "2026-11-02T02:52:14Z"
   },
   {
     "id": "datax-frame-boundary",
@@ -56,9 +56,9 @@
     "expected_diagnostic": "messages split at any byte across frames decode intact",
     "observed_diagnostic": "messages split at any byte across frames decode intact: failed",
     "path": "src/protocol/datax.cpp",
-    "before": "8f5cf4c870e06d3b9ed8da6701ebc5a9eb1a7158724d19247e828ab692b8e420",
-    "mutated": "052aa4102127ae16694479ab5003ae51bfd67a87315be57206ae7f4aac893517",
-    "after": "8f5cf4c870e06d3b9ed8da6701ebc5a9eb1a7158724d19247e828ab692b8e420",
+    "before": "b777d951af6259a02ff599fbfdeb7f6588b1a04dbe28dc54a60741102fa84347",
+    "mutated": "f9a14b7b379ff4dae5e51d9c18958bb4dd33394bbe691bfdf4ec07d909c99c42",
+    "after": "b777d951af6259a02ff599fbfdeb7f6588b1a04dbe28dc54a60741102fa84347",
     "log": "reports/red/datax-frame-boundary.txt",
     "inputs": [
       "src/protocol/datax.cpp",
@@ -68,8 +68,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "3f3af3c44421ec68b3c2b9fb3efa85d9c432932ce6439cce4b6a0dffeffed45c",
-    "recorded_at": "2026-10-21T01:40:16Z"
+    "inputs_sha256": "ebad0f67e8eacb80591e523d7840a087374227d74a070b18e96c99eb42c9c625",
+    "recorded_at": "2026-11-02T02:53:08Z"
   },
   {
     "id": "battery-change",
@@ -92,8 +92,56 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "93c26fb901da4d9d55e7a8e1c9388f45f740c06a73b159eaee54652476cd53e9",
-    "recorded_at": "2026-10-21T01:41:07Z"
+    "inputs_sha256": "9dd4d51253c5699c518a1e778c08e7619d3ed3e3d182506cb1ab312cb3827e34",
+    "recorded_at": "2026-11-02T02:54:04Z"
+  },
+  {
+    "id": "buffered-partial-read",
+    "gate": "test",
+    "baseline_exit": 0,
+    "mutated_exit": 1,
+    "restored_exit": 0,
+    "expected_diagnostic": "a split frame arrives",
+    "observed_diagnostic": "a split frame arrives: failed",
+    "path": "src/protocol/buffered_transport.cpp",
+    "before": "3d54c3dc2979318b55fdcf3c3ddf5fb0441fd821852a074db812a032dd8ff8a7",
+    "mutated": "172345da37066193d08098960593cfd1ab6f2e08311dac9b66ea8a293dfc369f",
+    "after": "3d54c3dc2979318b55fdcf3c3ddf5fb0441fd821852a074db812a032dd8ff8a7",
+    "log": "reports/red/buffered-partial-read.txt",
+    "inputs": [
+      "src/protocol/buffered_transport.cpp",
+      "scripts/Invoke-Project.ps1",
+      "CMakeLists.txt",
+      "CMakePresets.json",
+      "dependencies.lock.json",
+      "tests"
+    ],
+    "inputs_sha256": "b664cc41596fd55e4cd0fa541e92e444c4b545de16ea5f1bfd0089ffa1b3ca05",
+    "recorded_at": "2026-11-02T02:54:51Z"
+  },
+  {
+    "id": "login-state",
+    "gate": "test",
+    "baseline_exit": 0,
+    "mutated_exit": 1,
+    "restored_exit": 0,
+    "expected_diagnostic": "another login.s address gives no code",
+    "observed_diagnostic": "another login's address gives no code: failed",
+    "path": "src/core/setup.cpp",
+    "before": "2eddd3b6efef8f91b9fd17e4ba880cc59e63de2a1ba5b0df070b75a900be2c20",
+    "mutated": "ae7b3625799e1fac9e58e4f1601a90a28cda2a5bd4ce60ad548d16e2e6583ca4",
+    "after": "2eddd3b6efef8f91b9fd17e4ba880cc59e63de2a1ba5b0df070b75a900be2c20",
+    "log": "reports/red/login-state.txt",
+    "inputs": [
+      "src/core/setup.cpp",
+      "scripts/Invoke-Project.ps1",
+      "CMakeLists.txt",
+      "CMakePresets.json",
+      "dependencies.lock.json",
+      "tests"
+    ],
+    "inputs_sha256": "d20ecbcd4eee5eab17f98be809246914725f57e1123ce4b7c173a7115845b65c",
+    "recorded_at": "2026-11-02T02:55:42Z"
   },
   {
     "id": "module-metadata",
@@ -116,8 +164,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "e62fc644a9c7d48376cb441786d3ca0a063924672df09670b9c1e7951cb5661a",
-    "recorded_at": "2026-10-21T01:41:53Z"
+    "inputs_sha256": "f3904da3be8cb55218b81864f08e7c97c2371ef362eaa04d3f70c37171609680",
+    "recorded_at": "2026-11-02T02:56:26Z"
   },
   {
     "id": "probe-arguments",
@@ -128,9 +176,9 @@
     "expected_diagnostic": "invalid probe arguments must fail",
     "observed_diagnostic": "Expected 5, because invalid probe arguments must fail, but got 0.",
     "path": "src/probe/main.cpp",
-    "before": "020894fd4653b3f4ca01bece4e5d8e1f37c9852689b82fb3c79363321e610482",
-    "mutated": "3e8b81c93aaf02a787ade8b34620f4418bd3da706bad555969976e393521a46f",
-    "after": "020894fd4653b3f4ca01bece4e5d8e1f37c9852689b82fb3c79363321e610482",
+    "before": "1cbd066fa95bb3f5bb491ccd19900ac70d8206175da2a3ac4311f73091a03fb9",
+    "mutated": "f906276738d6c060a091156f5ac344537564837d7804ec04ce86b82cd9918b59",
+    "after": "1cbd066fa95bb3f5bb491ccd19900ac70d8206175da2a3ac4311f73091a03fb9",
     "log": "reports/red/probe-arguments.txt",
     "inputs": [
       "src/probe/main.cpp",
@@ -140,8 +188,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "4797cd86b27418a472e49c22b46c24784a5f38c3a293d95b86871999905dbad4",
-    "recorded_at": "2026-10-21T01:43:07Z"
+    "inputs_sha256": "33931667d22e1cf0608e4fa6ca4e377bb13b6cf6adc9b5ae12529585a788fac8",
+    "recorded_at": "2026-11-02T02:57:31Z"
   },
   {
     "id": "classic-connection-claim",
@@ -164,8 +212,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "9f4331c9d96e27f2d013d8c2879f3d14264a8ac7809fcf76b992ad206e364941",
-    "recorded_at": "2026-10-21T01:44:28Z"
+    "inputs_sha256": "6d6e081a467ae2f0190aa5c9aef45f0270b674ad83e08416b579a84744ffaa3a",
+    "recorded_at": "2026-11-02T02:58:45Z"
   },
   {
     "id": "private-address-validation",
@@ -188,8 +236,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "50e18f079dc818ecb64f197bc417b363ee8cf90f425653d539a1678ac29cc41e",
-    "recorded_at": "2026-10-21T01:44:33Z"
+    "inputs_sha256": "a9b7dceb13883c96f7127455c682450c855ee437b98fa95bcc968bd5e93418a2",
+    "recorded_at": "2026-11-02T02:58:50Z"
   },
   {
     "id": "uncached-query-loop",
@@ -212,8 +260,8 @@
       "dependencies.lock.json",
       "tests/live.Tests.ps1"
     ],
-    "inputs_sha256": "fc86c27884a88b46358cc574b1966bcb77091d33fb2734abb4ac759974ce5f92",
-    "recorded_at": "2026-10-21T01:46:21Z"
+    "inputs_sha256": "b65ddf89930d3ea8f534dc2fde71080fd3f84e625bf8cfc004dc4f6698d3e4b4",
+    "recorded_at": "2026-11-02T03:00:31Z"
   },
   {
     "id": "format",
@@ -222,19 +270,19 @@
     "mutated_exit": 1,
     "restored_exit": 0,
     "expected_diagnostic": "clang-format-violations",
-    "observed_diagnostic": "C:\\Users\\Randy\\Coding\\meta_g_link_direct\\src\\protocol\\sdu.cpp:80:22: error: code should be clang-formatted [-Wclang-format-violations]",
+    "observed_diagnostic": "C:\\Users\\Randy\\Coding\\meta_g_link_direct\\src\\protocol\\sdu.cpp:82:22: error: code should be clang-formatted [-Wclang-format-violations]",
     "path": "src/protocol/sdu.cpp",
-    "before": "23f81a1e6ccdf6122fdb9414b839a7e2ca96f3564b1608f35ffa807579178ca0",
-    "mutated": "035a04541f5afb17ba012edc2e51b8fb82f320e5a121437e3c823ea4358b2889",
-    "after": "23f81a1e6ccdf6122fdb9414b839a7e2ca96f3564b1608f35ffa807579178ca0",
+    "before": "53d659868e94a518e5fb184fdc191d4906d230a224e9639d3704f0c7468ebf47",
+    "mutated": "63567127733ebe96adb795961c569eb16a04df7dfdda44d11c376a7c3a6131b1",
+    "after": "53d659868e94a518e5fb184fdc191d4906d230a224e9639d3704f0c7468ebf47",
     "log": "reports/red/format.txt",
     "inputs": [
       "src/protocol/sdu.cpp",
       "scripts/Invoke-Project.ps1",
       ".clang-format"
     ],
-    "inputs_sha256": "9e602b6e3a37f9920dca1312034923e61b50f5112ea8517cf8706ba5e9f5a465",
-    "recorded_at": "2026-10-21T01:46:24Z"
+    "inputs_sha256": "72d652f93f6b2fa47b338a5b2b6e0880ed2ffdba33e0ee5d4e27263ed98db21a",
+    "recorded_at": "2026-11-02T03:00:33Z"
   },
   {
     "id": "owned-header",
@@ -257,8 +305,8 @@
       "dependencies.lock.json",
       ".clang-tidy"
     ],
-    "inputs_sha256": "1fa1f4f4828bc844439c846c6c7e1cc2d84b4d065c5676566d965f9018b1861f",
-    "recorded_at": "2026-10-21T02:01:26Z"
+    "inputs_sha256": "ba8cb4edca84cc03f36da6546a804868551b70ac78cc8af0c2094c821945a521",
+    "recorded_at": "2026-11-02T03:12:44Z"
   },
   {
     "id": "compiler-types",
@@ -267,11 +315,11 @@
     "mutated_exit": 1,
     "restored_exit": 0,
     "expected_diagnostic": "cannot initialize|cannot convert|incompatible",
-    "observed_diagnostic": "C:\\Users\\Randy\\Coding\\meta_g_link_direct\\src\\protocol\\sdu.cpp(80): error C2440: 'initializing': cannot convert from 'const char [16]' to 'const int'",
+    "observed_diagnostic": "C:\\Users\\Randy\\Coding\\meta_g_link_direct\\src\\protocol\\sdu.cpp(82): error C2440: 'initializing': cannot convert from 'const char [16]' to 'const int'",
     "path": "src/protocol/sdu.cpp",
-    "before": "23f81a1e6ccdf6122fdb9414b839a7e2ca96f3564b1608f35ffa807579178ca0",
-    "mutated": "b19aebbb568f816eca08b3b99d98e8d78c38e23adf18a6824274d9d2c60853f3",
-    "after": "23f81a1e6ccdf6122fdb9414b839a7e2ca96f3564b1608f35ffa807579178ca0",
+    "before": "53d659868e94a518e5fb184fdc191d4906d230a224e9639d3704f0c7468ebf47",
+    "mutated": "33953481b167b3271cc75131df4c2e4027bf1e4d0fb021caf7bcfb551b6f37da",
+    "after": "53d659868e94a518e5fb184fdc191d4906d230a224e9639d3704f0c7468ebf47",
     "log": "reports/red/compiler-types.txt",
     "inputs": [
       "src/protocol/sdu.cpp",
@@ -280,8 +328,8 @@
       "CMakePresets.json",
       "dependencies.lock.json"
     ],
-    "inputs_sha256": "3dddb57ed73db0b86a7e4690c3a723fe129405818185cd070bd25d65b3a07664",
-    "recorded_at": "2026-10-21T02:01:54Z"
+    "inputs_sha256": "f3a61a37fbcde9508b041b7578a6fa561e20096b10f0d80ac3c86b08c1ca85c1",
+    "recorded_at": "2026-11-02T03:13:20Z"
   },
   {
     "id": "unused-code",
@@ -290,11 +338,11 @@
     "mutated_exit": 1,
     "restored_exit": 0,
     "expected_diagnostic": "unusedFunction",
-    "observed_diagnostic": "C:\\Users\\Randy\\Coding\\meta_g_link_direct\\src\\protocol\\sdu.cpp:80:5: style: The function 'red_drill_unused_function' is never used. [unusedFunction]",
+    "observed_diagnostic": "C:\\Users\\Randy\\Coding\\meta_g_link_direct\\src\\protocol\\sdu.cpp:82:5: style: The function 'red_drill_unused_function' is never used. [unusedFunction]",
     "path": "src/protocol/sdu.cpp",
-    "before": "23f81a1e6ccdf6122fdb9414b839a7e2ca96f3564b1608f35ffa807579178ca0",
-    "mutated": "b1d39c7c8d2f96c8013197a72854afacecf6cb19379919659fb970b45af59f89",
-    "after": "23f81a1e6ccdf6122fdb9414b839a7e2ca96f3564b1608f35ffa807579178ca0",
+    "before": "53d659868e94a518e5fb184fdc191d4906d230a224e9639d3704f0c7468ebf47",
+    "mutated": "c8f5722bf426cb859cb6fa7ac05e1ed7fe92b6777e121ce88e17a2ba173a5f2b",
+    "after": "53d659868e94a518e5fb184fdc191d4906d230a224e9639d3704f0c7468ebf47",
     "log": "reports/red/unused-code.txt",
     "inputs": [
       "src/protocol/sdu.cpp",
@@ -304,8 +352,8 @@
       "dependencies.lock.json",
       ".cppcheck-obs.cfg"
     ],
-    "inputs_sha256": "c2a505bb4c66543d172369a6498e74146ac41f93a45a8665dd65133db1b02256",
-    "recorded_at": "2026-10-21T02:02:28Z"
+    "inputs_sha256": "bc27db994eff8c88b8dfdc718fecbfd6426017c59323b41eb863fe3ba34b0a13",
+    "recorded_at": "2026-11-02T03:13:39Z"
   },
   {
     "id": "script-analysis",
@@ -314,18 +362,18 @@
     "mutated_exit": 1,
     "restored_exit": 0,
     "expected_diagnostic": "PSUseApprovedVerbs",
-    "observed_diagnostic": "PSUseApprovedVerbs Warning  Invoke-Project.ps1 725  The cmdlet 'Badverb-RedDrill' uses an unapproved verb.",
+    "observed_diagnostic": "PSUseApprovedVerbs Warning  Invoke-Project.ps1 746  The cmdlet 'Badverb-RedDrill' uses an unapproved verb.",
     "path": "scripts/Invoke-Project.ps1",
-    "before": "7337e50aeaac4ac0f39874055a6b834bc1c805b5cffda4fe3ae0a6902216c920",
-    "mutated": "5c42463e604e3eb50a31fcf37502ab11289bedb44629d913168a95aee803e183",
-    "after": "7337e50aeaac4ac0f39874055a6b834bc1c805b5cffda4fe3ae0a6902216c920",
+    "before": "f5b4b2f38c1bb6e046795b0a7f3018870bfa12d4e8512c9a87fdb21ba8009e9b",
+    "mutated": "2141a6215ba38d77d6e9e76ad3441f3f060dfbb86a2a876ee41f6808ae60f6b7",
+    "after": "f5b4b2f38c1bb6e046795b0a7f3018870bfa12d4e8512c9a87fdb21ba8009e9b",
     "log": "reports/red/script-analysis.txt",
     "inputs": [
       "scripts/Invoke-Project.ps1",
       "PSScriptAnalyzerSettings.psd1"
     ],
-    "inputs_sha256": "4b7f8a89d3931c9f172760d2548cee680060b227d21b04cbfcbaa4f099ae18e9",
-    "recorded_at": "2026-10-21T02:02:52Z"
+    "inputs_sha256": "0799799e409deb5d2d94d50ccbd89673fade120e8d776ba284cb5a9e5c504d20",
+    "recorded_at": "2026-11-02T03:13:50Z"
   },
   {
     "id": "workflow-security",
@@ -345,8 +393,8 @@
       "scripts/Invoke-Project.ps1",
       ".github/workflows"
     ],
-    "inputs_sha256": "157d9bbc667f27a8a54baf3ec2676dccc8cdfab561e6eda1420d8329cd4f0065",
-    "recorded_at": "2026-10-21T02:02:55Z"
+    "inputs_sha256": "106b0533688ec34de444b55824eaeecc745d5ca0c3652d841eb5a168322d50e3",
+    "recorded_at": "2026-11-02T03:13:52Z"
   },
   {
     "id": "secret-scanner",
@@ -355,19 +403,19 @@
     "mutated_exit": 1,
     "restored_exit": 0,
     "expected_diagnostic": "leaks found",
-    "observed_diagnostic": "7:02PM WRN leaks found: 1",
+    "observed_diagnostic": "7:13PM WRN leaks found: 1",
     "path": "src/protocol/sdu.cpp",
-    "before": "23f81a1e6ccdf6122fdb9414b839a7e2ca96f3564b1608f35ffa807579178ca0",
-    "mutated": "8f0ad1aa76eced0f2914905292f1ad030bcb311863cb1041466b528ffad0b6de",
-    "after": "23f81a1e6ccdf6122fdb9414b839a7e2ca96f3564b1608f35ffa807579178ca0",
+    "before": "53d659868e94a518e5fb184fdc191d4906d230a224e9639d3704f0c7468ebf47",
+    "mutated": "ea62fccc608a9b1671b0d5c96f8a19b580786de6c3672702db6d2f33e3bcf6aa",
+    "after": "53d659868e94a518e5fb184fdc191d4906d230a224e9639d3704f0c7468ebf47",
     "log": "reports/red/secret-scanner.txt",
     "inputs": [
       "src/protocol/sdu.cpp",
       "scripts/Invoke-Project.ps1",
       ".gitleaks.toml"
     ],
-    "inputs_sha256": "024c630c8d7c74fab0e02119597e5ec89532b8d016992db914e724841fbf974a",
-    "recorded_at": "2026-10-21T02:03:00Z"
+    "inputs_sha256": "49e92a5787eca867fef504eb1cbec54e4873cbe56c8f788ce2f59e9c07e289a1",
+    "recorded_at": "2026-11-02T03:13:56Z"
   },
   {
     "id": "unsafe-copy",
@@ -378,17 +426,17 @@
     "expected_diagnostic": "mgl-unsafe-string-copy",
     "observed_diagnostic": "❯❯❱ mgl-unsafe-string-copy",
     "path": "src/protocol/sdu.cpp",
-    "before": "23f81a1e6ccdf6122fdb9414b839a7e2ca96f3564b1608f35ffa807579178ca0",
-    "mutated": "8f8893918ed2adef9591c30edfe3170dafcc7ec5ec7015c62d7ae7c95ba83d83",
-    "after": "23f81a1e6ccdf6122fdb9414b839a7e2ca96f3564b1608f35ffa807579178ca0",
+    "before": "53d659868e94a518e5fb184fdc191d4906d230a224e9639d3704f0c7468ebf47",
+    "mutated": "3e88e64820c4c1bcea4f15314ab3db40dbd8b88edcac049a3ab6557078c1e976",
+    "after": "53d659868e94a518e5fb184fdc191d4906d230a224e9639d3704f0c7468ebf47",
     "log": "reports/red/unsafe-copy.txt",
     "inputs": [
       "src/protocol/sdu.cpp",
       "scripts/Invoke-Project.ps1",
       ".semgrep.yml"
     ],
-    "inputs_sha256": "4231870f649ea776e93771958f2f2932d571f780fec81f99e9554c16226a9a98",
-    "recorded_at": "2026-10-21T02:03:29Z"
+    "inputs_sha256": "e55acabd4081af9c672c5fe79e5dcaebd3ae6c9b295f7a54f7a9f18b6fece05a",
+    "recorded_at": "2026-11-02T03:14:15Z"
   },
   {
     "id": "duplicated-code",
@@ -399,9 +447,9 @@
     "expected_diagnostic": "Found [1-9][0-9]* clones|threshold",
     "observed_diagnostic": "\u001b[90mFound 1 clones.\u001b[39m",
     "path": "src/protocol/sdu.cpp",
-    "before": "23f81a1e6ccdf6122fdb9414b839a7e2ca96f3564b1608f35ffa807579178ca0",
-    "mutated": "ab31274aa64f64d2e69cfebeea58cf09ff96d2e95658d3e2bbd2b018bd6573d1",
-    "after": "23f81a1e6ccdf6122fdb9414b839a7e2ca96f3564b1608f35ffa807579178ca0",
+    "before": "53d659868e94a518e5fb184fdc191d4906d230a224e9639d3704f0c7468ebf47",
+    "mutated": "fac062c151323155d85fd14cdcef7bde788279d1e70dedbb86a5452cac55fad8",
+    "after": "53d659868e94a518e5fb184fdc191d4906d230a224e9639d3704f0c7468ebf47",
     "log": "reports/red/duplicated-code.txt",
     "inputs": [
       "src/protocol/sdu.cpp",
@@ -410,8 +458,8 @@
       "package-lock.json",
       ".jscpd.json"
     ],
-    "inputs_sha256": "b1c62b8e16daa522def12c7b42530990c94fe82f82c91234abb6b345c63cad41",
-    "recorded_at": "2026-10-21T02:03:34Z"
+    "inputs_sha256": "7249a43288c06f6cc96f9e94a2b87bbc746581f7852794eaa3a93ff589658dd2",
+    "recorded_at": "2026-11-02T03:14:19Z"
   },
   {
     "id": "address-sanitizer",
@@ -420,7 +468,7 @@
     "mutated_exit": 1,
     "restored_exit": 0,
     "expected_diagnostic": "AddressSanitizer: heap-buffer-overflow",
-    "observed_diagnostic": "==45020==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x11eb829a0034 at pc 0x7ff7ed5053de bp 0x0007c9d5fe30 sp 0x0007c9d5fe38",
+    "observed_diagnostic": "==14344==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x11d9b99a0034 at pc 0x7ff6094953de bp 0x0083accff840 sp 0x0083accff848",
     "path": "tests/sdu_tests.cpp",
     "before": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd",
     "mutated": "f0b8a6f71a8f96f071d86024029c536756dd654d9beaea73b9a22d9535147d2e",
@@ -434,8 +482,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "c70e33d2c84e88815dc453a10f432db41de2f29cfb24590243ecd17cb31c8ab6",
-    "recorded_at": "2026-10-21T02:04:20Z"
+    "inputs_sha256": "39435066a2e18899ed707e9513f7d38c3c05a6b3b456802ffbe07429fc2accbc",
+    "recorded_at": "2026-11-02T03:14:54Z"
   },
   {
     "id": "dependency-npm",
@@ -447,7 +495,7 @@
     "observed_diagnostic": "Command Injection in lodash - https://github.com/advisories/GHSA-35jh-r3h4-6jhm",
     "path": "package-lock.json",
     "before": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16",
-    "mutated": "6a8ac83ba32bfab0ef10d655e7876e7f6f9fbb9af541d70949ade015ab5a15ae",
+    "mutated": "8ddef4d54f2453738e4928d7bb0e0edda8965c137053f212939429c45dc0b8da",
     "after": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16",
     "log": "reports/red/dependency-npm.txt",
     "inputs": [
@@ -455,8 +503,8 @@
       "scripts/Invoke-Project.ps1",
       "package.json"
     ],
-    "inputs_sha256": "6ad358567c93010115f1f2ed9d1ef5fedbfe3eff19027cefda92772b341a313b",
-    "recorded_at": "2026-10-21T02:04:25Z"
+    "inputs_sha256": "baba6df4eba55450e6dc50a51a7f4c79daf2941e1fe8dd4e75317f152a98f078",
+    "recorded_at": "2026-11-02T03:15:04Z"
   },
   {
     "id": "dependency-osv",
@@ -468,7 +516,7 @@
     "observed_diagnostic": "| https://osv.dev/GHSA-35jh-r3h4-6jhm | 7.2  | npm       | lodash (dev) | 4.17.20 | 4.17.21       | package-lock.json |",
     "path": "package-lock.json",
     "before": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16",
-    "mutated": "6a8ac83ba32bfab0ef10d655e7876e7f6f9fbb9af541d70949ade015ab5a15ae",
+    "mutated": "8ddef4d54f2453738e4928d7bb0e0edda8965c137053f212939429c45dc0b8da",
     "after": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16",
     "log": "reports/red/dependency-osv.txt",
     "inputs": [
@@ -476,8 +524,8 @@
       "scripts/Invoke-Project.ps1",
       "package.json"
     ],
-    "inputs_sha256": "6ad358567c93010115f1f2ed9d1ef5fedbfe3eff19027cefda92772b341a313b",
-    "recorded_at": "2026-10-21T02:04:29Z"
+    "inputs_sha256": "baba6df4eba55450e6dc50a51a7f4c79daf2941e1fe8dd4e75317f152a98f078",
+    "recorded_at": "2026-11-02T03:15:10Z"
   },
   {
     "id": "whatif-guard",
@@ -488,16 +536,16 @@
     "expected_diagnostic": "Expected strings to be the same",
     "observed_diagnostic": "Expected strings to be the same, but they were different.",
     "path": "scripts/Invoke-Project.ps1",
-    "before": "7337e50aeaac4ac0f39874055a6b834bc1c805b5cffda4fe3ae0a6902216c920",
-    "mutated": "af6096cd603a488819837f1611265583f4e10435148c2ca1db835bb733422668",
-    "after": "7337e50aeaac4ac0f39874055a6b834bc1c805b5cffda4fe3ae0a6902216c920",
+    "before": "f5b4b2f38c1bb6e046795b0a7f3018870bfa12d4e8512c9a87fdb21ba8009e9b",
+    "mutated": "720401816c3b26074017e99ae71d5db0ea750f108bad45e44d7a94001f7129cc",
+    "after": "f5b4b2f38c1bb6e046795b0a7f3018870bfa12d4e8512c9a87fdb21ba8009e9b",
     "log": "reports/red/whatif-guard.txt",
     "inputs": [
       "scripts/Invoke-Project.ps1",
       "tests/runner.Tests.ps1"
     ],
-    "inputs_sha256": "c820c5b3033a524b07020f6fc40df49895fc27701e781f4541405a4d5fd51e75",
-    "recorded_at": "2026-10-21T02:04:45Z"
+    "inputs_sha256": "1410d7cf24d084dedc94c9fc2f93c7f377fa12e08425a17e0a21d851ff950e70",
+    "recorded_at": "2026-11-02T03:15:26Z"
   },
   {
     "id": "native-exit-propagation",
@@ -508,16 +556,16 @@
     "expected_diagnostic": "Expected 0 to be different from the actual value",
     "observed_diagnostic": "Expected 0 to be different from the actual value, but got the same value.",
     "path": "scripts/Invoke-Project.ps1",
-    "before": "7337e50aeaac4ac0f39874055a6b834bc1c805b5cffda4fe3ae0a6902216c920",
-    "mutated": "4ae404f57da6051e2456cb28d135a44f2cbec9bd6ecb7f994bd0f6b5a1a603dc",
-    "after": "7337e50aeaac4ac0f39874055a6b834bc1c805b5cffda4fe3ae0a6902216c920",
+    "before": "f5b4b2f38c1bb6e046795b0a7f3018870bfa12d4e8512c9a87fdb21ba8009e9b",
+    "mutated": "3747c28148799b7a07f60b998f147cc2f20100fde9cedaef11437263aeaedcd3",
+    "after": "f5b4b2f38c1bb6e046795b0a7f3018870bfa12d4e8512c9a87fdb21ba8009e9b",
     "log": "reports/red/native-exit-propagation.txt",
     "inputs": [
       "scripts/Invoke-Project.ps1",
       "tests/runner.Tests.ps1"
     ],
-    "inputs_sha256": "c820c5b3033a524b07020f6fc40df49895fc27701e781f4541405a4d5fd51e75",
-    "recorded_at": "2026-10-21T02:05:04Z"
+    "inputs_sha256": "1410d7cf24d084dedc94c9fc2f93c7f377fa12e08425a17e0a21d851ff950e70",
+    "recorded_at": "2026-11-02T03:16:10Z"
   },
   {
     "id": "installer-drive-letter",
@@ -537,8 +585,8 @@
       "scripts/Invoke-Project.ps1",
       "tests/installer.Tests.ps1"
     ],
-    "inputs_sha256": "9a56c8d89c32771d3387f9ceccc52069887825481f27d73ffd59e8a5d915e2c3",
-    "recorded_at": "2026-10-21T02:05:15Z"
+    "inputs_sha256": "e607e1b43a56ece365cfe42bf31117f2920cbfe21069a769872ba2835b894436",
+    "recorded_at": "2026-11-02T03:16:16Z"
   },
   {
     "id": "drill-reuse",
@@ -549,15 +597,15 @@
     "expected_diagnostic": "because a drill whose inputs changed must run again",
     "observed_diagnostic": "Expected $null or empty, because a drill whose inputs changed must run again, but got @{id=passing; baseline_exit=0; mutated_exit=1; restored_exit=0; inputs_sha256=abc}.",
     "path": "scripts/Invoke-Project.ps1",
-    "before": "7337e50aeaac4ac0f39874055a6b834bc1c805b5cffda4fe3ae0a6902216c920",
-    "mutated": "b8b6b90501d669296aa609fafd78de6b58956aacc49b7d7c7bcd136b0e02356f",
-    "after": "7337e50aeaac4ac0f39874055a6b834bc1c805b5cffda4fe3ae0a6902216c920",
+    "before": "f5b4b2f38c1bb6e046795b0a7f3018870bfa12d4e8512c9a87fdb21ba8009e9b",
+    "mutated": "6e55893d39bccc4651a164f0a488457cb0b4336ac2d2b8d915b6ebc59683b2cd",
+    "after": "f5b4b2f38c1bb6e046795b0a7f3018870bfa12d4e8512c9a87fdb21ba8009e9b",
     "log": "reports/red/drill-reuse.txt",
     "inputs": [
       "scripts/Invoke-Project.ps1",
       "tests/runner.Tests.ps1"
     ],
-    "inputs_sha256": "c820c5b3033a524b07020f6fc40df49895fc27701e781f4541405a4d5fd51e75",
-    "recorded_at": "2026-10-21T02:05:33Z"
+    "inputs_sha256": "1410d7cf24d084dedc94c9fc2f93c7f377fa12e08425a17e0a21d851ff950e70",
+    "recorded_at": "2026-11-02T03:16:28Z"
   }
 ]

@@ -76,8 +76,6 @@ static void output_audio(void* context, const struct MglAudioBlock* sound) {
     obs_source_output_audio(source, &audio);
 }
 
-static void log_line(const char* message) { blog(LOG_INFO, "[meta-g-link-direct] %s", message); }
-
 static const char* camera_get_name(void* type_data) {
     (void)type_data;
     return obs_module_text("MetaGLinkCamera");

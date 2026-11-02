@@ -5,7 +5,6 @@
 // copied, and runs the change of owner. Where WebView2 is unavailable it says so and offers the
 // login in the browser, with a box for the final address. Exit codes: 0 done, 3 the setup failed,
 // 8 cancelled.
-#include "mgl/encoding.hpp"
 #include "mgl/provision.hpp"
 #include "mgl/setup.hpp"
 #include "mgl/win_text.hpp"
@@ -37,13 +36,11 @@
 #include <exception>
 #include <filesystem>
 #include <memory>
-#include <mutex>
 #include <string>
 #include <string_view>
 #include <system_error>
 #include <thread>
 #include <type_traits>
-#include <utility>
 
 namespace {
 using Microsoft::WRL::Callback;
@@ -120,11 +117,7 @@ class SetupWindow {
     SetupWindow& operator=(const SetupWindow&) = delete;
     SetupWindow(SetupWindow&&) = delete;
     SetupWindow& operator=(SetupWindow&&) = delete;
-    ~SetupWindow() {
-        if (worker_.joinable()) {
-            worker_.join();
-        }
-    }
+    ~SetupWindow() = default;
 
     int run(HINSTANCE instance, int show) {
         const wchar_t* const class_name = L"MetaGLinkDirectSetup";
@@ -269,8 +262,10 @@ class SetupWindow {
     // A window size in 96-DPI pixels, scaled, and cut down to fit the work area.
     [[nodiscard]] SIZE fitted(int width, int height) const {
         const RECT work = workArea();
-        return {.cx = std::min(scaled(width), static_cast<int>(work.right - work.left)),
-                .cy = std::min(scaled(height), static_cast<int>(work.bottom - work.top))};
+        return {
+            .cx = std::min(scaled(width), static_cast<int>(work.right - work.left)),
+            .cy = std::min(scaled(height), static_cast<int>(work.bottom - work.top)),
+        };
     }
 
     HWND addControl(const wchar_t* kind, DWORD style, int id) {
@@ -369,10 +364,12 @@ class SetupWindow {
                                      : client.right - margin - button_width;
         MoveWindow(primary_, primary_left, button_top, button_width, scaled(ButtonHeight), TRUE);
         if (controller_ != nullptr) {
-            const RECT login{.left = margin,
-                             .top = top,
-                             .right = client.right - margin,
-                             .bottom = button_top - gap};
+            const RECT login{
+                .left = margin,
+                .top = top,
+                .right = client.right - margin,
+                .bottom = button_top - gap,
+            };
             controller_->put_Bounds(login);
         }
     }
@@ -504,7 +501,7 @@ class SetupWindow {
     // A browser profile of this run only, removed afterwards.
     [[nodiscard]] static std::filesystem::path browserFolder() {
         std::error_code error;
-        auto base = std::filesystem::temp_directory_path(error);
+        const auto base = std::filesystem::temp_directory_path(error);
         if (error) {
             return {};
         }
@@ -612,44 +609,17 @@ class SetupWindow {
 
     // Checks a finished login's address and starts the change of owner with its code.
     void useAddress(const std::string& address) {
-        const auto state = mgl::encoding::queryParameter(address, "state");
-        if (state && *state != request_.state) {
-            fail("That address belongs to a different login. Select Try again and log in again.");
-            return;
-        }
-        const auto code = mgl::encoding::queryParameter(address, "code");
-        if (!code) {
-            fail("The login did not return a code. Select Try again and log in again.");
+        const auto login = mgl::setup::readLoginAddress(address, request_.state);
+        if (!login.code) {
+            fail(login.problem);
             return;
         }
         showScreen(Screen::Working);
-        if (worker_.joinable()) {
-            worker_.join();
-        }
-        worker_ = std::thread([this, auth_code = *code] {
-            mgl::setup::Outcome outcome;
-            try {
-                outcome = mgl::setup::changeOwner(auth_code);
-            } catch (const std::exception& error) {
-                outcome.problem = std::string("The setup hit an internal error: ") + error.what();
-            }
-            {
-                const std::scoped_lock lock(result_mutex_);
-                result_ = std::move(outcome);
-            }
-            PostMessageW(window_, MessageSetupFinished, 0, 0);
-        });
+        change_.start(*login.code, [this] { PostMessageW(window_, MessageSetupFinished, 0, 0); });
     }
 
     void onFinished() {
-        if (worker_.joinable()) {
-            worker_.join();
-        }
-        mgl::setup::Outcome outcome;
-        {
-            const std::scoped_lock lock(result_mutex_);
-            outcome = result_;
-        }
+        const auto outcome = change_.finish();
         if (outcome.ok) {
             exit_code_ = ExitDone;
             showScreen(Screen::Done);
@@ -704,9 +674,7 @@ class SetupWindow {
     ComPtr<ICoreWebView2Controller> controller_;
     ComPtr<ICoreWebView2> webview_;
     std::filesystem::path browser_data_;
-    std::thread worker_;
-    std::mutex result_mutex_;
-    mgl::setup::Outcome result_;
+    mgl::setup::OwnerChange change_;
 };
 } // namespace
 
@@ -717,8 +685,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPWSTR /*l
     if (FAILED(CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED))) {
         return ExitFailed;
     }
-    const INITCOMMONCONTROLSEX controls{.dwSize = sizeof(INITCOMMONCONTROLSEX),
-                                        .dwICC = ICC_PROGRESS_CLASS};
+    const INITCOMMONCONTROLSEX controls{
+        .dwSize = sizeof(INITCOMMONCONTROLSEX),
+        .dwICC = ICC_PROGRESS_CLASS,
+    };
     InitCommonControlsEx(&controls);
     int exit_code = ExitFailed;
     try {

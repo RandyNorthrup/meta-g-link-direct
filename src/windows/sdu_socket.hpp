@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-// Shared Winsock whole-SDU transport: owns a connected socket and cuts the byte stream into SDUs
-// with inspectFramePrefix for the current link phase. RFCOMM and TCP transports both use it.
+// The Winsock whole-SDU transport: owns a connected socket; BufferedTransport cuts its byte stream
+// into SDUs. RFCOMM and TCP transports both use it.
 #ifndef MGL_WINDOWS_SDU_SOCKET_HPP
 #define MGL_WINDOWS_SDU_SOCKET_HPP
 
+#include "mgl/buffered_transport.hpp"
 #include "mgl/bytes.hpp"
-#include "mgl/sdu.hpp"
 #include "mgl/transport.hpp"
 
 #include <winsock2.h>
@@ -29,8 +29,8 @@ class WinsockLibrary {
     bool owns_ = true;
 };
 
-// Owns a connected socket and buffers partial reads into whole SDUs.
-class SduSocket final : public Transport {
+// Owns a connected socket.
+class SduSocket final : public BufferedTransport {
   public:
     SduSocket(WinsockLibrary library, SOCKET socket);
     SduSocket(const SduSocket&) = delete;
@@ -40,16 +40,14 @@ class SduSocket final : public Transport {
     ~SduSocket() override;
 
     [[nodiscard]] bool send(ByteView frame) override;
-    [[nodiscard]] SduResult receive(LinkPhase phase, std::chrono::milliseconds timeout) override;
     void close() override;
+
+  protected:
+    [[nodiscard]] TransportStatus fill(std::chrono::milliseconds timeout) override;
 
   private:
     WinsockLibrary library_;
     SOCKET socket_;
-    Bytes buffer_;
-
-    [[nodiscard]] SduResult takeFrame(LinkPhase phase);
-    [[nodiscard]] TransportStatus fill(std::chrono::milliseconds timeout);
 };
 } // namespace mgl
 #endif

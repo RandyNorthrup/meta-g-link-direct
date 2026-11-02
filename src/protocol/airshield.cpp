@@ -22,8 +22,9 @@ constexpr std::uint32_t CounterPrefix = 0x00000202;
 constexpr std::uint8_t ProvisioningCapabilities = 2;
 
 const std::array<std::uint8_t, 9> AirshieldInfo{'A', 'i', 'r', 'S', 'h', 'i', 'e', 'l', 'd'};
-const std::array<std::uint8_t, 11> HmacDeriveLabel{'h', 'm', 'a', 'c', '_', 'd',
-                                                   'e', 'r', 'i', 'v', 'e'};
+const std::array<std::uint8_t, 11> HmacDeriveLabel{
+    'h', 'm', 'a', 'c', '_', 'd', 'e', 'r', 'i', 'v', 'e',
+};
 
 ByteView view(const auto& container) { return ByteView(container.data(), container.size()); }
 

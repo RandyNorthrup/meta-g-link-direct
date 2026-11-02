@@ -4,11 +4,11 @@ MUTATED EXIT 1
 
 RuleName           Severity ScriptName         Line Message
 --------           -------- ----------         ---- -------
-PSUseApprovedVerbs Warning  Invoke-Project.ps1 725  The cmdlet 'Badverb-RedDrill' uses an unapproved verb.
+PSUseApprovedVerbs Warning  Invoke-Project.ps1 746  The cmdlet 'Badverb-RedDrill' uses an unapproved verb.
 
 
 Write-Error: PSScriptAnalyzer rejected owned scripts
 
 RESTORED EXIT 0
 
-RESTORATION SHA256 7337e50aeaac4ac0f39874055a6b834bc1c805b5cffda4fe3ae0a6902216c920
+RESTORATION SHA256 f5b4b2f38c1bb6e046795b0a7f3018870bfa12d4e8512c9a87fdb21ba8009e9b

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-// Local, user-scoped protected storage for the glasses owner identity and the Meta client tokens.
-// Everything is sealed with Windows DPAPI (CryptProtectData, current-user scope) under
-// %LOCALAPPDATA%\MetaGLinkDirect. Nothing here is ever written to the repo, logs or diagnostics.
+// Local, user-scoped protected storage for the glasses owner identity and the Meta client tokens:
+// Windows DPAPI files, the Secret Service on Linux, the login keychain on macOS. Nothing here is
+// ever written to the repo, logs or diagnostics.
 #ifndef MGL_IDENTITY_HPP
 #define MGL_IDENTITY_HPP
 
@@ -17,9 +17,12 @@ struct OwnerIdentity {
     std::string user_id; // Meta user id from the final ownership receipt
 };
 
-// true on success. The blob is DPAPI-sealed before it touches disk.
+// true on success. The blob is sealed before it touches disk.
 [[nodiscard]] bool saveOwnerIdentity(const OwnerIdentity& identity);
 [[nodiscard]] std::optional<OwnerIdentity> loadOwnerIdentity();
+// The system's reason this thread's last store call failed, for the log; empty when it worked or
+// the store simply held nothing.
+[[nodiscard]] std::string lastStorageProblem();
 // Forget deletes this plugin's stored owner identity and any imported token store, nothing else.
 // true if both are removed or already absent.
 [[nodiscard]] bool forgetOwnerIdentity();
@@ -29,7 +32,8 @@ struct OwnerIdentity {
 [[nodiscard]] bool saveTokenBlob(const std::string& text);
 [[nodiscard]] std::optional<std::string> loadTokenBlob();
 
-// The directory the sealed files live in, created on demand.
+// The directory this project keeps its files in (the installed tools, and on Windows the sealed
+// blobs), created on demand.
 [[nodiscard]] std::optional<std::string> storageDirectory();
 } // namespace mgl::identity
 #endif

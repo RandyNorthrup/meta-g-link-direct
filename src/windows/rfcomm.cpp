@@ -107,9 +107,10 @@ bool waitSocket(SOCKET socket, bool writing, std::chrono::steady_clock::time_poi
     auto ready = singleSocketSet(socket);
     auto failed = singleSocketSet(socket);
     constexpr auto MicrosPerSecond = 1000000;
-    const timeval timeout{.tv_sec = static_cast<std::int32_t>(remaining.count() / MicrosPerSecond),
-                          .tv_usec =
-                              static_cast<std::int32_t>(remaining.count() % MicrosPerSecond)};
+    const timeval timeout{
+        .tv_sec = static_cast<std::int32_t>(remaining.count() / MicrosPerSecond),
+        .tv_usec = static_cast<std::int32_t>(remaining.count() % MicrosPerSecond),
+    };
     const int selected =
         select(0, writing ? nullptr : &ready, writing ? &ready : nullptr, &failed, &timeout);
     if (selected == 0) {
@@ -175,8 +176,9 @@ void receiveHello(SOCKET socket, DirectRfcommResult& result) {
     }
     result.frame_received = true;
     // Public Gen 2 channel-7 observation; this recognizes a candidate, not trusted identity.
-    constexpr std::array<std::uint8_t, 12> Reference{0x80, 0x70, 0x80, 0x01, 0x81, 0x00,
-                                                     0x00, 0x05, 0x02, 0x00, 0x00, 0x01};
+    constexpr std::array<std::uint8_t, 12> Reference{
+        0x80, 0x70, 0x80, 0x01, 0x81, 0x00, 0x00, 0x05, 0x02, 0x00, 0x00, 0x01,
+    };
     result.reference_hello_prefix = received >= Reference.size();
     for (std::size_t index = 0; index < std::min(received, Reference.size()); ++index) {
         result.reference_hello_prefix =
