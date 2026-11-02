@@ -30,7 +30,22 @@ Linux Bluetooth: the handshake reached `keys_derived`, the change of owner retur
 
 ### Battery
 
-From the glasses' own reports, streaming 720 × 1280: 62% to 45% in 3 min 33 s on macOS (with quality and audio changes), and 33% to 25% in about 2 minutes on Linux. That is 4–5% a minute, so about 20–25 minutes from a full charge, shorter than the earlier unconfirmed 35–40 minutes. No full-charge run has been made.
+From the glasses' own reports, streaming 720 × 1280: 62% to 45% in 3 min 33 s on macOS (with quality and audio changes), and 33% to 25% in about 2 minutes on Linux. A later run with a fuller battery fell from 88% to 77% in 3 min 23 s. That is 3–5% a minute, so about 20–30 minutes from a full charge, shorter than the earlier unconfirmed 35–40 minutes. No full-charge run has been made.
+
+### The released files
+
+After publishing, the release's own files were downloaded, checked against their SHA-256 files, installed with their installers, and run with a charged battery (each owner change used a real Meta login with its code piped in).
+
+| Platform | OBS | Video after | Frame rate | Quality change | Audio peak | Battery | Afterwards |
+|---|---|---|---|---|---|---|---|
+| Windows zip | 33.0.1 | 16.5 s, 16.3 s | 30 fps | 1.2 s | −45.4 dBFS (quiet room) | request and log | glasses disconnected |
+| Linux bundle, native | 33.0.0 | 17.2 s | 30 fps | 1.2 s | −40.0 dBFS (quiet room) | request and log | home network, 0 profiles left |
+| Linux bundle, Flatpak | 33.0.1 | 15.9 s | 30 fps, 0 render frames skipped of 2,738 | 1.1 s | −31.8 dBFS | request and log | home network, 0 profiles left |
+| macOS bundle, Intel | 33.0.1 | 30.1, 14.7, 15.5, 36.2 and 16.0 s | 30.0 fps from the glasses, 30.1 shown, 1 late, 0 undecodable over 60 s; 1 render frame skipped of 8,547 | 1.2–1.3 s | −30.8 dBFS | file, request and log | home network, 1 keychain item, 0 known networks, no prompts |
+
+On macOS the battery fell from 88% to 77% in 3 min 23 s of streaming, with OBS at about 40% of one core and memory flat at about 550 MB.
+
+The setup window opened from the Flatpak too (640 × 760 in the X11 window list). A full login through the Linux and macOS setup windows still hasn't been done; the owner changes went through `--provision`.
 
 ## macOS Wi-Fi: what was tried and why
 

@@ -29,7 +29,7 @@ Linux and macOS join Windows. What has and hasn't been checked on each platform 
 
 ### Measured
 
-- **Battery**: about 4–5% a minute at 720 × 1280 (62% to 45% in 3 min 33 s; 33% to 25% in about 2 minutes), so about 20–25 minutes from a full charge. This replaces the earlier unconfirmed 35–40 minutes. No full-charge run has been made.
+- **Battery**: about 3–5% a minute at 720 × 1280 (62% to 45% in 3 min 33 s; 33% to 25% in about 2 minutes; 88% to 77% in 3 min 23 s), so about 20–30 minutes from a full charge. This replaces the earlier unconfirmed 35–40 minutes. No full-charge run has been made.
 - The glasses' Bluetooth information reports firmware 20.3.6.
 
 ## [0.4.0] - 2026-10-20 (beta)
