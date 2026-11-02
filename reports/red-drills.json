@@ -21,7 +21,7 @@
       "tests"
     ],
     "inputs_sha256": "75a4c1a7aca5d93cd2348a5a1b66d9ed8ca5f8a3190b00d12c619f14ba2b9a86",
-    "recorded_at": "2026-11-02T02:51:31Z"
+    "recorded_at": "2026-11-02T03:28:53Z"
   },
   {
     "id": "playout-cadence",
@@ -45,7 +45,7 @@
       "tests"
     ],
     "inputs_sha256": "bdbbc7b160981c88791a4584730d15d0626f9595b5258839ecd7a94a0be4a181",
-    "recorded_at": "2026-11-02T02:52:14Z"
+    "recorded_at": "2026-11-02T03:30:02Z"
   },
   {
     "id": "datax-frame-boundary",
@@ -69,7 +69,7 @@
       "tests"
     ],
     "inputs_sha256": "ebad0f67e8eacb80591e523d7840a087374227d74a070b18e96c99eb42c9c625",
-    "recorded_at": "2026-11-02T02:53:08Z"
+    "recorded_at": "2026-11-02T03:31:53Z"
   },
   {
     "id": "battery-change",
@@ -93,7 +93,7 @@
       "tests"
     ],
     "inputs_sha256": "9dd4d51253c5699c518a1e778c08e7619d3ed3e3d182506cb1ab312cb3827e34",
-    "recorded_at": "2026-11-02T02:54:04Z"
+    "recorded_at": "2026-11-02T03:34:19Z"
   },
   {
     "id": "buffered-partial-read",
@@ -117,7 +117,7 @@
       "tests"
     ],
     "inputs_sha256": "b664cc41596fd55e4cd0fa541e92e444c4b545de16ea5f1bfd0089ffa1b3ca05",
-    "recorded_at": "2026-11-02T02:54:51Z"
+    "recorded_at": "2026-11-02T03:36:33Z"
   },
   {
     "id": "login-state",
@@ -141,7 +141,7 @@
       "tests"
     ],
     "inputs_sha256": "d20ecbcd4eee5eab17f98be809246914725f57e1123ce4b7c173a7115845b65c",
-    "recorded_at": "2026-11-02T02:55:42Z"
+    "recorded_at": "2026-11-02T03:37:59Z"
   },
   {
     "id": "module-metadata",
@@ -165,7 +165,7 @@
       "tests"
     ],
     "inputs_sha256": "f3904da3be8cb55218b81864f08e7c97c2371ef362eaa04d3f70c37171609680",
-    "recorded_at": "2026-11-02T02:56:26Z"
+    "recorded_at": "2026-11-02T03:38:50Z"
   },
   {
     "id": "probe-arguments",
@@ -189,7 +189,7 @@
       "tests"
     ],
     "inputs_sha256": "33931667d22e1cf0608e4fa6ca4e377bb13b6cf6adc9b5ae12529585a788fac8",
-    "recorded_at": "2026-11-02T02:57:31Z"
+    "recorded_at": "2026-11-02T03:40:02Z"
   },
   {
     "id": "classic-connection-claim",
@@ -213,7 +213,7 @@
       "tests"
     ],
     "inputs_sha256": "6d6e081a467ae2f0190aa5c9aef45f0270b674ad83e08416b579a84744ffaa3a",
-    "recorded_at": "2026-11-02T02:58:45Z"
+    "recorded_at": "2026-11-02T03:41:27Z"
   },
   {
     "id": "private-address-validation",
@@ -237,7 +237,7 @@
       "tests"
     ],
     "inputs_sha256": "a9b7dceb13883c96f7127455c682450c855ee437b98fa95bcc968bd5e93418a2",
-    "recorded_at": "2026-11-02T02:58:50Z"
+    "recorded_at": "2026-11-02T03:41:32Z"
   },
   {
     "id": "uncached-query-loop",
@@ -261,7 +261,7 @@
       "tests/live.Tests.ps1"
     ],
     "inputs_sha256": "b65ddf89930d3ea8f534dc2fde71080fd3f84e625bf8cfc004dc4f6698d3e4b4",
-    "recorded_at": "2026-11-02T03:00:31Z"
+    "recorded_at": "2026-11-02T03:43:08Z"
   },
   {
     "id": "format",
@@ -282,7 +282,7 @@
       ".clang-format"
     ],
     "inputs_sha256": "72d652f93f6b2fa47b338a5b2b6e0880ed2ffdba33e0ee5d4e27263ed98db21a",
-    "recorded_at": "2026-11-02T03:00:33Z"
+    "recorded_at": "2026-11-02T03:43:10Z"
   },
   {
     "id": "owned-header",
@@ -306,7 +306,7 @@
       ".clang-tidy"
     ],
     "inputs_sha256": "ba8cb4edca84cc03f36da6546a804868551b70ac78cc8af0c2094c821945a521",
-    "recorded_at": "2026-11-02T03:12:44Z"
+    "recorded_at": "2026-11-02T04:02:21Z"
   },
   {
     "id": "compiler-types",
@@ -329,7 +329,7 @@
       "dependencies.lock.json"
     ],
     "inputs_sha256": "f3a61a37fbcde9508b041b7578a6fa561e20096b10f0d80ac3c86b08c1ca85c1",
-    "recorded_at": "2026-11-02T03:13:20Z"
+    "recorded_at": "2026-11-02T04:02:52Z"
   },
   {
     "id": "unused-code",
@@ -353,7 +353,7 @@
       ".cppcheck-obs.cfg"
     ],
     "inputs_sha256": "bc27db994eff8c88b8dfdc718fecbfd6426017c59323b41eb863fe3ba34b0a13",
-    "recorded_at": "2026-11-02T03:13:39Z"
+    "recorded_at": "2026-11-02T04:03:09Z"
   },
   {
     "id": "script-analysis",
@@ -373,7 +373,7 @@
       "PSScriptAnalyzerSettings.psd1"
     ],
     "inputs_sha256": "0799799e409deb5d2d94d50ccbd89673fade120e8d776ba284cb5a9e5c504d20",
-    "recorded_at": "2026-11-02T03:13:50Z"
+    "recorded_at": "2026-11-02T04:03:20Z"
   },
   {
     "id": "workflow-security",
@@ -393,8 +393,8 @@
       "scripts/Invoke-Project.ps1",
       ".github/workflows"
     ],
-    "inputs_sha256": "106b0533688ec34de444b55824eaeecc745d5ca0c3652d841eb5a168322d50e3",
-    "recorded_at": "2026-11-02T03:13:52Z"
+    "inputs_sha256": "0f8988f974b95c802eb4e2adadc4efb311c11e3f076e09f36304a3b6fa6a892f",
+    "recorded_at": "2026-11-02T04:03:22Z"
   },
   {
     "id": "secret-scanner",
@@ -403,10 +403,10 @@
     "mutated_exit": 1,
     "restored_exit": 0,
     "expected_diagnostic": "leaks found",
-    "observed_diagnostic": "7:13PM WRN leaks found: 1",
+    "observed_diagnostic": "8:03PM WRN leaks found: 1",
     "path": "src/protocol/sdu.cpp",
     "before": "53d659868e94a518e5fb184fdc191d4906d230a224e9639d3704f0c7468ebf47",
-    "mutated": "ea62fccc608a9b1671b0d5c96f8a19b580786de6c3672702db6d2f33e3bcf6aa",
+    "mutated": "dfc08678b661b5e868b4d934461762ce237693ead5a9fcf551f5b12165a434d2",
     "after": "53d659868e94a518e5fb184fdc191d4906d230a224e9639d3704f0c7468ebf47",
     "log": "reports/red/secret-scanner.txt",
     "inputs": [
@@ -415,7 +415,7 @@
       ".gitleaks.toml"
     ],
     "inputs_sha256": "49e92a5787eca867fef504eb1cbec54e4873cbe56c8f788ce2f59e9c07e289a1",
-    "recorded_at": "2026-11-02T03:13:56Z"
+    "recorded_at": "2026-11-02T04:03:25Z"
   },
   {
     "id": "unsafe-copy",
@@ -436,7 +436,7 @@
       ".semgrep.yml"
     ],
     "inputs_sha256": "e55acabd4081af9c672c5fe79e5dcaebd3ae6c9b295f7a54f7a9f18b6fece05a",
-    "recorded_at": "2026-11-02T03:14:15Z"
+    "recorded_at": "2026-11-02T04:03:42Z"
   },
   {
     "id": "duplicated-code",
@@ -459,7 +459,7 @@
       ".jscpd.json"
     ],
     "inputs_sha256": "7249a43288c06f6cc96f9e94a2b87bbc746581f7852794eaa3a93ff589658dd2",
-    "recorded_at": "2026-11-02T03:14:19Z"
+    "recorded_at": "2026-11-02T04:03:45Z"
   },
   {
     "id": "address-sanitizer",
@@ -468,7 +468,7 @@
     "mutated_exit": 1,
     "restored_exit": 0,
     "expected_diagnostic": "AddressSanitizer: heap-buffer-overflow",
-    "observed_diagnostic": "==14344==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x11d9b99a0034 at pc 0x7ff6094953de bp 0x0083accff840 sp 0x0083accff848",
+    "observed_diagnostic": "==47664==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x1227fdda0034 at pc 0x7ff7eab253de bp 0x00685e1cfb50 sp 0x00685e1cfb58",
     "path": "tests/sdu_tests.cpp",
     "before": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd",
     "mutated": "f0b8a6f71a8f96f071d86024029c536756dd654d9beaea73b9a22d9535147d2e",
@@ -483,7 +483,7 @@
       "tests"
     ],
     "inputs_sha256": "39435066a2e18899ed707e9513f7d38c3c05a6b3b456802ffbe07429fc2accbc",
-    "recorded_at": "2026-11-02T03:14:54Z"
+    "recorded_at": "2026-11-02T04:04:28Z"
   },
   {
     "id": "dependency-npm",
@@ -495,7 +495,7 @@
     "observed_diagnostic": "Command Injection in lodash - https://github.com/advisories/GHSA-35jh-r3h4-6jhm",
     "path": "package-lock.json",
     "before": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16",
-    "mutated": "8ddef4d54f2453738e4928d7bb0e0edda8965c137053f212939429c45dc0b8da",
+    "mutated": "0b646abb587d290bf954bafe5efb38722e2d1e26bee0ddb1660eecdda4d05032",
     "after": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16",
     "log": "reports/red/dependency-npm.txt",
     "inputs": [
@@ -504,7 +504,7 @@
       "package.json"
     ],
     "inputs_sha256": "baba6df4eba55450e6dc50a51a7f4c79daf2941e1fe8dd4e75317f152a98f078",
-    "recorded_at": "2026-11-02T03:15:04Z"
+    "recorded_at": "2026-11-02T04:04:32Z"
   },
   {
     "id": "dependency-osv",
@@ -516,7 +516,7 @@
     "observed_diagnostic": "| https://osv.dev/GHSA-35jh-r3h4-6jhm | 7.2  | npm       | lodash (dev) | 4.17.20 | 4.17.21       | package-lock.json |",
     "path": "package-lock.json",
     "before": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16",
-    "mutated": "8ddef4d54f2453738e4928d7bb0e0edda8965c137053f212939429c45dc0b8da",
+    "mutated": "0b646abb587d290bf954bafe5efb38722e2d1e26bee0ddb1660eecdda4d05032",
     "after": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16",
     "log": "reports/red/dependency-osv.txt",
     "inputs": [
@@ -525,7 +525,7 @@
       "package.json"
     ],
     "inputs_sha256": "baba6df4eba55450e6dc50a51a7f4c79daf2941e1fe8dd4e75317f152a98f078",
-    "recorded_at": "2026-11-02T03:15:10Z"
+    "recorded_at": "2026-11-02T04:04:35Z"
   },
   {
     "id": "whatif-guard",
@@ -545,7 +545,7 @@
       "tests/runner.Tests.ps1"
     ],
     "inputs_sha256": "1410d7cf24d084dedc94c9fc2f93c7f377fa12e08425a17e0a21d851ff950e70",
-    "recorded_at": "2026-11-02T03:15:26Z"
+    "recorded_at": "2026-11-02T04:04:44Z"
   },
   {
     "id": "native-exit-propagation",
@@ -565,7 +565,7 @@
       "tests/runner.Tests.ps1"
     ],
     "inputs_sha256": "1410d7cf24d084dedc94c9fc2f93c7f377fa12e08425a17e0a21d851ff950e70",
-    "recorded_at": "2026-11-02T03:16:10Z"
+    "recorded_at": "2026-11-02T04:04:53Z"
   },
   {
     "id": "installer-drive-letter",
@@ -586,7 +586,7 @@
       "tests/installer.Tests.ps1"
     ],
     "inputs_sha256": "e607e1b43a56ece365cfe42bf31117f2920cbfe21069a769872ba2835b894436",
-    "recorded_at": "2026-11-02T03:16:16Z"
+    "recorded_at": "2026-11-02T04:04:59Z"
   },
   {
     "id": "drill-reuse",
@@ -606,6 +606,6 @@
       "tests/runner.Tests.ps1"
     ],
     "inputs_sha256": "1410d7cf24d084dedc94c9fc2f93c7f377fa12e08425a17e0a21d851ff950e70",
-    "recorded_at": "2026-11-02T03:16:28Z"
+    "recorded_at": "2026-11-02T04:05:09Z"
   }
 ]

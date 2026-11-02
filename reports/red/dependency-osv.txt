@@ -2,7 +2,7 @@ BASELINE EXIT 0
 Scanning dir .
 Starting filesystem walk for root: C:\
 Scanned C:\Users\Randy\Coding\meta_g_link_direct\package-lock.json file and found 9 packages
-End status: 266 dirs visited, 1198 inodes visited, 1 Extract calls, 192.1391ms elapsed, 192.1391ms wall time
+End status: 284 dirs visited, 1380 inodes visited, 1 Extract calls, 77.7095ms elapsed, 77.7095ms wall time
 
 No issues found
 
@@ -10,7 +10,7 @@ MUTATED EXIT 1
 Scanning dir .
 Starting filesystem walk for root: C:\
 Scanned C:\Users\Randy\Coding\meta_g_link_direct\package-lock.json file and found 10 packages
-End status: 266 dirs visited, 1198 inodes visited, 1 Extract calls, 57.2042ms elapsed, 57.2042ms wall time
+End status: 284 dirs visited, 1380 inodes visited, 1 Extract calls, 32.7716ms elapsed, 32.7716ms wall time
 
 Total 1 package affected by 5 known vulnerabilities (0 Critical, 2 High, 3 Medium, 0 Low, 0 Unknown) from 1 ecosystem.
 5 vulnerabilities can be fixed.
@@ -30,7 +30,7 @@ RESTORED EXIT 0
 Scanning dir .
 Starting filesystem walk for root: C:\
 Scanned C:\Users\Randy\Coding\meta_g_link_direct\package-lock.json file and found 9 packages
-End status: 266 dirs visited, 1198 inodes visited, 1 Extract calls, 65.5607ms elapsed, 65.5607ms wall time
+End status: 284 dirs visited, 1380 inodes visited, 1 Extract calls, 30.6011ms elapsed, 30.6011ms wall time
 
 No issues found
 

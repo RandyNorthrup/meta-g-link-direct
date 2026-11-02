@@ -17,14 +17,14 @@ BASELINE EXIT 0
 [16/53] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\sdu_tests.cpp for CXX dependencies
 [17/53] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\protocol_tests.cpp for CXX dependencies
 [18/53] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\transport_tests.cpp for CXX dependencies
-[19/53] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\setup_tests.cpp for CXX dependencies
-[20/53] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\buffered_transport.cpp.obj
+[19/53] Building CXX object CMakeFiles\mgl_protocol.dir\src\protocol\buffered_transport.cpp.obj
+[20/53] Scanning C:\Users\Randy\Coding\meta_g_link_direct\tests\setup_tests.cpp for CXX dependencies
 [21/53] Linking CXX static library mgl_protocol.lib
 [22/53] Building CXX object CMakeFiles\mgl_link.dir\src\core\session.cpp.obj
 [23/53] Building CXX object CMakeFiles\mgl_link.dir\src\core\provision.cpp.obj
 [24/53] Building CXX object CMakeFiles\mgl_link.dir\src\core\setup.cpp.obj
-[25/53] Building CXX object CMakeFiles\mgl_link.dir\src\windows\rfcomm.cpp.obj
-[26/53] Building CXX object CMakeFiles\mgl_link.dir\src\core\media_session.cpp.obj
+[25/53] Building CXX object CMakeFiles\mgl_link.dir\src\core\media_session.cpp.obj
+[26/53] Building CXX object CMakeFiles\mgl_link.dir\src\windows\rfcomm.cpp.obj
 [27/53] Building CXX object CMakeFiles\mgl_link.dir\src\windows\sdu_socket.cpp.obj
 [28/53] Building CXX object CMakeFiles\mgl_link.dir\src\windows\tcp_transport.cpp.obj
 [29/53] Generating CXX dyndep file CMakeFiles\meta-g-link-probe.dir\CXX.dd
@@ -33,8 +33,8 @@ BASELINE EXIT 0
 [32/51] Generating CXX dyndep file CMakeFiles\mgl-protocol-tests.dir\CXX.dd
 [33/51] Generating CXX dyndep file CMakeFiles\mgl-transport-tests.dir\CXX.dd
 [34/51] Generating CXX dyndep file CMakeFiles\mgl-setup-tests.dir\CXX.dd
-[35/51] Building CXX object CMakeFiles\mgl_link.dir\src\windows\rfcomm_transport.cpp.obj
-[36/51] Building CXX object CMakeFiles\meta-g-link-probe.dir\src\probe\main.cpp.obj
+[35/51] Building CXX object CMakeFiles\meta-g-link-probe.dir\src\probe\main.cpp.obj
+[36/51] Building CXX object CMakeFiles\mgl_link.dir\src\windows\rfcomm_transport.cpp.obj
 [37/51] Linking CXX static library mgl_link.lib
 [38/51] Building CXX object CMakeFiles\mgl-sdu-tests.dir\tests\sdu_tests.cpp.obj
 [39/51] Building CXX object CMakeFiles\mgl-protocol-tests.dir\tests\protocol_tests.cpp.obj
@@ -42,8 +42,8 @@ BASELINE EXIT 0
 [41/51] Building CXX object CMakeFiles\mgl-transport-tests.dir\tests\transport_tests.cpp.obj
 [42/51] Building CXX object CMakeFiles\mgl-setup-tests.dir\tests\setup_tests.cpp.obj
 [43/51] Linking CXX executable meta-g-link-probe.exe
-[44/51] Linking CXX shared module meta-g-link-direct.dll
-[45/51] Linking CXX executable meta-g-link-setup.exe
+[44/51] Linking CXX executable meta-g-link-setup.exe
+[45/51] Linking CXX shared module meta-g-link-direct.dll
 [46/51] Linking CXX executable mgl-sdu-tests.exe
 [47/51] Linking CXX executable mgl-address-tests.exe
 [48/51] Linking CXX executable mgl-protocol-tests.exe

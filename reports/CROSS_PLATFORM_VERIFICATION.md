@@ -72,6 +72,6 @@ The GTK window (Linux) was opened and captured: heading, explanation, *Continue*
 | Flatpak SDK 26.08 | GCC 16, warnings as errors; 6 of 6 CTest suites; 0 mbedTLS symbols exported; links the runtime's FFmpeg 62 and OBS | Same bundle |
 | macOS, Intel | Xcode 26.3; 6 of 6 CTest suites | `macos-x86_64` bundle: checksum and install run on the Mac mini |
 
-Apple Silicon has a CI job only, against the official OBS Apple build; no glasses have been tried on it.
+The `platforms.yml` workflow passed on all four jobs: Ubuntu 26.04 native, the newest OBS Flatpak, Intel macOS and Apple Silicon macOS. The Apple Silicon job built arm64 binaries against the official OBS 33.0.1 Apple build and passed 6 of 6 suites; its bundle is the one released. No glasses have been tried on Apple Silicon. On Arch Linux with OBS 33.0.1, FFmpeg 9 and GCC 16, the build and 6 of 6 suites also passed, with no radios to go further.
 
 The red drills `buffered-partial-read` and `login-state` were run: green, intended failure, exact restoration, green.
