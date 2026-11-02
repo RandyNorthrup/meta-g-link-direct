@@ -2,6 +2,29 @@
 
 All notable changes are recorded here. The project follows [semantic versioning](https://semver.org/); versions below 1.0 are beta releases.
 
+## [0.5.1] - 2026-11-01 (beta)
+
+### Fixed
+
+- **A pause in the glasses' keepalive answers no longer ends a stream that may still be running.** A streaming session now ends only when its media stops, after the same 8 seconds, and logs each pause. Sessions had been ending with *The glasses stopped answering over Wi-Fi* on Windows, Linux and macOS, recovering by themselves in under 30 seconds. Whether this cures all of them isn't known yet: runs since the change had no pause to test it.
+- **macOS: the helper looks for the glasses' network again after a refused join**, instead of retrying a scan result that could no longer work.
+- The log now says when the plugin is reading the stored identity, so a source held up by a keychain question is explained.
+
+### Verified
+
+- **The microphone source with the camera off** on Windows, native Linux, the Linux Flatpak and an Intel Mac: 48 kHz stereo, audio in 12–16 s, no video received.
+- **The 0.5.0 release files** on the glasses: Windows, native Linux, the Flatpak and an Intel Mac each streamed video with quality changes and audio.
+
+### Measured
+
+- **Battery with only the microphones**: about 1.5% a minute on Windows, about a third of video, so more than an hour from a full charge. This closes a question open since 0.3.0. Battery with video widens to 3–5% a minute.
+
+### Corrected
+
+- 0.5.0's notes said OBS reads the macOS keychain with no prompt. After each setup macOS asks once for OBS.
+- 0.5.0's report blamed a low battery for the failed Mac runs. The same failure came back at about 45%, so the cause is unknown.
+- A macOS run reported as clean in 0.5.0's report held two reconnects, found later in its log.
+
 ## [0.5.0] - 2026-11-01 (beta)
 
 Linux and macOS join Windows. What has and hasn't been checked on each platform is in [`reports/CERTIFICATION.md`](reports/CERTIFICATION.md); how, in [`reports/CROSS_PLATFORM_VERIFICATION.md`](reports/CROSS_PLATFORM_VERIFICATION.md).
@@ -9,7 +32,7 @@ Linux and macOS join Windows. What has and hasn't been checked on each platform 
 ### Added
 
 - **Linux**: native OBS and the OBS Flatpak. Bluetooth through BlueZ, a temporary NetworkManager connection for the glasses' network, the identity in the Secret Service, Meta setup over libcurl and a GTK setup window with the login inside it where WebKitGTK is present. Streamed in native OBS 33.0.0 and Flatpak OBS 33.0.1 on Ubuntu 26.04: video in about 15.6 s, 30 fps, quality changes in about 1.2 s, glasses audio, battery. The release's Flatpak build runs on any distribution; its native build needs Ubuntu 26.04's OBS and FFmpeg, and the installer checks that before installing.
-- **macOS**: `Meta G Link Helper`, a small app that holds what OBS can't: Bluetooth and Location, each behind its own macOS question. Streamed in OBS 33.0.1 on an Intel Mac mini with macOS 15: usually 15–23 s to video, 29.9 fps, glasses audio, battery. The identity is in the login keychain; OBS reads it with no prompt. Apple Silicon has automatic build and test checks only; no glasses have been tried on one.
+- **macOS**: `Meta G Link Helper`, a small app that holds what OBS can't: Bluetooth and Location, each behind its own macOS question. Streamed in OBS 33.0.1 on an Intel Mac mini with macOS 15: usually 15–23 s to video, 29.9 fps, glasses audio, battery. The identity is in the login keychain. Apple Silicon has automatic build and test checks only; no glasses have been tried on one.
 - `install.sh` for Linux and macOS, with `--setup`, `--uninstall` and `--dry-run`, and `.tar.gz` bundles with SHA-256 files.
 - A CI workflow (`platforms.yml`) that builds, tests and packs on Ubuntu 26.04, in the newest OBS Flatpak, and on Apple Silicon and Intel Macs.
 - Tests for the transport buffer (`buffered-transport`), the crypto providers against published vectors (`crypto-provider`) and the login-address check (`setup-login`), with two new red drills (`buffered-partial-read`, `login-state`; 27 in total).

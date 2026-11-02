@@ -19,12 +19,12 @@ MUTATED EXIT 1
 [8/13] Linking CXX shared module meta-g-link-direct.dll
 [9/13] Linking CXX executable mgl-address-tests.exe
 [10/13] Linking CXX executable mgl-protocol-tests.exe
-[11/13] Linking CXX executable mgl-crypto-tests.exe
-[12/13] Linking CXX executable mgl-transport-tests.exe
+[11/13] Linking CXX executable mgl-transport-tests.exe
+[12/13] Linking CXX executable mgl-crypto-tests.exe
 [13/13] Linking CXX executable mgl-setup-tests.exe
 Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
     Start 2: private-address
-1/1 Test #2: private-address ..................***Failed    0.02 sec
+1/1 Test #2: private-address ..................***Failed    0.01 sec
 Malformed/reserved Bluetooth address accepted
 
 

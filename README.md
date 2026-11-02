@@ -126,7 +126,9 @@ The window shows the login with Microsoft Edge WebView2, which is part of Window
 - **Bluetooth**, to reach the glasses.
 - **Location**, because macOS shows a Wi-Fi network's name only to apps allowed Location, and the helper needs the name to join the glasses' network. It never reads where you are.
 
-Please allow both. To change an answer later, use **System Settings → Privacy & Security**. These builds aren't notarized; the installer clears the download's quarantine mark for the plugin and its tools.
+Please allow both. To change an answer later, use **System Settings → Privacy & Security**.
+
+After each setup, the first time OBS connects to the glasses macOS asks for your password so OBS can read the glasses' key. Enter it and choose **Always Allow**. OBS waits until you answer, so if a source stays on *Connecting*, look for that question. These builds aren't notarized; the installer clears the download's quarantine mark for the plugin and its tools.
 
 ## 4 · Use it in OBS
 
@@ -187,7 +189,8 @@ A tool can use these, for example, to warn you when the battery drops below 20%.
 
 ## Known limits
 
-- **Battery**: streaming video drains the glasses quickly: about 3–5% a minute at 720 × 1280 in short tests, so about 20–30 minutes from a full charge (no full-charge run yet). In one test the battery fell 14% in about 3 minutes at 1080 × 1920 and 9% in about 3 minutes at 360 × 640. On one Mac, connections failed while the glasses were low on charge and worked after charging; the cause isn't proven. With only the microphone source live the camera is off; how much longer the battery lasts that way hasn't been measured yet.
+- **Battery**: streaming video drains the glasses quickly: about 3–5% a minute at 720 × 1280 in short tests, so about 20–30 minutes from a full charge (no full-charge run yet). In one test the battery fell 14% in about 3 minutes at 1080 × 1920 and 9% in about 3 minutes at 360 × 640. With only the microphone source live the camera is off, and the battery fell about 1.5% a minute on Windows, so more than an hour from a full charge (it read faster at low charge in shorter tests on Linux and macOS).
+- **The glasses sometimes stop answering**: on a Mac, twice for a few minutes at a time, the computer joined the glasses' network but they barely answered. It cleared by itself and the cause is unknown. Separately, a running stream occasionally ended on every platform tested and reconnected by itself within 30 seconds; 0.5.1 changes how that is detected, and whether it cures it isn't known yet.
 - **Quality**: all four profiles have been verified in OBS: 720 × 1280, 1080 × 1920 and 504 × 896 at 30 fps, and 360 × 640 at 24 fps.
 - **A short delay**: the glasses' radio sends video in bursts (several frames at once, then a pause of about 0.15 s). To show every frame at a steady 30 fps, the plugin holds each one briefly and plays it at its own time, so the picture runs about 0.2 s behind, more on an uneven link. The delay adapts to the link, between 0.02 and 0.5 s. Measured from the glasses' camera to OBS, the picture was about 0.4 s behind in total.
 - **Audio sync**: audio is timed on the same clock as the video; in a clap test the two matched within one frame, so no *Sync Offset* is needed.
@@ -232,7 +235,8 @@ The OBS log (*Help → Log Files*) lists each connection step under `[meta-g-lin
 | The log says *The stored glasses identity could not be read* | Your keyring or keychain refused: it is locked, or you cancelled its question. Unlock it and make the scene live again. |
 | *The glasses did not accept a Bluetooth connection* | The glasses' Bluetooth is full. Disconnect them from other computers and your phone, or put them in the case for a few seconds and take them out. |
 | *This computer could not join the glasses' Wi-Fi network: the system did not allow it* (macOS) | Allow Location for **Meta G Link Helper** in **System Settings → Privacy & Security → Location Services**. |
-| *The glasses' media port did not answer* | The computer joined the glasses' network but they aren't answering. Charge the glasses, and power-cycle them if it continues. |
+| *The glasses' media port did not answer* | The computer joined the glasses' network but they aren't answering. The source keeps retrying, and this has cleared by itself within minutes. If it continues, power-cycle the glasses. |
+| *Reading the stored glasses identity* is the last line, on macOS | A keychain question is waiting on the screen. Enter your password and choose **Always Allow**. |
 | The setup window says it can't show the Meta login | Microsoft Edge WebView2 is missing or broken. Use the window's browser option, or install the WebView2 Runtime from Microsoft and open the setup again. |
 | *This computer could not join the glasses' Wi-Fi network* | Make sure Wi-Fi is on and airplane mode is off. "No Wi-Fi adapter is available" means the system sees no Wi-Fi adapter; "the Wi-Fi adapter chosen in the source properties is not available" means the selected adapter is unplugged, so plug it back in or pick another in **Wi-Fi adapter**. |
 | *The glasses did not start their Wi-Fi network* | Their Wi-Fi may still be busy with an earlier session. The source retries; if it keeps failing, power-cycle the glasses. |

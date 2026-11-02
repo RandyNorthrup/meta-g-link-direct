@@ -24,13 +24,26 @@ Each row is the installed plugin in OBS, driven through obs-websocket: the scene
 | macOS, tree before the version change | 33.0.1 | 14.6–23.2 s, two at 31–36 s | 29.9 fps from the glasses, 29.9 shown, 0 undecodable, 18 late over 60 s | 2.5–5.4 s | −11.3 dBFS | file, request and log | back on the home network in about 1 s |
 | macOS 0.5.0 installed bundle | 33.0.1 | 15.8 s, 31.0 s | | | | | back on the home network, 1 keychain item, 0 known networks |
 
-A three-minute run on macOS showed OBS at 30 fps with 0 render frames skipped, OBS using about 40% of one core, and memory flat at about 600 MB (601 to 605 MB over 2 minutes).
+A three-minute run on macOS showed OBS at 30 fps with 0 render frames skipped in its last stretch, OBS using about 40% of one core, and memory flat at about 600 MB (601 to 605 MB over 2 minutes). That run also held two reconnects, found later in the log (see [When the glasses stop answering](#when-the-glasses-stop-answering)); the later run on the released bundle had none.
 
 Linux Bluetooth: the handshake reached `keys_derived`, the change of owner returned `ok`, and `--link` reached `ready` with trust status 4096, the same as Windows. The glasses' owner key was sealed in the desktop's Secret Service. The Flatpak's change of owner sealed it in its own `default.keyring` (mode 600).
 
 ### Battery
 
 From the glasses' own reports, streaming 720 × 1280: 62% to 45% in 3 min 33 s on macOS (with quality and audio changes), and 33% to 25% in about 2 minutes on Linux. A later run with a fuller battery fell from 88% to 77% in 3 min 23 s. That is 3–5% a minute, so about 20–30 minutes from a full charge, shorter than the earlier unconfirmed 35–40 minutes. No full-charge run has been made.
+
+### The microphone source
+
+A throwaway scene held only the existing microphone source, so the camera stayed off: no video unit arrived in any run, and the camera source stayed inactive. The glasses delivered 48 kHz stereo AAC.
+
+| Platform | OBS | Audio after | Length | Drops | Peak level |
+|---|---|---|---|---|---|
+| Windows | 33.0.1 | 13.5, 13.2 and 11.6 s | 2.7, 6.6 and 7.5 min | 1, recovered in 28 s (first run) | −16.2 to −54.7 dBFS |
+| Linux, native | 33.0.0 | 14.7 s | 2.9 min | 0 | −57.0 dBFS (nobody speaking) |
+| Linux, Flatpak | 33.0.1 | 15.6 s, then 14.7 s after the drop | 2.9 min | 1, recovered in 16 s | −39.0 dBFS |
+| macOS, Intel | 33.0.1 | 14.3 s after an answer on the keychain | 3.5 min | 0 | −8.4 dBFS |
+
+**Battery with only the microphones:** about 1.5% a minute on Windows (69% to 60% in 6 min 10 s; 37% to 28% in 6 min), about a third of video, so more than an hour from a full charge. It read faster at low charge on other machines: 58% to 55% in 72 s on Linux and 26% to 19% in 2 min 31 s on macOS. No full-charge run has been made.
 
 ### The released files
 
@@ -41,9 +54,9 @@ After publishing, the release's own files were downloaded, checked against their
 | Windows zip | 33.0.1 | 16.5 s, 16.3 s | 30 fps | 1.2 s | −45.4 dBFS (quiet room) | request and log | glasses disconnected |
 | Linux bundle, native | 33.0.0 | 17.2 s | 30 fps | 1.2 s | −40.0 dBFS (quiet room) | request and log | home network, 0 profiles left |
 | Linux bundle, Flatpak | 33.0.1 | 15.9 s | 30 fps, 0 render frames skipped of 2,738 | 1.1 s | −31.8 dBFS | request and log | home network, 0 profiles left |
-| macOS bundle, Intel | 33.0.1 | 30.1, 14.7, 15.5, 36.2 and 16.0 s | 30.0 fps from the glasses, 30.1 shown, 1 late, 0 undecodable over 60 s; 1 render frame skipped of 8,547 | 1.2–1.3 s | −30.8 dBFS | file, request and log | home network, 1 keychain item, 0 known networks, no prompts |
+| macOS bundle, Intel | 33.0.1 | 30.1, 14.7, 15.5, 36.2 and 16.0 s | 30.0 fps from the glasses, 30.1 shown, 1 late, 0 undecodable over 60 s; 1 render frame skipped of 8,547 | 1.2–1.3 s | −30.8 dBFS | file, request and log | home network, 1 keychain item, 0 known networks |
 
-On macOS the battery fell from 88% to 77% in 3 min 23 s of streaming, with OBS at about 40% of one core and memory flat at about 550 MB.
+On macOS the battery fell from 88% to 77% in 3 min 23 s of video, with OBS at about 40% of one core and memory flat at about 550 MB.
 
 The setup window opened from the Flatpak too (640 × 760 in the X11 window list). A full login through the Linux and macOS setup windows still hasn't been done; the owner changes went through `--provision`.
 
@@ -58,15 +71,25 @@ The glasses' network is joined by Meta G Link Helper, not by OBS.
 - **macOS remembers every network it joins.** After 13 sessions with random names, 13 entries sat in the known networks and in the System keychain. A plain user can take a network off the known networks (`-removepreferredwirelessnetwork`, no prompt) but can't delete the keychain item (`CWKeychainDeleteWiFiPassword` returns `-61`, no prompt). So on macOS the network keeps one name per computer (`wifi-network-name` in the storage folder), the passphrase stays random per session, and the helper removes the known-network entry when it leaves. After later sessions: 0 known networks, 1 keychain item. That item holds the passphrase of a finished session.
 - **Disassociating from a home network sets its `TemporarilyDisabled` flag**, and auto-join then skips it. A test tool caused this on the home network; the plugin only disassociates from the glasses' network, and auto-join returned to the home network in about 1 second in every later session.
 
-### The failed runs before charging
+### When the glasses stop answering
 
-Between 15:58 and 16:09, when the battery was low (level not recorded), the plugin joined the network but the glasses mostly didn't answer: TCP SYNs to port 20203 went unanswered (`error 60`), `ping` and `nc` failed as well, and two attempts stopped at stages 2 and 3. The Wi-Fi driver reported a strong signal (RSSI −40), AWDL off and almost no Bluetooth airtime, and no other scans ran in those windows. After charging, 16 of the next 17 starts reached video on the first try. Fast and slow joins both worked, which refutes a timing theory proposed during the test. The cause is **not proven**; a low battery is the leading suspect. The one later failure was macOS refusing a join (`-3906`), then going back to the home network; the plugin recovered on its next attempt. The helper now scans again after a refused join; that exact failure hasn't recurred since, so the change is unproven.
+Two kinds of failure showed up, and neither is explained yet.
+
+**Minutes when the glasses barely answer.** Twice on the Mac, at 15:58–16:09 and 21:16–21:20, the plugin joined the network but the glasses mostly didn't respond: TCP SYNs to port 20203 went unanswered (`error 60`, sometimes 64 or 65), `ping` and `nc` failed as well, and some attempts stopped part-way through the handshake. In the first cluster the Wi-Fi driver reported a strong signal (RSSI −40), AWDL off and almost no Bluetooth airtime, and no other scans ran. Each cluster cleared by itself. These theories were checked and don't hold:
+
+- *Join timing*: fast and slow joins both worked and both failed.
+- *The glasses' channel*: the glasses choose channel 1, 6 or 11 though the plugin asks for 6; channels 1 and 11 each show both outcomes.
+- *Low charge*: the first cluster cleared after charging, but the second began at about 45%, while Windows streamed normally at 17% and 28%.
+
+Between the clusters, 16 of 17 starts reached media first try. The one exception was macOS refusing a join (`-3906`) and going back to the home network; the plugin recovered on its next attempt. The helper now scans again after a refused join; that failure hasn't recurred since, so the change is unproven.
+
+**Sessions ended by "The glasses stopped answering over Wi-Fi."** This ended sessions on Windows (2 min 8 s into a microphone run), on the Flatpak (79 s into one) and on the Mac (twice in video runs at about 17:07–17:09, and 21 s into a microphone attempt during the second cluster). Each recovered by itself in 16–28 s. Until 0.5.1, the session ended whenever the glasses' keepalive answers stopped for 8 s, even if media was still arriving. Whether media was still arriving in those runs wasn't recorded. Since 0.5.1 a streaming session goes by its media and logs a pause in the answers, so the next one shows which it was. Runs since then, of 7.5 minutes on Windows and 3.5 on the Mac, had no pause and no drop, so the fix has not yet been seen working.
 
 ### Permissions after an update
 
 Ad-hoc signed builds are a new app to macOS each time. An old Bluetooth answer makes macOS ask again with no window in front, so the question stays hidden and the helper waits. The installer now resets this app's Bluetooth answer first (`tccutil reset BluetoothAlways`), and the helper then asks in the open. Verified on the Mac mini: without the reset the question stayed hidden for over 4 minutes; with it, the question appeared and was answered in 20 s.
 
-A keychain item likewise doesn't trust a rebuilt program. OBS.app is on the item's list and read it with no prompt in every run. A rebuilt `meta-g-link-probe` asks for the keychain password on each read until someone chooses Always Allow, which lasts for that build only.
+A keychain item likewise doesn't trust another program, even one on its access list. The tool that creates the identity lists OBS.app on the item, yet after each owner change macOS asked once for OBS (`displaying keychain prompt for /Applications/OBS.app`), and the media session waited until someone answered. This was first read as "OBS never prompts", because the prompt was answered at the Mac while tests checked for it before or after. Always Allow settles it until the next setup. A rebuilt `meta-g-link-probe` asks in the same way, once per build.
 
 ## Linux: where the identity lives
 

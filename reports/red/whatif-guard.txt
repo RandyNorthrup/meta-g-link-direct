@@ -2,31 +2,31 @@ BASELINE EXIT 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 5 tests in 132ms.
+Discovery found 5 tests in 159ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 446ms (423ms|23ms)
-  [+] formats a disposable source when effects are requested 544ms (542ms|2ms)
-  [+] propagates native formatter errors 598ms (597ms|1ms)
+  [+] does not modify files with WhatIf 547ms (518ms|29ms)
+  [+] formats a disposable source when effects are requested 745ms (741ms|4ms)
+  [+] propagates native formatter errors 1.22s (1.21s|2ms)
 
 Describing Red-drill reuse
-  [+] changes the fingerprint when an input file or folder changes 111ms (108ms|2ms)
-  [+] reuses only a passing result recorded with the same inputs 27ms (25ms|1ms)
-Tests completed in 2.26s
+  [+] changes the fingerprint when an input file or folder changes 95ms (93ms|3ms)
+  [+] reuses only a passing result recorded with the same inputs 27ms (26ms|1ms)
+Tests completed in 3.3s
 Tests Passed: 5, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
 MUTATED EXIT 1
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 5 tests in 149ms.
+Discovery found 5 tests in 142ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [-] does not modify files with WhatIf 538ms (516ms|22ms)
+  [-] does not modify files with WhatIf 596ms (572ms|24ms)
    Expected strings to be the same, but they were different.
    Expected length: 23
    Actual length:   25
@@ -36,13 +36,13 @@ Describing Project task runner
               ---------^
    at [IO.File]::ReadAllText($samplePath) | Should -BeExactly $originalSample, C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1:26
    at <ScriptBlock>, C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1:26
-  [+] formats a disposable source when effects are requested 424ms (423ms|1ms)
-  [+] propagates native formatter errors 503ms (502ms|1ms)
+  [+] formats a disposable source when effects are requested 474ms (472ms|1ms)
+  [+] propagates native formatter errors 519ms (518ms|1ms)
 
 Describing Red-drill reuse
-  [+] changes the fingerprint when an input file or folder changes 74ms (72ms|2ms)
-  [+] reuses only a passing result recorded with the same inputs 19ms (18ms|1ms)
-Tests completed in 2.15s
+  [+] changes the fingerprint when an input file or folder changes 93ms (91ms|2ms)
+  [+] reuses only a passing result recorded with the same inputs 24ms (23ms|1ms)
+Tests completed in 2.23s
 Tests Passed: 4, Failed: 1, Skipped: 0, Inconclusive: 0, NotRun: 0
 Write-Error: Pester runner tests failed or discovery count changed
 
@@ -50,19 +50,19 @@ RESTORED EXIT 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 5 tests in 132ms.
+Discovery found 5 tests in 135ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 436ms (410ms|26ms)
-  [+] formats a disposable source when effects are requested 439ms (437ms|2ms)
-  [+] propagates native formatter errors 549ms (549ms|1ms)
+  [+] does not modify files with WhatIf 520ms (494ms|27ms)
+  [+] formats a disposable source when effects are requested 466ms (464ms|2ms)
+  [+] propagates native formatter errors 543ms (542ms|1ms)
 
 Describing Red-drill reuse
-  [+] changes the fingerprint when an input file or folder changes 75ms (74ms|2ms)
-  [+] reuses only a passing result recorded with the same inputs 20ms (19ms|1ms)
-Tests completed in 2s
+  [+] changes the fingerprint when an input file or folder changes 82ms (80ms|2ms)
+  [+] reuses only a passing result recorded with the same inputs 24ms (23ms|1ms)
+Tests completed in 2.13s
 Tests Passed: 5, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
 RESTORATION SHA256 f5b4b2f38c1bb6e046795b0a7f3018870bfa12d4e8512c9a87fdb21ba8009e9b

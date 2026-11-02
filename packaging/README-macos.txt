@@ -32,6 +32,9 @@ BEFORE YOU START
    Run ./install.sh --setup, or use "Set up glasses..." in the glasses source's
    properties in OBS. Log in to Meta in that window; it finishes by itself. Cancel
    changes nothing.
+   The first time OBS connects afterwards, macOS asks for your password so OBS can
+   read the glasses' key. Enter it and choose Always Allow. OBS waits until you
+   answer.
 
 USE
 In OBS, add the "Ray-Ban Meta Glasses (Direct)" source to a scene and make the

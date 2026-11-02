@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Confirmed contract; public beta releases (0.3.0 adds the microphone source, the shared link, keep-connected and the setup window; 0.3.1 shows the full 30 fps in OBS; 0.3.2 fixes old sources' audio tracks and messages split inside their header; 0.4.0 passes the battery to overlays and obs-websocket, and fixes the setup window's size, focus and labels after the accessibility pass; 0.5.0 adds Linux and macOS) |
+| Status | Confirmed contract; public beta releases (0.3.0 adds the microphone source, the shared link, keep-connected and the setup window; 0.3.1 shows the full 30 fps in OBS; 0.3.2 fixes old sources' audio tracks and messages split inside their header; 0.4.0 passes the battery to overlays and obs-websocket, and fixes the setup window's size, focus and labels after the accessibility pass; 0.5.0 adds Linux and macOS; 0.5.1 keeps a stream running through a pause in the glasses' keepalive answers) |
 | Product owner | Randy |
 | Technical work | Coding agent under Randy's direction |
 | Created / last updated | 2026-10-15 / 2026-11-01 |

@@ -2,84 +2,84 @@ BASELINE EXIT 0
 ninja: no work to do.
 Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
     Start 1: protocol-prefix
-1/7 Test #1: protocol-prefix ..................   Passed    0.02 sec
+1/7 Test #1: protocol-prefix ..................   Passed    0.01 sec
     Start 2: private-address
-2/7 Test #2: private-address ..................   Passed    0.02 sec
+2/7 Test #2: private-address ..................   Passed    0.01 sec
     Start 3: protocol-datax
-3/7 Test #3: protocol-datax ...................   Passed    0.02 sec
+3/7 Test #3: protocol-datax ...................   Passed    0.04 sec
     Start 4: buffered-transport
 4/7 Test #4: buffered-transport ...............   Passed    0.01 sec
     Start 5: crypto-provider
 5/7 Test #5: crypto-provider ..................   Passed    0.02 sec
     Start 6: setup-login
-6/7 Test #6: setup-login ......................   Passed    0.04 sec
+6/7 Test #6: setup-login ......................   Passed    0.03 sec
     Start 7: module-abi
-7/7 Test #7: module-abi .......................   Passed    0.04 sec
+7/7 Test #7: module-abi .......................   Passed    0.02 sec
 
 100% tests passed out of 7
 
-Total Test time (real) =   0.18 sec
+Total Test time (real) =   0.15 sec
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 5 tests in 260ms.
+Discovery found 5 tests in 148ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 701ms (662ms|40ms)
-  [+] formats a disposable source when effects are requested 690ms (687ms|3ms)
-  [+] propagates native formatter errors 819ms (817ms|2ms)
+  [+] does not modify files with WhatIf 538ms (506ms|32ms)
+  [+] formats a disposable source when effects are requested 506ms (505ms|2ms)
+  [+] propagates native formatter errors 592ms (592ms|1ms)
 
 Describing Red-drill reuse
-  [+] changes the fingerprint when an input file or folder changes 182ms (178ms|4ms)
-  [+] reuses only a passing result recorded with the same inputs 36ms (35ms|1ms)
-Tests completed in 3.41s
+  [+] changes the fingerprint when an input file or folder changes 88ms (86ms|2ms)
+  [+] reuses only a passing result recorded with the same inputs 21ms (20ms|1ms)
+Tests completed in 2.29s
 Tests Passed: 5, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 21 tests in 67ms.
+Discovery found 21 tests in 40ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1'
 Describing Native diagnostic probe contract
-  [+] rejects private input without echo or connection: --direct-classic-uuid 144ms (137ms|7ms)
-  [+] rejects private input without echo or connection: --direct-classic-channel7 83ms (80ms|2ms)
-  [+] rejects private input without echo or connection: --direct-classic-channel7 90ms (87ms|3ms)
-  [+] rejects private input without echo or connection: --direct-classic-uuid 92ms (90ms|2ms)
-  [+] rejects private input without echo or connection: --direct-classic-uuid 62ms (59ms|2ms)
-  [+] exports only requested redacted direct-probe diagnostics 68ms (67ms|1ms)
-  [+] propagates requested diagnostic write failure 68ms (65ms|2ms)
-  [+] reports association separately and performs no implicit discovery 128ms (126ms|2ms)
-  [+] rejects an empty auth code before contacting Meta 64ms (62ms|2ms)
-  [+] explains discovery limits without accessing glasses 62ms (60ms|2ms)
-  [+] reports actual scan completion or native failure with a matching exit code 10.11s (10.11s|1ms)
-  [+] performs explicit Classic inquiry without claiming an RFCOMM connection 5.3s (5.3s|1ms)
-  [+] rejects invalid argument sequence --pair-classic extra before scanning 88ms (85ms|3ms)
-  [+] rejects invalid argument sequence --direct-classic-uuid extra before scanning 78ms (77ms|1ms)
-  [+] rejects invalid argument sequence --discover-classic-live extra before scanning 53ms (52ms|1ms)
-  [+] rejects invalid argument sequence --invalid before scanning 53ms (52ms|1ms)
-  [+] rejects invalid argument sequence --discover extra before scanning 74ms (73ms|1ms)
-  [+] rejects invalid argument sequence --help extra before scanning 52ms (51ms|1ms)
-  [+] rejects invalid argument sequence extra --discover before scanning 45ms (44ms|1ms)
-  [+] rejects invalid argument sequence --connect-classic extra before scanning 51ms (50ms|1ms)
-  [+] rejects invalid argument sequence --discover-classic --connect-classic before scanning 48ms (47ms|1ms)
-Tests completed in 17.04s
+  [+] rejects private input without echo or connection: --direct-classic-uuid 81ms (78ms|3ms)
+  [+] rejects private input without echo or connection: --direct-classic-channel7 67ms (66ms|1ms)
+  [+] rejects private input without echo or connection: --direct-classic-channel7 40ms (39ms|1ms)
+  [+] rejects private input without echo or connection: --direct-classic-uuid 34ms (33ms|1ms)
+  [+] rejects private input without echo or connection: --direct-classic-uuid 54ms (53ms|1ms)
+  [+] exports only requested redacted direct-probe diagnostics 48ms (47ms|1ms)
+  [+] propagates requested diagnostic write failure 35ms (34ms|1ms)
+  [+] reports association separately and performs no implicit discovery 52ms (51ms|1ms)
+  [+] rejects an empty auth code before contacting Meta 47ms (46ms|1ms)
+  [+] explains discovery limits without accessing glasses 35ms (35ms|1ms)
+  [+] reports actual scan completion or native failure with a matching exit code 10.06s (10.06s|1ms)
+  [+] performs explicit Classic inquiry without claiming an RFCOMM connection 5.22s (5.22s|1ms)
+  [+] rejects invalid argument sequence --pair-classic extra before scanning 32ms (31ms|1ms)
+  [+] rejects invalid argument sequence --direct-classic-uuid extra before scanning 29ms (29ms|0ms)
+  [+] rejects invalid argument sequence --discover-classic-live extra before scanning 36ms (35ms|0ms)
+  [+] rejects invalid argument sequence --invalid before scanning 27ms (27ms|0ms)
+  [+] rejects invalid argument sequence --discover extra before scanning 26ms (26ms|0ms)
+  [+] rejects invalid argument sequence --help extra before scanning 32ms (32ms|0ms)
+  [+] rejects invalid argument sequence extra --discover before scanning 57ms (56ms|0ms)
+  [+] rejects invalid argument sequence --connect-classic extra before scanning 28ms (27ms|0ms)
+  [+] rejects invalid argument sequence --discover-classic --connect-classic before scanning 29ms (28ms|0ms)
+Tests completed in 16.19s
 Tests Passed: 21, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 4 tests in 30ms.
+Discovery found 4 tests in 13ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\installer.Tests.ps1'
 Describing Installer locations
-  [+] takes system folders from Windows rather than from drive letters 34ms (32ms|2ms)
-  [+] puts the shared plugin folder in the ProgramData folder that Windows reports 257ms (256ms|1ms)
-  [+] derives the OBS folder from obs64.exe on any drive 7ms (2ms|5ms)
-  [+] reads Steam library folders on other drives 19ms (18ms|0ms)
-Tests completed in 515ms
+  [+] takes system folders from Windows rather than from drive letters 18ms (17ms|1ms)
+  [+] puts the shared plugin folder in the ProgramData folder that Windows reports 148ms (148ms|0ms)
+  [+] derives the OBS folder from obs64.exe on any drive 3ms (1ms|2ms)
+  [+] reads Steam library folders on other drives 11ms (11ms|0ms)
+Tests completed in 250ms
 Tests Passed: 4, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
 MUTATED EXIT 1
@@ -87,25 +87,25 @@ MUTATED EXIT 1
 [2/2] Linking CXX shared module meta-g-link-direct.dll
 Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
     Start 1: protocol-prefix
-1/7 Test #1: protocol-prefix ..................   Passed    0.02 sec
+1/7 Test #1: protocol-prefix ..................   Passed    0.01 sec
     Start 2: private-address
 2/7 Test #2: private-address ..................   Passed    0.01 sec
     Start 3: protocol-datax
-3/7 Test #3: protocol-datax ...................   Passed    0.04 sec
+3/7 Test #3: protocol-datax ...................   Passed    0.01 sec
     Start 4: buffered-transport
-4/7 Test #4: buffered-transport ...............   Passed    0.02 sec
+4/7 Test #4: buffered-transport ...............   Passed    0.01 sec
     Start 5: crypto-provider
-5/7 Test #5: crypto-provider ..................   Passed    0.02 sec
+5/7 Test #5: crypto-provider ..................   Passed    0.01 sec
     Start 6: setup-login
-6/7 Test #6: setup-login ......................   Passed    0.05 sec
+6/7 Test #6: setup-login ......................   Passed    0.03 sec
     Start 7: module-abi
-7/7 Test #7: module-abi .......................***Failed    0.04 sec
+7/7 Test #7: module-abi .......................***Failed    0.03 sec
 OBS module metadata does not match the camera-source contract
 
 
 86% tests passed, 1 tests failed out of 7
 
-Total Test time (real) =   0.21 sec
+Total Test time (real) =   0.12 sec
 
 The following tests FAILED:
 	  7 - module-abi (Failed)
@@ -117,84 +117,84 @@ RESTORED EXIT 0
 [2/2] Linking CXX shared module meta-g-link-direct.dll
 Test project C:/Users/Randy/Coding/meta_g_link_direct/out/windows
     Start 1: protocol-prefix
-1/7 Test #1: protocol-prefix ..................   Passed    0.02 sec
+1/7 Test #1: protocol-prefix ..................   Passed    0.01 sec
     Start 2: private-address
 2/7 Test #2: private-address ..................   Passed    0.01 sec
     Start 3: protocol-datax
-3/7 Test #3: protocol-datax ...................   Passed    0.02 sec
+3/7 Test #3: protocol-datax ...................   Passed    0.01 sec
     Start 4: buffered-transport
-4/7 Test #4: buffered-transport ...............   Passed    0.02 sec
+4/7 Test #4: buffered-transport ...............   Passed    0.01 sec
     Start 5: crypto-provider
-5/7 Test #5: crypto-provider ..................   Passed    0.02 sec
+5/7 Test #5: crypto-provider ..................   Passed    0.03 sec
     Start 6: setup-login
-6/7 Test #6: setup-login ......................   Passed    0.04 sec
+6/7 Test #6: setup-login ......................   Passed    0.03 sec
     Start 7: module-abi
-7/7 Test #7: module-abi .......................   Passed    0.04 sec
+7/7 Test #7: module-abi .......................   Passed    0.03 sec
 
 100% tests passed out of 7
 
-Total Test time (real) =   0.18 sec
+Total Test time (real) =   0.14 sec
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 5 tests in 295ms.
+Discovery found 5 tests in 142ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\runner.Tests.ps1'
 Describing Project task runner
-  [+] does not modify files with WhatIf 703ms (658ms|46ms)
-  [+] formats a disposable source when effects are requested 653ms (649ms|5ms)
-  [+] propagates native formatter errors 848ms (846ms|2ms)
+  [+] does not modify files with WhatIf 518ms (490ms|28ms)
+  [+] formats a disposable source when effects are requested 480ms (478ms|2ms)
+  [+] propagates native formatter errors 578ms (577ms|1ms)
 
 Describing Red-drill reuse
-  [+] changes the fingerprint when an input file or folder changes 182ms (178ms|4ms)
-  [+] reuses only a passing result recorded with the same inputs 37ms (36ms|1ms)
-Tests completed in 3.5s
+  [+] changes the fingerprint when an input file or folder changes 98ms (96ms|2ms)
+  [+] reuses only a passing result recorded with the same inputs 21ms (20ms|1ms)
+Tests completed in 2.22s
 Tests Passed: 5, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 21 tests in 79ms.
+Discovery found 21 tests in 36ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\probe.Tests.ps1'
 Describing Native diagnostic probe contract
-  [+] rejects private input without echo or connection: --direct-classic-uuid 166ms (160ms|6ms)
-  [+] rejects private input without echo or connection: --direct-classic-channel7 88ms (85ms|4ms)
-  [+] rejects private input without echo or connection: --direct-classic-channel7 80ms (77ms|3ms)
-  [+] rejects private input without echo or connection: --direct-classic-uuid 78ms (75ms|2ms)
-  [+] rejects private input without echo or connection: --direct-classic-uuid 67ms (65ms|2ms)
-  [+] exports only requested redacted direct-probe diagnostics 65ms (64ms|1ms)
-  [+] propagates requested diagnostic write failure 56ms (55ms|1ms)
-  [+] reports association separately and performs no implicit discovery 148ms (146ms|2ms)
-  [+] rejects an empty auth code before contacting Meta 69ms (66ms|2ms)
-  [+] explains discovery limits without accessing glasses 62ms (60ms|2ms)
-  [+] reports actual scan completion or native failure with a matching exit code 10.11s (10.1s|3ms)
-  [+] performs explicit Classic inquiry without claiming an RFCOMM connection 5.29s (5.28s|1ms)
-  [+] rejects invalid argument sequence --pair-classic extra before scanning 69ms (65ms|4ms)
-  [+] rejects invalid argument sequence --direct-classic-uuid extra before scanning 80ms (79ms|1ms)
-  [+] rejects invalid argument sequence --discover-classic-live extra before scanning 64ms (63ms|1ms)
-  [+] rejects invalid argument sequence --invalid before scanning 52ms (51ms|1ms)
-  [+] rejects invalid argument sequence --discover extra before scanning 73ms (72ms|1ms)
-  [+] rejects invalid argument sequence --help extra before scanning 52ms (51ms|1ms)
-  [+] rejects invalid argument sequence extra --discover before scanning 51ms (50ms|1ms)
-  [+] rejects invalid argument sequence --connect-classic extra before scanning 49ms (48ms|1ms)
-  [+] rejects invalid argument sequence --discover-classic --connect-classic before scanning 56ms (55ms|1ms)
-Tests completed in 17.05s
+  [+] rejects private input without echo or connection: --direct-classic-uuid 76ms (73ms|3ms)
+  [+] rejects private input without echo or connection: --direct-classic-channel7 69ms (68ms|1ms)
+  [+] rejects private input without echo or connection: --direct-classic-channel7 44ms (43ms|1ms)
+  [+] rejects private input without echo or connection: --direct-classic-uuid 41ms (41ms|1ms)
+  [+] rejects private input without echo or connection: --direct-classic-uuid 42ms (41ms|1ms)
+  [+] exports only requested redacted direct-probe diagnostics 57ms (55ms|2ms)
+  [+] propagates requested diagnostic write failure 37ms (36ms|1ms)
+  [+] reports association separately and performs no implicit discovery 66ms (65ms|1ms)
+  [+] rejects an empty auth code before contacting Meta 37ms (36ms|1ms)
+  [+] explains discovery limits without accessing glasses 63ms (62ms|1ms)
+  [+] reports actual scan completion or native failure with a matching exit code 10.06s (10.06s|1ms)
+  [+] performs explicit Classic inquiry without claiming an RFCOMM connection 5.69s (5.69s|1ms)
+  [+] rejects invalid argument sequence --pair-classic extra before scanning 271ms (266ms|5ms)
+  [+] rejects invalid argument sequence --direct-classic-uuid extra before scanning 228ms (227ms|1ms)
+  [+] rejects invalid argument sequence --discover-classic-live extra before scanning 247ms (245ms|1ms)
+  [+] rejects invalid argument sequence --invalid before scanning 132ms (131ms|1ms)
+  [+] rejects invalid argument sequence --discover extra before scanning 72ms (71ms|1ms)
+  [+] rejects invalid argument sequence --help extra before scanning 46ms (46ms|0ms)
+  [+] rejects invalid argument sequence extra --discover before scanning 40ms (39ms|1ms)
+  [+] rejects invalid argument sequence --connect-classic extra before scanning 34ms (33ms|1ms)
+  [+] rejects invalid argument sequence --discover-classic --connect-classic before scanning 37ms (37ms|1ms)
+Tests completed in 17.79s
 Tests Passed: 21, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 Pester v5.7.1
 
 Starting discovery in 1 files.
-Discovery found 4 tests in 26ms.
+Discovery found 4 tests in 14ms.
 Running tests.
 
 Running tests from 'C:\Users\Randy\Coding\meta_g_link_direct\tests\installer.Tests.ps1'
 Describing Installer locations
-  [+] takes system folders from Windows rather than from drive letters 27ms (26ms|1ms)
-  [+] puts the shared plugin folder in the ProgramData folder that Windows reports 264ms (263ms|1ms)
-  [+] derives the OBS folder from obs64.exe on any drive 7ms (2ms|4ms)
-  [+] reads Steam library folders on other drives 56ms (24ms|32ms)
-Tests completed in 537ms
+  [+] takes system folders from Windows rather than from drive letters 137ms (70ms|67ms)
+  [+] puts the shared plugin folder in the ProgramData folder that Windows reports 270ms (269ms|1ms)
+  [+] derives the OBS folder from obs64.exe on any drive 5ms (2ms|3ms)
+  [+] reads Steam library folders on other drives 24ms (24ms|1ms)
+Tests completed in 610ms
 Tests Passed: 4, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0
 
 RESTORATION SHA256 3c848647107aa81a608c37012c488ce412f14e497403a4cef4f571867141de43

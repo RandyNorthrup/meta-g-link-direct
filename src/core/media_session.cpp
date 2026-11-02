@@ -443,10 +443,15 @@ class StreamWatch {
         if (media.linkLost()) {
             return Pump::LinkLost;
         }
-        if (keepalive_.silent()) {
+        // The glasses' answers can pause while the stream carries on, so a streaming session goes
+        // by its media: stalled() catches one that really stopped, after the same wait. Only a
+        // session with no stream to watch goes by the answers alone.
+        const bool streaming = video || audio;
+        if (keepalive_.silent() && !streaming) {
             return Pump::Silent;
         }
-        if (stalled(video || audio)) {
+        noteAnswerPause(keepalive_.silent(), callbacks);
+        if (stalled(streaming)) {
             return Pump::Stalled;
         }
         if (!message || keepalive_.observe(*message)) {
@@ -493,6 +498,15 @@ class StreamWatch {
         return true;
     }
 
+    // Logs each pause in the glasses' answers once, so a later stall can be told from a pause that
+    // did no harm.
+    void noteAnswerPause(bool silent, const MediaCallbacks& callbacks) {
+        if (silent && !answers_paused_) {
+            logLine(callbacks, "The glasses paused their keepalive answers; the stream continues.");
+        }
+        answers_paused_ = silent;
+    }
+
     [[nodiscard]] bool stalled(bool streaming) const {
         constexpr auto StallTimeout = 8s;
         return streaming && std::chrono::steady_clock::now() - last_media_at_ > StallTimeout;
@@ -512,6 +526,7 @@ class StreamWatch {
     }
 
     Keepalive keepalive_;
+    bool answers_paused_ = false;
     Reassembly units_;
     std::set<std::uint16_t> noted_media_;
     std::set<std::uint32_t> noted_other_;
@@ -705,6 +720,8 @@ MediaSession::SessionEnd MediaSession::attemptSession() {
 MediaSession::SessionEnd MediaSession::runSession() {
     attempt_started_ = std::chrono::steady_clock::now();
     setState(MediaState::Connecting);
+    // The system may stop here to ask the user, so the log says why nothing is happening.
+    log("Reading the stored glasses identity; the system may ask you to allow it.");
     const auto identity = identity::loadOwnerIdentity();
     if (!identity) {
         const auto problem = identity::lastStorageProblem();

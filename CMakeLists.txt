@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.28...3.31)
 # std::format, which the core uses, needs macOS 13.3.
 set(CMAKE_OSX_DEPLOYMENT_TARGET "13.3" CACHE STRING "The oldest macOS these binaries run on")
-project(meta_g_link_direct VERSION 0.5.0 LANGUAGES C CXX)
+project(meta_g_link_direct VERSION 0.5.1 LANGUAGES C CXX)
 
 include(CTest)
 set(CMAKE_CXX_STANDARD 20)

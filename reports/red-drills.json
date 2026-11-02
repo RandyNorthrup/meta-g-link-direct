@@ -20,8 +20,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "75a4c1a7aca5d93cd2348a5a1b66d9ed8ca5f8a3190b00d12c619f14ba2b9a86",
-    "recorded_at": "2026-11-02T03:28:53Z"
+    "inputs_sha256": "ad4c2457b64bae5f01571e4316ff69d7dda4156089d5b3846abb7305ddff2802",
+    "recorded_at": "2026-11-02T05:53:04Z"
   },
   {
     "id": "playout-cadence",
@@ -44,8 +44,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "bdbbc7b160981c88791a4584730d15d0626f9595b5258839ecd7a94a0be4a181",
-    "recorded_at": "2026-11-02T03:30:02Z"
+    "inputs_sha256": "35741896880cef44f3d0258e1b788f3432b75a620a691d5c8e3ff50c2c67bddc",
+    "recorded_at": "2026-11-02T05:53:51Z"
   },
   {
     "id": "datax-frame-boundary",
@@ -68,8 +68,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "ebad0f67e8eacb80591e523d7840a087374227d74a070b18e96c99eb42c9c625",
-    "recorded_at": "2026-11-02T03:31:53Z"
+    "inputs_sha256": "74618cb5b0308fdca52c91fae75f2f44d5bb1ba4bda769d7aee5959c9b8f4e02",
+    "recorded_at": "2026-11-02T05:54:36Z"
   },
   {
     "id": "battery-change",
@@ -92,8 +92,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "9dd4d51253c5699c518a1e778c08e7619d3ed3e3d182506cb1ab312cb3827e34",
-    "recorded_at": "2026-11-02T03:34:19Z"
+    "inputs_sha256": "2106d9bead6f3d72138c02bd904a4d0765064d723767e49f0b90985f687290c6",
+    "recorded_at": "2026-11-02T05:55:28Z"
   },
   {
     "id": "buffered-partial-read",
@@ -116,8 +116,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "b664cc41596fd55e4cd0fa541e92e444c4b545de16ea5f1bfd0089ffa1b3ca05",
-    "recorded_at": "2026-11-02T03:36:33Z"
+    "inputs_sha256": "665c9b51342b53e64149504cb1122e918c715a0be4920d5cb1fa45a0d72d90cb",
+    "recorded_at": "2026-11-02T05:56:19Z"
   },
   {
     "id": "login-state",
@@ -140,8 +140,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "d20ecbcd4eee5eab17f98be809246914725f57e1123ce4b7c173a7115845b65c",
-    "recorded_at": "2026-11-02T03:37:59Z"
+    "inputs_sha256": "0ee65648e16145a16d2526cd54cc0ea484c0f9286391284c918d8d14b6a3de8d",
+    "recorded_at": "2026-11-02T05:57:07Z"
   },
   {
     "id": "module-metadata",
@@ -164,8 +164,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "f3904da3be8cb55218b81864f08e7c97c2371ef362eaa04d3f70c37171609680",
-    "recorded_at": "2026-11-02T03:38:50Z"
+    "inputs_sha256": "d9fa66ffcd20bc37353733ecdbc170fe85443e67a917a121f342974a5682d4d5",
+    "recorded_at": "2026-11-02T05:57:52Z"
   },
   {
     "id": "probe-arguments",
@@ -188,8 +188,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "33931667d22e1cf0608e4fa6ca4e377bb13b6cf6adc9b5ae12529585a788fac8",
-    "recorded_at": "2026-11-02T03:40:02Z"
+    "inputs_sha256": "0ab12025017d157ee8106129c6128f8731a6141457f669b09c3bdaa80617b6f4",
+    "recorded_at": "2026-11-02T05:58:57Z"
   },
   {
     "id": "classic-connection-claim",
@@ -212,8 +212,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "6d6e081a467ae2f0190aa5c9aef45f0270b674ad83e08416b579a84744ffaa3a",
-    "recorded_at": "2026-11-02T03:41:27Z"
+    "inputs_sha256": "5a01861eb7c52521add56678905816d3bd8862c8bcf4bf504b3fa481fa8b9938",
+    "recorded_at": "2026-11-02T06:00:12Z"
   },
   {
     "id": "private-address-validation",
@@ -236,8 +236,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "a9b7dceb13883c96f7127455c682450c855ee437b98fa95bcc968bd5e93418a2",
-    "recorded_at": "2026-11-02T03:41:32Z"
+    "inputs_sha256": "87aed3524558a4a6c2b870c73f5689f314d022f16a7dbe157059a2128e7ce9eb",
+    "recorded_at": "2026-11-02T06:00:17Z"
   },
   {
     "id": "uncached-query-loop",
@@ -260,8 +260,8 @@
       "dependencies.lock.json",
       "tests/live.Tests.ps1"
     ],
-    "inputs_sha256": "b65ddf89930d3ea8f534dc2fde71080fd3f84e625bf8cfc004dc4f6698d3e4b4",
-    "recorded_at": "2026-11-02T03:43:08Z"
+    "inputs_sha256": "03521ff7c1fc5a2a3e6e07b7c707d166dc8d4d123e85be1f6c16afbe833de740",
+    "recorded_at": "2026-11-02T06:01:59Z"
   },
   {
     "id": "format",
@@ -282,7 +282,7 @@
       ".clang-format"
     ],
     "inputs_sha256": "72d652f93f6b2fa47b338a5b2b6e0880ed2ffdba33e0ee5d4e27263ed98db21a",
-    "recorded_at": "2026-11-02T03:43:10Z"
+    "recorded_at": "2026-11-02T06:02:04Z"
   },
   {
     "id": "owned-header",
@@ -305,8 +305,8 @@
       "dependencies.lock.json",
       ".clang-tidy"
     ],
-    "inputs_sha256": "ba8cb4edca84cc03f36da6546a804868551b70ac78cc8af0c2094c821945a521",
-    "recorded_at": "2026-11-02T04:02:21Z"
+    "inputs_sha256": "6fb22d7093c16b2f18f7bcb19db9fefaf956dbea057055682b0a3991cce80cef",
+    "recorded_at": "2026-11-02T06:12:31Z"
   },
   {
     "id": "compiler-types",
@@ -328,8 +328,8 @@
       "CMakePresets.json",
       "dependencies.lock.json"
     ],
-    "inputs_sha256": "f3a61a37fbcde9508b041b7578a6fa561e20096b10f0d80ac3c86b08c1ca85c1",
-    "recorded_at": "2026-11-02T04:02:52Z"
+    "inputs_sha256": "1e17740b7011f881f413a83fe6093752f164aae69516ea5f589c521c4a2169ef",
+    "recorded_at": "2026-11-02T06:12:52Z"
   },
   {
     "id": "unused-code",
@@ -352,8 +352,8 @@
       "dependencies.lock.json",
       ".cppcheck-obs.cfg"
     ],
-    "inputs_sha256": "bc27db994eff8c88b8dfdc718fecbfd6426017c59323b41eb863fe3ba34b0a13",
-    "recorded_at": "2026-11-02T04:03:09Z"
+    "inputs_sha256": "8ba81dababe82fcd5cb9be75925a58a48f8365e2311a7995328468d1ae42f351",
+    "recorded_at": "2026-11-02T06:13:19Z"
   },
   {
     "id": "script-analysis",
@@ -373,7 +373,7 @@
       "PSScriptAnalyzerSettings.psd1"
     ],
     "inputs_sha256": "0799799e409deb5d2d94d50ccbd89673fade120e8d776ba284cb5a9e5c504d20",
-    "recorded_at": "2026-11-02T04:03:20Z"
+    "recorded_at": "2026-11-02T06:13:34Z"
   },
   {
     "id": "workflow-security",
@@ -394,7 +394,7 @@
       ".github/workflows"
     ],
     "inputs_sha256": "0f8988f974b95c802eb4e2adadc4efb311c11e3f076e09f36304a3b6fa6a892f",
-    "recorded_at": "2026-11-02T04:03:22Z"
+    "recorded_at": "2026-11-02T06:13:36Z"
   },
   {
     "id": "secret-scanner",
@@ -403,10 +403,10 @@
     "mutated_exit": 1,
     "restored_exit": 0,
     "expected_diagnostic": "leaks found",
-    "observed_diagnostic": "8:03PM WRN leaks found: 1",
+    "observed_diagnostic": "10:13PM WRN leaks found: 1",
     "path": "src/protocol/sdu.cpp",
     "before": "53d659868e94a518e5fb184fdc191d4906d230a224e9639d3704f0c7468ebf47",
-    "mutated": "dfc08678b661b5e868b4d934461762ce237693ead5a9fcf551f5b12165a434d2",
+    "mutated": "a7cf18b76520af957382ddff1d83c58e2e888cbd443349f315e2f55f95a2dcbb",
     "after": "53d659868e94a518e5fb184fdc191d4906d230a224e9639d3704f0c7468ebf47",
     "log": "reports/red/secret-scanner.txt",
     "inputs": [
@@ -415,7 +415,7 @@
       ".gitleaks.toml"
     ],
     "inputs_sha256": "49e92a5787eca867fef504eb1cbec54e4873cbe56c8f788ce2f59e9c07e289a1",
-    "recorded_at": "2026-11-02T04:03:25Z"
+    "recorded_at": "2026-11-02T06:13:39Z"
   },
   {
     "id": "unsafe-copy",
@@ -436,7 +436,7 @@
       ".semgrep.yml"
     ],
     "inputs_sha256": "e55acabd4081af9c672c5fe79e5dcaebd3ae6c9b295f7a54f7a9f18b6fece05a",
-    "recorded_at": "2026-11-02T04:03:42Z"
+    "recorded_at": "2026-11-02T06:13:56Z"
   },
   {
     "id": "duplicated-code",
@@ -459,7 +459,7 @@
       ".jscpd.json"
     ],
     "inputs_sha256": "7249a43288c06f6cc96f9e94a2b87bbc746581f7852794eaa3a93ff589658dd2",
-    "recorded_at": "2026-11-02T04:03:45Z"
+    "recorded_at": "2026-11-02T06:13:59Z"
   },
   {
     "id": "address-sanitizer",
@@ -468,7 +468,7 @@
     "mutated_exit": 1,
     "restored_exit": 0,
     "expected_diagnostic": "AddressSanitizer: heap-buffer-overflow",
-    "observed_diagnostic": "==47664==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x1227fdda0034 at pc 0x7ff7eab253de bp 0x00685e1cfb50 sp 0x00685e1cfb58",
+    "observed_diagnostic": "==36224==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x12bec2ca0034 at pc 0x7ff6f0c153de bp 0x00e27d30fdc0 sp 0x00e27d30fdc8",
     "path": "tests/sdu_tests.cpp",
     "before": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd",
     "mutated": "f0b8a6f71a8f96f071d86024029c536756dd654d9beaea73b9a22d9535147d2e",
@@ -482,8 +482,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "39435066a2e18899ed707e9513f7d38c3c05a6b3b456802ffbe07429fc2accbc",
-    "recorded_at": "2026-11-02T04:04:28Z"
+    "inputs_sha256": "014359aa9e02745c45448230648c465b05a73952599f68d31dc63fccb036cd3b",
+    "recorded_at": "2026-11-02T06:14:29Z"
   },
   {
     "id": "dependency-npm",
@@ -495,7 +495,7 @@
     "observed_diagnostic": "Command Injection in lodash - https://github.com/advisories/GHSA-35jh-r3h4-6jhm",
     "path": "package-lock.json",
     "before": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16",
-    "mutated": "0b646abb587d290bf954bafe5efb38722e2d1e26bee0ddb1660eecdda4d05032",
+    "mutated": "55a94e0ca609f9c43263164d98163a9057daf13c65dd980eccc570ad31f8c11f",
     "after": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16",
     "log": "reports/red/dependency-npm.txt",
     "inputs": [
@@ -504,7 +504,7 @@
       "package.json"
     ],
     "inputs_sha256": "baba6df4eba55450e6dc50a51a7f4c79daf2941e1fe8dd4e75317f152a98f078",
-    "recorded_at": "2026-11-02T04:04:32Z"
+    "recorded_at": "2026-11-02T06:14:33Z"
   },
   {
     "id": "dependency-osv",
@@ -516,7 +516,7 @@
     "observed_diagnostic": "| https://osv.dev/GHSA-35jh-r3h4-6jhm | 7.2  | npm       | lodash (dev) | 4.17.20 | 4.17.21       | package-lock.json |",
     "path": "package-lock.json",
     "before": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16",
-    "mutated": "0b646abb587d290bf954bafe5efb38722e2d1e26bee0ddb1660eecdda4d05032",
+    "mutated": "55a94e0ca609f9c43263164d98163a9057daf13c65dd980eccc570ad31f8c11f",
     "after": "4deb7e5248da52fcdb7385dc9c96f915f841e3509466222990bd7a751770dd16",
     "log": "reports/red/dependency-osv.txt",
     "inputs": [
@@ -525,7 +525,7 @@
       "package.json"
     ],
     "inputs_sha256": "baba6df4eba55450e6dc50a51a7f4c79daf2941e1fe8dd4e75317f152a98f078",
-    "recorded_at": "2026-11-02T04:04:35Z"
+    "recorded_at": "2026-11-02T06:14:36Z"
   },
   {
     "id": "whatif-guard",
@@ -545,7 +545,7 @@
       "tests/runner.Tests.ps1"
     ],
     "inputs_sha256": "1410d7cf24d084dedc94c9fc2f93c7f377fa12e08425a17e0a21d851ff950e70",
-    "recorded_at": "2026-11-02T04:04:44Z"
+    "recorded_at": "2026-11-02T06:14:48Z"
   },
   {
     "id": "native-exit-propagation",
@@ -565,7 +565,7 @@
       "tests/runner.Tests.ps1"
     ],
     "inputs_sha256": "1410d7cf24d084dedc94c9fc2f93c7f377fa12e08425a17e0a21d851ff950e70",
-    "recorded_at": "2026-11-02T04:04:53Z"
+    "recorded_at": "2026-11-02T06:14:58Z"
   },
   {
     "id": "installer-drive-letter",
@@ -586,7 +586,7 @@
       "tests/installer.Tests.ps1"
     ],
     "inputs_sha256": "e607e1b43a56ece365cfe42bf31117f2920cbfe21069a769872ba2835b894436",
-    "recorded_at": "2026-11-02T04:04:59Z"
+    "recorded_at": "2026-11-02T06:15:03Z"
   },
   {
     "id": "drill-reuse",
@@ -606,6 +606,6 @@
       "tests/runner.Tests.ps1"
     ],
     "inputs_sha256": "1410d7cf24d084dedc94c9fc2f93c7f377fa12e08425a17e0a21d851ff950e70",
-    "recorded_at": "2026-11-02T04:05:09Z"
+    "recorded_at": "2026-11-02T06:15:13Z"
   }
 ]
