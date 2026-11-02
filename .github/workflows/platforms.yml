@@ -20,7 +20,7 @@ jobs:
           apt-get update
           apt-get install --yes --no-install-recommends ca-certificates cmake curl g++ git gpg ninja-build pkg-config python3 software-properties-common
           add-apt-repository --yes ppa:obsproject/obs-studio
-          apt-get install --yes --no-install-recommends obs-studio libavcodec-dev libavutil-dev libbluetooth-dev libcurl4-openssl-dev libglib2.0-dev libgtk-3-dev libsecret-1-dev libwebkit2gtk-4.1-dev
+          apt-get install --yes --no-install-recommends obs-studio libavcodec-dev libavutil-dev libbluetooth-dev libcurl4-openssl-dev libglib2.0-dev libgtk-3-dev libsecret-1-dev libsimde-dev libwebkit2gtk-4.1-dev
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false

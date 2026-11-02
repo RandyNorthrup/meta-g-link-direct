@@ -68,7 +68,7 @@ A build needs the OBS it will run in, and links its libobs and FFmpeg. mbedTLS 3
 ```bash
 sudo add-apt-repository ppa:obsproject/obs-studio
 sudo apt install obs-studio cmake ninja-build g++ pkg-config libavcodec-dev libavutil-dev libbluetooth-dev \
-    libcurl4-openssl-dev libglib2.0-dev libgtk-3-dev libsecret-1-dev libwebkit2gtk-4.1-dev
+    libcurl4-openssl-dev libglib2.0-dev libgtk-3-dev libsecret-1-dev libsimde-dev libwebkit2gtk-4.1-dev
 cmake -S . -B out/linux -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DMGL_BUILD_LINK=ON -DMGL_BUILD_OBS_PLUGIN=ON
 cmake --build out/linux && ctest --test-dir out/linux --output-on-failure
 ```
