@@ -30,6 +30,19 @@ inline constexpr std::string_view DefaultArAppToken =
 inline constexpr std::string_view LoginRedirectUri =
     "https://accounts.meta.com/native/oidc/redirect/metaai";
 
+// Meta's token exchange answers any login code it will not exchange (one already used, or one
+// that waited too long) with HTTP 500 and a plain-text body that gives no reason; this is the
+// reason reported for that answer.
+inline constexpr std::string_view RefusedLoginCode =
+    "Meta refused the login code with HTTP 500 and gave no reason";
+
+// Reads Meta's token-exchange reply: the FRLA it carries, or the reason there is none.
+struct ExchangeReply {
+    std::optional<std::string> frla;
+    std::string error;
+};
+[[nodiscard]] ExchangeReply readTokenExchange(unsigned status, std::string_view body);
+
 // The browser login half.
 struct Authorize {
     std::string url;   // the accounts.meta.com page to open

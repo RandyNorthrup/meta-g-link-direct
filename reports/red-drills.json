@@ -20,8 +20,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "ad4c2457b64bae5f01571e4316ff69d7dda4156089d5b3846abb7305ddff2802",
-    "recorded_at": "2026-11-02T05:53:04Z"
+    "inputs_sha256": "c13eb627042595ea41417712bf67b5ff9f7ef477273418c5b4441ea59d1db405",
+    "recorded_at": "2026-11-17T15:26:59Z"
   },
   {
     "id": "playout-cadence",
@@ -44,8 +44,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "35741896880cef44f3d0258e1b788f3432b75a620a691d5c8e3ff50c2c67bddc",
-    "recorded_at": "2026-11-02T05:53:51Z"
+    "inputs_sha256": "790ddf12cf856908be17a04db4109136ed15b0ac78413817ccf4bb66c0ae8ea2",
+    "recorded_at": "2026-11-17T15:27:40Z"
   },
   {
     "id": "datax-frame-boundary",
@@ -68,8 +68,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "74618cb5b0308fdca52c91fae75f2f44d5bb1ba4bda769d7aee5959c9b8f4e02",
-    "recorded_at": "2026-11-02T05:54:36Z"
+    "inputs_sha256": "592ca25e546654038dcaa2d8ebd4d91ebe5aa262245a956daae7604cf77196fe",
+    "recorded_at": "2026-11-17T15:28:21Z"
   },
   {
     "id": "battery-change",
@@ -92,8 +92,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "2106d9bead6f3d72138c02bd904a4d0765064d723767e49f0b90985f687290c6",
-    "recorded_at": "2026-11-02T05:55:28Z"
+    "inputs_sha256": "8d68c6208fe1959dc63db6c2674a3e7d339116069431c2c65da4f41a4cc11cc6",
+    "recorded_at": "2026-11-17T15:29:04Z"
   },
   {
     "id": "buffered-partial-read",
@@ -116,8 +116,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "665c9b51342b53e64149504cb1122e918c715a0be4920d5cb1fa45a0d72d90cb",
-    "recorded_at": "2026-11-02T05:56:19Z"
+    "inputs_sha256": "dc50f5887a7b0ce25a01c688a3f8831836a99b7cdcda3e710874445efe2b4522",
+    "recorded_at": "2026-11-17T15:29:47Z"
   },
   {
     "id": "login-state",
@@ -128,9 +128,9 @@
     "expected_diagnostic": "another login.s address gives no code",
     "observed_diagnostic": "another login's address gives no code: failed",
     "path": "src/core/setup.cpp",
-    "before": "2eddd3b6efef8f91b9fd17e4ba880cc59e63de2a1ba5b0df070b75a900be2c20",
-    "mutated": "ae7b3625799e1fac9e58e4f1601a90a28cda2a5bd4ce60ad548d16e2e6583ca4",
-    "after": "2eddd3b6efef8f91b9fd17e4ba880cc59e63de2a1ba5b0df070b75a900be2c20",
+    "before": "190ef1b9e70fb19593e59933b916884da86a771dd4e132d27edba97b84976297",
+    "mutated": "d8fa362b32811e78c0dc2d80450bc44d0f6e3efe75a0a897cf0fd50187f3911e",
+    "after": "190ef1b9e70fb19593e59933b916884da86a771dd4e132d27edba97b84976297",
     "log": "reports/red/login-state.txt",
     "inputs": [
       "src/core/setup.cpp",
@@ -140,8 +140,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "0ee65648e16145a16d2526cd54cc0ea484c0f9286391284c918d8d14b6a3de8d",
-    "recorded_at": "2026-11-02T05:57:07Z"
+    "inputs_sha256": "281eaa2a10ebf6c2abbcb6cae6d030bdd884f3d419dda8a38773bb1ddedff92c",
+    "recorded_at": "2026-11-17T15:30:31Z"
   },
   {
     "id": "module-metadata",
@@ -164,8 +164,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "d9fa66ffcd20bc37353733ecdbc170fe85443e67a917a121f342974a5682d4d5",
-    "recorded_at": "2026-11-02T05:57:52Z"
+    "inputs_sha256": "6239710c413bc4b7e008e3e98b893dfb460b6779ad505c22b7ab16f309973512",
+    "recorded_at": "2026-11-17T15:31:16Z"
   },
   {
     "id": "probe-arguments",
@@ -188,8 +188,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "0ab12025017d157ee8106129c6128f8731a6141457f669b09c3bdaa80617b6f4",
-    "recorded_at": "2026-11-02T05:58:57Z"
+    "inputs_sha256": "b26bbd7acb60d9a01d415ced2da76e6e2bfa4cedd31fe6a321469267faffd39d",
+    "recorded_at": "2026-11-17T15:32:17Z"
   },
   {
     "id": "classic-connection-claim",
@@ -212,8 +212,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "5a01861eb7c52521add56678905816d3bd8862c8bcf4bf504b3fa481fa8b9938",
-    "recorded_at": "2026-11-02T06:00:12Z"
+    "inputs_sha256": "d946a8ab3b02ae6f645f59339fa312c2c28f5658dbffd13ccaf2452cf8911bcc",
+    "recorded_at": "2026-11-17T15:33:30Z"
   },
   {
     "id": "private-address-validation",
@@ -236,8 +236,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "87aed3524558a4a6c2b870c73f5689f314d022f16a7dbe157059a2128e7ce9eb",
-    "recorded_at": "2026-11-02T06:00:17Z"
+    "inputs_sha256": "fc081c875f81c6412d5b7f0a12ae29da9bb3fb1f5eaa6a2cf3f4a1f5a14c6088",
+    "recorded_at": "2026-11-17T15:33:36Z"
   },
   {
     "id": "uncached-query-loop",
@@ -468,7 +468,7 @@
     "mutated_exit": 1,
     "restored_exit": 0,
     "expected_diagnostic": "AddressSanitizer: heap-buffer-overflow",
-    "observed_diagnostic": "==36224==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x12bec2ca0034 at pc 0x7ff6f0c153de bp 0x00e27d30fdc0 sp 0x00e27d30fdc8",
+    "observed_diagnostic": "==45484==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x11d9dfca0034 at pc 0x7ff755b153de bp 0x0055719dfb90 sp 0x0055719dfb98",
     "path": "tests/sdu_tests.cpp",
     "before": "ecebacb95369954308e0431df4fd8fbfed85275b09e7b1b0be13556494df32fd",
     "mutated": "f0b8a6f71a8f96f071d86024029c536756dd654d9beaea73b9a22d9535147d2e",
@@ -482,8 +482,8 @@
       "dependencies.lock.json",
       "tests"
     ],
-    "inputs_sha256": "014359aa9e02745c45448230648c465b05a73952599f68d31dc63fccb036cd3b",
-    "recorded_at": "2026-11-02T06:14:29Z"
+    "inputs_sha256": "ad198a7258347bdedc5c6bb7f9468261b870b35340a3c4c1af2433e423d2c9b9",
+    "recorded_at": "2026-11-17T15:33:59Z"
   },
   {
     "id": "dependency-npm",

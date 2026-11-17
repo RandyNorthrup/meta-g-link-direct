@@ -421,7 +421,8 @@ class SetupWindow {
                 L"1.  Select Open the login in your browser, and log in.\r\n"
                 L"2.  When the login has finished, copy the whole address from the browser's "
                 L"address bar.\r\n"
-                L"3.  Paste it in the box below and select Continue.");
+                L"3.  Paste it in the box below and select Continue, within a minute or two: "
+                L"Meta refuses a login code that waited longer.");
             setButtons(L"Continue", L"Cancel");
             break;
         case Screen::Working:

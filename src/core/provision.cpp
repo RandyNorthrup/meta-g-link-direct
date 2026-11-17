@@ -38,6 +38,8 @@ constexpr std::string_view UserAgent =
     "Dalvik/2.1.0 (Linux; U; Android 15) "
     "[FBAN/Stella;FBAV/289.0.0.25.162;FBSN/Android;FBSV/15;FBLC/en_US]";
 constexpr std::string_view FormUrlEncoded = "application/x-www-form-urlencoded";
+constexpr unsigned HttpErrorStatus = 400;
+constexpr unsigned HttpServerError = 500;
 
 constexpr std::uint16_t IdentityService = 36;
 constexpr std::uint16_t MtIdentityRequest = 0x3000;
@@ -158,9 +160,9 @@ std::vector<std::pair<std::string, std::string>> commonFields(const std::string&
     };
 }
 
-std::optional<json::Value> postForm(std::string_view url,
-                                    const std::vector<std::pair<std::string, std::string>>& fields,
-                                    bool gzip_body, std::string& error) {
+http::Reply sendForm(std::string_view url,
+                     const std::vector<std::pair<std::string, std::string>>& fields,
+                     bool gzip_body) {
     const auto encoded = encoding::formUrlEncode(fields);
     if (httpDebug()) {
         debugRequest(url, fields);
@@ -173,28 +175,42 @@ std::optional<json::Value> postForm(std::string_view url,
     if (gzip_body) {
         headers.emplace_back("Content-Encoding", "gzip");
     }
-    const auto reply = http::post(url, headers, body, UserAgent);
+    auto reply = http::post(url, headers, body, UserAgent);
     if (httpDebug()) {
         debugReply("[reply]", reply.status, reply.body);
     }
-    if (reply.status == 0) {
+    return reply;
+}
+
+// A Meta form reply as JSON, or nullopt with the reason: no answer, a body that is not JSON, or an
+// HTTP error status (with Meta's own message when the body carries one).
+std::optional<json::Value> readJsonReply(unsigned status, std::string_view body,
+                                         std::string& error) {
+    if (status == 0) {
         error = "network error contacting Meta";
         return std::nullopt;
     }
-    auto parsed = json::parse(toString(reply.body));
+    auto parsed = json::parse(body);
     if (!parsed) {
-        error = "Meta returned a non-JSON body (HTTP " + std::to_string(reply.status) + ")";
+        error = "Meta returned a non-JSON body (HTTP " + std::to_string(status) + ")";
         return std::nullopt;
     }
-    if (reply.status >= 400) {
+    if (status >= HttpErrorStatus) {
         if (const auto* err = parsed->at("error")) {
-            error = err->stringAt("message").value_or("Meta HTTP " + std::to_string(reply.status));
+            error = err->stringAt("message").value_or("Meta HTTP " + std::to_string(status));
         } else {
-            error = "Meta HTTP " + std::to_string(reply.status);
+            error = "Meta HTTP " + std::to_string(status);
         }
         return std::nullopt;
     }
     return parsed;
+}
+
+std::optional<json::Value> postForm(std::string_view url,
+                                    const std::vector<std::pair<std::string, std::string>>& fields,
+                                    bool gzip_body, std::string& error) {
+    const auto reply = sendForm(url, fields, gzip_body);
+    return readJsonReply(reply.status, toString(reply.body), error);
 }
 
 // Await one svc36 message of the given type; fills payload. Returns false on timeout or a status
@@ -261,6 +277,29 @@ Authorize authorizeRequest() {
     };
 }
 
+ExchangeReply readTokenExchange(unsigned status, std::string_view body) {
+    ExchangeReply result;
+    // Meta answers a code it will not exchange with HTTP 500 and the plain text "Internal Server
+    // Error", not a JSON error. A code already exchanged once gets exactly this answer, and so
+    // do a code exchanged 10 minutes after its login and a made-up one, so it does not say why.
+    if (status == HttpServerError && !json::parse(body)) {
+        result.error = std::string(RefusedLoginCode);
+        return result;
+    }
+    const auto parsed = readJsonReply(status, body, result.error);
+    if (!parsed) {
+        return result;
+    }
+    auto token = parsed->stringAt("access_token");
+    // user_id comes back as a JSON number, so require only its presence, not a string.
+    if (!token || token->empty() || parsed->at("user_id") == nullptr) {
+        result.error = "token-exchange returned no access_token/user_id (the code may be stale)";
+        return result;
+    }
+    result.frla = std::move(token);
+    return result;
+}
+
 namespace {
 std::optional<std::string> exchangeCode(const std::string& code, std::string& error) {
     const std::vector<std::pair<std::string, std::string>> fields{
@@ -268,17 +307,12 @@ std::optional<std::string> exchangeCode(const std::string& code, std::string& er
         {"oidc_auth_code", code},
         {"redirect_uri", std::string(LoginRedirectUri)},
     };
-    const auto parsed = postForm(ExchangeUrl, fields, false, error);
-    if (!parsed) {
-        return std::nullopt;
+    const auto reply = sendForm(ExchangeUrl, fields, false);
+    auto exchanged = readTokenExchange(reply.status, toString(reply.body));
+    if (!exchanged.frla) {
+        error = std::move(exchanged.error);
     }
-    auto token = parsed->stringAt("access_token");
-    // user_id comes back as a JSON number, so require only its presence, not a string.
-    if (!token || token->empty() || parsed->at("user_id") == nullptr) {
-        error = "token-exchange returned no access_token/user_id (the code may be stale)";
-        return std::nullopt;
-    }
-    return token; // the FRLA
+    return std::move(exchanged.frla);
 }
 
 // FRLA -> AR-universe user token via ar.graph.meta.com/login. The AR app token (caller-supplied,

@@ -69,6 +69,13 @@ Outcome runSetup(const std::string& auth_code) {
     const auto auth = provision::authenticate(auth_code, ar_tokens);
     if (!auth.error.empty()) {
         outcome.auth_error = auth.error;
+        if (auth.error == provision::RefusedLoginCode) {
+            return stopped(std::move(outcome),
+                           "Meta refused the login (HTTP 500) before this computer contacted the "
+                           "glasses, and gave no reason. Select Try again to log in once more. If "
+                           "it happens again, report it with the glasses' model and how you "
+                           "logged in (Meta account, Facebook or Instagram).");
+        }
         return stopped(std::move(outcome), "Meta did not accept the login (" + auth.error +
                                                "). Try again with a fresh login.");
     }

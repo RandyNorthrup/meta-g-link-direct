@@ -2,6 +2,13 @@
 
 All notable changes are recorded here. The project follows [semantic versioning](https://semver.org/); versions below 1.0 are beta releases.
 
+## [Unreleased]
+
+### Changed
+
+- **Setup explains Meta's HTTP 500 at login** ([#7](https://github.com/RandyNorthrup/meta-g-link-direct/issues/7)). When Meta refuses the login code, it answers HTTP 500 with no reason, and setup said *Meta returned a non-JSON body (HTTP 500)*. It now says Meta refused the login before the glasses were contacted, and what to try. Meta gives this answer to a code sent twice, to a code sent 10 minutes after the login and to a made-up one; a real code still worked 2 minutes after the login.
+- **The paste-the-address screen asks for the address within a minute or two**, because Meta refuses a login code that has waited too long. This screen appears only when the login cannot be shown inside the setup window.
+
 ## [0.5.1] - 2026-11-01 (beta)
 
 ### Fixed

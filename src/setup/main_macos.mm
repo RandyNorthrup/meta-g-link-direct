@@ -174,10 +174,12 @@ NSString* text(const std::string& value) { return [NSString stringWithUTF8String
         break;
     case Screen::Paste:
         _heading.stringValue = @"Log in to Meta in your browser";
-        _body.stringValue = @"1.  Select Open the login in your browser, and log in.\n"
-                            @"2.  When the login has finished, copy the whole address from the "
-                            @"browser's address bar.\n"
-                            @"3.  Paste it in the box below and select Continue.";
+        _body.stringValue =
+            @"1.  Select Open the login in your browser, and log in.\n"
+            @"2.  When the login has finished, copy the whole address from the "
+            @"browser's address bar.\n"
+            @"3.  Paste it in the box below and select Continue, within a minute or two: "
+            @"Meta refuses a login code that waited longer.";
         [self setPrimary:@"Continue" secondary:@"Cancel"];
         break;
     case Screen::Working:

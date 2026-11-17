@@ -185,7 +185,9 @@ class SetupWindow {
             gtk_label_set_text(body_, "1.  Select Open the login in your browser, and log in.\n"
                                       "2.  When the login has finished, copy the whole address "
                                       "from the browser's address bar.\n"
-                                      "3.  Paste it in the box below and select Continue.");
+                                      "3.  Paste it in the box below and select Continue, "
+                                      "within a minute or two: Meta refuses a login "
+                                      "code that waited longer.");
             setButtons("_Continue", "C_ancel");
             break;
         case Screen::Working:
